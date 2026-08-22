@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trey - Network Engineering &amp; Cybersecurity Portfolio</title>
+  <meta name="description" content="Portfolio and lab notes of a CCNA-certified network engineer: routing and switching labs, Python network automation projects, and security write-ups.">
+  <link rel="canonical" href="https://breakfixlearn.com/">
+  <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+
+  <!-- Open Graph / social sharing -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Trey - Network Engineering &amp; Cybersecurity">
+  <meta property="og:description" content="CCNA labs, Python network automation, and security write-ups.">
+  <meta property="og:url" content="https://breakfixlearn.com/">
+  <meta name="twitter:card" content="summary">
+
+  <!-- Structured data for search engines -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Trey",
+    "url": "https://breakfixlearn.com/",
+    "jobTitle": "CCNA-Certified Network Engineer",
+    "knowsAbout": ["Networking", "Cybersecurity", "Python", "Cisco IOS", "Network Automation"]
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Home">
+      <span class="prompt">Trey@lab</span>:<span class="host">~</span>$ <span aria-hidden="true">_</span>
+    </a>
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="index.html" aria-current="page">home</a>
+      <a href="projects.html">projects</a>
+      <a href="blog.html">blog</a>
+      <a href="index.html#about">about</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ HERO: live IOS session ============ -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="terminal" aria-label="Terminal introduction">
+        <div class="terminal-bar">
+          <span class="dot" aria-hidden="true"></span>
+          <span class="dot" aria-hidden="true"></span>
+          <span class="dot" aria-hidden="true"></span>
+          <span>ssh Trey@edge-router</span>
+        </div>
+        <!-- JS types this out; noscript/reduced-motion users see it instantly -->
+        <div class="terminal-body" id="terminal-output" aria-live="polite">
+          <noscript><span class="prompt">edge-router&gt;</span> <span class="cmd">enable</span>
+<span class="prompt">edge-router#</span> <span class="cmd">show portfolio brief</span>
+<span class="key">Name       :</span> <span class="val">Trey</span>
+<span class="key">Focus      :</span> <span class="val">Network Engineering · Cybersecurity</span>
+<span class="key">Certs      :</span> <span class="val">CCNA</span>
+<span class="key">Learning   :</span> <span class="val">Python for network automation</span>
+<span class="key">Location   :</span> <span class="val">Vancouver, BC</span>
+<span class="key">Status     :</span> <span class="up">up/up - open to opportunities</span></noscript>
+        </div>
+      </div>
+
+      <h1 class="hero-title"><span class="mono">Trey</span> - network engineering &amp; cybersecurity, documented from the lab up.</h1>
+
+      <p class="hero-tagline">
+        I build and break networks in the lab so I understand them in production.
+        This site documents my <strong>CCNA labs</strong>, my
+        <strong>Python automation tools</strong>, and the
+        <strong>security research</strong> I do along the way.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ PROJECTS as show ip interface brief ============ -->
+  <section class="section" id="projects">
+    <div class="wrap">
+      <h2 class="cmd-heading">
+        <span class="prompt">edge-router#</span><span class="verb">show</span> projects brief
+      </h2>
+
+      <div class="int-table-scroll">
+        <table class="int-brief">
+          <thead>
+            <tr>
+              <th scope="col">Project</th>
+              <th scope="col">Status</th>
+              <th scope="col">Protocol</th>
+              <th scope="col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="int-name"><a href="projects.html#ospf-lab">Lab-OSPF-01</a></td>
+              <td><span class="status up">up</span></td>
+              <td><span class="status up">up</span></td>
+              <td class="int-desc">Multi-area OSPF topology with route summarization and virtual links (Packet Tracer + real IOS).</td>
+            </tr>
+            <tr>
+              <td class="int-name"><a href="projects.html#subnet-tool">Py-SubnetCalc</a></td>
+              <td><span class="status up">up</span></td>
+              <td><span class="status up">up</span></td>
+              <td class="int-desc">Python CLI that plans VLSM subnetting from a requirements file - my first automation tool.</td>
+            </tr>
+            <tr>
+              <td class="int-name"><a href="projects.html#config-backup">Py-ConfigBackup</a></td>
+              <td><span class="status up">up</span></td>
+              <td><span class="status prog">down</span></td>
+              <td class="int-desc">Netmiko script that backs up running-configs over SSH and diffs them nightly. (In progress.)</td>
+            </tr>
+            <tr>
+              <td class="int-name"><a href="projects.html#soc-lab">SOC-HomeLab</a></td>
+              <td><span class="status prog">up</span></td>
+              <td><span class="status prog">down</span></td>
+              <td class="int-desc">Home SOC: pfSense, Suricata IDS, and a log pipeline for detection practice. (In progress.)</td>
+            </tr>
+            <tr>
+              <td class="int-name"><a href="projects.html#ccna-notes">CCNA-Notes</a></td>
+              <td><span class="status admin">admin down</span></td>
+              <td><span class="status admin">down</span></td>
+              <td class="int-desc">Public study notes and flashcard deck from my CCNA pass. (Planned.)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="legend">
+        Status codes: <span class="up">up/up</span> = shipped ·
+        <span class="prog">up/down</span> = in progress ·
+        <span class="admin">admin down</span> = planned
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ BLOG as syslog feed ============ -->
+  <section class="section" id="blog-feed">
+    <div class="wrap">
+      <h2 class="cmd-heading">
+        <span class="prompt">edge-router#</span><span class="verb">show</span> logging | include BLOG
+      </h2>
+
+      <div class="syslog">
+        <a class="syslog-line" href="blog/building-my-first-ospf-lab.html">
+          <span class="ts">Aug 12 2026 09:41:07</span>
+          <span class="fac cat-lab">%BLOG-6-LAB:</span>
+          <span class="msg">Building my first multi-area OSPF lab (and the LSAs that confused me)</span>
+          <span class="summary">Topology, addressing plan, and the three mistakes that taught me more than the textbook did.</span>
+        </a>
+        <a class="syslog-line" href="blog.html">
+          <span class="ts">Aug 03 2026 21:15:33</span>
+          <span class="fac cat-sec">%BLOG-5-SEC:</span>
+          <span class="msg">Security news digest: what I learned from this month's advisories</span>
+          <span class="summary">A plain-language breakdown of recent vulnerabilities that matter for network gear.</span>
+        </a>
+        <a class="syslog-line" href="blog.html">
+          <span class="ts">Jul 24 2026 18:02:51</span>
+          <span class="fac cat-python">%BLOG-6-PYTHON:</span>
+          <span class="msg">Automating my lab backups with Netmiko in 60 lines of Python</span>
+          <span class="summary">From "SSH by hand into five routers" to one script and a cron job.</span>
+        </a>
+      </div>
+
+      <p class="mt-1"><a class="mono" href="blog.html">show logging | full →</a></p>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT as running-config ============ -->
+  <section class="section" id="about">
+    <div class="wrap">
+      <h2 class="cmd-heading">
+        <span class="prompt">edge-router#</span><span class="verb">show</span> running-config | section me
+      </h2>
+
+      <div class="about-grid">
+        <div>
+          <p>
+            I'm a <strong>CCNA-certified</strong> network engineer with a growing focus
+            on <strong>network security</strong>. I learn by building: every new topic
+            becomes a lab, and every repetitive lab task becomes a Python script.
+          </p>
+          <p>
+            Right now I'm deep in routing protocols, VLAN design, and using
+            <strong>Python (Netmiko, ipaddress, scapy)</strong> to automate the boring
+            parts of network administration. On the security side, I run a small home SOC
+            and write up what I find here on the blog.
+          </p>
+          <p class="mono contact-line">
+            contact: <a href="mailto:treyrct858@gmail.com">treyrct858@gmail.com</a> ·
+            <a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a> ·
+            <a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a>
+          </p>
+        </div>
+
+        <pre class="runcfg" aria-label="Skills summary formatted as a router configuration"><span class="cm">! skills snapshot</span>
+<span class="kw">hostname</span> <span class="val">Trey</span>
+<span class="kw">certification</span> <span class="val">ccna active</span>
+<span class="kw">routing</span> <span class="val">ospf eigrp static</span>
+<span class="kw">switching</span> <span class="val">vlan stp etherchannel</span>
+<span class="kw">language</span> <span class="val">python 3</span>
+ <span class="kw">library</span> <span class="val">netmiko ipaddress scapy</span>
+<span class="kw">security</span> <span class="val">acl suricata pfSense</span>
+<span class="cm">! end</span></pre>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>© 2026 Trey · built by hand, no trackers, no cookies</span>
+    <span>uptime: learning since 2024 · <a href="/feed.xml">rss feed</a></span>
+  </div>
+</footer>
+
+<script src="js/main.js" defer></script>
+</body>
+</html>

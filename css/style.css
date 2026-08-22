@@ -1,0 +1,484 @@
+/* ============================================================
+   NETFOLIO - Cisco IOS design system
+   Palette: Cisco midnight navy / Cisco sky blue / status green
+   ============================================================ */
+
+:root {
+  --navy-950: #071A33;   /* page background        */
+  --navy-900: #0B2240;   /* section background     */
+  --navy-800: #10305A;   /* panels / cards         */
+  --navy-700: #1E4471;   /* borders / raised edges */
+  --cisco-sky: #049FD9;  /* Cisco brand blue       */
+  --cisco-sky-dim: #037CB0;
+  --ice: #CDE9F6;        /* primary text           */
+  --ice-dim: #8FB8CF;    /* secondary text         */
+  --status-up: #6CC04A;  /* up/up                  */
+  --amber: #FBAB2C;      /* in-progress / warning  */
+  --down: #E2231A;       /* Cisco red - admin down */
+
+  --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", "Fira Code",
+          Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+          Arial, sans-serif;
+
+  --radius: 6px;
+  --max-w: 68rem;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--navy-950);
+  color: var(--ice);
+  font-family: var(--sans);
+  font-size: 1rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- utilities ---------- */
+.wrap {
+  max-width: var(--max-w);
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+.mono { font-family: var(--mono); }
+
+a { color: var(--cisco-sky); text-decoration: none; }
+a:hover, a:focus-visible { text-decoration: underline; }
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--cisco-sky);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+::selection { background: var(--cisco-sky); color: var(--navy-950); }
+
+/* ---------- header / nav ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(7, 26, 51, 0.92);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--navy-700);
+}
+
+.site-header .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.8rem;
+}
+
+.brand {
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  color: var(--ice);
+  white-space: nowrap;
+}
+.brand .prompt { color: var(--status-up); }
+.brand .host   { color: var(--cisco-sky); }
+
+.site-nav { display: flex; gap: 1.4rem; }
+.site-nav a {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--ice-dim);
+  letter-spacing: 0.03em;
+}
+.site-nav a[aria-current="page"],
+.site-nav a:hover { color: var(--cisco-sky); }
+
+/* ---------- terminal hero ---------- */
+.hero { padding-block: 4.5rem 3.5rem; }
+
+.terminal {
+  background: #05121F;
+  border: 1px solid var(--navy-700);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45),
+              0 0 0 1px rgba(4, 159, 217, 0.08);
+  overflow: hidden;
+}
+
+.terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.9rem;
+  background: var(--navy-900);
+  border-bottom: 1px solid var(--navy-700);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--ice-dim);
+}
+.terminal-bar .dot {
+  width: 0.65rem; height: 0.65rem;
+  border-radius: 50%;
+  background: var(--navy-700);
+}
+.terminal-bar .dot:first-child { background: var(--cisco-sky-dim); }
+
+.terminal-body {
+  padding: 1.4rem 1.2rem 1.6rem;
+  font-family: var(--mono);
+  font-size: clamp(0.8rem, 2.3vw, 0.95rem);
+  line-height: 1.8;
+  min-height: 16rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.terminal-body .cmd    { color: var(--ice); }
+.terminal-body .prompt { color: var(--status-up); }
+.terminal-body .key    { color: var(--ice-dim); }
+.terminal-body .val    { color: var(--cisco-sky); }
+.terminal-body .up     { color: var(--status-up); }
+
+.cursor {
+  display: inline-block;
+  width: 0.55em; height: 1.1em;
+  vertical-align: text-bottom;
+  background: var(--cisco-sky);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cursor { animation: blink 1.05s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+}
+
+.hero-tagline {
+  margin-top: 1.6rem;
+  max-width: 44rem;
+  color: var(--ice-dim);
+  font-size: 1.05rem;
+}
+.hero-tagline strong { color: var(--ice); font-weight: 600; }
+
+/* ---------- section headings styled as IOS commands ---------- */
+.section { padding-block: 3.2rem; }
+.section + .section { border-top: 1px solid var(--navy-800); }
+
+.cmd-heading {
+  font-family: var(--mono);
+  font-size: clamp(1.05rem, 3vw, 1.35rem);
+  font-weight: 600;
+  margin: 0 0 1.6rem;
+  color: var(--ice);
+}
+.cmd-heading .prompt { color: var(--status-up); margin-right: 0.4em; }
+.cmd-heading .verb   { color: var(--cisco-sky); }
+
+/* ---------- interface-brief project table ---------- */
+.int-table-scroll { overflow-x: auto; }
+
+table.int-brief {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  min-width: 42rem;
+}
+.int-brief th {
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  color: var(--ice-dim);
+  font-weight: 600;
+  border-bottom: 1px solid var(--navy-700);
+  white-space: nowrap;
+}
+.int-brief td {
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--navy-800);
+  vertical-align: top;
+}
+.int-brief tr:hover td { background: rgba(4, 159, 217, 0.06); }
+
+.int-name a { color: var(--ice); font-weight: 600; }
+.int-name a:hover { color: var(--cisco-sky); }
+.int-desc { color: var(--ice-dim); font-family: var(--sans); font-size: 0.88rem; }
+
+.status { font-weight: 600; white-space: nowrap; }
+.status.up    { color: var(--status-up); }
+.status.prog  { color: var(--amber); }
+.status.admin { color: var(--down); }
+
+.legend {
+  margin-top: 1rem;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--ice-dim);
+}
+.legend .up    { color: var(--status-up); }
+.legend .prog  { color: var(--amber); }
+.legend .admin { color: var(--down); }
+
+/* ---------- project cards (projects page detail) ---------- */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+  gap: 1.1rem;
+}
+
+.card {
+  background: var(--navy-900);
+  border: 1px solid var(--navy-700);
+  border-radius: var(--radius);
+  padding: 1.2rem 1.25rem 1.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.card h3 {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 1rem;
+  color: var(--ice);
+}
+.card p { margin: 0; color: var(--ice-dim); font-size: 0.92rem; }
+.card .meta {
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  padding-top: 0.5rem;
+}
+.tag {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  padding: 0.18rem 0.55rem;
+  border: 1px solid var(--navy-700);
+  border-radius: 999px;
+  color: var(--cisco-sky);
+  white-space: nowrap;
+}
+
+/* ---------- syslog-style blog index ---------- */
+.syslog { display: flex; flex-direction: column; gap: 0.35rem; }
+
+.syslog-line {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  color: var(--ice);
+  line-height: 1.7;
+}
+.syslog-line:hover {
+  background: var(--navy-900);
+  border-color: var(--navy-700);
+  text-decoration: none;
+}
+.syslog-line .ts  { color: var(--ice-dim); }
+.syslog-line .fac { color: var(--cisco-sky); }
+.syslog-line .msg { color: var(--ice); }
+.syslog-line:hover .msg { text-decoration: underline; }
+.syslog-line .summary {
+  display: block;
+  font-family: var(--sans);
+  color: var(--ice-dim);
+  font-size: 0.85rem;
+  margin-top: 0.15rem;
+}
+
+/* ---------- blog article ---------- */
+.article { max-width: 46rem; padding-block: 3.5rem; }
+.article h1 {
+  font-family: var(--mono);
+  font-size: clamp(1.4rem, 4vw, 1.9rem);
+  line-height: 1.3;
+  margin: 0.4rem 0 0.6rem;
+}
+.article .post-meta {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--ice-dim);
+  margin-bottom: 2rem;
+}
+.article h2 {
+  font-family: var(--mono);
+  font-size: 1.15rem;
+  color: var(--cisco-sky);
+  margin-top: 2.2rem;
+}
+.article p, .article li { color: var(--ice); }
+.article code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--navy-900);
+  border: 1px solid var(--navy-700);
+  border-radius: 4px;
+  padding: 0.1em 0.4em;
+}
+.article pre {
+  background: #05121F;
+  border: 1px solid var(--navy-700);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+}
+.article pre code { background: none; border: 0; padding: 0; }
+
+/* ---------- about block ---------- */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 2.2rem;
+  align-items: start;
+}
+@media (max-width: 46rem) {
+  .about-grid { grid-template-columns: 1fr; }
+}
+
+.runcfg {
+  background: #05121F;
+  border: 1px solid var(--navy-700);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.2rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1.9;
+  color: var(--ice-dim);
+  overflow-x: auto;
+}
+.runcfg .kw  { color: var(--cisco-sky); }
+.runcfg .val { color: var(--ice); }
+.runcfg .cm  { color: var(--status-up); }
+
+/* ---------- footer ---------- */
+.site-footer {
+  border-top: 1px solid var(--navy-700);
+  margin-top: 3rem;
+  padding-block: 2rem 2.5rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--ice-dim);
+}
+.site-footer .wrap {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.site-footer a { color: var(--ice-dim); }
+.site-footer a:hover { color: var(--cisco-sky); }
+
+/* ---------- small screens ---------- */
+@media (max-width: 40rem) {
+  .site-nav { gap: 0.9rem; }
+  .hero { padding-block: 2.8rem 2.4rem; }
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- utility classes (replace inline styles for strict CSP) ---------- */
+.mt-1 { margin-top: 1.4rem; }
+.mt-2 { margin-top: 1.6rem; }
+.mt-3 { margin-top: 2.5rem; }
+.contact-line { font-size: 0.85rem; }
+.page-intro {
+  color: var(--ice-dim);
+  max-width: 44rem;
+  margin-top: -0.6rem;
+  margin-bottom: 1.8rem;
+}
+.post-eyebrow {
+  color: var(--cisco-sky);
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.hero-title {
+  margin: 2rem 0 0.4rem;
+  font-family: var(--sans);
+  font-weight: 650;
+  font-size: clamp(1.25rem, 3.4vw, 1.7rem);
+  line-height: 1.35;
+  max-width: 46rem;
+  color: var(--ice);
+}
+.hero-title .mono { color: var(--cisco-sky); }
+
+/* ---------- category filter bar (IOS pipe-filter style) ---------- */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: -0.6rem 0 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--ice-dim);
+}
+.filter-bar .pipe { color: var(--ice-dim); user-select: none; }
+
+.filter-btn {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  padding: 0.3rem 0.8rem;
+  background: transparent;
+  color: var(--ice-dim);
+  border: 1px solid var(--navy-700);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.filter-btn:hover { color: var(--cisco-sky); border-color: var(--cisco-sky-dim); }
+.filter-btn[aria-pressed="true"] {
+  color: var(--navy-950);
+  background: var(--cisco-sky);
+  border-color: var(--cisco-sky);
+  font-weight: 600;
+}
+
+.filter-current { color: var(--amber); }
+
+.filter-empty {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--ice-dim);
+  padding: 0.9rem;
+}
+
+/* category label inside a syslog facility */
+.fac.cat-sec    { color: var(--amber); }
+.fac.cat-lab    { color: var(--cisco-sky); }
+.fac.cat-python { color: var(--status-up); }
+
+/* ---------- blog post images (responsive WebP via tools/imgprep.py) ---------- */
+.post-figure {
+  margin: 1.8rem 0;
+}
+.post-figure img {
+  display: block;
+  width: 100%;
+  height: auto;             /* with width/height attrs set: no layout shift */
+  border: 1px solid var(--navy-700);
+  border-radius: var(--radius);
+  background: #05121F;      /* letterbox color while lazy-loading */
+}
+.post-figure figcaption {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--ice-dim);
+  margin-top: 0.5rem;
+}
+.post-figure figcaption::before {
+  content: "! ";
+  color: var(--status-up);  /* IOS comment-style caption */
+}

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects - Trey | Networking &amp; Cybersecurity Labs</title>
+  <meta name="description" content="Networking and cybersecurity projects: OSPF labs, Python network automation with Netmiko, VLSM subnet tools, and a home SOC lab.">
+  <link rel="canonical" href="https://breakfixlearn.com/projects.html">
+  <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Projects - Trey">
+  <meta property="og:description" content="OSPF labs, Python network automation, and a home SOC.">
+  <meta property="og:url" content="https://breakfixlearn.com/projects.html">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Home">
+      <span class="prompt">Trey@lab</span>:<span class="host">~</span>$ <span aria-hidden="true">_</span>
+    </a>
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="index.html">home</a>
+      <a href="projects.html" aria-current="page">projects</a>
+      <a href="blog.html">blog</a>
+      <a href="index.html#about">about</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="section" data-filter-group>
+    <div class="wrap">
+      <h1 class="cmd-heading">
+        <span class="prompt">edge-router#</span><span class="verb">show</span> projects detail<span class="filter-current" aria-hidden="true"></span>
+      </h1>
+
+      <div class="filter-bar" hidden>
+        <span class="pipe" aria-hidden="true">|</span>
+        <span id="proj-filter-label">include:</span>
+        <button type="button" class="filter-btn" data-filter="all" aria-pressed="true" aria-describedby="proj-filter-label">all</button>
+        <button type="button" class="filter-btn" data-filter="routing" aria-pressed="false" aria-describedby="proj-filter-label">ROUTING &amp; switching</button>
+        <button type="button" class="filter-btn" data-filter="automation" aria-pressed="false" aria-describedby="proj-filter-label">AUTOMATION · python</button>
+        <button type="button" class="filter-btn" data-filter="security" aria-pressed="false" aria-describedby="proj-filter-label">SECURITY · blue team</button>
+      </div>
+
+      <div class="card-grid">
+
+        <article class="card" data-cat="routing" id="ospf-lab">
+          <h3>Lab-OSPF-01 <span class="status up">· up/up</span></h3>
+          <p>
+            A three-area OSPF topology built first in Packet Tracer, then rebuilt on
+            real IOS images. Covers ABRs, route summarization, a virtual link, and
+            passive interfaces. Includes the full addressing plan and verification
+            command cheat-sheet.
+          </p>
+          <div class="meta">
+            <span class="tag">OSPF</span><span class="tag">Packet Tracer</span><span class="tag">IOS</span>
+          </div>
+        </article>
+
+        <article class="card" data-cat="automation" id="subnet-tool">
+          <h3>Py-SubnetCalc <span class="status up">· up/up</span></h3>
+          <p>
+            A Python CLI that reads a list of departments and host counts, then produces
+            an optimal VLSM plan using the <code class="mono">ipaddress</code> standard
+            library. Built to stop making subnetting mistakes by hand - and to learn
+            argparse properly.
+          </p>
+          <div class="meta">
+            <span class="tag">Python</span><span class="tag">ipaddress</span><span class="tag">VLSM</span>
+          </div>
+        </article>
+
+        <article class="card" data-cat="automation" id="config-backup">
+          <h3>Py-ConfigBackup <span class="status prog">· up/down</span></h3>
+          <p>
+            Netmiko script that connects to every device in an inventory file over SSH,
+            pulls the running-config, timestamps it, and produces a diff against the
+            previous backup. Currently adding email alerts when a config changes.
+          </p>
+          <div class="meta">
+            <span class="tag">Python</span><span class="tag">Netmiko</span><span class="tag">SSH</span><span class="tag">Automation</span>
+          </div>
+        </article>
+
+        <article class="card" data-cat="security" id="soc-lab">
+          <h3>SOC-HomeLab <span class="status prog">· up/down</span></h3>
+          <p>
+            A segmented home lab behind pfSense with Suricata IDS on the WAN edge and a
+            log pipeline for practicing detection and alert triage. Blog write-ups cover
+            each stage of the build and the first real alerts it caught.
+          </p>
+          <div class="meta">
+            <span class="tag">pfSense</span><span class="tag">Suricata</span><span class="tag">Blue team</span>
+          </div>
+        </article>
+
+        <article class="card" data-cat="routing" id="ccna-notes">
+          <h3>CCNA-Notes <span class="status admin">· admin down</span></h3>
+          <p>
+            My complete CCNA study notes, lab files, and spaced-repetition flashcard
+            deck, all verified against the real exam. Cleaning them up for
+            publication.
+          </p>
+          <div class="meta">
+            <span class="tag">CCNA</span><span class="tag">Study notes</span>
+          </div>
+        </article>
+
+      </div>
+
+      <p class="filter-empty" hidden>% No projects match this filter yet.</p>
+
+      <p class="legend mt-2">
+        Status codes: <span class="up">up/up</span> = shipped ·
+        <span class="prog">up/down</span> = in progress ·
+        <span class="admin">admin down</span> = planned
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>© 2026 Trey · built by hand, no trackers, no cookies</span>
+    <span><a href="index.html">exit →</a></span>
+  </div>
+</footer>
+
+<script src="js/filter.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog - Trey | Security News &amp; Network Lab Notes</title>
+  <meta name="description" content="Security news breakdowns, network lab walkthroughs, and Python automation notes from a CCNA-certified engineer.">
+  <link rel="canonical" href="https://breakfixlearn.com/blog.html">
+  <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Blog - Trey">
+  <meta property="og:description" content="Security news breakdowns, CCNA labs, Python automation notes.">
+  <meta property="og:url" content="https://breakfixlearn.com/blog.html">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Home">
+      <span class="prompt">Trey@lab</span>:<span class="host">~</span>$ <span aria-hidden="true">_</span>
+    </a>
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="index.html">home</a>
+      <a href="projects.html">projects</a>
+      <a href="blog.html" aria-current="page">blog</a>
+      <a href="index.html#about">about</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="section" data-filter-group>
+    <div class="wrap">
+      <h1 class="cmd-heading">
+        <span class="prompt">edge-router#</span><span class="verb">show</span> logging<span class="filter-current" aria-hidden="true"></span>
+      </h1>
+
+      <p class="page-intro">
+        Lab walkthroughs, plain-language security news breakdowns, and Python
+        automation notes. Severity levels borrowed from syslog:
+        <span class="mono">5</span> = security news, <span class="mono">6</span> = lab notes.
+      </p>
+
+      <div class="filter-bar" hidden>
+        <span class="pipe" aria-hidden="true">|</span>
+        <span id="blog-filter-label">include:</span>
+        <button type="button" class="filter-btn" data-filter="all" aria-pressed="true" aria-describedby="blog-filter-label">all</button>
+        <button type="button" class="filter-btn" data-filter="sec" aria-pressed="false" aria-describedby="blog-filter-label">SEC · security news</button>
+        <button type="button" class="filter-btn" data-filter="lab" aria-pressed="false" aria-describedby="blog-filter-label">LAB · lab notes</button>
+        <button type="button" class="filter-btn" data-filter="python" aria-pressed="false" aria-describedby="blog-filter-label">PYTHON · automation</button>
+      </div>
+
+      <div class="syslog">
+        <a class="syslog-line" data-cat="lab" href="blog/building-my-first-ospf-lab.html">
+          <span class="ts">Aug 12 2026 09:41:07</span>
+          <span class="fac cat-lab">%BLOG-6-LAB:</span>
+          <span class="msg">Building my first multi-area OSPF lab (and the LSAs that confused me)</span>
+          <span class="summary">Topology, addressing plan, and the three mistakes that taught me more than the textbook did.</span>
+        </a>
+
+        <!-- TEMPLATE: copy the block below for each new post.
+             1. Duplicate blog/building-my-first-ospf-lab.html and edit it.
+             2. Add a matching entry here (newest at top) and on index.html.
+             3. Add the URL to sitemap.xml. -->
+
+        <a class="syslog-line" data-cat="sec" href="blog/building-my-first-ospf-lab.html">
+          <span class="ts">Aug 03 2026 21:15:33</span>
+          <span class="fac cat-sec">%BLOG-5-SEC:</span>
+          <span class="msg">Security news digest: what I learned from this month's advisories</span>
+          <span class="summary">A plain-language breakdown of recent vulnerabilities that matter for network gear. (Placeholder - replace with your post.)</span>
+        </a>
+
+        <a class="syslog-line" data-cat="python" href="blog/building-my-first-ospf-lab.html">
+          <span class="ts">Jul 24 2026 18:02:51</span>
+          <span class="fac cat-python">%BLOG-6-PYTHON:</span>
+          <span class="msg">Automating my lab backups with Netmiko in 60 lines of Python</span>
+          <span class="summary">From "SSH by hand into five routers" to one script and a cron job. (Placeholder - replace with your post.)</span>
+        </a>
+      </div>
+
+      <p class="filter-empty" hidden>% No log entries match this filter - more posts on the way.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>© 2026 Trey · built by hand, no trackers, no cookies</span>
+    <span><a href="index.html">exit →</a></span>
+  </div>
+</footer>
+
+<script src="js/filter.js" defer></script>
+</body>
+</html>
