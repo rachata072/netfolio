@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Microsoft 365 Sandbox: The Real Setup Guide (2026) - Trey</title>
+  <meta name="description" content="The Microsoft 365 developer sandbox isn't actually free for individuals. Here's the real accessible path (30-day E3 trial) and how to avoid getting billed.">
+  <link rel="canonical" href="https://breakfixlearn.com/blog/free-microsoft-365-sandbox-real-setup-guide.html">
+  <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Free Microsoft 365 Sandbox: The Real Setup Guide (2026)">
+  <meta property="og:description" content="The Microsoft 365 developer sandbox isn't actually free for individuals. Here's the real accessible path (30-day E3 trial) and how to avoid getting billed.">
+  <meta property="og:url" content="https://breakfixlearn.com/blog/free-microsoft-365-sandbox-real-setup-guide.html">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "The Microsoft 365 Developer Sandbox Isn't Actually Free for Most People. Here Is What Actually Works.",
+    "datePublished": "2026-08-23",
+    "author": { "@type": "Person", "name": "Trey" },
+    "mainEntityOfPage": "https://breakfixlearn.com/blog/free-microsoft-365-sandbox-real-setup-guide.html"
+  }
+  </script>
+  <!-- FAQPage schema - makes the FAQ section eligible for a rich-result snippet in search -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is there any way to get the Microsoft 365 E5 developer sandbox without Visual Studio or a partner program?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Not through the standard self service Developer Program flow. If you have access to a paid Visual Studio Professional or Enterprise subscription through an employer, school program, or your own purchase, that is currently the most direct individual path. Without one, the E3 trial covered in this article is the realistic option." }
+      },
+      {
+        "@type": "Question",
+        "name": "Is the Microsoft 365 E3 trial actually free?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes, for the one month trial period, provided you cancel before it converts. It requires a credit card at signup and will bill you automatically if you do not cancel, so \"free\" here means \"free if actively managed,\" not \"never charged under any circumstance.\"" }
+      },
+      {
+        "@type": "Question",
+        "name": "What happens if I forget to cancel?",
+        "acceptedAnswer": { "@type": "Answer", "text": "You get charged the standard subscription rate for Microsoft 365 E3 going forward, until you cancel. Contacting Microsoft billing support promptly after a missed deadline is worth doing, but refunds for trials that convert due to a missed cancellation are handled case by case and are not guaranteed, which is exactly why setting a reminder in advance matters far more than trying to fix it after the fact." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I sign up for another trial later if I let this one convert or expire?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Trial eligibility varies and Microsoft generally limits repeat trials on the same account to prevent abuse. Do not count on being able to easily restart the same trial offer; treat each trial period as the one attempt you have." }
+      },
+      {
+        "@type": "Question",
+        "name": "Is E3 good enough for general IT support study, or do I really need E5?",
+        "acceptedAnswer": { "@type": "Answer", "text": "E3 is sufficient for the vast majority of Microsoft 365 administration, identity fundamentals, and Graph API automation practice, including everything in this project series. E5 specific features matter mainly for advanced compliance, identity protection, and premium threat protection scenarios, which are not typically where someone early in an IT support or networking career path is focused first." }
+      },
+      {
+        "@type": "Question",
+        "name": "What should I build next once this tenant is set up?",
+        "acceptedAnswer": { "@type": "Answer", "text": "The next project in this series automates user onboarding and offboarding against this same tenant using the Microsoft Graph PowerShell SDK, replacing a manual, error prone process with something logged, repeatable, and fast. After that, a license and cost audit script and a Conditional Access policy rollout are natural next steps." }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html" aria-label="Home">
+      <span class="prompt">Trey@lab</span>:<span class="host">~</span>$ <span aria-hidden="true">_</span>
+    </a>
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="../index.html">home</a>
+      <a href="../projects.html">projects</a>
+      <a href="../blog.html" aria-current="page">blog</a>
+      <a href="../index.html#about">about</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <article class="article wrap">
+    <p class="mono post-eyebrow">%BLOG-6-SUPPORT</p>
+    <h1>The Microsoft 365 Developer Sandbox Isn't Actually Free for Most People. Here Is What Actually Works.</h1>
+    <p class="post-meta">Aug 23, 2026 · 15 min read · Microsoft 365, IT Support, Cybersecurity, Cloud Computing, Career Advice</p>
+
+    <p>
+      I set out to write a straightforward guide to provisioning a free Microsoft 365
+      environment for practice, the kind of thing you need if you are studying
+      <a href="../projects.html#ccna-notes">IT support, cybersecurity, or networking</a>
+      and want somewhere real to build hands on skills without touching a production
+      tenant. I found Microsoft's Developer Program, read the setup documentation, and
+      wrote the whole procedure up assuming it was open to anyone with a Microsoft
+      account, the way the getting started page reads on first pass.
+    </p>
+    <p>
+      Then I actually tried to follow my own instructions and hit a wall. The free
+      Microsoft 365 E5 developer sandbox is not, in fact, open to individual sign ups. It
+      requires one of three things: a paid Visual Studio Professional or Enterprise
+      subscription, ISV Success Program or Microsoft AI Cloud Partner Program partner
+      status, or a Premier or Unified Support contract. A plain personal or work Microsoft
+      account, the thing most students and career changers actually have, does not qualify
+      on its own. I found this out the hard way, corrected the entire project as a result,
+      and I am leaving that correction visible in this article rather than quietly
+      rewriting history, because the actual accessible path, and the reasoning for
+      choosing it, is more useful to you than a version of this guide that pretends
+      everything worked perfectly the first time.
+    </p>
+    <p>
+      This article covers what genuinely works: the standard Microsoft 365 E3 free trial,
+      available to anyone, along with the real terms attached to it (a credit card
+      requirement and an automatic conversion to a paid subscription if you are not
+      careful), and exactly how to use it without paying anything.
+    </p>
+
+    <h2>Why you need a free Microsoft 365 environment in the first place</h2>
+    <p>
+      If you are learning IT support, cybersecurity, or networking, or working toward a
+      certification like the CCNA, you eventually need somewhere to practice real
+      Microsoft 365 administration: user provisioning, license management, security
+      policy configuration, Microsoft Graph API automation, Conditional Access rules.
+      None of that is something you want to learn for the first time against a production
+      tenant with real employees in it. A mistake in a sandbox costs you nothing. The same
+      mistake in production can lock out an executive, break mail flow for an entire
+      department, or worse.
+    </p>
+    <p>
+      This is not a small or niche need. Anyone building a portfolio around Microsoft 365
+      administration, anyone studying for a Microsoft certification, anyone trying to
+      demonstrate real hands on experience to a hiring manager rather than just describing
+      what they read in a textbook, needs an actual tenant to work in. The question is how
+      to get one without paying for enterprise licensing you cannot justify while you are
+      still learning.
+    </p>
+
+    <h2>The path that looks free but usually is not: the Developer Program</h2>
+    <p>
+      Microsoft's <a href="https://learn.microsoft.com/en-us/office/developer-program/microsoft-365-developer-program" rel="noopener" target="_blank">Developer Program</a>
+      advertises a Microsoft 365 E5 developer sandbox, and the marketing language around
+      it genuinely does say things like "free of charge to eligible members." That is
+      technically accurate and practically misleading, because the eligibility bar is much
+      higher than most people assume when they first read it.
+    </p>
+    <p>
+      According to
+      <a href="https://learn.microsoft.com/en-us/office/developer-program/microsoft-365-developer-program-faq" rel="noopener" target="_blank">Microsoft's own current documentation</a>,
+      qualifying for the free E5 developer subscription requires one of three things.
+      First, an active Visual Studio Professional or Enterprise subscription, and
+      specifically a paid standard subscription, not the free Visual Studio Community
+      edition and not a monthly subscription tier. Second, membership in the ISV Success
+      Program or an eligible tier of the Microsoft AI Cloud Partner Program, which is
+      aimed at software vendor companies, not individual learners. Third, a Premier or
+      Unified Support contract, which is an enterprise support relationship that
+      individuals and small teams simply do not have.
+    </p>
+    <p>
+      If none of those apply to you, and for most students, career changers, and self
+      taught IT professionals none of them do, you cannot get the free E5 developer
+      sandbox through the standard sign up flow, regardless of how the getting started
+      documentation reads. This is a genuinely common point of confusion, and it is worth
+      naming clearly rather than glossing over, because I initially missed it myself and
+      built an entire project around the assumption that it was open to anyone.
+    </p>
+    <p>
+      If you do happen to have access to one of those three qualifying paths,
+      particularly a paid Visual Studio subscription, that route is worth taking: it gives
+      you a full E5 sandbox, 25 licenses, a 90 day renewable subscription, and genuinely no
+      billing risk since Microsoft does not charge for it under any circumstance short of
+      you deliberately purchasing an add on. But this article is written for the far more
+      common case: you do not have any of those, and you need a real option that does not
+      require them.
+    </p>
+
+    <h2>The path that actually works for individuals: the Microsoft 365 E3 trial</h2>
+    <p>
+      Microsoft's standard enterprise
+      <a href="https://www.microsoft.com/en-us/microsoft-365/enterprise/microsoft-365-plans-and-pricing" rel="noopener" target="_blank">pricing page</a>,
+      the one most people land on when they search for Microsoft 365 plans, includes a
+      straightforward "Try for free" option next to the Microsoft 365 E3 plan. This is not
+      gated behind a partner program or a paid developer subscription. Anyone can sign up.
+    </p>
+    <p>
+      The terms are different from the Developer Program sandbox, though, and it is
+      important to understand them precisely before you start, because getting them wrong
+      costs actual money.
+    </p>
+    <p>
+      It is a one month trial, not 90 days. It requires a credit card at signup, which the
+      Developer Program path does not strictly require for the sandbox itself. And
+      critically, it automatically converts to a paid subscription and begins billing you
+      once the month ends, unless you cancel first. This is the opposite risk profile from
+      the Developer Program: instead of a subscription that quietly expires if you stop
+      using it, you have a subscription that quietly starts costing money if you stop
+      paying attention to it.
+    </p>
+    <p>
+      None of this makes the E3 trial a bad option. It makes it an option that requires
+      you to actually manage it, the way you would manage any trial software subscription
+      in a real job, which, honestly, is itself a reasonable thing to practice.
+    </p>
+
+    <h2>What E3 gives you compared to the E5 sandbox you cannot easily get</h2>
+    <p>
+      It is worth being specific about what you are and are not getting, since "E3 instead
+      of E5" sounds like a downgrade without context.
+    </p>
+    <p>
+      E3 includes Exchange Online, SharePoint, Teams, and full Office apps, the core
+      productivity and collaboration stack. It includes Microsoft Entra ID P1, which
+      covers the identity and access management fundamentals: single sign on, basic
+      Conditional Access, group based licensing, and self service password reset. It
+      includes Intune for device management. And critically for anything involving
+      automation, it includes full access to the
+      <a href="https://learn.microsoft.com/en-us/graph/overview" rel="noopener" target="_blank">Microsoft Graph API</a>,
+      the same API surface the Developer Program sandbox would give you.
+    </p>
+    <p>
+      What you lose moving from E5 to E3: Entra ID P2, which adds Identity Protection and
+      Privileged Identity Management, Microsoft Purview eDiscovery Premium, higher tier
+      Defender threat protection features, Customer Lockbox, and Privileged Access
+      Management. These are real, valuable enterprise features, but they are not things a
+      foundational IT support or automation portfolio project needs on day one. If a later
+      project in a learning series specifically requires one of these E5 only
+      capabilities, that is worth calling out explicitly at the time, rather than assuming
+      from the start that E5 is a requirement for everything.
+    </p>
+    <p>
+      Practically speaking, for building the exact kind of project this article is walking
+      through (a documented tenant with a security baseline, followed by identity
+      lifecycle automation using PowerShell and the Graph API) E3 covers everything
+      needed.
+    </p>
+
+    <h2>Step by step: setting up your Microsoft 365 E3 trial correctly</h2>
+
+    <h3>Step one: find the trial and start signup</h3>
+    <p>
+      Go to Microsoft's official Microsoft 365 plans and pricing page for your country
+      (search "Microsoft 365 plans and pricing" plus your country name if you are not sure
+      of the exact URL, since Microsoft runs localized versions). Find the Microsoft 365
+      E3 column specifically, not E5 or E7, which are typically "Contact Sales" only
+      rather than self service trials. Choose "Try for free."
+    </p>
+
+    <figure class="post-figure">
+      <img src="/assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-e3-trial-signup-page-1200.webp"
+           srcset="/assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-e3-trial-signup-page-480.webp 480w,
+                   /assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-e3-trial-signup-page-800.webp 800w,
+                   /assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-e3-trial-signup-page-1200.webp 1200w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="1200" height="675"
+           loading="lazy" decoding="async"
+           alt="Microsoft 365 plans and pricing page with the Microsoft 365 E3 plan's &quot;Try for free&quot; button highlighted">
+      <figcaption>The self-service E3 trial — no partner program or Visual Studio subscription required.</figcaption>
+    </figure>
+
+    <h3>Step two: complete the business style signup</h3>
+    <p>
+      You will be asked for business style details: your name, an organization name (this
+      can be anything reasonable, it does not need to be a registered company for a
+      personal learning project), a phone number, and a domain prefix that will become
+      your tenant's default onmicrosoft.com address. Choose something you are comfortable
+      seeing in screenshots and documentation.
+    </p>
+
+    <h3>Step three: enter payment details and read the terms on screen</h3>
+    <p>
+      This is the step that matters most. You will be asked for a credit card. Before
+      submitting, read the terms shown on that exact screen: they will state plainly that
+      the trial lasts one month and that it converts to a paid subscription automatically
+      unless cancelled. Do not skip past this screen quickly. Screenshot it if you can,
+      since having your own record of the exact terms you agreed to is useful later if
+      anything about billing is ever unclear.
+    </p>
+
+    <h3>Step four: record your conversion date immediately, in more than one place</h3>
+    <p>
+      The instant your trial is active, find the exact date it will convert to paid
+      (usually visible in the admin center under your billing or subscription details)
+      and write it down somewhere durable: a calendar event, a phone reminder, a note on
+      your desk, ideally more than one of these. This is not busywork. This single step is
+      what separates "I used a free trial responsibly" from "I got surprised by a charge
+      on my card."
+    </p>
+    <p>
+      Set a reminder for five days before that conversion date, not the day of. Giving
+      yourself a buffer accounts for travel, a busy week, or the cancellation flow itself
+      taking a moment to fully process.
+    </p>
+
+    <h3>Step five: run the guided setup</h3>
+    <p>
+      Sign into the Microsoft 365 admin center with your new trial admin credentials and
+      walk through the guided setup: optionally install Office apps, decide on domain
+      personalization (fine to defer), and add users.
+    </p>
+
+    <figure class="post-figure">
+      <img src="/assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-admin-center-guided-setup-1200.webp"
+           srcset="/assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-admin-center-guided-setup-480.webp 480w,
+                   /assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-admin-center-guided-setup-800.webp 800w,
+                   /assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-admin-center-guided-setup-1200.webp 1200w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="1200" height="551"
+           loading="lazy" decoding="async"
+           alt="Microsoft 365 admin center guided setup screen for installing Office apps and personalizing the tenant domain">
+      <figcaption>The guided setup wizard in the Microsoft 365 admin center, right after the trial activates.</figcaption>
+    </figure>
+
+    <p>
+      Resist the urge to add users randomly. A small, coherent, believable organizational
+      structure reads far better in a portfolio, and in an actual demo, than a scattered
+      pile of test accounts. I used five people across three departments: an IT manager, a
+      help desk technician, a payroll specialist and a CFO in finance, and a generalist in
+      HR. That is enough breadth to make identity lifecycle automation and future access
+      policy projects feel like they are happening inside a real, if small, organization.
+    </p>
+
+    <figure class="post-figure">
+      <img src="/assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-test-users-department-structure-1200.webp"
+           srcset="/assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-test-users-department-structure-480.webp 480w,
+                   /assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-test-users-department-structure-800.webp 800w,
+                   /assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-test-users-department-structure-1200.webp 1195w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="1195" height="672"
+           loading="lazy" decoding="async"
+           alt="Microsoft 365 admin center Active users list showing five test accounts across IT, finance, and HR">
+      <figcaption>Five users across three departments — enough structure to make later automation projects feel like a real org.</figcaption>
+    </figure>
+
+    <p>
+      Assign licenses to whichever users you want active, being mindful of however many
+      seats your specific trial offer grants (this can vary), share sign in credentials
+      using whatever method makes sense since these are fictitious accounts, and complete
+      the guided flow.
+    </p>
+
+    <figure class="post-figure">
+      <img src="/assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-license-assignment-screen-1200.webp"
+           srcset="/assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-license-assignment-screen-480.webp 480w,
+                   /assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-license-assignment-screen-800.webp 800w,
+                   /assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-license-assignment-screen-1200.webp 1195w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="1195" height="672"
+           loading="lazy" decoding="async"
+           alt="Microsoft 365 admin center license assignment screen for a test user account">
+      <figcaption>Assigning an E3 license to a test user during the guided setup flow.</figcaption>
+    </figure>
+
+    <h3>Step six: configure multifactor authentication before anything else</h3>
+    <p>
+      This is the step that actually demonstrates security judgment rather than just
+      following a checklist, and the ordering matters. Do this before running any
+      automation scripts, before testing any access policies, before doing anything beyond
+      the guided setup itself.
+    </p>
+    <p>
+      In the admin center, go to Setup, then Configure multifactor authentication. Link it
+      to an email or phone you actually control. At minimum, enable MFA on your admin
+      account. Enabling it tenant wide is a reasonable stretch goal, and worth documenting
+      explicitly as a deliberate next step even if you do not do it immediately, since
+      there is a real difference between a documented, prioritized gap and the same gap
+      existing silently with no explanation.
+    </p>
+
+    <figure class="post-figure">
+      <img src="/assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-mfa-configuration-admin-center-1200.webp"
+           srcset="/assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-mfa-configuration-admin-center-480.webp 480w,
+                   /assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-mfa-configuration-admin-center-800.webp 800w,
+                   /assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-mfa-configuration-admin-center-1200.webp 1195w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="1195" height="672"
+           loading="lazy" decoding="async"
+           alt="Microsoft 365 admin center Setup page with the Configure multifactor authentication option selected">
+      <figcaption>Turning on MFA before touching anything else in the tenant — the security baseline, not an afterthought.</figcaption>
+    </figure>
+
+    <h3>Step seven: export your baseline and capture evidence</h3>
+    <p>
+      Before building anything else on top of this tenant, export your current user list
+      from the admin center under Users, then Active users, then Export users. Save that
+      file somewhere durable, outside the tenant itself. This becomes the reference point
+      every later project in this environment can be measured against.
+    </p>
+
+    <figure class="post-figure">
+      <img src="/assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-export-active-users-baseline-1200.webp"
+           srcset="/assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-export-active-users-baseline-480.webp 480w,
+                   /assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-export-active-users-baseline-800.webp 800w,
+                   /assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-export-active-users-baseline-1200.webp 1195w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="1195" height="672"
+           loading="lazy" decoding="async"
+           alt="Microsoft 365 admin center Active users page with the Export users button highlighted">
+      <figcaption>Exporting the active-users list as the baseline record before building anything else on the tenant.</figcaption>
+    </figure>
+
+    <h3>Step eight: cancel before your deadline, and confirm it</h3>
+    <p>
+      When your reminder fires, go to the admin center, then Billing, then Your products,
+      find your subscription, and cancel it. Read every confirmation screen rather than
+      clicking through automatically, since Microsoft sometimes offers a retention
+      discount or asks you to confirm your intent more than once. After cancelling, check
+      Billing and Your products again to confirm the subscription shows a cancelled or
+      expiring status rather than active, and screenshot that confirmation too.
+    </p>
+
+    <figure class="post-figure">
+      <img src="/assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-e3-trial-cancellation-confirmation-1200.webp"
+           srcset="/assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-e3-trial-cancellation-confirmation-480.webp 480w,
+                   /assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-e3-trial-cancellation-confirmation-800.webp 800w,
+                   /assets/img/free-microsoft-365-sandbox-real-setup-guide/microsoft-365-e3-trial-cancellation-confirmation-1200.webp 1200w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="1200" height="411"
+           loading="lazy" decoding="async"
+           alt="Microsoft 365 admin center Billing then Your products page showing the E3 trial subscription cancelled">
+      <figcaption>Confirmation that the E3 trial subscription is cancelled — the step that actually avoids the charge.</figcaption>
+    </figure>
+
+    <h2>Frequently asked questions</h2>
+
+    <h3>Is there any way to get the Microsoft 365 E5 developer sandbox without Visual Studio or a partner program?</h3>
+    <p>
+      Not through the standard self service Developer Program flow. If you have access to
+      a paid Visual Studio Professional or Enterprise subscription through an employer,
+      school program, or your own purchase, that is currently the most direct individual
+      path. Without one, the E3 trial covered in this article is the realistic option.
+    </p>
+
+    <h3>Is the Microsoft 365 E3 trial actually free?</h3>
+    <p>
+      Yes, for the one month trial period, provided you cancel before it converts. It
+      requires a credit card at signup and will bill you automatically if you do not
+      cancel, so "free" here means "free if actively managed," not "never charged under
+      any circumstance."
+    </p>
+
+    <h3>What happens if I forget to cancel?</h3>
+    <p>
+      You get charged the standard subscription rate for Microsoft 365 E3 going forward,
+      until you cancel. Contacting Microsoft billing support promptly after a missed
+      deadline is worth doing, but refunds for trials that convert due to a missed
+      cancellation are handled case by case and are not guaranteed, which is exactly why
+      setting a reminder in advance matters far more than trying to fix it after the fact.
+    </p>
+
+    <h3>Can I sign up for another trial later if I let this one convert or expire?</h3>
+    <p>
+      Trial eligibility varies and Microsoft generally limits repeat trials on the same
+      account to prevent abuse. Do not count on being able to easily restart the same
+      trial offer; treat each trial period as the one attempt you have.
+    </p>
+
+    <h3>Is E3 good enough for general IT support study, or do I really need E5?</h3>
+    <p>
+      E3 is sufficient for the vast majority of Microsoft 365 administration, identity
+      fundamentals, and Graph API automation practice, including everything in this
+      project series. E5 specific features matter mainly for advanced compliance, identity
+      protection, and premium threat protection scenarios, which are not typically where
+      someone early in an IT support or networking career path is focused first.
+    </p>
+
+    <h3>What should I build next once this tenant is set up?</h3>
+    <p>
+      The next project in this series automates user onboarding and offboarding against
+      this same tenant using the Microsoft Graph PowerShell SDK, replacing a manual, error
+      prone process with something logged, repeatable, and fast. After that, a license and
+      cost audit script and a Conditional Access policy rollout are natural next steps.
+    </p>
+
+    <h2>Try it yourself</h2>
+    <p>
+      The full runbook, including the exact cancellation timeline, a troubleshooting
+      table, a stakeholder style meeting script, and the complete project README, are all
+      in the
+      <a href="https://github.com/rachata072/m365-admin-lab/blob/main/RUNBOOK.md" rel="noopener" target="_blank">GitHub repository linked here</a>.
+    </p>
+    <p>
+      Repository:
+      <a href="https://github.com/rachata072/m365-admin-lab/blob/main/RUNBOOK.md" rel="noopener" target="_blank">github.com/rachata072/m365-admin-lab</a>
+    </p>
+    <p>
+      This is the first project in an ongoing series of small, real-world IT support,
+      cybersecurity, and networking projects I am building while
+      <a href="../index.html#about">studying for my CCNA</a>.
+      Each one is scoped to be genuinely useful in a real organization rather than
+      portfolio filler, corrections included when the plan turns out to be wrong. The next
+      project in the series covers automating user onboarding and offboarding on top of
+      this same tenant — <a href="../blog.html">more lab notes and write-ups land here</a>
+      as each one ships.
+    </p>
+
+    <p class="mono mt-3"><a href="../blog.html">&larr; show logging</a></p>
+  </article>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>© 2026 Trey · built by hand, no trackers, no cookies</span>
+    <span><a href="../index.html">exit →</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

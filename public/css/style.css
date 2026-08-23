@@ -15,6 +15,7 @@
   --status-up: #6CC04A;  /* up/up                  */
   --amber: #FBAB2C;      /* in-progress / warning  */
   --down: #E2231A;       /* Cisco red - admin down */
+  --violet: #A78BFA;     /* blog category: support */
 
   --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", "Fira Code",
           Menlo, Consolas, monospace;
@@ -456,9 +457,10 @@ table.int-brief {
 }
 
 /* category label inside a syslog facility */
-.fac.cat-sec    { color: var(--amber); }
-.fac.cat-lab    { color: var(--cisco-sky); }
-.fac.cat-python { color: var(--status-up); }
+.fac.cat-sec     { color: var(--amber); }
+.fac.cat-lab     { color: var(--cisco-sky); }
+.fac.cat-python  { color: var(--status-up); }
+.fac.cat-support { color: var(--violet); }
 
 /* ---------- blog post images (responsive WebP via tools/imgprep.py) ---------- */
 .post-figure {
