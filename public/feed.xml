@@ -5,7 +5,7 @@
   <link>https://breakfixlearn.com/</link>
   <description>CCNA lab walkthroughs, plain-language security news breakdowns, and Python network automation notes.</description>
   <language>en</language>
-  <lastBuildDate>Sun, 23 Aug 2026 09:00:00 -0600</lastBuildDate>
+  <lastBuildDate>Mon, 24 Aug 2026 10:00:00 -0600</lastBuildDate>
   <atom:link href="https://breakfixlearn.com/feed.xml" rel="self" type="application/rss+xml"/>
 
   <!-- TEMPLATE: when you publish a post, copy this <item> block to the TOP
@@ -21,6 +21,15 @@
     <description>One-sentence summary, same as the blog index entry.</description>
   </item>
   -->
+
+  <item>
+    <title>I Automated the Seven Microsoft 365 Admin Tasks That Actually Fill an IT Ticket Queue</title>
+    <link>https://breakfixlearn.com/blog/automate-microsoft-365-admin-tasks-powershell-graph.html</link>
+    <guid>https://breakfixlearn.com/blog/automate-microsoft-365-admin-tasks-powershell-graph.html</guid>
+    <pubDate>Mon, 24 Aug 2026 10:00:00 -0600</pubDate>
+    <category>SUPPORT</category>
+    <description>Onboarding, offboarding, groups, delegated admin roles, mail flow, and service health, automated with the Microsoft Graph PowerShell SDK, with a real audit trail.</description>
+  </item>
 
   <item>
     <title>Free Microsoft 365 Sandbox: The Real Setup Guide (2026)</title>
