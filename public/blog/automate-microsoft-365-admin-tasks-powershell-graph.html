@@ -539,10 +539,10 @@
       <figcaption>The one-screen answer to whether it's Microsoft's problem or yours, checked before troubleshooting anything further.</figcaption>
     </figure>
 
-    <h2>Why I chose not to automate account or group deletion</h2>
+    <h2>Why deletion is gated, not automated</h2>
     <p>
-      This is a deliberate design decision worth explaining rather than an oversight, and
-      it applies to both people and groups. The user-facing scripts disable, revoke, strip,
+      This is a deliberate design choice, not an oversight, and it applies to both people
+      and groups. The user-facing scripts disable, revoke, strip,
       and hide, but they never delete a user outright. A deleted user object goes into a 30
       day soft-delete window before permanent purge, and treating deletion as something a
       script does automatically, without a human explicitly deciding it is time, is exactly
@@ -793,9 +793,9 @@
       <a href="https://github.com/rachata072/m365-identity-ops-automation/blob/main/RUNBOOK.md" rel="noopener" target="_blank">github.com/rachata072/m365-identity-ops-automation</a>
     </p>
     <p>
-      This is the second project in an ongoing series of small, real-world IT support,
-      cybersecurity, and networking projects I am building while
-      <a href="../index.html#about" rel="noopener" target="_blank">studying for my CCNA</a>.
+      This is the second project in an ongoing series of hands-on IT support and
+      cybersecurity projects I'm building for my portfolio
+      (<a href="../index.html#about" rel="noopener" target="_blank">more on my background here</a>).
       Each one is scoped to solve a genuinely real problem an IT organization actually has,
       not to look impressive in a portfolio scroll without holding up under a closer look.
       <a href="../blog.html" rel="noopener" target="_blank">More lab notes and write-ups land here</a>
