@@ -5,7 +5,7 @@
   <link>https://breakfixlearn.com/</link>
   <description>CCNA lab walkthroughs, plain-language security news breakdowns, and Python network automation notes.</description>
   <language>en</language>
-  <lastBuildDate>Thu, 03 Sep 2026 09:00:00 -0600</lastBuildDate>
+  <lastBuildDate>Thu, 10 Sep 2026 09:00:00 -0600</lastBuildDate>
   <atom:link href="https://breakfixlearn.com/feed.xml" rel="self" type="application/rss+xml"/>
 
   <!-- TEMPLATE: when you publish a post, copy this <item> block to the TOP
@@ -21,6 +21,15 @@
     <description>One-sentence summary, same as the blog index entry.</description>
   </item>
   -->
+
+  <item>
+    <title>I Kept Getting VLSM Wrong By Hand, So I Wrote a Tool That Can't</title>
+    <link>https://breakfixlearn.com/blog/vlsm-subnet-calculator-python-tool.html</link>
+    <guid>https://breakfixlearn.com/blog/vlsm-subnet-calculator-python-tool.html</guid>
+    <pubDate>Thu, 10 Sep 2026 09:00:00 -0600</pubDate>
+    <category>NETWORK</category>
+    <description>A dependency-free Python CLI that plans VLSM subnetting from a CSV of departments and host counts, no manual bookkeeping, 30 tests, and the allocation-order decision that stops wasted address space.</description>
+  </item>
 
   <item>
     <title>I Ran a Real Security Audit Against My Own Linux Machine, Here Is What Actually Broke</title>

@@ -16,6 +16,7 @@
   --amber: #FBAB2C;      /* in-progress / warning  */
   --down: #E2231A;       /* Cisco red - admin down */
   --violet: #A78BFA;     /* blog category: support */
+  --teal: #2DD4BF;       /* blog category: network */
 
   --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", "Fira Code",
           Menlo, Consolas, monospace;
@@ -461,6 +462,7 @@ table.int-brief {
 .fac.cat-lab     { color: var(--cisco-sky); }
 .fac.cat-python  { color: var(--status-up); }
 .fac.cat-support { color: var(--violet); }
+.fac.cat-network { color: var(--teal); }
 
 /* ---------- blog post images (responsive WebP via tools/imgprep.py) ---------- */
 .post-figure {
