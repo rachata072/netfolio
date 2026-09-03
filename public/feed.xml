@@ -5,7 +5,7 @@
   <link>https://breakfixlearn.com/</link>
   <description>CCNA lab walkthroughs, plain-language security news breakdowns, and Python network automation notes.</description>
   <language>en</language>
-  <lastBuildDate>Thu, 27 Aug 2026 09:00:00 -0600</lastBuildDate>
+  <lastBuildDate>Thu, 03 Sep 2026 09:00:00 -0600</lastBuildDate>
   <atom:link href="https://breakfixlearn.com/feed.xml" rel="self" type="application/rss+xml"/>
 
   <!-- TEMPLATE: when you publish a post, copy this <item> block to the TOP
@@ -21,6 +21,15 @@
     <description>One-sentence summary, same as the blog index entry.</description>
   </item>
   -->
+
+  <item>
+    <title>I Ran a Real Security Audit Against My Own Linux Machine, Here Is What Actually Broke</title>
+    <link>https://breakfixlearn.com/blog/linux-hardening-audit-lynis-rkhunter.html</link>
+    <guid>https://breakfixlearn.com/blog/linux-hardening-audit-lynis-rkhunter.html</guid>
+    <pubDate>Thu, 03 Sep 2026 09:00:00 -0600</pubDate>
+    <category>SEC</category>
+    <description>Lynis and rkhunter against a real Ubuntu workstation: three warnings triaged, a crashed Fail2ban jail caught, and an honest account of the thirty eight suggestions I skipped.</description>
+  </item>
 
   <item>
     <title>I Built a Vulnerability Management Program From Scratch, Policy to Remediation</title>
