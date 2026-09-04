@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://breakfixlearn.com/</loc><lastmod>2026-09-10</lastmod></url>
-  <url><loc>https://breakfixlearn.com/projects.html</loc><lastmod>2026-09-10</lastmod></url>
-  <url><loc>https://breakfixlearn.com/blog.html</loc><lastmod>2026-09-10</lastmod></url>
+  <url><loc>https://breakfixlearn.com/</loc><lastmod>2026-09-04</lastmod></url>
+  <url><loc>https://breakfixlearn.com/projects.html</loc><lastmod>2026-09-04</lastmod></url>
+  <url><loc>https://breakfixlearn.com/blog.html</loc><lastmod>2026-09-04</lastmod></url>
   <url><loc>https://breakfixlearn.com/blog/building-my-first-ospf-lab.html</loc><lastmod>2026-08-12</lastmod></url>
-  <url><loc>https://breakfixlearn.com/blog/free-microsoft-365-sandbox-real-setup-guide.html</loc><lastmod>2026-09-10</lastmod></url>
+  <url><loc>https://breakfixlearn.com/blog/free-microsoft-365-sandbox-real-setup-guide.html</loc><lastmod>2026-09-04</lastmod></url>
   <url><loc>https://breakfixlearn.com/blog/automate-microsoft-365-admin-tasks-powershell-graph.html</loc><lastmod>2026-08-27</lastmod></url>
   <url><loc>https://breakfixlearn.com/blog/vulnerability-management-program-tenable-powershell-bash.html</loc><lastmod>2026-08-27</lastmod></url>
   <url><loc>https://breakfixlearn.com/blog/linux-hardening-audit-lynis-rkhunter.html</loc><lastmod>2026-09-03</lastmod></url>
-  <url><loc>https://breakfixlearn.com/blog/vlsm-subnet-calculator-python-tool.html</loc><lastmod>2026-09-10</lastmod></url>
+  <url><loc>https://breakfixlearn.com/blog/vlsm-subnet-calculator-python-tool.html</loc><lastmod>2026-09-04</lastmod></url>
 </urlset>

@@ -5,7 +5,7 @@
   <link>https://breakfixlearn.com/</link>
   <description>CCNA lab walkthroughs, plain-language security news breakdowns, and Python network automation notes.</description>
   <language>en</language>
-  <lastBuildDate>Thu, 10 Sep 2026 09:00:00 -0600</lastBuildDate>
+  <lastBuildDate>Fri, 04 Sep 2026 09:00:00 -0700</lastBuildDate>
   <atom:link href="https://breakfixlearn.com/feed.xml" rel="self" type="application/rss+xml"/>
 
   <!-- TEMPLATE: when you publish a post, copy this <item> block to the TOP
@@ -16,7 +16,7 @@
     <title>Post title here</title>
     <link>https://breakfixlearn.com/blog/your-post.html</link>
     <guid>https://breakfixlearn.com/blog/your-post.html</guid>
-    <pubDate>Mon, 01 Sep 2026 08:00:00 -0600</pubDate>
+    <pubDate>Mon, 01 Sep 2026 08:00:00 -0700</pubDate>
     <category>LAB</category>
     <description>One-sentence summary, same as the blog index entry.</description>
   </item>
@@ -26,7 +26,7 @@
     <title>I Kept Getting VLSM Wrong By Hand, So I Wrote a Tool That Can't</title>
     <link>https://breakfixlearn.com/blog/vlsm-subnet-calculator-python-tool.html</link>
     <guid>https://breakfixlearn.com/blog/vlsm-subnet-calculator-python-tool.html</guid>
-    <pubDate>Thu, 10 Sep 2026 09:00:00 -0600</pubDate>
+    <pubDate>Fri, 04 Sep 2026 09:00:00 -0700</pubDate>
     <category>NETWORK</category>
     <description>A dependency-free Python CLI that plans VLSM subnetting from a CSV of departments and host counts, no manual bookkeeping, 30 tests, and the allocation-order decision that stops wasted address space.</description>
   </item>
@@ -35,7 +35,7 @@
     <title>I Ran a Real Security Audit Against My Own Linux Machine, Here Is What Actually Broke</title>
     <link>https://breakfixlearn.com/blog/linux-hardening-audit-lynis-rkhunter.html</link>
     <guid>https://breakfixlearn.com/blog/linux-hardening-audit-lynis-rkhunter.html</guid>
-    <pubDate>Thu, 03 Sep 2026 09:00:00 -0600</pubDate>
+    <pubDate>Thu, 03 Sep 2026 09:00:00 -0700</pubDate>
     <category>SEC</category>
     <description>Lynis and rkhunter against a real Ubuntu workstation: three warnings triaged, a crashed Fail2ban jail caught, and an honest account of the thirty eight suggestions I skipped.</description>
   </item>
@@ -44,7 +44,7 @@
     <title>I Built a Vulnerability Management Program From Scratch, Policy to Remediation</title>
     <link>https://breakfixlearn.com/blog/vulnerability-management-program-tenable-powershell-bash.html</link>
     <guid>https://breakfixlearn.com/blog/vulnerability-management-program-tenable-powershell-bash.html</guid>
-    <pubDate>Thu, 27 Aug 2026 09:00:00 -0600</pubDate>
+    <pubDate>Thu, 27 Aug 2026 09:00:00 -0700</pubDate>
     <category>SEC</category>
     <description>Policy, stakeholder buy-in, Tenable scanning across Windows and Linux targets, and ten confirmed remediations in PowerShell and Bash, including the two attempts that didn't work out.</description>
   </item>
@@ -53,7 +53,7 @@
     <title>I Automated the Seven Microsoft 365 Admin Tasks That Actually Fill an IT Ticket Queue</title>
     <link>https://breakfixlearn.com/blog/automate-microsoft-365-admin-tasks-powershell-graph.html</link>
     <guid>https://breakfixlearn.com/blog/automate-microsoft-365-admin-tasks-powershell-graph.html</guid>
-    <pubDate>Mon, 24 Aug 2026 10:00:00 -0600</pubDate>
+    <pubDate>Mon, 24 Aug 2026 10:00:00 -0700</pubDate>
     <category>SUPPORT</category>
     <description>Onboarding, offboarding, groups, delegated admin roles, mail flow, and service health, automated with the Microsoft Graph PowerShell SDK, with a real audit trail.</description>
   </item>
@@ -62,7 +62,7 @@
     <title>Free Microsoft 365 Sandbox: The Real Setup Guide (2026)</title>
     <link>https://breakfixlearn.com/blog/free-microsoft-365-sandbox-real-setup-guide.html</link>
     <guid>https://breakfixlearn.com/blog/free-microsoft-365-sandbox-real-setup-guide.html</guid>
-    <pubDate>Sun, 23 Aug 2026 09:00:00 -0600</pubDate>
+    <pubDate>Sun, 23 Aug 2026 09:00:00 -0700</pubDate>
     <category>SUPPORT</category>
     <description>The Microsoft 365 developer sandbox isn't actually free for individuals. Here's the real accessible path (30-day E3 trial) and how to avoid getting billed.</description>
   </item>
@@ -71,7 +71,7 @@
     <title>Building my first multi-area OSPF lab (and the LSAs that confused me)</title>
     <link>https://breakfixlearn.com/blog/building-my-first-ospf-lab.html</link>
     <guid>https://breakfixlearn.com/blog/building-my-first-ospf-lab.html</guid>
-    <pubDate>Wed, 12 Aug 2026 09:41:07 -0600</pubDate>
+    <pubDate>Wed, 12 Aug 2026 09:41:07 -0700</pubDate>
     <category>LAB</category>
     <description>Topology, addressing plan, and the three mistakes that taught me more than the textbook did.</description>
   </item>

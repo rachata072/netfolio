@@ -29,6 +29,13 @@
 
 * { box-sizing: border-box; }
 
+/* Category filters set el.hidden via JS (see js/filter.js). Several
+   components below declare their own `display` (flex/block), which
+   otherwise beats the browser's default [hidden] rule and leaves
+   "filtered out" cards/posts visible. Force it here so hidden always
+   wins regardless of what display value a component sets. */
+[hidden] { display: none !important; }
+
 html { scroll-behavior: smooth; }
 
 body {
