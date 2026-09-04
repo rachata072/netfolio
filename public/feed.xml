@@ -67,13 +67,5 @@
     <description>The Microsoft 365 developer sandbox isn't actually free for individuals. Here's the real accessible path (30-day E3 trial) and how to avoid getting billed.</description>
   </item>
 
-  <item>
-    <title>Building my first multi-area OSPF lab (and the LSAs that confused me)</title>
-    <link>https://breakfixlearn.com/blog/building-my-first-ospf-lab.html</link>
-    <guid>https://breakfixlearn.com/blog/building-my-first-ospf-lab.html</guid>
-    <pubDate>Wed, 12 Aug 2026 09:41:07 -0700</pubDate>
-    <category>LAB</category>
-    <description>Topology, addressing plan, and the three mistakes that taught me more than the textbook did.</description>
-  </item>
 </channel>
 </rss>
