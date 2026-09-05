@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building an IT Runbook for a Real Service Desk - Trey</title>
+  <meta name="description" content="A five-document IT runbook, onboarding, offboarding, password reset, laptop setup, and network troubleshooting, built from NIST, CIS Controls v8, and Microsoft's own documentation instead of assumptions.">
+  <link rel="canonical" href="https://breakfixlearn.com/blog/it-runbook-sops-real-service-desk.html">
+  <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Building an IT Runbook That Would Actually Survive Contact With a Real Service Desk">
+  <meta property="og:description" content="A five-document IT runbook, onboarding, offboarding, password reset, laptop setup, and network troubleshooting, built from NIST, CIS Controls v8, and Microsoft's own documentation instead of assumptions.">
+  <meta property="og:url" content="https://breakfixlearn.com/blog/it-runbook-sops-real-service-desk.html">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Building an IT Runbook That Would Actually Survive Contact With a Real Service Desk",
+    "datePublished": "2026-09-05",
+    "author": { "@type": "Person", "name": "Trey" },
+    "mainEntityOfPage": "https://breakfixlearn.com/blog/it-runbook-sops-real-service-desk.html"
+  }
+  </script>
+  <!-- FAQPage schema - makes the FAQ section eligible for a rich-result snippet in search -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is this a hands-on lab, or just documentation?",
+        "acceptedAnswer": { "@type": "Answer", "text": "It's a documentation and process design project, not yet a hands-on lab with screenshots of a live environment. Every SOP is written to a standard where it could be picked up and used immediately, and every non-obvious claim inside it traces back to a real, checkable source rather than an assumption, but running each procedure against a live directory, device fleet, and network, and capturing that evidence, is the next phase. The repository's screenshots folder already contains the full checklist of exactly what to capture once that happens." }
+      },
+      {
+        "@type": "Question",
+        "name": "Why is a higher failed-login threshold actually more secure than a stricter one?",
+        "acceptedAnswer": { "@type": "Answer", "text": "A low threshold with a hard, manual-unlock-only lockout mostly punishes legitimate users who mistype a password, generating helpdesk tickets without meaningfully slowing an attacker, who can simply wait out a short window or spread attempts across many accounts. Microsoft's own default for Microsoft Entra ID is ten failed attempts with an initial lockout of just sixty seconds, increasing automatically with repeated failures, because the real control against a compromised password is multi-factor authentication, not the lockout counter." }
+      },
+      {
+        "@type": "Question",
+        "name": "What's the gap between a BitLocker policy being \"assigned\" and a device actually being encrypted?",
+        "acceptedAnswer": { "@type": "Answer", "text": "An encryption policy can show as successfully assigned in the management console while the encryption on the physical device silently failed, most commonly because of a TPM version mismatch or a device still in legacy BIOS mode instead of native UEFI. If a device shows compliant but was never actually encrypted, nobody finds out until a device goes missing and there's no way to prove after the fact whether the data on it was ever protected. That's why the laptop setup checklist requires confirming the recovery key actually escrowed to the directory, the only reliable proof encryption genuinely completed, as its own explicit line item." }
+      },
+      {
+        "@type": "Question",
+        "name": "Why is divide-and-conquer the default network troubleshooting approach in this runbook, instead of bottom-up or top-down?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Divide-and-conquer starts in the middle of the stack, typically the network layer, with a basic connectivity test like a ping, then moves up or down depending on the result. Structured troubleshooting guidance built around Cisco's own IP networking methodology calls it the most commonly used approach in real day-to-day network support, because it cuts the space of possible causes roughly in half on the very first test. Bottom-up and top-down are still documented in the SOP for the specific cases where they make more sense, aging hardware where a physical fault is likely, or an issue clearly isolated to one application." }
+      },
+      {
+        "@type": "Question",
+        "name": "How are the onboarding and offboarding SOPs connected?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Onboarding is the act of granting access correctly. Offboarding is the act of removing it correctly, and if either half is sloppy, the other half inherits the mess. The CIS Critical Security Controls describe account management and access control management as a single continuous lifecycle, not two separate activities, so the onboarding SOP's role-template requirement and the offboarding SOP's audit-trail requirement are really solving the same underlying problem from two different points in time: a role template makes offboarding traceable, and an audit trail reveals exactly where onboarding originally granted something it shouldn't have." }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html" aria-label="Home">
+      <span class="prompt">Trey@lab</span>:<span class="host">~</span>$ <span aria-hidden="true">_</span>
+    </a>
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="../index.html">home</a>
+      <a href="../projects.html">projects</a>
+      <a href="../blog.html" aria-current="page">blog</a>
+      <a href="../index.html#about">about</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <article class="article wrap">
+    <p class="mono post-eyebrow">%BLOG-6-SUPPORT</p>
+    <h1>Building an IT Runbook That Would Actually Survive Contact With a Real Service Desk</h1>
+    <p class="post-meta">Sep 5, 2026 · 17 min read · IT Documentation, NIST 800-63B, CIS Controls, Service Desk, CCNA</p>
+
+    <p>
+      Most portfolio projects in IT and cybersecurity look the same: someone spins up a
+      lab, breaks something on purpose, fixes it, and writes it up with a lot of
+      screenshots. That's a genuinely useful exercise, and I've done it myself for other
+      projects. But it leaves out an entire category of skill that almost every real IT
+      job actually depends on day to day: the ability to write documentation that a
+      stranger, under pressure, at two in the morning, can follow without having to call
+      you first.
+    </p>
+    <p>
+      This project is that second kind of skill, built as a standalone artifact instead
+      of a side effect of a lab. It's a five-document IT runbook covering the procedures
+      that come up constantly in any organization with more than a handful of employees:
+      onboarding a new hire, offboarding a departing one, resetting a password or
+      clearing a lockout, setting up a laptop, and troubleshooting a network
+      connectivity complaint. None of these are exotic. That's deliberate. The point
+      wasn't to impress anyone with novelty, it was to demonstrate that I understand
+      what "critical" actually means in an IT operations context, which is not the same
+      thing as "impressive."
+    </p>
+
+    <h2>Why documentation is a real skill, not busywork</h2>
+    <p>
+      Early in my own IT and cybersecurity education, documentation felt like the thing
+      you did after the real work was finished, a summary for someone else's benefit
+      rather than part of the work itself. Researching and building this runbook
+      changed that view completely. A procedure that only exists in one experienced
+      person's head isn't actually a functioning process. It's a single point of
+      failure wearing a job title. The moment that person is on vacation, sick, or has
+      moved to a different role, the organization discovers the "process" was never a
+      process at all, just a habit.
+    </p>
+    <p>
+      A real runbook has to survive exactly that scenario. It has to work for the
+      newest technician on the team, not just the most senior one. That requirement
+      shaped almost every decision in this project, from the consistent document
+      structure across all five SOPs to the explicit verification section in each one
+      that defines what "done" actually means instead of leaving it to judgment.
+    </p>
+
+    <h2>Starting with research, not assumptions</h2>
+    <p>
+      Before writing a single procedure, I set a rule for myself: nothing in this
+      runbook could be a guess or something that merely sounded plausible. Every
+      numeric threshold, every policy recommendation, and every structural decision
+      needed a real, checkable source behind it. That turned out to be a much bigger
+      undertaking than writing the procedures themselves.
+    </p>
+    <p>
+      I ended up with twelve references spanning three categories: primary standards
+      (<a href="https://pages.nist.gov/800-63-3/sp800-63b.html" rel="noopener" target="_blank">NIST Special Publication 800-63B</a>
+      on digital identity and authentication, NIST Special Publication 800-53's
+      personnel termination control, and the
+      <a href="https://www.cisecurity.org/controls/v8" rel="noopener" target="_blank">CIS Critical Security Controls version 8</a>),
+      vendor documentation (Microsoft Learn's own pages on
+      <a href="https://learn.microsoft.com/en-us/entra/identity/authentication/howto-password-smart-lockout" rel="noopener" target="_blank">smart lockout</a>,
+      self-service password reset policy, and
+      <a href="https://learn.microsoft.com/en-us/intune/device-configuration/endpoint-security/encrypt-bitlocker-windows" rel="noopener" target="_blank">BitLocker deployment through Intune</a>),
+      and industry practice guides describing how these standards actually get
+      implemented day to day. All twelve are listed with their exact URLs and a note on
+      what each one was used for in the runbook's <span class="mono">REFERENCES.md</span>
+      file, so anyone reviewing this project can verify the claims themselves rather
+      than taking my word for it.
+    </p>
+    <p>
+      This research phase surfaced a few things that genuinely surprised me, which is
+      usually a sign the research was worth doing. The most significant one involved
+      the password lockout SOP.
+    </p>
+
+    <h2>The lockout threshold surprise</h2>
+    <p>
+      Going in, I assumed a strict account lockout policy, something like five failed
+      attempts before a hard lock that only a technician could clear, was the more
+      secure default. It felt intuitive: fewer allowed guesses should mean better
+      protection against a brute-force attack. Reading NIST's actual current guidance,
+      and Microsoft's documented smart lockout defaults for Microsoft Entra ID, showed
+      the opposite is true in practice.
+    </p>
+    <p>
+      A low threshold with a hard, manual-unlock-only lockout mostly punishes
+      legitimate users who mistype a password or are using an old cached credential
+      somewhere, generating a flood of helpdesk tickets without meaningfully slowing
+      down an actual attacker, who can simply wait out a short lockout window or spread
+      attempts across many accounts instead of hammering one. Microsoft's own default
+      for Microsoft Entra ID is ten failed attempts with an initial lockout of just
+      sixty seconds, increasing automatically with repeated failures, precisely because
+      the real security control against a compromised or guessed password is
+      multi-factor authentication, not the lockout counter. The lockout mechanism
+      exists to slow down automated attacks and self-heal for normal humans, not to be
+      the last line of defense on its own.
+    </p>
+    <p>
+      Writing that section forced me to actually justify a design decision with a
+      citation rather than intuition, a different and more honest kind of thinking than
+      just following what "feels" secure. I ended up including a plain explanation of
+      the reasoning in the SOP itself, not just the resulting number, because a policy
+      that looks less strict on the surface needs a clear justification or it will get
+      second-guessed and quietly reverted by the next person who reviews it.
+    </p>
+
+    <h2>The gap between "policy configured" and "device actually protected"</h2>
+    <p>
+      The laptop setup SOP surfaced a similarly uncomfortable finding. While
+      researching BitLocker deployment through Microsoft Intune, I ran into repeated
+      documentation warnings that an encryption policy can show as successfully
+      assigned in the management console while the actual encryption on the physical
+      device silently failed, most commonly because of a TPM version mismatch or the
+      device still being in legacy BIOS mode instead of native UEFI.
+    </p>
+    <p>
+      That distinction, between a policy being configured and a device actually being
+      encrypted, is exactly the kind of gap that turns a routine lost laptop into a
+      full data breach investigation. If a device shows "compliant" in the console but
+      was never actually encrypted, nobody finds out until the worst possible moment,
+      when a device goes missing and there's no way to prove after the fact whether the
+      data on it was ever protected in the first place.
+    </p>
+    <p>
+      I wrote the laptop setup checklist so this failure mode can't slip through
+      unnoticed. The quality check doesn't just confirm that a BitLocker policy is
+      assigned to the device. It requires confirming that the recovery key actually
+      escrowed to the directory, which is the only reliable proof that encryption
+      genuinely completed rather than merely being requested. I turned this into its
+      own explicit line item in the mandatory pre-handoff checklist rather than folding
+      it into a vague "encryption enabled" checkbox a rushed technician could tick
+      without really verifying anything.
+    </p>
+    <p>
+      I used this exact scenario in the meeting script that accompanies this project: a
+      laptop reported lost at an airport, and the uncomfortable moment where the
+      security lead asks a simple question, "was that laptop actually encrypted," and
+      nobody can answer with certainty. That scenario isn't exaggerated. It's precisely
+      the kind of thing that happens when a checklist confirms intent instead of
+      verifying outcome.
+    </p>
+
+    <h2>Structuring the network troubleshooting SOP around the OSI model, on purpose</h2>
+    <p>
+      The fifth SOP, network connectivity troubleshooting, was the one I most wanted to
+      get right, since it draws directly on what I've been studying for the CCNA
+      certification. The temptation with a network troubleshooting document is to just
+      list every possible thing that could be wrong. That's not actually useful to a
+      technician mid-incident, because it gives them no order of operations, just a
+      long inventory of possibilities.
+    </p>
+    <p>
+      Instead, I researched how structured troubleshooting is actually taught and
+      practiced, and found three broadly recognized approaches: bottom-up, starting at
+      the physical layer and working up; top-down, starting at the application and
+      working down; and divide-and-conquer, starting in the middle of the stack,
+      typically at the network layer, with a basic connectivity test like a ping, and
+      moving up or down depending on the result.
+      <a href="https://www.ciscopress.com/articles/article.asp?p=2273070&seqNum=2" rel="noopener" target="_blank">Cisco's own structured troubleshooting documentation</a>
+      specifically calls out divide-and-conquer as the most commonly used approach in
+      real day-to-day network support, because it's the fastest way to cut the space of
+      possible causes roughly in half on the very first test.
+    </p>
+    <p>
+      I made divide-and-conquer the SOP's default approach, while still documenting the
+      other two for the specific situations where they genuinely make more sense, aging
+      hardware where a physical fault is likely, or an issue clearly isolated to one
+      specific application while general connectivity is already confirmed working. The
+      procedure walks through real diagnostic commands at each layer: pinging the
+      default gateway to confirm Layer 3 locally, checking for a
+      <span class="mono">169.254.x.x</span> address as a sign of a failed DHCP lease,
+      using <span class="mono">arp -a</span> to confirm a working Layer 2 relationship
+      with the gateway, and using a tool like
+      <span class="mono">Test-NetConnection</span> to isolate a Layer 4, port-specific
+      problem from a general connectivity one.
+    </p>
+    <p>
+      The meeting scenario I wrote for this SOP describes something I believe happens
+      constantly in real IT departments and rarely gets fixed: the same complaint
+      recurring from the same floor, handled by three different technicians over two
+      weeks, each starting from zero because there was no shared method and no
+      documentation of what had already been ruled out. A structured, documented
+      approach doesn't just fix the immediate ticket faster. It makes the pattern
+      visible across multiple incidents, which is often how a genuinely failing piece
+      of hardware finally gets identified and replaced instead of being worked around
+      indefinitely.
+    </p>
+
+    <h2>Onboarding and offboarding are the same problem, seen from two directions</h2>
+    <p>
+      One thing that became obvious only after I had drafted both the onboarding and
+      offboarding SOPs separately is how tightly the two are connected, even though
+      they sit at opposite ends of an employee's time at a company. Onboarding is the
+      act of granting access correctly. Offboarding is the act of removing it
+      correctly. If either half is sloppy, the other half inherits the mess.
+    </p>
+    <p>
+      This connection shows up directly in the
+      <a href="https://www.cisecurity.org/controls/v8" rel="noopener" target="_blank">CIS Critical Security Controls</a>,
+      one of the primary standards this runbook draws from. Control 5, account
+      management, and Control 6, access control management, both describe a single
+      continuous lifecycle rather than two separate activities: accounts should be
+      centrally inventoried, assigned through defined roles rather than ad hoc
+      requests, reviewed periodically, and fully disabled the moment they're no longer
+      needed. Reading the standard this way changed how I approached the onboarding SOP
+      specifically. If access is granted through a defined role template in the first
+      place, rather than through a collection of individually remembered exceptions,
+      then offboarding becomes dramatically simpler, because removing "the sales rep
+      template" is a much cleaner operation than trying to reconstruct, from memory or
+      from scattered emails, everything a specific person happened to accumulate access
+      to over an eighteen month tenure.
+    </p>
+    <p>
+      This is also why the onboarding SOP's role template requirement and the
+      offboarding SOP's audit trail requirement are, in a real sense, solving the same
+      underlying problem from two different points in time. A role template makes
+      onboarding fast and offboarding traceable at the same time. An audit trail makes
+      offboarding defensible and, when reviewed later, reveals exactly where the
+      original onboarding process granted something that shouldn't have been part of
+      the standard template in the first place. Neither procedure is complete without
+      assuming the other one exists and is followed with the same discipline.
+    </p>
+    <p>
+      I think this is a detail that's easy to miss if you write these two SOPs
+      independently, as separate items on a list of "critical projects," rather than
+      treating access management as a single lifecycle with a beginning and an end.
+      Standards documents like the CIS Controls are useful precisely because they force
+      that connection to the surface instead of letting each procedure be designed in
+      isolation.
+    </p>
+
+    <h2>Why every SOP has an escalation path and a revision history</h2>
+    <p>
+      Two structural choices run through all five documents, and neither one is
+      decorative.
+    </p>
+    <p>
+      The first is a shared escalation matrix that every SOP references instead of
+      repeating. Every procedure defines a specific point where a Tier 1 technician
+      should stop trying to resolve something themselves and hand it to someone with
+      more access, more authority, or more specialized knowledge. I deliberately wrote
+      the escalation triggers around demonstrated lack of capability rather than a
+      fixed timer, because a ticket that's actively progressing doesn't need to
+      escalate just because a clock ran out, and a ticket that's genuinely stalled
+      needs to escalate immediately even if it's well inside a nominal time window. A
+      rule based purely on elapsed time either escalates too aggressively on tickets
+      that are fine, or not aggressively enough on the ones that actually need help.
+    </p>
+    <p>
+      The second is a revision history table on every document. This sounds like a
+      small formality, but it matters more than it looks. Documentation nobody dates or
+      attributes tends to silently drift out of sync with reality, because nobody knows
+      whether a given line reflects last year's environment or this year's, and nobody
+      feels ownership over keeping it current. A version and date stamp forces an
+      explicit decision every time something changes, and it's exactly what an auditor
+      or a new IT manager inheriting this documentation would look for first to judge
+      whether it can actually be trusted.
+    </p>
+
+    <h2>What this project is not</h2>
+    <p>
+      I want to be direct about the boundaries of this project, since overclaiming
+      would undercut the entire point of building something grounded in verifiable
+      sources. This is a documentation and process design project, not a hands-on lab
+      with screenshots of a live environment, at least not yet. The runbook is written
+      to be run against a real or lab identity and device environment, with a full
+      checklist of specific screenshots to capture once that happens, tracked in the
+      repository's screenshots folder. Until then, this project demonstrates something
+      specific and, I think, genuinely valuable on its own: the ability to translate
+      published standards and vendor documentation into procedures a real team could
+      pick up and use immediately, with the reasoning behind every non-obvious decision
+      made explicit rather than assumed.
+    </p>
+    <p>
+      It's also intentionally not trying to reinvent IT operations. Onboarding,
+      offboarding, password management, device provisioning, and network
+      troubleshooting are not original ideas. Every mature IT department already has
+      some version of these processes. What I was practicing here was the specific
+      discipline of writing them down correctly, consistently, and defensibly, the same
+      discipline that separates a functioning MSP's documentation from a folder of
+      half-finished notes that only make sense to the person who wrote them.
+    </p>
+
+    <h2>What's in the repository</h2>
+    <p>
+      The repository contains the five SOPs themselves, each following an identical
+      structure: purpose and scope, roles and responsibilities, prerequisites, a
+      numbered step-by-step procedure, a verification section that defines completion
+      concretely, a troubleshooting table for common failure modes, an escalation path
+      with SOP-specific triggers layered on the shared matrix, placeholders for
+      evidence screenshots, and a revision history. Alongside the five SOPs sit the
+      shared escalation matrix and the full reference list mapping every non-obvious
+      claim to its source.
+    </p>
+    <p>
+      Outside the technical repository, I also wrote a set of realistic meeting
+      scripts, one per SOP, showing the problem that forced the conversation, who in
+      the organization is actually affected by it, and how the relevant procedure
+      resolves it. I wrote these as real dialogue between a recurring cast of
+      characters rather than as a bulleted summary, because a meeting rarely unfolds as
+      a list, it unfolds as people pushing back, asking follow-up questions, and
+      gradually converging on a decision. I also wrote a set of interview preparation
+      stories using the STAR method, each tied to a specific, real decision I made
+      while researching and building this runbook, like the lockout threshold reversal
+      and the encryption verification gap described above, rather than generic claims
+      about being detail-oriented or a good communicator.
+    </p>
+
+    <h2>What I would do differently at a larger scale</h2>
+    <p>
+      If I were doing this inside a real organization rather than as a portfolio
+      project, a few things would change. The role templates referenced in the
+      onboarding SOP would need to be built out for every actual job family in the
+      company, not just the illustrative examples I used. The escalation matrix's
+      contact directory, which I deliberately left as a fill-in-the-blank template,
+      would need real names, real phone numbers, and a real on-call rotation behind it,
+      since a runbook a new technician can't actually use at two in the morning because
+      the contact list still says "TBD" has failed at its one job. And every SOP would
+      need to be run for real, against a real environment, with the screenshot
+      checklist filled in and any procedural gap that only shows up in practice folded
+      back into a revised version, with the version number and date updated to reflect
+      it.
+    </p>
+    <p>
+      That last point matters more than it might sound. A runbook isn't a document you
+      write once and consider finished. It's closer to a piece of software: it needs to
+      be run, it will reveal bugs when it is, and it needs a version history so
+      everyone can see how it's evolved. Treating documentation with that same
+      discipline, write it, verify every claim, run it for real, revise it based on
+      what actually happens, and version every change, is, I think, the actual
+      difference between IT documentation that looks good in a portfolio and IT
+      documentation a real team would trust with their actual work.
+    </p>
+
+    <h2>Why this project mattered to my own CCNA studies specifically</h2>
+    <p>
+      I want to close on something more personal about the fifth SOP in particular. I'm
+      currently working through CCNA-level networking material, and one thing that
+      material makes clear early on, but that's easy to forget once you're
+      troubleshooting a real ticket under time pressure, is that the OSI model isn't
+      just an exam topic to memorize layer names for. It's a genuinely practical tool
+      for narrowing down a problem, provided you actually use it as a method rather
+      than as a diagram you can recite.
+    </p>
+    <p>
+      Writing SOP-05 forced me to translate that classroom knowledge into something a
+      working technician would reach for on an actual ticket, complete with the
+      specific commands you'd run at each layer and what a specific result should tell
+      you to check next. That's a different exercise from answering a multiple-choice
+      question about which layer a MAC address belongs to. It's closer to what the job
+      actually requires: given a vague complaint like "the internet is down," produce a
+      specific, ordered sequence of tests that narrows the cause quickly and leaves a
+      clear record of what was checked. I think that translation, from certification
+      knowledge to an operational procedure someone else could follow, is exactly the
+      kind of evidence a hiring manager is actually looking for when they see a CCNA in
+      progress on a resume, more so than the certification alone.
+    </p>
+
+    <h2>A final note on scope and honesty</h2>
+    <p>
+      I mentioned earlier that this project is documentation and process design, not
+      yet a hands-on lab with captured evidence. I want to restate that plainly rather
+      than let the polish of the finished SOPs imply otherwise. Every SOP in this
+      runbook is written to a standard where it could be picked up and used
+      immediately, and every non-obvious claim inside it traces back to a real,
+      checkable source rather than an assumption. What hasn't yet happened is running
+      each procedure against a live directory, a live device fleet, and a live
+      network, and capturing the resulting evidence.
+    </p>
+    <p>
+      That's the natural next phase of this project, and the repository is structured
+      to support it directly: the screenshots folder already contains the full
+      checklist of exactly what to capture and where each image needs to go once these
+      procedures are exercised for real. I'd rather ship a runbook that's honest about
+      being pre-execution documentation, backed by real standards, than one that
+      implies a level of field testing that hasn't actually happened yet. Overstating
+      that distinction would undercut the entire premise of a project built around
+      verifiable claims in the first place.
+    </p>
+
+    <h2>Frequently asked questions</h2>
+
+    <h3>Is this a hands-on lab, or just documentation?</h3>
+    <p>
+      It's a documentation and process design project, not yet a hands-on lab with
+      screenshots of a live environment. Every SOP is written to a standard where it
+      could be picked up and used immediately, and every non-obvious claim inside it
+      traces back to a real, checkable source rather than an assumption, but running
+      each procedure against a live directory, device fleet, and network, and
+      capturing that evidence, is the next phase. The repository's screenshots folder
+      already contains the full checklist of exactly what to capture once that
+      happens.
+    </p>
+
+    <h3>Why is a higher failed-login threshold actually more secure than a stricter one?</h3>
+    <p>
+      A low threshold with a hard, manual-unlock-only lockout mostly punishes
+      legitimate users who mistype a password, generating helpdesk tickets without
+      meaningfully slowing an attacker, who can simply wait out a short window or
+      spread attempts across many accounts. Microsoft's own default for Microsoft
+      Entra ID is ten failed attempts with an initial lockout of just sixty seconds,
+      increasing automatically with repeated failures, because the real control
+      against a compromised password is multi-factor authentication, not the lockout
+      counter.
+    </p>
+
+    <h3>What's the gap between a BitLocker policy being "assigned" and a device actually being encrypted?</h3>
+    <p>
+      An encryption policy can show as successfully assigned in the management console
+      while the encryption on the physical device silently failed, most commonly
+      because of a TPM version mismatch or a device still in legacy BIOS mode instead
+      of native UEFI. If a device shows compliant but was never actually encrypted,
+      nobody finds out until a device goes missing and there's no way to prove after
+      the fact whether the data on it was ever protected. That's why the laptop setup
+      checklist requires confirming the recovery key actually escrowed to the
+      directory, the only reliable proof encryption genuinely completed, as its own
+      explicit line item.
+    </p>
+
+    <h3>Why is divide-and-conquer the default network troubleshooting approach in this runbook, instead of bottom-up or top-down?</h3>
+    <p>
+      Divide-and-conquer starts in the middle of the stack, typically the network
+      layer, with a basic connectivity test like a ping, then moves up or down
+      depending on the result. Structured troubleshooting guidance built around
+      Cisco's own IP networking methodology calls it the most commonly used approach in
+      real day-to-day network support, because it cuts the space of possible causes
+      roughly in half on the very first test. Bottom-up and top-down are still
+      documented in the SOP for the specific cases where they make more sense, aging
+      hardware where a physical fault is likely, or an issue clearly isolated to one
+      application.
+    </p>
+
+    <h3>How are the onboarding and offboarding SOPs connected?</h3>
+    <p>
+      Onboarding is the act of granting access correctly. Offboarding is the act of
+      removing it correctly, and if either half is sloppy, the other half inherits the
+      mess. The CIS Critical Security Controls describe account management and access
+      control management as a single continuous lifecycle, not two separate
+      activities, so the onboarding SOP's role-template requirement and the
+      offboarding SOP's audit-trail requirement are really solving the same underlying
+      problem from two different points in time: a role template makes offboarding
+      traceable, and an audit trail reveals exactly where onboarding originally
+      granted something it shouldn't have.
+    </p>
+
+    <h2>Try it yourself</h2>
+    <p>
+      If you want to see the full runbook, the shared escalation matrix, and the
+      complete twelve-source reference list mapping every non-obvious claim back to
+      NIST, CIS, and Microsoft's own documentation, the repository is public:
+    </p>
+    <p>
+      Runbook and SOPs:
+      <a href="https://github.com/rachata072/it-runbook-sops" rel="noopener" target="_blank">github.com/rachata072/it-runbook-sops</a>
+    </p>
+    <p>
+      This is part of an ongoing series of IT support and cybersecurity projects I'm
+      building for my portfolio
+      (<a href="../index.html#about" rel="noopener" target="_blank">more on my background here</a>).
+      <a href="../blog.html" rel="noopener" target="_blank">More lab notes and write-ups land here</a>
+      as each one ships.
+    </p>
+
+    <p class="mono mt-3"><a href="../blog.html">&larr; show logging</a></p>
+  </article>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>© 2026 Trey · built by hand · no cookies · privacy-respecting analytics · <a href="../privacy.html">privacy</a></span>
+    <span><a href="../index.html">exit →</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

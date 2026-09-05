@@ -5,7 +5,7 @@
   <link>https://breakfixlearn.com/</link>
   <description>CCNA lab walkthroughs, plain-language security news breakdowns, and Python network automation notes.</description>
   <language>en</language>
-  <lastBuildDate>Fri, 04 Sep 2026 09:00:00 -0700</lastBuildDate>
+  <lastBuildDate>Sat, 05 Sep 2026 09:00:00 -0700</lastBuildDate>
   <atom:link href="https://breakfixlearn.com/feed.xml" rel="self" type="application/rss+xml"/>
 
   <!-- TEMPLATE: when you publish a post, copy this <item> block to the TOP
@@ -21,6 +21,15 @@
     <description>One-sentence summary, same as the blog index entry.</description>
   </item>
   -->
+
+  <item>
+    <title>Building an IT Runbook That Would Actually Survive Contact With a Real Service Desk</title>
+    <link>https://breakfixlearn.com/blog/it-runbook-sops-real-service-desk.html</link>
+    <guid>https://breakfixlearn.com/blog/it-runbook-sops-real-service-desk.html</guid>
+    <pubDate>Sat, 05 Sep 2026 09:00:00 -0700</pubDate>
+    <category>SUPPORT</category>
+    <description>A five-document IT runbook covering onboarding, offboarding, password reset, laptop setup, and network troubleshooting, built from NIST, CIS Controls v8, and Microsoft's own documentation, including the lockout threshold assumption that turned out backwards.</description>
+  </item>
 
   <item>
     <title>I Kept Getting VLSM Wrong By Hand, So I Wrote a Tool That Can't</title>
