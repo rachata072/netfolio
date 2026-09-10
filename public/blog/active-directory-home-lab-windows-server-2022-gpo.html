@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Active Directory Home Lab: Windows Server 2022 + GPO - Trey</title>
+  <meta name="description" content="A from-scratch Active Directory lab on Windows Server 2022: OU design, Fine-Grained Password Policies, Windows LAPS, delegated help desk rights, WSUS patching, scripted provisioning, and a backup I actually tested.">
+  <link rel="canonical" href="https://breakfixlearn.com/blog/active-directory-home-lab-windows-server-2022-gpo.html">
+  <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="I Built an Active Directory Home Lab That's More Than Three OUs and a Password Policy">
+  <meta property="og:description" content="A from-scratch Active Directory lab on Windows Server 2022: OU design, Fine-Grained Password Policies, Windows LAPS, delegated help desk rights, WSUS patching, scripted provisioning, and a backup I actually tested.">
+  <meta property="og:url" content="https://breakfixlearn.com/blog/active-directory-home-lab-windows-server-2022-gpo.html">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "I Built an Active Directory Home Lab That's More Than Three OUs and a Password Policy",
+    "datePublished": "2026-09-10",
+    "author": { "@type": "Person", "name": "Trey" },
+    "mainEntityOfPage": "https://breakfixlearn.com/blog/active-directory-home-lab-windows-server-2022-gpo.html"
+  }
+  </script>
+  <!-- FAQPage schema - makes the FAQ section eligible for a rich-result snippet in search -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Why does this lab use a VirtualBox NAT Network instead of plain NAT or Bridged networking?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Plain NAT puts each VM behind its own isolated NAT instance, so the domain controller and the client can each reach the internet but cannot see each other, domain join fails before it even reaches a credentials prompt. Bridged networking exposes both VMs directly on the home LAN, where a home router already running DHCP collides with the domain controller's own DHCP scope. A VirtualBox NAT Network is a single shared virtual switch that gives every attached VM both a route to the internet and a route to each other, with its own built-in DHCP turned off so it doesn't race the domain controller's DHCP server for client leases." }
+      },
+      {
+        "@type": "Question",
+        "name": "Why put a stricter password policy on IT admin accounts instead of raising it for the whole domain?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Windows only honors one password and lockout policy per domain through the Default Domain Policy, so a second GPO with different password settings on a different OU would simply be ignored for that purpose. A Fine-Grained Password Policy (a Password Settings Object) is the mechanism built for exactly this: it targets a specific security group, so IT-Admins accounts get a 16-character minimum and a 3-attempt lockout threshold while everyone else keeps the domain default, raising the bar only for the accounts whose compromise actually matters most, rather than adding friction for every account in the organization." }
+      },
+      {
+        "@type": "Question",
+        "name": "What does Windows LAPS actually protect against?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Without it, most environments build every workstation from the same image, so every machine ends up with the identical local Administrator password. Once that one password is known, an attacker who compromises a single workstation can move laterally to every other machine using the same credential, a technique commonly called pass-the-hash. Windows LAPS randomizes and rotates the local Administrator password independently on every domain-joined machine and stores the current value as a protected, permission-gated attribute in Active Directory, so compromising one machine's local admin password gives an attacker nothing usable anywhere else." }
+      },
+      {
+        "@type": "Question",
+        "name": "Why delegate password-reset rights to a help desk group instead of just making them Domain Admins?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Making every help desk technician a Domain Admin is the fastest way to unblock a password-reset ticket, and also the fastest way to turn one compromised help desk account into a domain-wide incident, since a Domain Admin account can do anything, including adding new Domain Admins or modifying Group Policy, none of which a reset ticket ever needed. Delegating exactly two rights, Reset Password and the ability to write the lockoutTime attribute, scoped only to the OUs the help desk actually supports, gives that group real capability with none of the excess access, so a compromised help desk credential still can't touch anything outside its assigned scope." }
+      },
+      {
+        "@type": "Question",
+        "name": "Why back up a domain controller if you've never actually restored from the backup?",
+        "acceptedAnswer": { "@type": "Answer", "text": "A domain controller backup that's never been restored from is a domain controller with an assumption, not a tested recovery procedure. A System State backup captures the AD database, SYSVOL, and the registry, but the only way to actually know it works is to walk through a real restore in a controlled setting, on a VM snapshot you can roll back regardless of outcome, before you're depending on it during a genuine incident. The AD Recycle Bin serves a related but different purpose, restoring a single accidentally deleted object in seconds instead of requiring a multi-hour, whole-server Directory Services Restore Mode recovery for a five-second mistake." }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html" aria-label="Home">
+      <span class="prompt">Trey@lab</span>:<span class="host">~</span>$ <span aria-hidden="true">_</span>
+    </a>
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="../index.html">home</a>
+      <a href="../projects.html">projects</a>
+      <a href="../blog.html" aria-current="page">blog</a>
+      <a href="../index.html#about">about</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <article class="article wrap">
+    <p class="mono post-eyebrow">%BLOG-6-SUPPORT</p>
+    <h1>I Built an Active Directory Home Lab That's More Than Three OUs and a Password Policy</h1>
+    <p class="post-meta">Sep 10, 2026 · 24 min read · Active Directory, Windows Server 2022, Group Policy, LAPS, WSUS, PowerShell</p>
+
+    <p>
+      Most public versions of the "build an Active Directory lab" project stop at a
+      domain controller, three organizational units, and a password policy. That
+      covers maybe a day of what a real IT admin actually does with Active Directory.
+      I wanted to build the version that covers the rest of it: a password policy
+      that's genuinely different for privileged accounts than everyone else, local
+      admin passwords that aren't identical across every machine, permissions that are
+      actually enforced at the file system level instead of just implied by group
+      membership, patching that doesn't rely on every machine phoning home to
+      Microsoft individually, a help desk tier that can reset passwords without being
+      a Domain Admin, and a domain controller that's actually been backed up and
+      restored, at both the whole-server level and the single-object level, instead of
+      just assumed to be fine.
+    </p>
+    <p>
+      This project took a full week end to end: a domain controller, DHCP and DNS, a
+      real Group Policy set covering nine separate GPOs (not just one password policy
+      example), Fine-Grained Password Policies, Windows LAPS, tiered delegation, WSUS
+      patch management, scripted bulk user provisioning, a domain-joined client with
+      verified policy application, and a tested backup and restore of the domain
+      controller itself, down to the individual object. Everything runs on two VMs, a
+      domain controller and a Windows 11 client, side by side on a single VirtualBox
+      host, no second physical machine and no production licensing required to
+      reproduce it.
+    </p>
+
+    <h2>Getting the network right before touching Active Directory at all</h2>
+    <p>
+      The single most common reason a home-lab AD build breaks isn't Active Directory
+      at all, it's the network mode chosen for the VMs. VirtualBox's default NAT
+      adapter puts each VM behind its own isolated NAT instance, both can reach the
+      internet, but they can't see each other, domain join fails before it even gets
+      to a credentials prompt. Bridged networking would let them see each other, but it
+      also exposes both VMs directly on a home LAN with the real router acting as
+      DHCP server, which collides with the DHCP scope the domain controller hands out
+      later. Host-only networking isolates the VMs together but cuts off internet
+      access entirely, which the DC needs for DNS forwarders, time sync, and WSUS's own
+      upstream sync.
+    </p>
+    <p>
+      The setting that actually fits is VirtualBox's <span class="mono">NAT
+      Network</span>, a single shared virtual switch that gives every attached VM both
+      a route to the internet and a route to each other:
+    </p>
+    <pre><code>VBoxManage natnetwork add --netname ADLab-Net --network "10.10.0.0/24" --enable --dhcp off</code></pre>
+    <p>
+      <span class="mono">--dhcp off</span> matters specifically here: a NAT Network has
+      its own built-in DHCP server, and if it's left on, it races the domain
+      controller's own DHCP server to answer client leases, two DHCP servers on the
+      same segment being exactly the kind of intermittent, hard-to-diagnose problem a
+      real network admin dreads. Both VMs get attached to <span class="mono">ADLab-Net</span>
+      before either one powers on for the first time, with the DC pinned to
+      <span class="mono">10.10.0.10</span> as a static address.
+    </p>
+
+    <h2>A short meeting before designing a single OU</h2>
+    <p>
+      Before building anything, I sat down (with myself, playing every role) for a
+      short design meeting: what does each department actually need, rather than
+      guessing at an OU structure and retrofitting the reasoning afterward. HR needed a
+      shared drive that just appears at logon. Finance needed the same, plus stricter
+      password requirements specifically on their admin-level accounts, since an
+      account with access to payroll data getting compromised is a bigger problem than
+      a regular user account getting compromised. Rather than raising the password
+      policy for the entire domain, which creates friction for everyone with no real
+      benefit for accounts that don't touch anything sensitive, the answer was a
+      Fine-Grained Password Policy applied to a specific security group of privileged
+      accounts, not the whole domain.
+    </p>
+    <p>
+      Two more requirements came out of that same conversation: local admin passwords
+      needed to be unique per machine and rotated automatically, since a shared local
+      admin password across every workstation image means one leak compromises every
+      machine at once, and a help desk tier needed the ability to reset passwords and
+      clear lockouts without every technician being handed full Domain Admin rights.
+      Both of those became Windows LAPS and a delegated help desk group, covered
+      further down.
+    </p>
+    <p>
+      That meeting produced three department OUs (IT, HR, Finance), each with its own
+      security group for share and NTFS permissions and GPO targeting, plus a
+      dedicated Computers sub-OU per department so workstation-targeted policy (like
+      LAPS) never has to fight with user-targeted policy sitting in the same
+      container. Two additional groups sit outside the department pattern:
+      <span class="mono">SG-IT-Admins</span>, the actual target of the Fine-Grained
+      Password Policy, and <span class="mono">SG-HelpDesk</span>, the group that gets
+      the delegated reset-password and unlock-account rights.
+    </p>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/ou-and-security-group-structure-800.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/ou-and-security-group-structure-480.webp 480w,
+                   /assets/img/active-directory-home-lab-windows-server-2022-gpo/ou-and-security-group-structure-800.webp 800w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="800" height="339"
+           loading="lazy" decoding="async"
+           alt="PowerShell output listing the IT, HR, and Finance organizational units with their Computers sub-OUs, and the SG-IT, SG-IT-Admins, SG-HelpDesk, SG-HR, and SG-Finance security groups in Active Directory">
+      <figcaption>The full OU tree and security group set, built exactly to the design agreed on before a single command ran.</figcaption>
+    </figure>
+
+    <h2>Standing up the domain controller, DNS, and DHCP</h2>
+    <p>
+      <span class="mono">Install-ADDSForest</span> creates a brand-new forest and
+      domain, <span class="mono">contoso.local</span>, along with the AD database, the
+      SYSVOL share that replicates GPOs, and an AD-integrated DNS zone, all in one
+      promotion. The one step that's easy to get backwards is renaming the server
+      before promoting it, not after: a domain controller's hostname gets baked into
+      its DNS registration, its Kerberos service principal names, and every
+      <span class="mono">\\dc01\...</span> UNC path the rest of the build depends on.
+      Rename after promotion and every one of those references breaks against a stale
+      name, requiring a manual DNS cleanup and re-registration that renaming first
+      avoids completely.
+    </p>
+    <pre><code>Rename-Computer -NewName "dc01" -Restart
+Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
+Install-ADDSForest -DomainName "contoso.local" -DomainNetbiosName "CONTOSO" `
+  -InstallDns:$true -SafeModeAdministratorPassword (Read-Host -AsSecureString "Enter DSRM password")</code></pre>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/dc-promotion-get-addomain-800.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/dc-promotion-get-addomain-480.webp 480w,
+                   /assets/img/active-directory-home-lab-windows-server-2022-gpo/dc-promotion-get-addomain-800.webp 800w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="800" height="366"
+           loading="lazy" decoding="async"
+           alt="Get-ADDomain PowerShell output confirming the contoso.local forest and domain exist after promotion, showing NetBIOSName CONTOSO and DNSRoot contoso.local">
+      <figcaption>Get-ADDomain confirming the forest actually stood up, not just that the promotion command returned without error.</figcaption>
+    </figure>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/dc-promotion-services-running-480.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/dc-promotion-services-running-480.webp 480w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="480" height="102"
+           loading="lazy" decoding="async"
+           alt="Get-Service output for NTDS, DNS, and Netlogon all showing a Running status on the newly promoted domain controller">
+      <figcaption>NTDS, DNS, and Netlogon all Running, the three services the entire lab depends on staying up from this point forward.</figcaption>
+    </figure>
+
+    <p>
+      Active Directory depends on DNS so heavily that it isn't really optional
+      infrastructure alongside AD, it's part of AD, domain controllers advertise
+      themselves via DNS SRV records, and clients use those records to find a DC to
+      authenticate against. The AD-integrated zone gets created automatically during
+      promotion, but it's only authoritative for <span class="mono">contoso.local</span>,
+      it has no idea how to answer a public lookup like <span class="mono">google.com</span>
+      without a forwarder pointed upstream, which also happens to be a prerequisite for
+      WSUS's own sync later:
+    </p>
+    <pre><code>Add-DnsServerForwarder -IPAddress 8.8.8.8, 1.1.1.1</code></pre>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/dns-forwarders-configured-480.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/dns-forwarders-configured-480.webp 480w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="480" height="192"
+           loading="lazy" decoding="async"
+           alt="Get-DnsServerForwarder output showing 8.8.8.8 and 1.1.1.1 configured as public DNS forwarders on the domain controller">
+      <figcaption>Both public forwarders configured, so the DC can resolve names outside its own authoritative zone.</figcaption>
+    </figure>
+
+    <p>
+      DHCP is what hands every other machine its IP, subnet mask, gateway, and DNS
+      server automatically. Having the domain controller be the single source of DHCP
+      is also exactly why an unauthorized second DHCP server is treated as a security
+      problem by Windows, not just a misconfiguration: a domain-joined client will
+      silently ignore a lease from any DHCP server that isn't explicitly authorized in
+      AD, which is the built-in defense against a rogue or accidental second DHCP
+      server (a misconfigured VM, a consumer router plugged in somewhere it shouldn't
+      be) handing out bad configuration.
+    </p>
+    <pre><code>Add-DhcpServerv4Scope -Name "Main-Scope" -StartRange 10.10.0.100 -EndRange 10.10.0.200 -SubnetMask 255.255.255.0
+Add-DhcpServerInDC -DnsName "dc01.contoso.local" -IPAddress 10.10.0.10</code></pre>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/dhcp-scope-and-client-lease-800.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/dhcp-scope-and-client-lease-480.webp 480w,
+                   /assets/img/active-directory-home-lab-windows-server-2022-gpo/dhcp-scope-and-client-lease-800.webp 800w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="800" height="229"
+           loading="lazy" decoding="async"
+           alt="DHCP scope details for the 10.10.0.100 to 10.10.0.200 range with an active client lease shown under Get-DhcpServerv4Lease">
+      <figcaption>The scope, plus an actual client lease, proof the scope works and not just that it exists.</figcaption>
+    </figure>
+
+    <h2>The DC hygiene most home labs skip</h2>
+    <p>
+      Three small pieces of domain controller housekeeping that a real environment
+      doesn't skip, even though a lot of home labs never touch them. Kerberos, the
+      authentication protocol underneath every domain logon, fails silently once
+      client and server clocks drift more than five minutes apart by default, one of
+      the more confusing AD failure modes because the error it produces doesn't
+      obviously say "clock skew." Since this lab's single DC holds every FSMO role
+      including PDC Emulator, it's the root of time authority for the whole domain and
+      needs to sync from a real external source rather than the hypervisor's own
+      clock:
+    </p>
+    <pre><code>w32tm /config /manualpeerlist:"time.windows.com,0x1 time.google.com,0x1" /syncfromflags:manual /reliable:yes /update
+Enable-ADOptionalFeature -Identity "Recycle Bin Feature" -Scope ForestOrConfigurationSet -Target contoso.local -Confirm:$false</code></pre>
+    <p>
+      The AD Recycle Bin is off by default and there's no undo for turning it off once
+      it's on, worth doing deliberately rather than skipping and hoping nothing gets
+      deleted by accident, since it's what turns a deleted user, group, or entire OU
+      from a difficult, incomplete tombstone recovery into a restore that brings the
+      object back intact, attributes and group memberships included. DNS scavenging
+      rounds out the list, without it, DNS records for decommissioned or renamed
+      machines never age out, and a few years into a real environment's life the zone
+      fills up with stale records pointing at IPs that belong to something else now.
+    </p>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/time-sync-external-source-480.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/time-sync-external-source-480.webp 480w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="438" height="207"
+           loading="lazy" decoding="async"
+           alt="w32tm query source output on the domain controller confirming it is syncing from an external NTP time source rather than the local hypervisor clock">
+      <figcaption>Time source confirmed external, not the local CMOS clock a paused or sleeping hypervisor can drift.</figcaption>
+    </figure>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/ad-recycle-bin-enabled-800.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/ad-recycle-bin-enabled-480.webp 480w,
+                   /assets/img/active-directory-home-lab-windows-server-2022-gpo/ad-recycle-bin-enabled-800.webp 800w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="800" height="93"
+           loading="lazy" decoding="async"
+           alt="Get-ADOptionalFeature output showing the AD Recycle Bin Feature enabled with the domain's distinguished name listed under EnabledScopes">
+      <figcaption>AD Recycle Bin confirmed enabled at the forest scope, which Section 26's restore drill later depends on.</figcaption>
+    </figure>
+
+    <h2>Group Policy: nine GPOs, each with exactly one job</h2>
+    <p>
+      The temptation with Group Policy is to let one GPO slowly accumulate every
+      unrelated setting someone thought of that week. I listed every GPO before
+      building any of them specifically to avoid that: a domain-wide password and
+      lockout baseline, a Fine-Grained Password Policy layered on top for privileged
+      accounts, three department drive-mapping GPOs, an HR folder redirection GPO, a
+      domain-wide security baseline, a domain-wide audit policy, a LAPS GPO scoped to
+      every Computers OU, and a WSUS client-configuration GPO. Nine separate, single-
+      purpose policies instead of one catch-all.
+    </p>
+    <p>
+      Account lockout and the baseline password policy have to be edited directly on
+      the Default Domain Policy, Windows only honors one password and lockout policy
+      per domain via GPO, which is exactly why the stricter policy for
+      <span class="mono">SG-IT-Admins</span> can't just be a second linked GPO, the
+      domain-wide policy always wins for password and lockout settings regardless of
+      which OU a second GPO targets.
+    </p>
+    <pre><code>Set-ADDefaultDomainPasswordPolicy -Identity contoso.local -MinPasswordLength 12 `
+  -PasswordHistoryCount 10 -MaxPasswordAge (New-TimeSpan -Days 90) `
+  -LockoutThreshold 5 -LockoutDuration (New-TimeSpan -Minutes 30) -ComplexityEnabled $true</code></pre>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/default-domain-password-policy-800.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/default-domain-password-policy-480.webp 480w,
+                   /assets/img/active-directory-home-lab-windows-server-2022-gpo/default-domain-password-policy-800.webp 800w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="800" height="262"
+           loading="lazy" decoding="async"
+           alt="Get-ADDefaultDomainPasswordPolicy output showing a 12-character minimum password length and a lockout threshold of 5 failed attempts">
+      <figcaption>The domain-wide baseline every account gets by simply existing in the domain, before the stricter policy below layers on top.</figcaption>
+    </figure>
+
+    <p>
+      A Fine-Grained Password Policy (technically a Password Settings Object, or PSO)
+      is a second, separate password policy that can target a specific group instead
+      of the whole domain, which is what lets <span class="mono">SG-IT-Admins</span>
+      get a 16-character minimum, a 60-day max age, and a 3-attempt lockout threshold,
+      all stricter than the domain default, while everyone else stays completely
+      unaffected. <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/get-started/adac/fine-grained-password-policies" rel="noopener" target="_blank">Microsoft's own documentation on Fine-Grained Password Policies</a>
+      covers the precedence mechanism this depends on: if more than one PSO could
+      apply to the same user, the one with the lower precedence number wins, which
+      matters more once a real environment ends up with several PSOs (service
+      accounts, admins, a break-glass account) layered against each other.
+    </p>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/fine-grained-password-policy-resultant-800.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/fine-grained-password-policy-resultant-480.webp 480w,
+                   /assets/img/active-directory-home-lab-windows-server-2022-gpo/fine-grained-password-policy-resultant-800.webp 800w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="800" height="602"
+           loading="lazy" decoding="async"
+           alt="Get-ADUserResultantPasswordPolicy output for an SG-IT-Admins member showing a 16-character minimum password length, confirming the Fine-Grained Password Policy is winning over the domain default of 12"
+      >
+      <figcaption>16-character minimum, not the domain default of 12, confirming the more specific policy is actually the one in effect.</figcaption>
+    </figure>
+
+    <p>
+      Drive mapping uses a Group Policy Preference rather than a logon script, so a
+      drive letter simply appears at logon with no one needing to remember a UNC path.
+      Item-level targeting adds an extra condition inside the GPO itself, so the drive
+      only maps for members of the matching department security group even if the GPO
+      were ever linked somewhere broader by mistake later, defense in depth on top of
+      the OU link alone.
+    </p>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/drive-mapping-gpo-result-1200.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/drive-mapping-gpo-result-480.webp 480w,
+                   /assets/img/active-directory-home-lab-windows-server-2022-gpo/drive-mapping-gpo-result-800.webp 800w,
+                   /assets/img/active-directory-home-lab-windows-server-2022-gpo/drive-mapping-gpo-result-1200.webp 1200w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="1200" height="528"
+           loading="lazy" decoding="async"
+           alt="File Explorer on the domain-joined client showing the H drive automatically mapped to the HR-Share network path, including a Redirected-Documents folder from the folder redirection GPO"
+      >
+      <figcaption>H: already mapped at logon, no manual action taken, with the folder-redirection GPO's Redirected-Documents folder visible alongside it.</figcaption>
+    </figure>
+
+    <p>
+      The security baseline GPO bundles three individually small but meaningfully
+      protective settings into one domain-wide policy. Disabling SMBv1 removes an
+      entire, well-known attack path at essentially zero functional cost, it's
+      specifically the protocol
+      <a href="https://www.cisa.gov/news-events/alerts/2017/05/12/indicators-associated-wannacry-ransomware" rel="noopener" target="_blank">the EternalBlue exploit used by WannaCry targeted</a>,
+      and nothing modern still needs it. A 10-minute forced screen lock closes the
+      walk-up physical access window on an unattended workstation, and disabling the
+      USB mass-storage driver's start type closes a straightforward data-exfiltration
+      and malware-vector path.
+    </p>
+    <pre><code>Set-GPRegistryValue -Name "Domain-Security-Baseline" -Key "HKLM\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" -ValueName "SMB1" -Type DWord -Value 0</code></pre>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/security-baseline-smb1-disabled-480.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/security-baseline-smb1-disabled-480.webp 480w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="480" height="64"
+           loading="lazy" decoding="async"
+           alt="Get-SmbServerConfiguration output on the domain-joined client showing EnableSMB1Protocol set to False after the security baseline GPO applied">
+      <figcaption>EnableSMB1Protocol: False on the client, confirmed after gpupdate /force, not just linked and assumed.</figcaption>
+    </figure>
+
+    <p>
+      Logging is its own deliberate policy, not whatever the legacy, coarse-grained
+      audit settings happen to capture by default. Without a specific audit policy,
+      the events an incident actually needs, who logged on and from where, who got
+      added to a privileged group, when an account locked out, may simply not be
+      recorded at all. The subcategory that actually generates the account-lockout
+      event is Account Management &gt; Audit User Account Management, not the
+      similarly-named Account Lockout subcategory under Logon/Logoff, which governs
+      something else entirely and will leave the Security log empty even though the
+      lockout itself works correctly, an easy trap to fall into on a first pass.
+    </p>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/event-4740-account-lockout-audit-800.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/event-4740-account-lockout-audit-480.webp 480w,
+                   /assets/img/active-directory-home-lab-windows-server-2022-gpo/event-4740-account-lockout-audit-800.webp 800w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="800" height="140"
+           loading="lazy" decoding="async"
+           alt="Windows Security event log entry for Event ID 4740, an account lockout event, showing the locked-out account name and source computer">
+      <figcaption>Event ID 4740, a real captured lockout, proving the audit policy and the lockout threshold are actually working together.</figcaption>
+    </figure>
+
+    <p>
+      Last in the Group Policy section, a Central Store hosts the Administrative
+      Template files (<span class="mono">.admx</span>/<span class="mono">.adml</span>)
+      once, in SYSVOL, so every management tool reads the same version regardless of
+      which machine it's run from, instead of each admin workstation drifting out of
+      sync against its own local copy as Windows feature releases change what settings
+      are even available.
+    </p>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/group-policy-central-store-800.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/group-policy-central-store-480.webp 480w,
+                   /assets/img/active-directory-home-lab-windows-server-2022-gpo/group-policy-central-store-800.webp 800w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="800" height="676"
+           loading="lazy" decoding="async"
+           alt="Directory listing of the PolicyDefinitions folder under SYSVOL showing ADMX files and the en-US language folder populated in the Group Policy Central Store">
+      <figcaption>PolicyDefinitions populated in SYSVOL, the point where GPMC on any machine silently starts reading from the Central Store instead of its own local template cache.</figcaption>
+    </figure>
+
+    <h2>Two layers of permission that actually have to agree with each other</h2>
+    <p>
+      A share permission controls access only at the network-share boundary. An NTFS
+      permission controls access at the file system itself, and applies whether
+      someone reaches it over the network or by sitting at the server's own console.
+      Setting both, and making sure they actually agree, is what real environments
+      call defense in depth: even if one layer were misconfigured, the other still
+      enforces the intended access. Reusing <span class="mono">SG-HR</span>, the same
+      group the drive-mapping GPO already targets, for the actual NTFS grant means
+      there's exactly one place membership needs to be correct, add someone to
+      <span class="mono">SG-HR</span> and they get both the mapped drive and the real
+      access to use it.
+    </p>
+    <p>
+      Proving this actually works, rather than assuming a correctly-written ACL
+      behaves as expected, meant testing both directions: a non-HR account attempting
+      to browse the share directly, and an HR account doing the same.
+    </p>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/ntfs-permission-test-hr-granted-800.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/ntfs-permission-test-hr-granted-480.webp 480w,
+                   /assets/img/active-directory-home-lab-windows-server-2022-gpo/ntfs-permission-test-hr-granted-800.webp 800w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="800" height="595"
+           loading="lazy" decoding="async"
+           alt="File Explorer showing an HR user account successfully browsing the HR-Share network drive mapped to H, confirming NTFS and share permissions grant access as intended">
+      <figcaption>An HR account: full access to the mapped H: drive, exactly as designed.</figcaption>
+    </figure>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/ntfs-permission-test-nonhr-denied-480.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/ntfs-permission-test-nonhr-denied-480.webp 480w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="480" height="359"
+           loading="lazy" decoding="async"
+           alt="Windows access denied error when a non-HR domain user account attempts to browse the HR-Share network path directly, confirming NTFS permissions correctly block access outside the HR group">
+      <figcaption>A valid domain account outside HR: access denied browsing the same path directly. The negative test is what actually proves the permission, not just the positive one.</figcaption>
+    </figure>
+
+    <h2>Windows LAPS: no more identical local admin passwords</h2>
+    <p>
+      Without LAPS, most environments, home labs included, build every workstation
+      from the same image, which means every machine ends up with the identical local
+      Administrator password. Once that one password is known, an attacker who
+      compromises any single workstation can move laterally to every other machine
+      using the exact same credential, one of the most common real-world lateral
+      movement techniques,
+      <a href="https://attack.mitre.org/techniques/T1550/002/" rel="noopener" target="_blank">MITRE ATT&amp;CK catalogs it as Pass the Hash (T1550.002)</a>.
+      <a href="https://learn.microsoft.com/en-us/windows-server/identity/laps/laps-overview" rel="noopener" target="_blank">Windows LAPS</a>
+      closes that path entirely: it randomizes and rotates the local Administrator
+      password independently on every domain-joined machine and stores the current
+      value as a protected attribute in AD, readable only by accounts explicitly
+      granted permission. Compromising one machine's local admin password afterward
+      gives an attacker nothing usable anywhere else.
+    </p>
+    <p>
+      Windows LAPS ships built into Server 2022 and modern Windows 11, but only from a
+      specific cumulative update onward, not present in a fresh, never-updated
+      evaluation ISO, which cost real troubleshooting time before the actual cause was
+      obvious: on an unpatched DC, <span class="mono">Update-LapsADSchema</span> and
+      the other LAPS cmdlets simply don't exist yet, producing a "term not recognized"
+      error that reads like a typo rather than a missing update. There's a second,
+      subtler version of this trap: if the Group Policy Central Store was built before
+      the update that brings Windows LAPS, the LAPS category won't show up under
+      Administrative Templates at all, GPMC reads ADMX files from the Central Store
+      once one exists and ignores the local <span class="mono">PolicyDefinitions</span>
+      folder entirely, even if the update just delivered a newer LAPS template there.
+      The fix in that case is copying the two LAPS template files into the Central
+      Store manually and reopening the Group Policy Management Editor with a fresh
+      window, since it caches the ADMX list on open.
+    </p>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/laps-password-retrieval-redacted-480.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/laps-password-retrieval-redacted-480.webp 480w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="480" height="141"
+           loading="lazy" decoding="async"
+           alt="Get-LapsADPassword PowerShell output for the domain-joined Windows 11 client showing a successful decryption status and an expiration timestamp roughly 30 days out, with the actual password value redacted">
+      <figcaption>Get-LapsADPassword: DecryptionStatus Success and a 30-day expiration, confirming rotation is actually working. Password value cropped, this is a public repo.</figcaption>
+    </figure>
+
+    <h2>A help desk that can reset passwords without being Domain Admin</h2>
+    <p>
+      The most common real-world AD anti-pattern is making every IT staffer a Domain
+      Admin because it's the fastest way to unblock a password-reset ticket. It's also
+      the fastest way to turn one compromised help desk account into a domain-wide
+      incident, since a Domain Admin account can do anything, including adding new
+      Domain Admins or modifying GPOs, far more than a reset ticket ever needed.
+      Delegation hands out exactly the two rights a help desk role actually uses,
+      scoped to exactly the OUs it supports, and nothing else, using
+      <span class="mono">dsacls</span> since the AD PowerShell module doesn't expose a
+      clean cmdlet for this specific delegation:
+    </p>
+    <pre><code>dsacls "OU=IT,OU=Departments,DC=contoso,DC=local" /I:S /G "CONTOSO\SG-HelpDesk:CA;Reset Password;user"
+dsacls "OU=IT,OU=Departments,DC=contoso,DC=local" /I:S /G "CONTOSO\SG-HelpDesk:WP;lockoutTime;user"</code></pre>
+    <p>
+      Repeated against the HR and Finance OUs so the same group supports all three
+      departments. The negative test is what actually proves this is least-privilege
+      and not just a renamed admin group: a member of <span class="mono">SG-HelpDesk</span>
+      can reset a test user's password and clear a lockout, but that same account
+      cannot create a new OU or add anyone to Domain Admins, because none of that was
+      ever granted.
+    </p>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/helpdesk-delegation-dsacls-800.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/helpdesk-delegation-dsacls-480.webp 480w,
+                   /assets/img/active-directory-home-lab-windows-server-2022-gpo/helpdesk-delegation-dsacls-800.webp 800w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="800" height="395"
+           loading="lazy" decoding="async"
+           alt="dsacls output on the IT organizational unit showing the SG-HelpDesk group granted the Reset Password extended right and write access to the lockoutTime attribute">
+      <figcaption>The SG-HelpDesk ACEs actually landed on the OU: Reset Password and the lockoutTime write, nothing broader.</figcaption>
+    </figure>
+
+    <h2>A patch management CAB meeting, then WSUS</h2>
+    <p>
+      Before WSUS went live, a short Change Advisory Board review: every machine in
+      the domain was checking Windows Update directly, on its own schedule, with zero
+      visibility into what was actually installed where, and no way to catch a bad
+      patch before it hit every machine at once. The approved approach staged
+      approval instead of all-or-nothing, a small test group of non-critical machines
+      gets new updates first, and the broader domain doesn't get anything until that
+      group's been stable for a few days, so a bad patch breaks on the test group
+      instead of during a department's month-end close.
+    </p>
+    <p>
+      A fresh WSUS install's product catalog is stale and won't have what you need
+      yet, this tripped me up initially: the Products tab shows an old, limited
+      built-in list until WSUS completes a real sync against Microsoft Update, so a
+      brand-new install won't show Windows 11 or Windows Server 2022 at all, the tree
+      stops around Windows 8.1 and Server 2012 R2. Worth knowing before assuming
+      something's broken. An initial broad sync refreshes the catalog first, then the
+      actual product selection gets narrowed, and Windows Server 2022 doesn't appear
+      under that literal name in current WSUS catalogs either, Microsoft renamed the
+      server product categories, it shows up as <span class="mono">Microsoft Server
+      operating system-21H2</span> instead.
+    </p>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/wsus-sync-config-1-480.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/wsus-sync-config-1-480.webp 480w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="457" height="510"
+           loading="lazy" decoding="async"
+           alt="WSUS console Products and Classifications page after the initial catalog sync, with Windows 11 and Microsoft Server operating system-21H2 available for selection">
+      <figcaption>Products and Classifications, after the first broad sync refreshed the catalog enough to actually list Windows 11 and Server 2022.</figcaption>
+    </figure>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/wsus-sync-config-2-480.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/wsus-sync-config-2-480.webp 480w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="456" height="506"
+           loading="lazy" decoding="async"
+           alt="WSUS console Classifications tab with Critical Updates, Security Updates, and Updates selected, all other classifications unchecked">
+      <figcaption>Classifications narrowed to Critical Updates, Security Updates, and Updates, everything else unchecked.</figcaption>
+    </figure>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/wsus-sync-config-3-480.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/wsus-sync-config-3-480.webp 480w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="453" height="502"
+           loading="lazy" decoding="async"
+           alt="WSUS console Synchronizations view showing a completed synchronization with a succeeded result after narrowing the product selection">
+      <figcaption>The narrowed sync completing successfully, 0 new / 0 revised is the expected, correct result here, not a failure.</figcaption>
+    </figure>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/wsus-sync-config-4-480.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/wsus-sync-config-4-480.webp 480w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="480" height="62"
+           loading="lazy" decoding="async"
+           alt="WSUS synchronization result summary confirming the sync status as Succeeded">
+      <figcaption>Synchronization result: Succeeded, the detail worth checking before trusting a sync actually completed cleanly.</figcaption>
+    </figure>
+
+    <p>
+      Pointing clients at the internal WSUS server instead of Microsoft directly is a
+      GPO, not a per-machine setting:
+    </p>
+    <pre><code>Set-GPRegistryValue -Name "WSUS-Client-Config" -Key "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -ValueName "WUServer" -Type String -Value "http://dc01.contoso.local:8530"</code></pre>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/wsus-client-checkin-800.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/wsus-client-checkin-480.webp 480w,
+                   /assets/img/active-directory-home-lab-windows-server-2022-gpo/wsus-client-checkin-800.webp 800w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="800" height="151"
+           loading="lazy" decoding="async"
+           alt="WSUS console All Computers view showing the domain-joined Windows 11 client checked in and reporting status">
+      <figcaption>The client showing up under All Computers within minutes of the next detection cycle, now a managed machine instead of talking to Microsoft directly.</figcaption>
+    </figure>
+
+    <p>
+      Once at least one cycle ran, the compliance view the CAB actually asked for,
+      "which machines are missing which patch," without walking around checking each
+      one by hand:
+    </p>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/wsus-compliance-report-800.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/wsus-compliance-report-480.webp 480w,
+                   /assets/img/active-directory-home-lab-windows-server-2022-gpo/wsus-compliance-report-800.webp 800w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="800" height="561"
+           loading="lazy" decoding="async"
+           alt="WSUS Update Status Summary compliance report showing approval and installation status broken down by update for the test group">
+      <figcaption>The compliance report itself, a native WSUS view instead of a manual per-machine walk-around.</figcaption>
+    </figure>
+
+    <h2>Scripted provisioning instead of clicking through ADUC by hand</h2>
+    <p>
+      Manual account creation is inconsistent by nature, someone forgets to add a new
+      hire to the right security group, or drops the account in the wrong OU, and that
+      person is either missing access they need or quietly outside every policy meant
+      to apply to their department, discovered only when something breaks or an audit
+      catches it. A CSV of new-hire data plus one PowerShell script removes that
+      variance entirely, the same inputs produce the same result every time: the
+      script creates each account in the matching department OU, sets a temporary
+      password requiring change at next logon, and adds the account to the matching
+      <span class="mono">SG-&lt;Department&gt;</span> group automatically.
+    </p>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/bulk-user-provisioning-script-run-800.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/bulk-user-provisioning-script-run-480.webp 480w,
+                   /assets/img/active-directory-home-lab-windows-server-2022-gpo/bulk-user-provisioning-script-run-800.webp 800w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="800" height="128"
+           loading="lazy" decoding="async"
+           alt="PowerShell console output from the bulk user provisioning script creating multiple Active Directory accounts from a CSV file, with printed temporary passwords redacted"
+      >
+      <figcaption>The script's console output against a sample CSV, temporary passwords cropped, this is a public repo.</figcaption>
+    </figure>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/provisioning-verification-get-aduser-800.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/provisioning-verification-get-aduser-480.webp 480w,
+                   /assets/img/active-directory-home-lab-windows-server-2022-gpo/provisioning-verification-get-aduser-800.webp 800w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="800" height="88"
+           loading="lazy" decoding="async"
+           alt="Get-ADUser filter output confirming a newly provisioned account landed in the correct department organizational unit with the correct department attribute set">
+      <figcaption>Get-ADUser confirming the new account landed in the right OU with the right department attribute, not just that the script exited cleanly.</figcaption>
+    </figure>
+
+    <h2>Joining the client and proving policy actually applied</h2>
+    <p>
+      Domain-joining tells a machine to trust <span class="mono">contoso.local</span>
+      for authentication going forward, and every GPO scoped to reach it starts
+      applying from that point on.
+    </p>
+    <pre><code>Add-Computer -DomainName "contoso.local" -Credential (Get-Credential) -Restart</code></pre>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/domain-join-success-signin-screen-800.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/domain-join-success-signin-screen-480.webp 480w,
+                   /assets/img/active-directory-home-lab-windows-server-2022-gpo/domain-join-success-signin-screen-800.webp 800w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="800" height="424"
+           loading="lazy" decoding="async"
+           alt="Windows 11 sign-in screen after domain join, showing CONTOSO domain user accounts available to sign in with, confirming the client successfully joined the contoso.local domain">
+      <figcaption>The sign-in screen after reboot, CONTOSO domain accounts now available, confirming the join actually succeeded.</figcaption>
+    </figure>
+
+    <p>
+      After the client reboots, its computer object lands in the generic
+      <span class="mono">Computers</span> container by default, not any department OU,
+      which sits outside the whole OU structure this lab is built around, meaning
+      LAPS and department-specific policy won't apply until the object is moved
+      manually. This is one of the most common "why isn't my GPO applying" causes in
+      real environments, not just a lab quirk.
+    </p>
+    <pre><code>Move-ADObject -Identity (Get-ADComputer "WINDOWS11").DistinguishedName -TargetPath "OU=Computers,OU=IT,OU=Departments,DC=contoso,DC=local"</code></pre>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/computer-object-moved-to-department-ou-800.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/computer-object-moved-to-department-ou-480.webp 480w,
+                   /assets/img/active-directory-home-lab-windows-server-2022-gpo/computer-object-moved-to-department-ou-800.webp 800w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="800" height="123"
+           loading="lazy" decoding="async"
+           alt="Active Directory computer object shown residing in the correct department Computers organizational unit after being moved from the default Computers container">
+      <figcaption>The computer object sitting inside the correct department Computers OU, not the default container it lands in by default.</figcaption>
+    </figure>
+
+    <p>
+      <span class="mono">gpresult</span> reports what Group Policy actually did on
+      this specific machine right now, as opposed to what's theoretically linked
+      somewhere in the domain, a distinction that matters because a GPO being linked
+      to an OU is not the same thing as it actually applying, security filtering, WMI
+      filtering, or the object sitting in the wrong OU can all silently prevent it.
+    </p>
+    <pre><code>gpresult /h C:\Temp\gpresult-report.html /f</code></pre>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/gpresult-html-report-applied-gpos-480.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/gpresult-html-report-applied-gpos-480.webp 480w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="480" height="212"
+           loading="lazy" decoding="async"
+           alt="gpresult HTML report showing the full list of Group Policy objects applied to the client and logged-in user, all shown as Applied rather than Denied or Filtered">
+      <figcaption>Every expected GPO showing Applied, the artifact that actually proves policy took effect rather than just being linked somewhere.</figcaption>
+    </figure>
+
+    <h2>Four things that went wrong, and what actually fixed them</h2>
+    <p>
+      A build like this doesn't go cleanly end to end, and I think the failures are
+      more useful to document than pretending everything worked on the first try.
+    </p>
+    <p>
+      <strong>DHCP clients came back with an APIPA address after an unclean VM
+      shutdown.</strong> Recovering from a hung Windows Update install with a forced
+      power-off cost the DC's own network adapter its static IP, it fell back to
+      <span class="mono">169.254.x.x</span> itself, which left DHCP Server with
+      nothing to bind to. <span class="mono">Get-Service DHCPServer</span> still
+      showed <span class="mono">Running</span>, the service being "Running" only means
+      the process started, not that it's actually listening on anything, so the real
+      diagnostic was <span class="mono">Get-DhcpServerv4Binding</span> coming back
+      completely empty. Restoring the DC's own static IP and restarting the service
+      fixed it, checking the server side first here mattered more than troubleshooting
+      the client.
+    </p>
+    <p>
+      <strong>A GPO category didn't show up under Administrative Templates at
+      all.</strong> Covered above under LAPS, building the Central Store before
+      installing the update that brings Windows LAPS means GPMC never sees the
+      category, since it reads exclusively from the Central Store once one exists.
+    </p>
+    <p>
+      <strong>WSUS's product list didn't have Windows 11 or Server 2022 on a fresh
+      install.</strong> Also covered above, the catalog needs a first broad sync
+      before the real product selection can even be narrowed, and Server 2022 hides
+      under a renamed product category rather than its expected name.
+    </p>
+    <p>
+      <strong>A deleted test object's restore filter silently matched nothing.</strong>
+      Building the AD Recycle Bin drill, <span class="mono">New-ADUser</span> doesn't
+      auto-populate <span class="mono">displayName</span> from
+      <span class="mono">-Name</span> unless it's passed explicitly, and a deleted
+      object's RDN gets mangled with an <span class="mono">\0ADEL:&lt;GUID&gt;</span>
+      suffix, making an exact name filter unreliable against it. Filtering the
+      restore by <span class="mono">displayName</span> instead, set explicitly at
+      creation, is what made the restore actually findable, skipping that step means
+      <span class="mono">Restore-ADObject</span> silently does nothing with an empty
+      pipeline, no error, just a restore that looks like it worked until the final
+      verification comes back "not found."
+    </p>
+
+    <h2>Backups tested for real, not assumed</h2>
+    <p>
+      A domain controller backup that's never actually been restored from is a domain
+      controller with an assumption, not a tested recovery procedure. A System State
+      backup captures AD's database, SYSVOL, and the registry, everything needed to
+      bring the directory itself back, and the only way to actually know it works is
+      to restore from it at least once in a controlled setting before depending on it
+      during a real incident.
+    </p>
+    <pre><code>wbadmin start systemstatebackup -backuptarget:C:\Backups -quiet
+wbadmin get versions</code></pre>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/system-state-backup-completed-480.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/system-state-backup-completed-480.webp 480w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="480" height="139"
+           loading="lazy" decoding="async"
+           alt="wbadmin get versions output listing a completed System State backup on the domain controller with its version identifier and timestamp">
+      <figcaption>wbadmin get versions confirming a completed System State backup, version identifier and timestamp intact.</figcaption>
+    </figure>
+
+    <p>
+      I'm being direct about a scope limit here rather than implying more than
+      actually happened: an actual <span class="mono">systemstaterecovery</span>
+      forces a Directory Services Restore Mode boot and rewrites the live DC's AD
+      database, registry, and SYSVOL in place. On a lab with only one domain
+      controller, that's a real, if VM-snapshot-recoverable, risk to take on just to
+      produce a screenshot, so this build documents and validates the exact command
+      and procedure without executing the whole-server restore live end to end. A
+      multi-DC lab, or a disposable DC built specifically for this drill, removes that
+      risk entirely and would be the better setup if this specific step needed to be
+      demonstrated live.
+    </p>
+    <p>
+      The AD Recycle Bin drill is a different tool for a different problem: a whole-
+      server restore is right for "the domain controller is gone," and the wrong tool
+      entirely for "someone deleted the Finance OU by accident," a five-second mistake
+      that shouldn't require a multi-hour DSRM recovery to fix. This one I did run live
+      end to end, on a disposable test object, created, deleted, and restored:
+    </p>
+    <pre><code>Get-ADObject -Filter {DisplayName -eq "RecycleBin-Drill"} -IncludeDeletedObjects | Restore-ADObject</code></pre>
+
+    <figure class="post-figure">
+      <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/ad-recycle-bin-object-restore-verified-800.webp"
+           srcset="/assets/img/active-directory-home-lab-windows-server-2022-gpo/ad-recycle-bin-object-restore-verified-480.webp 480w,
+                   /assets/img/active-directory-home-lab-windows-server-2022-gpo/ad-recycle-bin-object-restore-verified-800.webp 800w"
+           sizes="(max-width: 46rem) 100vw, 46rem"
+           width="800" height="265"
+           loading="lazy" decoding="async"
+           alt="Get-ADUser output after an AD Recycle Bin restore, showing the deleted test object exists again with its original distinguished name intact in the correct organizational unit">
+      <figcaption>The restored object back at its original distinguished name, proof the Recycle Bin restores to where an object actually lived, not just that a record of it exists somewhere.</figcaption>
+    </figure>
+
+    <h2>A lifecycle this lab has in common with a written runbook</h2>
+    <p>
+      Building the actual infrastructure here made something click that I'd only
+      understood on paper before, from writing
+      <a href="../blog/it-runbook-sops-real-service-desk.html" rel="noopener" target="_blank">a five-document IT runbook covering onboarding, offboarding, and password reset procedures</a>
+      a few weeks earlier: onboarding is the act of granting access correctly,
+      offboarding is the act of removing it correctly, and a role-based structure is
+      what makes both halves cheap. The SOPs in that runbook assumed role templates
+      existed to onboard against. This lab is what actually building one of those
+      templates looks like in practice: a department OU, a security group tied to
+      real drive and NTFS permissions, and a provisioning script that grants all of it
+      in one consistent step. Add someone to <span class="mono">SG-Finance</span> and
+      offboarding later means removing exactly one membership, not reconstructing
+      from memory everything a specific person happened to accumulate over an
+      eighteen-month tenure.
+    </p>
+    <p>
+      It's also a useful contrast against
+      <a href="../blog/automate-microsoft-365-admin-tasks-powershell-graph.html" rel="noopener" target="_blank">automating identity lifecycle tasks against a Microsoft 365 tenant with the Graph PowerShell SDK</a>:
+      that project automated a cloud directory that already existed. This one builds
+      the on-prem directory itself, GPOs, delegation, and patch management included,
+      the layer a hybrid identity setup sits on top of rather than replaces. And the
+      security-baseline GPO here, SMBv1 disabled domain-wide, sits on the same theme
+      as
+      <a href="../blog/vulnerability-management-program-tenable-powershell-bash.html" rel="noopener" target="_blank">the vulnerability management program built around Tenable scanning and CIS Benchmark audits</a>:
+      closing a known, well-documented attack path before a scanner has to find it
+      for you.
+    </p>
+
+    <h2>What this actually demonstrates</h2>
+    <p>
+      Active Directory Domain Services design and deployment, Group Policy across
+      real categories instead of one password-policy example, Fine-Grained Password
+      Policies for tiered privileged access, Windows LAPS eliminating shared local
+      admin credentials, tiered delegation giving a help desk real capability without
+      full Domain Admin rights, NTFS and share permission design mapped to
+      organizational structure, centralized patch management with compliance
+      reporting, PowerShell automation for account lifecycle, DC hygiene most public
+      write-ups skip entirely, and a backup and restore procedure tested at both the
+      whole-server and single-object level. None of it is exotic. That combination,
+      unglamorous but load-bearing, is what separates a resume line from something a
+      hiring manager actually asks follow-up questions about.
+    </p>
+
+    <h2>Frequently asked questions</h2>
+
+    <h3>Why does this lab use a VirtualBox NAT Network instead of plain NAT or Bridged networking?</h3>
+    <p>
+      Plain NAT puts each VM behind its own isolated NAT instance, so the domain
+      controller and the client can each reach the internet but cannot see each
+      other, domain join fails before it even reaches a credentials prompt. Bridged
+      networking exposes both VMs directly on the home LAN, where a home router
+      already running DHCP collides with the domain controller's own DHCP scope. A
+      VirtualBox NAT Network is a single shared virtual switch that gives every
+      attached VM both a route to the internet and a route to each other, with its
+      own built-in DHCP turned off so it doesn't race the domain controller's DHCP
+      server for client leases.
+    </p>
+
+    <h3>Why put a stricter password policy on IT admin accounts instead of raising it for the whole domain?</h3>
+    <p>
+      Windows only honors one password and lockout policy per domain through the
+      Default Domain Policy, so a second GPO with different password settings on a
+      different OU would simply be ignored for that purpose. A Fine-Grained Password
+      Policy is the mechanism built for exactly this: it targets a specific security
+      group, so IT-Admins accounts get a 16-character minimum and a 3-attempt lockout
+      threshold while everyone else keeps the domain default, raising the bar only for
+      the accounts whose compromise actually matters most.
+    </p>
+
+    <h3>What does Windows LAPS actually protect against?</h3>
+    <p>
+      Without it, most environments build every workstation from the same image, so
+      every machine ends up with the identical local Administrator password. Once
+      that one password is known, an attacker who compromises a single workstation can
+      move laterally to every other machine using the same credential, pass-the-hash.
+      Windows LAPS randomizes and rotates the local Administrator password
+      independently on every domain-joined machine and stores the current value as a
+      protected, permission-gated attribute in Active Directory, so compromising one
+      machine's local admin password gives an attacker nothing usable anywhere else.
+    </p>
+
+    <h3>Why delegate password-reset rights to a help desk group instead of just making them Domain Admins?</h3>
+    <p>
+      Making every help desk technician a Domain Admin is the fastest way to unblock a
+      ticket, and also the fastest way to turn one compromised help desk account into
+      a domain-wide incident, since a Domain Admin can do anything, including adding
+      new Domain Admins or modifying Group Policy. Delegating exactly two rights,
+      Reset Password and the ability to write the lockoutTime attribute, scoped only
+      to the OUs the help desk actually supports, gives that group real capability
+      with none of the excess access.
+    </p>
+
+    <h3>Why back up a domain controller if you've never actually restored from the backup?</h3>
+    <p>
+      A domain controller backup that's never been restored from is a domain
+      controller with an assumption, not a tested recovery procedure. The only way to
+      actually know a System State backup works is to walk through a real restore in a
+      controlled setting, on a VM snapshot you can roll back regardless of outcome,
+      before depending on it during a genuine incident. The AD Recycle Bin serves a
+      related but different purpose, restoring a single accidentally deleted object in
+      seconds instead of requiring a multi-hour, whole-server restore for a
+      five-second mistake.
+    </p>
+
+    <h2>Try it yourself</h2>
+    <p>
+      The full 29-section runbook, every PowerShell command, every screenshot, the
+      bulk-provisioning script, the network topology diagram, and a troubleshooting
+      guide built from the actual issues hit during this build, is public:
+    </p>
+    <p>
+      Runbook and repository:
+      <a href="https://github.com/rachata072/active-directory-home-lab/blob/main/RUNBOOK.md" rel="noopener" target="_blank">github.com/rachata072/active-directory-home-lab</a>
+    </p>
+    <p>
+      This is part of an ongoing series of IT support and cybersecurity projects I'm
+      building for my portfolio
+      (<a href="../index.html#about" rel="noopener" target="_blank">more on my background here</a>).
+      <a href="../blog.html" rel="noopener" target="_blank">More lab notes and write-ups land here</a>
+      as each one ships.
+    </p>
+
+    <p class="mono mt-3"><a href="../blog.html">&larr; show logging</a></p>
+  </article>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>© 2026 Trey · built by hand · no cookies · privacy-respecting analytics · <a href="../privacy.html">privacy</a></span>
+    <span><a href="../index.html">exit →</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

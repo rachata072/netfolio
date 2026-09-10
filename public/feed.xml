@@ -5,7 +5,7 @@
   <link>https://breakfixlearn.com/</link>
   <description>CCNA lab walkthroughs, plain-language security news breakdowns, and Python network automation notes.</description>
   <language>en</language>
-  <lastBuildDate>Sat, 05 Sep 2026 09:00:00 -0700</lastBuildDate>
+  <lastBuildDate>Thu, 10 Sep 2026 09:00:00 -0700</lastBuildDate>
   <atom:link href="https://breakfixlearn.com/feed.xml" rel="self" type="application/rss+xml"/>
 
   <!-- TEMPLATE: when you publish a post, copy this <item> block to the TOP
@@ -21,6 +21,15 @@
     <description>One-sentence summary, same as the blog index entry.</description>
   </item>
   -->
+
+  <item>
+    <title>I Built an Active Directory Home Lab That's More Than Three OUs and a Password Policy</title>
+    <link>https://breakfixlearn.com/blog/active-directory-home-lab-windows-server-2022-gpo.html</link>
+    <guid>https://breakfixlearn.com/blog/active-directory-home-lab-windows-server-2022-gpo.html</guid>
+    <pubDate>Thu, 10 Sep 2026 09:00:00 -0700</pubDate>
+    <category>SUPPORT</category>
+    <description>A from-scratch Active Directory lab on Windows Server 2022: OU design, Fine-Grained Password Policies, Windows LAPS, delegated help desk rights, WSUS patching, scripted provisioning, and a backup I actually tested.</description>
+  </item>
 
   <item>
     <title>Building an IT Runbook That Would Actually Survive Contact With a Real Service Desk</title>
