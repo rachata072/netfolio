@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twenty Simulated Helpdesk Tickets: Lessons in IT Support - Trey</title>
+  <meta name="description" content="Building a full Freshservice service desk from scratch: three SLA tiers, a category taxonomy, a service catalog, and twenty simulated helpdesk tickets designed to be genuinely representative of a real support queue.">
+  <link rel="canonical" href="https://breakfixlearn.com/blog/freshservice-service-desk-simulation-sla-tickets.html">
+  <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="What Twenty Fake Helpdesk Tickets Taught Me About Real IT Support">
+  <meta property="og:description" content="Building a full Freshservice service desk from scratch: three SLA tiers, a category taxonomy, a service catalog, and twenty simulated helpdesk tickets designed to be genuinely representative of a real support queue.">
+  <meta property="og:url" content="https://breakfixlearn.com/blog/freshservice-service-desk-simulation-sla-tickets.html">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "What Twenty Fake Helpdesk Tickets Taught Me About Real IT Support",
+    "datePublished": "2026-09-14",
+    "author": { "@type": "Person", "name": "Trey" },
+    "mainEntityOfPage": "https://breakfixlearn.com/blog/freshservice-service-desk-simulation-sla-tickets.html"
+  }
+  </script>
+  <!-- FAQPage schema - makes the FAQ section eligible for a rich-result snippet in search -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is this a live, running Freshservice instance, or is it documentation?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Right now it's fully written and ready to build, not yet entered into a live Freshservice trial account. The category taxonomy, the service catalog, all three SLA tiers, and all twenty tickets are complete and documented, but the repository still has a checklist of twenty seven screenshots left to capture once the configuration is actually built in a live trial. The reasoning behind the decisions, not the screenshots, is the part meant to demonstrate judgment, the screenshots exist to make it verifiable." }
+      },
+      {
+        "@type": "Question",
+        "name": "Why build three SLA tiers instead of one policy for the whole company?",
+        "acceptedAnswer": { "@type": "Answer", "text": "One flat SLA treats every ticket identically, which feels fair but ignores that the actual business impact of a blocked ticket varies enormously by who's blocked and why. A blocked executive assistant during board call preparation, or a dead conference room screen before a client call, has a blast radius a blocked individual contributor's routine task usually doesn't. Three tiers, VIP and Executive Support, Standard Business Support, and General and Self-Service Support, let response and resolution targets map to actual business risk instead of an identical number applied out of habit." }
+      },
+      {
+        "@type": "Question",
+        "name": "Why revoke a terminated employee's active sessions instead of just disabling their account?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Disabling sign-in access stops new logins, but an already authenticated session on a phone or personal device can keep working even after a password change, unless active sessions and refresh tokens are explicitly revoked too. That's an easy step to skip when offboarding is happening under time pressure, timed to the minute against an HR meeting in another room, which is exactly when a checklist followed carefully needs to catch what a checklist followed quickly would miss." }
+      },
+      {
+        "@type": "Question",
+        "name": "Why redirect a request for local admin rights instead of just approving or denying it?",
+        "acceptedAnswer": { "@type": "Answer", "text": "The employee's underlying need, installing one legitimate piece of software, was completely reasonable, but standing admin access is a much bigger and more permanent grant than a single approved install, since it widens what any future compromise on that laptop could do, not just what one install can do. Separating what someone actually needs from what they literally asked for, and routing the real need through an approval and a managed installation, answers the request without either rejecting it outright or granting more than the task requires." }
+      },
+      {
+        "@type": "Question",
+        "name": "Why stop at a two-level category structure when Freshservice supports three?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Freshservice supports up to three levels of category, subcategory, and item hierarchy, but a third level almost always meant, in practice, that a category was too broad to begin with and should have been split into two categories instead of nested deeper into one. A ticket picker with too many nested levels slows down every agent, every day, for the entire life of the tool, a cost that compounds quietly and never shows up in a demo." }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html" aria-label="Home">
+      <span class="prompt">Trey@lab</span>:<span class="host">~</span>$ <span aria-hidden="true">_</span>
+    </a>
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="../index.html">home</a>
+      <a href="../projects.html">projects</a>
+      <a href="../blog.html" aria-current="page">blog</a>
+      <a href="../index.html#about">about</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <article class="article wrap">
+    <p class="mono post-eyebrow">%BLOG-6-SUPPORT</p>
+    <h1>What Twenty Fake Helpdesk Tickets Taught Me About Real IT Support</h1>
+    <p class="post-meta">Sep 14, 2026 · 15 min read · IT Support, Freshservice, ITSM, SLA Design, Help Desk</p>
+
+    <!-- PENDING SCREENSHOT: resolved ticket list in the Freshservice agent view.
+         Once the live Freshservice trial is built out, generate the responsive
+         image with: python3 tools/imgprep.py ticket-list.png --slug freshservice-service-desk-simulation-sla-tickets
+         then paste the resulting <figure> here in place of this comment, with real alt text. -->
+
+    <p>
+      When I sat down to plan the third project in my IT and cybersecurity
+      portfolio, I almost skipped this one. A ticketing system project sounded, on
+      paper, like the least impressive thing I could build. No exploit chain, no
+      packet capture, no diagram full of firewalls and VLANs. Just a helpdesk tool
+      and some tickets. Compared to a vulnerability scan or a home lab full of
+      virtual machines, it felt small.
+    </p>
+    <p>
+      Then I thought about what actually happens in most entry-level IT and
+      helpdesk roles, and I changed my mind completely.
+    </p>
+    <p>
+      Almost nobody starts their career configuring firewalls or hunting advanced
+      persistent threats. Almost everybody starts by picking up the phone, or
+      opening a ticket, and figuring out what a stressed, confused, or sometimes
+      mildly embarrassed person actually needs. That skill, reading a vague
+      description and turning it into an actual diagnosis, while staying kind and
+      professional the whole time, is genuinely hard to demonstrate on a resume.
+      "Handled tickets" is a bullet point every entry-level applicant has. It says
+      nothing about how well someone actually handles them.
+    </p>
+    <p>
+      So instead of trying to build something flashy, I built something honest: a
+      full Freshservice configuration from an empty account, three SLA tiers with
+      real escalation logic, a proper ticket category taxonomy, and twenty
+      simulated helpdesk tickets designed to be genuinely representative of a real
+      queue, not a highlight reel of easy wins. Some of them are technically
+      complicated. Some of them are deliberately confusing, written the way a
+      non-technical person actually describes a problem, not the way a textbook
+      describes it. A few of them turned into security conversations that had
+      nothing to do with the original complaint. And a few of them were just
+      simple mistakes, because pretending every ticket is a fascinating puzzle
+      would be dishonest about what the job actually looks like most days.
+    </p>
+    <p>
+      This post walks through how I built it, what I learned designing the SLA
+      structure, a few of the tickets that taught me the most, and what I would
+      still want to do to make this fully real instead of fully documented.
+    </p>
+
+    <h2>Why the boring parts matter more than they sound</h2>
+    <p>
+      Before writing a single ticket, I had to build the actual service desk
+      configuration: categories, a service catalog, and SLA policies. It would
+      have been faster to skip straight to writing ticket scenarios and just label
+      them with made-up categories. I didn't, because the configuration itself is
+      where a lot of real service desk failures actually start.
+    </p>
+    <p>
+      <a href="https://www.freshworks.com/freshservice/signup/" rel="noopener" target="_blank">Freshservice offers a fourteen day free trial with no credit card required</a>,
+      which is what made this entire project a zero cost build. I want to be
+      upfront about that up front, since a couple of my other portfolio projects
+      do require a paid lab environment, and I think it matters to say clearly
+      which ones do and which ones don't.
+    </p>
+    <p>
+      I built eight top level ticket categories: Hardware, Software, Network,
+      Access Management, Security, Facilities and AV, Onboarding and Offboarding,
+      and Email and Collaboration, each with subcategories underneath. That sounds
+      like a small administrative task, but the ordering and structure decisions
+      underneath it are not trivial.
+      <a href="https://support.freshservice.com/support/solutions/articles/50000000636-creating-incident-categories-in-freshservice" rel="noopener" target="_blank">Freshservice supports up to three levels of category hierarchy</a>,
+      and I made a deliberate choice to stay at two levels rather than three. My
+      reasoning was simple: if I ever felt tempted to add a third level to make a
+      category more specific, that almost always meant the category itself was too
+      broad to begin with and should be split into two categories instead of
+      nested deeper into one. A ticket picker with too many nested levels slows
+      down every single agent, every single day, for the entire life of the tool.
+      That is a cost that compounds quietly and never shows up in a demo.
+    </p>
+    <p>
+      The service catalog took longer than I expected too. It is one thing to say
+      "employees can request things through a catalog." It is another thing to
+      actually write a plain language description for each catalog item that a
+      non-technical employee can read and understand without a follow up
+      question, decide who should be allowed to see each item, and figure out
+      which requests need an approval workflow attached before they process. I
+      ended up building at least one catalog item per top level category, so
+      every part of the organization has a self-service path instead of
+      defaulting to "just submit a blank ticket and explain."
+    </p>
+
+    <h2>Designing three SLA tiers instead of one flat policy</h2>
+    <p>
+      This was the part of the project I found myself thinking about the most,
+      days after I thought I had finished it.
+    </p>
+    <p>
+      My first instinct, and I suspect most people's first instinct, is to set one
+      SLA policy for the whole company and call it done. Everyone gets the same
+      response time, everyone gets the same resolution target, and it feels fair
+      because it treats everyone identically. The problem is that identical
+      treatment is not the same thing as fair treatment when the actual business
+      impact of a blocked ticket varies enormously depending on who is blocked and
+      why.
+    </p>
+    <p>
+      I ended up building three tiers instead: VIP and Executive Support, Standard
+      Business Support, and General and Self-Service Support. The VIP tier isn't
+      about treating executives as more important people. It's about business
+      risk. A blocked executive assistant during board call preparation, or a dead
+      conference room screen forty minutes before a call with the company's
+      biggest client, has a blast radius that a blocked individual contributor
+      working on a routine task usually does not. I tried to write that reasoning
+      down explicitly in the SLA policy document itself, not just imply it,
+      because I think an SLA tier structure that reads as "hierarchy for its own
+      sake" is genuinely worth avoiding, and the only way to avoid it is to be
+      explicit about the actual reasoning instead of leaving people to assume the
+      worst explanation.
+    </p>
+    <p>
+      Each tier defines its own response and resolution targets broken down by
+      priority level, and each one has its own escalation ladder if a ticket is
+      trending toward a breach, the same kind of shared, referenced-not-repeated
+      structure I used for the escalation matrix in
+      <a href="../blog/it-runbook-sops-real-service-desk.html" rel="noopener" target="_blank">an earlier IT runbook project covering onboarding, offboarding, and password reset SOPs</a>.
+      I set business hours as Monday through Friday, eight in the morning to six
+      in the evening, with one deliberate exception: Urgent priority tickets run
+      on a twenty four hour clock regardless of tier, because a genuine emergency
+      does not politely wait for business hours to resume.
+    </p>
+    <p>
+      As part of this project, I also wrote out a simulated monthly service desk
+      review, a conversation between the IT manager, the security lead, the
+      operations manager, and the service desk lead role I designed the tickets
+      around. I want to be clear that this is a simulated conversation I wrote to
+      practice the kind of communication this role actually requires, not a
+      transcript of a real meeting, since I have not yet run this configuration
+      against a live team. The conversation centers on the one ticket in this set
+      that missed its SLA target: a phishing incident that took ten minutes longer
+      than its two hour Urgent resolution window because a full mailbox sweep
+      across the company took real time to do properly. Writing that conversation
+      out forced me to think through something I don't think I would have
+      considered otherwise: an SLA breach isn't automatically a failure. Sometimes
+      the correct action takes longer than the target allows, and the right
+      response isn't to hide the miss or to blow through a necessary step just to
+      hit a number. It's to document the tradeoff honestly and build a defined
+      exception process so the next person facing the same situation has a
+      documented answer instead of a judgment call made under pressure.
+    </p>
+
+    <h2>A few tickets that taught me something</h2>
+    <p>
+      I wrote all twenty tickets to feel like a real week, not twenty separate
+      showcase pieces, but a handful of them stuck with me more than the others.
+    </p>
+    <p>
+      The first is the printer ticket. An office manager called in saying the
+      printer near reception was "eating documents." That phrase sounds like a
+      paper jam, and if I had gone in assuming a mechanical fault, I would have
+      wasted time on a physical inspection that had nothing to do with the actual
+      problem. One clarifying question, whether paper was actually being pulled
+      into the machine or the print job was simply vanishing with no paper
+      movement at all, completely reframed the issue. It turned out to be a
+      stalled print queue caused by one corrupted job earlier that morning
+      silently backing up eleven jobs behind it. Nobody's printer was broken. The
+      lesson I took from writing this one is that the words a non-technical person
+      uses to describe a problem are a translation of their experience, not a
+      diagnosis, and the first job in any ticket is figuring out what experience
+      is actually behind the words.
+    </p>
+    <p>
+      The second is the phishing ticket. A paralegal called in, clearly a little
+      embarrassed, saying she had clicked a link in what looked like an email from
+      a document signing service, and pop-up ads had started appearing right
+      afterward. I made a decision while writing this ticket that I think matters
+      more than the technical remediation itself: even though she said she did not
+      believe she had entered her credentials on the fake login page, I reset her
+      password and her multi-factor authentication anyway, as a precaution. Human
+      memory under the stress of realizing you clicked something malicious is not
+      a reliable security control, and a password reset costs almost nothing next
+      to the cost of a compromised account. The other thing I made sure came
+      through clearly in the resolution message was thanking her directly and
+      specifically for reporting it immediately instead of quietly trying to deal
+      with the pop-ups herself, because that speed is genuinely what kept the
+      incident contained to one machine. A service desk that makes people afraid
+      to report mistakes is a service desk that finds out about incidents later
+      than it should.
+    </p>
+    <p>
+      The third is the involuntary termination ticket. This one has no
+      investigation phase at all, because there is nothing to investigate. It is
+      pure execution against a checklist, timed to the minute against an HR
+      meeting happening in another room. I wrote this one specifically to practice
+      the parts of offboarding that are easy to get wrong under time pressure:
+      disabling sign-in access is not enough on its own, because an already
+      authenticated session on a phone or a personal device can keep working even
+      after a password level change, unless
+      <a href="https://learn.microsoft.com/en-us/entra/identity/users/users-revoke-access" rel="noopener" target="_blank">active sessions and refresh tokens are explicitly revoked too</a>.
+      That is a step that is easy to skip when everyone in the room is watching a
+      clock, and it is exactly the kind of detail I ran into again automating the
+      seven Microsoft 365 admin tasks in an
+      <a href="../blog/automate-microsoft-365-admin-tasks-powershell-graph.html" rel="noopener" target="_blank">earlier project on scripting onboarding and offboarding with the Graph PowerShell SDK</a>,
+      the kind of detail that separates a checklist followed carefully from a
+      checklist followed quickly.
+    </p>
+    <p>
+      And then there are the simple ones, and I want to spend a paragraph on those
+      specifically, because I think they are the most quietly important tickets
+      in the whole set. A monitor that would not turn on, caused by a power strip
+      someone had accidentally switched off. A Wi-Fi outage caused by Airplane
+      Mode getting bumped on accidentally. A keyboard suddenly typing the wrong
+      characters because a layout shortcut had switched the input language. None
+      of these needed any real technical skill to fix. All three took under ten
+      minutes. What I focused on writing for these tickets was the tone of the
+      resolution message, because I think it is very easy, especially once you
+      have some experience, to let a simple fix come across as slightly
+      dismissive, even unintentionally. Every one of these closes with a full,
+      respectful explanation of what actually happened and why, the same care I
+      gave the complicated tickets. Someone's stress about their laptop being
+      "completely dead" is real to them in the moment, even if the actual cause
+      turns out to be a switch nobody thought to check.
+    </p>
+    <p>
+      Two more are worth mentioning because they had nothing to do with broken
+      technology at all. One ticket started as "I can't find any of my files,"
+      which sounds like data loss, and turned out to be a department reorg where
+      an employee's old team access had been removed before his new team access
+      had been added. Nothing was actually lost, but I could not know that from
+      the ticket text alone, and the panic in a message like that deserves a fast,
+      clear answer, not a slow investigation that leaves someone assuming the
+      worst for half a day. Once I confirmed the real cause, I checked the reorg
+      tracking sheet for other employees who had moved teams that same week and
+      found two more people with the identical gap, and fixed those proactively
+      instead of waiting for two more tickets to land. That felt like the actual
+      point of the exercise: a ticket is rarely just about the one person who
+      filed it, if the underlying process has a gap.
+    </p>
+    <p>
+      The other is the request for local admin rights to install a legitimate
+      piece of software. This one had no villain in it at all. The employee's
+      need was completely reasonable, and the software itself checked out fine.
+      The only issue was the shape of the request: standing admin access is a
+      much bigger and more permanent grant than a single approved install, since
+      it widens what any future compromise on that laptop could do, not just what
+      this one piece of software can do. Writing the resolution for this ticket
+      meant separating "what does this person actually need" from "what did they
+      ask for," and routing the actual need through an approval and a managed
+      installation instead of either rejecting the request outright or approving
+      it exactly as written, the same kind of narrowly-scoped delegation I ended
+      up building for real in
+      <a href="../blog/active-directory-home-lab-windows-server-2022-gpo.html" rel="noopener" target="_blank">an Active Directory home lab, where a help desk security group gets exactly two delegated rights instead of full admin</a>.
+      I think this is one of the more realistic security tickets in the whole
+      set, because it never involved anything malicious, just an ordinary request
+      that needed a slightly narrower answer than the one asked for.
+    </p>
+
+    <h2>How this maps to what job postings actually ask for</h2>
+    <p>
+      Partway through writing the tickets, I went back and reread a stack of
+      entry-level IT support, helpdesk, and junior systems administrator postings
+      I had saved from my own job search, specifically to check whether this
+      project was actually practicing the right things or just the things I
+      personally found interesting to write about.
+    </p>
+    <p>
+      The overlap was closer than I expected. Nearly every posting mentions
+      "strong communication skills" and "customer service orientation" somewhere
+      near the top, right next to the technical requirements, and I think those
+      phrases get skimmed past because they sound generic. They are not generic
+      once you try to actually write twenty resolution messages that need to
+      sound calm, clear, and human to twenty different people with twenty
+      different levels of technical comfort and twenty different emotional
+      states, from mildly annoyed to genuinely panicked. A posting asking for
+      "the ability to explain technical issues to non-technical users" is asking
+      for exactly the skill the printer ticket and the reorg ticket in this
+      project were built to practice.
+    </p>
+    <p>
+      The postings that mention ITSM tools by name, ServiceNow, Freshservice,
+      Jira Service Management, Zendesk, are usually also the postings that expect
+      some familiarity with SLA management and ticket prioritization, not just
+      "has used a ticketing tool before." Building the three SLA tiers from
+      scratch, including the reasoning for why they exist and not just the
+      numbers inside them, was my attempt at actually earning that line rather
+      than just being able to say I have.
+    </p>
+    <p>
+      And a smaller number of postings, more often the ones for helpdesk roles
+      embedded inside a security-conscious organization, mention something like
+      "awareness of security best practices" as a soft requirement buried a few
+      lines down. I think that line gets underestimated by a lot of applicants,
+      myself included until I started this project, because it sounds like a box
+      to check rather than a real daily skill. Six of the twenty tickets in this
+      set turned into a security decision partway through a request that did not
+      start out looking like a security ticket at all: a routine software
+      request, a blocked USB port, a client complaining about spam. Recognizing
+      that turn, instead of just solving the surface complaint, is the actual
+      skill that line in the job posting is trying to describe.
+    </p>
+
+    <h2>What this project is not yet</h2>
+    <p>
+      I want to be honest about where this stands right now, the same way I have
+      tried to be honest in every other project in this portfolio. Everything
+      described in this post, the catalog, the three SLA tiers, the category
+      taxonomy, and all twenty tickets, is fully written and ready to build, but
+      I have not yet actually entered this configuration into a live Freshservice
+      trial account and captured real screenshots. The repository has a complete
+      checklist of every screenshot still needed, twenty seven in total, covering
+      the setup screens and one piece of evidence per ticket.
+    </p>
+    <p>
+      I'm choosing to publish the written work now rather than wait, for the
+      same reason I've made that choice on a couple of other projects in this
+      series: the reasoning behind a decision, why three SLA tiers instead of
+      one, why a particular ticket got re-triaged partway through, why a request
+      for admin rights got redirected instead of approved, is the part of this
+      work that actually demonstrates judgment. The screenshots will make it
+      verifiable. They will not change the reasoning underneath it, which is the
+      part I actually want a hiring manager or a recruiter to read closely.
+    </p>
+
+    <h2>What I'd tell someone starting this same project</h2>
+    <p>
+      If you're building something similar for your own portfolio, the
+      temptation is going to be to write tickets that make you look clever. A
+      tricky DNS misconfiguration, a clever registry fix, something that sounds
+      impressive in a sentence. Write a few of those, because that skill is real
+      and worth showing. But also write the boring ones, the ones where the fix
+      takes four minutes and the hardest part of the ticket is making sure the
+      person on the other end doesn't feel foolish for calling it in. And write
+      at least one where the "real" fix isn't a technical fix at all, it's
+      catching an incomplete form before it turns into someone getting the wrong
+      access, or redirecting a reasonable request toward a safer version of the
+      same outcome instead of just approving it as asked.
+    </p>
+    <p>
+      That mix, not the cleverness of any single ticket, is what I think
+      actually looks like a person who is ready to run a real queue.
+    </p>
+
+    <h2>Frequently asked questions</h2>
+
+    <h3>Is this a live, running Freshservice instance, or is it documentation?</h3>
+    <p>
+      Right now it's fully written and ready to build, not yet entered into a
+      live Freshservice trial account. The category taxonomy, the service
+      catalog, all three SLA tiers, and all twenty tickets are complete and
+      documented, but the repository still has a checklist of twenty seven
+      screenshots left to capture once the configuration is actually built in a
+      live trial. The reasoning behind the decisions, not the screenshots, is the
+      part meant to demonstrate judgment, the screenshots exist to make it
+      verifiable.
+    </p>
+
+    <h3>Why build three SLA tiers instead of one policy for the whole company?</h3>
+    <p>
+      One flat SLA treats every ticket identically, which feels fair but ignores
+      that the actual business impact of a blocked ticket varies enormously by
+      who's blocked and why. A blocked executive assistant during board call
+      preparation, or a dead conference room screen before a client call, has a
+      blast radius a blocked individual contributor's routine task usually
+      doesn't. Three tiers, VIP and Executive Support, Standard Business Support,
+      and General and Self-Service Support, let response and resolution targets
+      map to actual business risk instead of an identical number applied out of
+      habit.
+    </p>
+
+    <h3>Why revoke a terminated employee's active sessions instead of just disabling their account?</h3>
+    <p>
+      Disabling sign-in access stops new logins, but an already authenticated
+      session on a phone or personal device can keep working even after a
+      password change, unless active sessions and refresh tokens are explicitly
+      revoked too. That's an easy step to skip when offboarding is happening
+      under time pressure, timed to the minute against an HR meeting in another
+      room, which is exactly when a checklist followed carefully needs to catch
+      what a checklist followed quickly would miss.
+    </p>
+
+    <h3>Why redirect a request for local admin rights instead of just approving or denying it?</h3>
+    <p>
+      The employee's underlying need, installing one legitimate piece of
+      software, was completely reasonable, but standing admin access is a much
+      bigger and more permanent grant than a single approved install, since it
+      widens what any future compromise on that laptop could do, not just what
+      one install can do. Separating what someone actually needs from what they
+      literally asked for, and routing the real need through an approval and a
+      managed installation, answers the request without either rejecting it
+      outright or granting more than the task requires.
+    </p>
+
+    <h3>Why stop at a two-level category structure when Freshservice supports three?</h3>
+    <p>
+      Freshservice supports up to three levels of category, subcategory, and item
+      hierarchy, but a third level almost always meant, in practice, that a
+      category was too broad to begin with and should have been split into two
+      categories instead of nested deeper into one. A ticket picker with too many
+      nested levels slows down every agent, every day, for the entire life of the
+      tool, a cost that compounds quietly and never shows up in a demo.
+    </p>
+
+    <h2>Where this goes from here</h2>
+    <p>
+      The next concrete step for this project is running the actual build in a
+      live Freshservice trial and capturing the twenty seven screenshots the
+      repository is already tracking, then coming back and replacing every
+      placeholder in this post and in the ticket files with the real thing.
+      After that, I want to add a second pass of tickets, a slightly smaller set,
+      focused specifically on the kind of multi-department coordination that a
+      single service desk agent can't fully resolve alone, since that is a
+      different skill than the individual troubleshooting this first set focuses
+      on.
+    </p>
+    <p>
+      If you want to see the full configuration, all twenty tickets in complete
+      detail, the SLA policy document, and the setup runbook, the repository is
+      public:
+    </p>
+    <p>
+      Repository:
+      <a href="https://github.com/rachata072/itsm-service-desk-simulation" rel="noopener" target="_blank">github.com/rachata072/itsm-service-desk-simulation</a>
+    </p>
+    <p>
+      I'd genuinely welcome feedback, especially from anyone who has actually run
+      a real service desk queue and can tell me what I got wrong or
+      oversimplified. That kind of correction is exactly the sort of thing I
+      can't get from a certification study guide alone. This is part of an
+      ongoing series of IT support and cybersecurity projects I'm building for my
+      portfolio
+      (<a href="../index.html#about" rel="noopener" target="_blank">more on my background here</a>).
+      <a href="../blog.html" rel="noopener" target="_blank">More lab notes and write-ups land here</a>
+      as each one ships.
+    </p>
+
+    <p class="mono mt-3"><a href="../blog.html">&larr; show logging</a></p>
+  </article>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>© 2026 Trey · built by hand · no cookies · privacy-respecting analytics · <a href="../privacy.html">privacy</a></span>
+    <span><a href="../index.html">exit →</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

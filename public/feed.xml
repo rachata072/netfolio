@@ -5,7 +5,7 @@
   <link>https://breakfixlearn.com/</link>
   <description>CCNA lab walkthroughs, plain-language security news breakdowns, and Python network automation notes.</description>
   <language>en</language>
-  <lastBuildDate>Thu, 10 Sep 2026 09:00:00 -0700</lastBuildDate>
+  <lastBuildDate>Mon, 14 Sep 2026 09:00:00 -0700</lastBuildDate>
   <atom:link href="https://breakfixlearn.com/feed.xml" rel="self" type="application/rss+xml"/>
 
   <!-- TEMPLATE: when you publish a post, copy this <item> block to the TOP
@@ -21,6 +21,15 @@
     <description>One-sentence summary, same as the blog index entry.</description>
   </item>
   -->
+
+  <item>
+    <title>What Twenty Fake Helpdesk Tickets Taught Me About Real IT Support</title>
+    <link>https://breakfixlearn.com/blog/freshservice-service-desk-simulation-sla-tickets.html</link>
+    <guid>https://breakfixlearn.com/blog/freshservice-service-desk-simulation-sla-tickets.html</guid>
+    <pubDate>Mon, 14 Sep 2026 09:00:00 -0700</pubDate>
+    <category>SUPPORT</category>
+    <description>Building a full Freshservice service desk from scratch: three SLA tiers, a category taxonomy, a service catalog, and twenty simulated helpdesk tickets designed to be genuinely representative of a real support queue.</description>
+  </item>
 
   <item>
     <title>I Built an Active Directory Home Lab That's More Than Three OUs and a Password Policy</title>
