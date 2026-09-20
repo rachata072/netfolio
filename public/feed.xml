@@ -5,7 +5,7 @@
   <link>https://breakfixlearn.com/</link>
   <description>CCNA lab walkthroughs, plain-language security news breakdowns, and Python network automation notes.</description>
   <language>en</language>
-  <lastBuildDate>Fri, 18 Sep 2026 09:00:00 -0700</lastBuildDate>
+  <lastBuildDate>Sun, 20 Sep 2026 09:00:00 -0700</lastBuildDate>
   <atom:link href="https://breakfixlearn.com/feed.xml" rel="self" type="application/rss+xml"/>
 
   <!-- TEMPLATE: when you publish a post, copy this <item> block to the TOP
@@ -21,6 +21,15 @@
     <description>One-sentence summary, same as the blog index entry.</description>
   </item>
   -->
+
+  <item>
+    <title>I Built a Netmiko Config Backup Tool So I'd Stop Losing Arguments With My Own Router</title>
+    <link>https://breakfixlearn.com/blog/py-configbackup-netmiko-config-backup-alerts.html</link>
+    <guid>https://breakfixlearn.com/blog/py-configbackup-netmiko-config-backup-alerts.html</guid>
+    <pubDate>Sun, 20 Sep 2026 09:00:00 -0700</pubDate>
+    <category>NETWORK</category>
+    <description>A Python CLI that SSHes into every device in an inventory with Netmiko, backs up the running config, diffs it, and emails an alert on change, tested against a real two-router VyOS lab that caught two genuine bugs a mocked test suite never could.</description>
+  </item>
 
   <item>
     <title>What Nine Packet Captures Taught Me About Networks I Thought I Already Understood</title>
