@@ -114,8 +114,8 @@
             <tr>
               <td class="int-name"><a href="projects.html#config-backup">Py-ConfigBackup</a></td>
               <td><span class="status up">up</span></td>
-              <td><span class="status prog">down</span></td>
-              <td class="int-desc">Netmiko script that backs up running-configs over SSH and diffs them nightly. (In progress.)</td>
+              <td><span class="status up">up</span></td>
+              <td class="int-desc">Netmiko script that backs up running-configs over SSH, diffs them, and emails an alert on change, tested against a real two-router VyOS lab.</td>
             </tr>
             <tr>
               <td class="int-name"><a href="projects.html#soc-lab">SOC-HomeLab</a></td>
@@ -151,7 +151,7 @@
       <div class="syslog">
         <a class="syslog-line" href="blog/py-configbackup-netmiko-config-backup-alerts.html">
           <span class="ts">Sep 20 2026 09:00:00</span>
-          <span class="fac cat-network">%BLOG-6-NETWORK:</span>
+          <span class="fac cat-python">%BLOG-6-PYTHON:</span>
           <span class="msg">I Built a Netmiko Config Backup Tool So I'd Stop Losing Arguments With My Own Router</span>
           <span class="summary">A Python CLI that SSHes into every device in an inventory with Netmiko, backs up the running config, diffs it, and emails an alert on change, tested against a real two-router VyOS lab that caught two genuine bugs a mocked test suite never could.</span>
         </a>

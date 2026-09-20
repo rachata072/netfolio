@@ -75,15 +75,18 @@
         </article>
 
         <article class="card" data-cat="automation" id="config-backup">
-          <h3>Py-ConfigBackup <span class="status prog">· up/down</span></h3>
+          <h3><a href="https://github.com/rachata072/py-configbackup" rel="noopener" target="_blank">Py-ConfigBackup</a> <span class="status up">· up/up</span></h3>
           <p>
-            Netmiko script that connects to every device in an inventory file over SSH,
-            pulls the running-config, timestamps it, and produces a diff against the
-            previous backup. Currently adding email alerts when a config changes.
+            A Netmiko CLI that SSHes into every device in an inventory file, backs up the
+            running config, diffs it against the last backup, and emails an alert only when
+            something actually changed. Tested end to end against a real two-router VyOS
+            lab built with containerlab, which caught two genuine bugs a mocked test suite
+            never could.
           </p>
           <div class="meta">
-            <span class="tag">Python</span><span class="tag">Netmiko</span><span class="tag">SSH</span><span class="tag">Automation</span>
+            <span class="tag">Python</span><span class="tag">Netmiko</span><span class="tag">SSH</span><span class="tag">VyOS</span><span class="tag">Automation</span>
           </div>
+          <p class="mono mt-1"><a href="blog/py-configbackup-netmiko-config-backup-alerts.html">read the write-up →</a></p>
         </article>
 
         <article class="card" data-cat="security" id="soc-lab">

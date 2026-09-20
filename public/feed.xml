@@ -27,7 +27,7 @@
     <link>https://breakfixlearn.com/blog/py-configbackup-netmiko-config-backup-alerts.html</link>
     <guid>https://breakfixlearn.com/blog/py-configbackup-netmiko-config-backup-alerts.html</guid>
     <pubDate>Sun, 20 Sep 2026 09:00:00 -0700</pubDate>
-    <category>NETWORK</category>
+    <category>PYTHON</category>
     <description>A Python CLI that SSHes into every device in an inventory with Netmiko, backs up the running config, diffs it, and emails an alert on change, tested against a real two-router VyOS lab that caught two genuine bugs a mocked test suite never could.</description>
   </item>
 
@@ -72,7 +72,7 @@
     <link>https://breakfixlearn.com/blog/vlsm-subnet-calculator-python-tool.html</link>
     <guid>https://breakfixlearn.com/blog/vlsm-subnet-calculator-python-tool.html</guid>
     <pubDate>Fri, 04 Sep 2026 09:00:00 -0700</pubDate>
-    <category>NETWORK</category>
+    <category>PYTHON</category>
     <description>A dependency-free Python CLI that plans VLSM subnetting from a CSV of departments and host counts, no manual bookkeeping, 30 tests, and the allocation-order decision that stops wasted address space.</description>
   </item>
 
