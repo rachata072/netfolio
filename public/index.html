@@ -119,9 +119,9 @@
             </tr>
             <tr>
               <td class="int-name"><a href="projects.html#soc-lab">SOC-HomeLab</a></td>
-              <td><span class="status prog">up</span></td>
-              <td><span class="status prog">down</span></td>
-              <td class="int-desc">Home SOC: pfSense, Suricata IDS, and a log pipeline for detection practice. (In progress.)</td>
+              <td><span class="status up">up</span></td>
+              <td><span class="status up">up</span></td>
+              <td class="int-desc">Two-VM home SOC: Suricata IDS, Zeek, and Wazuh SIEM with Grafana/Loki, a scripted attack simulation, and a real 24-hour threat hunt.</td>
             </tr>
             <tr>
               <td class="int-name"><a href="projects.html#ccnp-notes">CCNP-Security-Notes</a></td>
@@ -149,29 +149,29 @@
       </h2>
 
       <div class="syslog">
-        <a class="syslog-line" href="blog/py-configbackup-netmiko-config-backup-alerts.html">
-          <span class="ts">Sep 20 2026 09:00:00</span>
-          <span class="fac cat-python">%BLOG-6-PYTHON:</span>
-          <span class="msg">I Built a Netmiko Config Backup Tool So I'd Stop Losing Arguments With My Own Router</span>
-          <span class="summary">A Python CLI that SSHes into every device in an inventory with Netmiko, backs up the running config, diffs it, and emails an alert on change, tested against a real two-router VyOS lab that caught two genuine bugs a mocked test suite never could.</span>
+        <a class="syslog-line" href="blog/soc-homelab-threat-hunt-report.html">
+          <span class="ts">Sep 25 2026 09:00:00</span>
+          <span class="fac cat-sec">%BLOG-5-SEC:</span>
+          <span class="msg">Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab</span>
+          <span class="summary">A full 24-hour Wazuh threat hunting report from the SOC home lab, read cold: eight level-15 Shellshock alerts pulled apart record by record, a Zeek detection I had documented as broken turned out to be live, and an honest look at zero authentication failures.</span>
         </a>
-        <a class="syslog-line" href="blog/wireshark-network-analysis-nine-packet-captures.html">
-          <span class="ts">Sep 18 2026 09:00:00</span>
-          <span class="fac cat-network">%BLOG-6-NETWORK:</span>
-          <span class="msg">What Nine Packet Captures Taught Me About Networks I Thought I Already Understood</span>
-          <span class="summary">Nine real packet captures, DNS, TCP, HTTP vs HTTPS, ICMP, packet loss, ARP, DHCP, Telnet vs SSH, and FTP, each one generated, read, and explained by hand for CCNA study and a networking portfolio.</span>
+        <a class="syslog-line" href="blog/soc-homelab-first-alerts-attack-simulation.html">
+          <span class="ts">Sep 24 2026 09:00:00</span>
+          <span class="fac cat-sec">%BLOG-5-SEC:</span>
+          <span class="msg">First Alerts: What My SOC Home Lab Caught, What It Missed, and How I Triaged It</span>
+          <span class="summary">Predictions written before running a single command, then a real scripted attack against my SOC home lab: SYN scan, SQL injection confirmed by three independent tools, a beacon caught at a 0.001 coefficient of variation, and the triage tickets that followed.</span>
         </a>
-        <a class="syslog-line" href="blog/freshservice-service-desk-simulation-sla-tickets.html">
-          <span class="ts">Sep 14 2026 09:00:00</span>
-          <span class="fac cat-support">%BLOG-6-SUPPORT:</span>
-          <span class="msg">What Twenty Fake Helpdesk Tickets Taught Me About Real IT Support</span>
-          <span class="summary">Building a full Freshservice service desk from scratch: three SLA tiers, a category taxonomy, a service catalog, and twenty simulated helpdesk tickets designed to be genuinely representative of a real support queue.</span>
+        <a class="syslog-line" href="blog/soc-homelab-wazuh-zeek-grafana-pipeline.html">
+          <span class="ts">Sep 23 2026 09:00:00</span>
+          <span class="fac cat-sec">%BLOG-5-SEC:</span>
+          <span class="msg">One Pipeline, Three Jobs: Wazuh, Zeek and Grafana in a SOC Home Lab</span>
+          <span class="summary">Wazuh as the SIEM, Zeek as a second pair of eyes on the same interface, and Loki with Grafana for hunting: the rule that keeps a home SOC lab's memory budget sane, and a real Zeek notice that corrected an earlier assumption.</span>
         </a>
-        <a class="syslog-line" href="blog/active-directory-home-lab-windows-server-2022-gpo.html">
-          <span class="ts">Sep 10 2026 09:00:00</span>
-          <span class="fac cat-support">%BLOG-6-SUPPORT:</span>
-          <span class="msg">I Built an Active Directory Home Lab That's More Than Three OUs and a Password Policy</span>
-          <span class="summary">A from-scratch Active Directory lab on Windows Server 2022: OU design, Fine-Grained Password Policies, Windows LAPS, delegated help desk rights, WSUS patching, scripted provisioning, and a backup I actually tested.</span>
+        <a class="syslog-line" href="blog/soc-homelab-suricata-ids-installation.html">
+          <span class="ts">Sep 22 2026 09:00:00</span>
+          <span class="fac cat-sec">%BLOG-5-SEC:</span>
+          <span class="msg">Suricata on the SOC VM: Installing and Tuning a Host-Based IDS</span>
+          <span class="summary">Installing Suricata from the OISF PPA on a two-VM SOC home lab: why HOME_NET has to be one address instead of a subnet, three custom rules that always fire, and reading real EVE JSON alerts end to end.</span>
         </a>
       </div>
 

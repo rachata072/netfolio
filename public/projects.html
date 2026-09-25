@@ -90,15 +90,18 @@
         </article>
 
         <article class="card" data-cat="security" id="soc-lab">
-          <h3>SOC-HomeLab <span class="status prog">· up/down</span></h3>
+          <h3><a href="https://github.com/rachata072/soc-homelab" rel="noopener" target="_blank">SOC-HomeLab</a> <span class="status up">· up/up</span></h3>
           <p>
-            A segmented home lab behind pfSense with Suricata IDS on the WAN edge and a
-            log pipeline for practicing detection and alert triage. Blog write-ups cover
-            each stage of the build and the first real alerts it caught.
+            A two-VM detection lab: Suricata IDS and Zeek watching the same interface,
+            Wazuh as the SIEM, Grafana and Loki for hunting. Custom Suricata rules, a
+            scripted attack simulation with a beacon-detection script, and a real 24-hour
+            threat hunt through the SIEM's own alert volume, five posts covering design
+            through triage.
           </p>
           <div class="meta">
-            <span class="tag">pfSense</span><span class="tag">Suricata</span><span class="tag">Blue team</span>
+            <span class="tag">Suricata</span><span class="tag">Zeek</span><span class="tag">Wazuh</span><span class="tag">Grafana</span><span class="tag">Blue team</span>
           </div>
+          <p class="mono mt-1"><a href="blog/soc-homelab-designing-two-vm-lab.html">read the 5-part write-up →</a></p>
         </article>
 
         <article class="card" data-cat="security" id="ccnp-notes">

@@ -5,7 +5,7 @@
   <link>https://breakfixlearn.com/</link>
   <description>CCNA lab walkthroughs, plain-language security news breakdowns, and Python network automation notes.</description>
   <language>en</language>
-  <lastBuildDate>Sun, 20 Sep 2026 09:00:00 -0700</lastBuildDate>
+  <lastBuildDate>Fri, 25 Sep 2026 09:00:00 -0700</lastBuildDate>
   <atom:link href="https://breakfixlearn.com/feed.xml" rel="self" type="application/rss+xml"/>
 
   <!-- TEMPLATE: when you publish a post, copy this <item> block to the TOP
@@ -21,6 +21,51 @@
     <description>One-sentence summary, same as the blog index entry.</description>
   </item>
   -->
+
+  <item>
+    <title>Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab</title>
+    <link>https://breakfixlearn.com/blog/soc-homelab-threat-hunt-report.html</link>
+    <guid>https://breakfixlearn.com/blog/soc-homelab-threat-hunt-report.html</guid>
+    <pubDate>Fri, 25 Sep 2026 09:00:00 -0700</pubDate>
+    <category>SEC</category>
+    <description>A full 24-hour Wazuh threat hunting report from the SOC home lab, read cold: eight level-15 Shellshock alerts pulled apart record by record, a Zeek detection I had documented as broken turned out to be live, and an honest look at zero authentication failures.</description>
+  </item>
+
+  <item>
+    <title>First Alerts: What My SOC Home Lab Caught, What It Missed, and How I Triaged It</title>
+    <link>https://breakfixlearn.com/blog/soc-homelab-first-alerts-attack-simulation.html</link>
+    <guid>https://breakfixlearn.com/blog/soc-homelab-first-alerts-attack-simulation.html</guid>
+    <pubDate>Thu, 24 Sep 2026 09:00:00 -0700</pubDate>
+    <category>SEC</category>
+    <description>Predictions written before running a single command, then a real scripted attack against my SOC home lab: SYN scan, SQL injection confirmed by three independent tools, a beacon caught at a 0.001 coefficient of variation, and the triage tickets that followed.</description>
+  </item>
+
+  <item>
+    <title>One Pipeline, Three Jobs: Wazuh, Zeek and Grafana in a SOC Home Lab</title>
+    <link>https://breakfixlearn.com/blog/soc-homelab-wazuh-zeek-grafana-pipeline.html</link>
+    <guid>https://breakfixlearn.com/blog/soc-homelab-wazuh-zeek-grafana-pipeline.html</guid>
+    <pubDate>Wed, 23 Sep 2026 09:00:00 -0700</pubDate>
+    <category>SEC</category>
+    <description>Wazuh as the SIEM, Zeek as a second pair of eyes on the same interface, and Loki with Grafana for hunting: the rule that keeps a home SOC lab's memory budget sane, and a real Zeek notice that corrected an earlier assumption.</description>
+  </item>
+
+  <item>
+    <title>Suricata on the SOC VM: Installing and Tuning a Host-Based IDS</title>
+    <link>https://breakfixlearn.com/blog/soc-homelab-suricata-ids-installation.html</link>
+    <guid>https://breakfixlearn.com/blog/soc-homelab-suricata-ids-installation.html</guid>
+    <pubDate>Tue, 22 Sep 2026 09:00:00 -0700</pubDate>
+    <category>SEC</category>
+    <description>Installing Suricata from the OISF PPA on a two-VM SOC home lab: why HOME_NET has to be one address instead of a subnet, three custom rules that always fire, and reading real EVE JSON alerts end to end.</description>
+  </item>
+
+  <item>
+    <title>Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work</title>
+    <link>https://breakfixlearn.com/blog/soc-homelab-designing-two-vm-lab.html</link>
+    <guid>https://breakfixlearn.com/blog/soc-homelab-designing-two-vm-lab.html</guid>
+    <pubDate>Mon, 21 Sep 2026 09:00:00 -0700</pubDate>
+    <category>SEC</category>
+    <description>Why I cut a segmented, multi-firewall SOC design down to two VirtualBox VMs, the networking and memory budget that came out of that decision, and the threat model that decided what belonged in the lab.</description>
+  </item>
 
   <item>
     <title>I Built a Netmiko Config Backup Tool So I'd Stop Losing Arguments With My Own Router</title>
