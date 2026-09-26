@@ -9,7 +9,8 @@ Checks
               no inline event handlers (onclick=...), target=_blank always has rel=noopener,
               no innerHTML / outerHTML / insertAdjacentHTML / document.write / eval in JS,
               no http:// resources (mixed content)
-  content   : no em dashes (house style), images have alt + width + height
+  content   : no em dashes (house style), images have alt + width + height,
+              every raster image (posts, OG/share images, files in public/) is WebP
   seo       : canonical is extension-less and absolute, description 50-170 chars
 """
 import pathlib
@@ -124,10 +125,25 @@ for f in sorted(ROOT.rglob("*.html")):
     # --- content ---
     if "—" in html:
         bad(f, "em dash found (house style: use a comma or colon)")
+    # house rule: every raster image the site uses is WebP (SVG is fine: it's vector)
+    img_urls = re.findall(r'<img\b[^>]*\ssrc="([^"]+)"', html)
+    for srcset in re.findall(r'srcset="([^"]+)"', html):
+        img_urls += [part.strip().split()[0] for part in srcset.split(",") if part.strip()]
+    img_urls += re.findall(r'<meta property="(?:og:image|twitter:image)" content="([^"]+)"', html)
+    img_urls += re.findall(r'"image":\s*"([^"]+)"', html)
+    for u in img_urls:
+        ext = u.split("?")[0].rsplit(".", 1)[-1].lower()
+        if ext not in ("webp", "svg"):
+            bad(f, f"image is not WebP: {u}")
     for img in re.findall(r"<img\b[^>]*>", html, re.S):
         for attr in ("alt=", "width=", "height="):
             if attr not in img:
                 bad(f, f"<img> missing {attr[:-1]}: {img[:80]}")
+
+RASTER = {".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tif", ".tiff", ".avif", ".heic"}
+for f in sorted(ROOT.rglob("*")):
+    if f.is_file() and f.suffix.lower() in RASTER:
+        bad(f, "non-WebP image in public/ (convert with tools/imgprep.py)")
 
 danger = re.compile(r"\b(innerHTML|outerHTML|insertAdjacentHTML|document\.write|eval\s*\(|new Function)")
 for f in sorted(ROOT.rglob("*.js")):

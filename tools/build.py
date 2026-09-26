@@ -164,7 +164,7 @@ def head(site, *, title, description, path, og_title=None, og_description=None, 
          og_image_alt=None, og_type="website", jsonld=(), noindex=False, preload_display=False,
          scripts=(), article=None, hashes=None):
     url = site["url"] + path
-    og_image = og_image or "/assets/og/default.png"
+    og_image = og_image or "/assets/og/default.webp"
     tags = [
         "<!DOCTYPE html>",
         '<html lang="en-CA">',
@@ -199,6 +199,7 @@ def head(site, *, title, description, path, og_title=None, og_description=None, 
             f'<meta property="og:description" content="{esc(og_description or description)}">',
             f'<meta property="og:url" content="{esc(url)}">',
             f'<meta property="og:image" content="{esc(site["url"] + og_image)}">',
+            '<meta property="og:image:type" content="image/webp">',
             '<meta property="og:image:width" content="1200">',
             '<meta property="og:image:height" content="630">',
             f'<meta property="og:image:alt" content="{esc(og_image_alt or og_title or title)}">',
@@ -351,7 +352,7 @@ def render_post(site, hashes, last_change, post, posts):
         "author": {"@type": "Person", "name": site["author"], "url": site["url"] + "/"},
         "publisher": {"@type": "Person", "name": site["author"]},
         "mainEntityOfPage": url,
-        "image": site["url"] + f'/assets/og/{post["slug"]}.png',
+        "image": site["url"] + f'/assets/og/{post["slug"]}.webp',
         "keywords": ", ".join(post.get("tags", [])),
         "articleSection": c["name"],
         "timeRequired": f'PT{post["read_min"]}M',
@@ -371,7 +372,7 @@ def render_post(site, hashes, last_change, post, posts):
             "mainEntity": [{"@type": "Question", "name": q,
                             "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in post["faq"]],
         })
-    og_img = f'/assets/og/{post["slug"]}.png'
+    og_img = f'/assets/og/{post["slug"]}.webp'
     if not (PUB / og_img.lstrip("/")).exists():
         og_img = None
     return page(site, hashes, last_change, nav="blog", body=main, progress=True,
@@ -594,7 +595,7 @@ def main():
                 "@context": "https://schema.org", "@type": "WebSite",
                 "name": site["name"], "url": site["url"] + "/",
             }]
-        og = f'/assets/og/{f.stem}.png'
+        og = f'/assets/og/{f.stem}.webp'
         write(meta["out"], page(
             site, hashes, last_change, nav=meta.get("nav", ""), body=body,
             title=meta["title"], description=meta["description"], path=meta["path"],

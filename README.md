@@ -32,6 +32,18 @@ The home page, blog index, month groups, filter counts, RSS feed, sitemap,
 table of contents, series box, and previous/next links all update from that one file.
 Projects live in `src/projects.json`.
 
+## Images: WebP only
+
+Every raster image on the site is WebP: post screenshots and the link-preview (OG)
+images alike. SVG is allowed for vector art such as the favicon.
+
+- Convert screenshots before using them: `python tools/imgprep.py shot.png --slug <post-slug>`
+  writes 480/800/1200 px WebP files to `public/assets/img/<slug>/` and prints the `<figure>` to paste.
+- `python tools/build.py --og` writes the share images as WebP (supported by LinkedIn, Facebook,
+  X, Slack, WhatsApp, Discord and iMessage).
+- `python tools/qa.py` fails if any PNG/JPG/GIF/AVIF file sits in `public/`, or if a page, srcset,
+  og:image or JSON-LD image points at anything other than `.webp` / `.svg`.
+
 ## Layout
 
 ```
@@ -40,7 +52,7 @@ netfolio-v2/
     css/ js/         hand-written, versioned by build.py (?v=hash)
     assets/fonts/    IBM Plex Sans / Mono / Condensed, woff2, OFL licensed
     assets/img/      post screenshots (only the ones posts actually use)
-    assets/og/       1200x630 link-preview images, generated
+    assets/og/       1200x630 link-preview images (WebP), generated
     _headers         security + cache headers
   src/
     site.json        name, links, blog categories, series

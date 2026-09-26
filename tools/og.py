@@ -2,7 +2,8 @@
 """Social preview images (1200x630 PNG) for LinkedIn / X / Slack link cards.
 
 Called by `python tools/build.py --og`. Needs Pillow:  pip install pillow
-Writes public/assets/og/<slug>.png for every post plus one per page.
+Writes public/assets/og/<slug>.webp for every post plus one per page.
+WebP share images work on LinkedIn, Facebook, X, Slack, WhatsApp, Discord and iMessage.
 """
 import pathlib
 from PIL import Image, ImageDraw, ImageFont
@@ -103,7 +104,7 @@ def post_image(site, post, path):
     dd = date.fromisoformat(post["date"])
     line = f'{dd.strftime("%b")} {dd.day}, {dd.year}  /  {post["read_min"]} min read  /  by {site["author"]}'
     d.text((64, H - 84), line, font=meta, fill=TEXT2)
-    im.save(path, "PNG", optimize=True)
+    im.save(path, "WEBP", quality=88, method=6)
 
 
 def page_image(site, path, kicker, title, sub):
@@ -115,16 +116,16 @@ def page_image(site, path, kicker, title, sub):
         d.text((64, y), ln, font=tf, fill=TEXT)
         y += 100
     d.text((64, H - 84), sub, font=font("ibm-plex-mono-latin-400-normal.woff", 22), fill=TEXT2)
-    im.save(path, "PNG", optimize=True)
+    im.save(path, "WEBP", quality=88, method=6)
 
 
 def make_all(site, posts, outdir):
     outdir.mkdir(parents=True, exist_ok=True)
     for p in posts:
-        post_image(site, p, outdir / f'{p["slug"]}.png')
+        post_image(site, p, outdir / f'{p["slug"]}.webp')
     sub = f'{site["author"]}  /  CCNA  /  {site["location"]}'
-    page_image(site, outdir / "default.png", "edge# show version", "BUILD. BREAK.\nFIX. LEARN.", sub)
-    page_image(site, outdir / "index.png", "edge# show version", "BUILD. BREAK.\nFIX. LEARN.", sub)
-    page_image(site, outdir / "blog.png", "edge# show logging", f"{len(posts)} LAB LOGS\n& WRITE-UPS", sub)
-    page_image(site, outdir / "projects.png", "edge# show interfaces status", "PROJECTS:\nNET + SEC LABS", sub)
+    page_image(site, outdir / "default.webp", "edge# show version", "BUILD. BREAK.\nFIX. LEARN.", sub)
+    page_image(site, outdir / "index.webp", "edge# show version", "BUILD. BREAK.\nFIX. LEARN.", sub)
+    page_image(site, outdir / "blog.webp", "edge# show logging", f"{len(posts)} LAB LOGS\n& WRITE-UPS", sub)
+    page_image(site, outdir / "projects.webp", "edge# show interfaces status", "PROJECTS:\nNET + SEC LABS", sub)
     print(f"  og images: {len(posts) + 4} written to {outdir}")
