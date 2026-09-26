@@ -10,7 +10,7 @@
 <meta name="color-scheme" content="dark">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/style.css?v=fac4bc101c">
+<link rel="stylesheet" href="/css/style.css?v=8f8c37b981">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
 <meta property="og:type" content="website">
@@ -24,8 +24,8 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="show logging: security write-ups and network lab notes">
 <meta name="twitter:card" content="summary_large_image">
-<script src="/js/main.js?v=7d994f174b" defer></script>
-<script src="/js/filter.js?v=7c3e277a89" defer></script>
+<script src="/js/main.js?v=b6a070fa7c" defer></script>
+<script src="/js/filter.js?v=a0f69c6c0a" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -48,11 +48,11 @@
       <span class="cli"><span class="h">edge#</span> <span class="v">show</span> <span class="a">logging</span></span>
       <h1>Logs</h1>
       <p class="sec-lede">
-        Lab walkthroughs, security write-ups, and automation notes, 15 entries and
+        Lab walkthroughs, security write-ups, and automation notes, 17 entries and
         counting. Every post is tagged like a syslog message, <span class="mono nowrap">%BLOG-severity-FACILITY</span>:
         the lower the number, the sooner it's worth reading.
       </p>
-      <details class="facilities" open><summary><span class="h">edge#</span> show logging facilities</summary><dl><div class="fac-row c-news is-empty"><dt><span class="sev c-news">NEWS-2</span><span class="lvl">2 crit</span></dt><dd><b>Security news</b> CVEs, breaches and advisories worth acting on, explained in plain language. <span class="ct">coming soon</span></dd></div><div class="fac-row c-ai is-empty"><dt><span class="sev c-ai">AI-3</span><span class="lvl">3 err</span></dt><dd><b>AI</b> AI in networking and security: tools I test, how attackers use it, and where it breaks. <span class="ct">coming soon</span></dd></div><div class="fac-row c-network"><dt><span class="sev c-network">NETWORK-4</span><span class="lvl">4 warning</span></dt><dd><b>Networking</b> Routing, switching, subnetting and packet captures. CCNA labs live here. <span class="ct">1 post</span></dd></div><div class="fac-row c-sec"><dt><span class="sev c-sec">SEC-5</span><span class="lvl">5 notice</span></dt><dd><b>Security</b> Blue team work: SOC labs, detection, hardening and vulnerability management. <span class="ct">7 posts</span></dd></div><div class="fac-row c-python"><dt><span class="sev c-python">PYTHON-6</span><span class="lvl">6 info</span></dt><dd><b>Automation</b> Python, Netmiko and PowerShell scripts that remove the boring parts of admin work. <span class="ct">2 posts</span></dd></div><div class="fac-row c-support"><dt><span class="sev c-support">SUPPORT-7</span><span class="lvl">7 debug</span></dt><dd><b>IT support</b> Troubleshooting and systems: Active Directory, Microsoft 365, ITSM and runbooks. <span class="ct">5 posts</span></dd></div></dl></details>
+      <details class="facilities" open><summary><span class="h">edge#</span> show logging facilities</summary><dl><div class="fac-row c-news"><dt><span class="sev c-news">NEWS-2</span><span class="lvl">2 crit</span></dt><dd><b>Security news</b> CVEs, breaches and advisories worth acting on, explained in plain language. <span class="ct">1 post</span></dd></div><div class="fac-row c-ai"><dt><span class="sev c-ai">AI-3</span><span class="lvl">3 err</span></dt><dd><b>AI</b> AI in networking and security: tools I test, how attackers use it, and where it breaks. <span class="ct">1 post</span></dd></div><div class="fac-row c-network"><dt><span class="sev c-network">NETWORK-4</span><span class="lvl">4 warning</span></dt><dd><b>Networking</b> Routing, switching, subnetting and packet captures. CCNA labs live here. <span class="ct">1 post</span></dd></div><div class="fac-row c-sec"><dt><span class="sev c-sec">SEC-5</span><span class="lvl">5 notice</span></dt><dd><b>Security</b> Blue team work: SOC labs, detection, hardening and vulnerability management. <span class="ct">7 posts</span></dd></div><div class="fac-row c-python"><dt><span class="sev c-python">PYTHON-6</span><span class="lvl">6 info</span></dt><dd><b>Automation</b> Python, Netmiko and PowerShell scripts that remove the boring parts of admin work. <span class="ct">2 posts</span></dd></div><div class="fac-row c-support"><dt><span class="sev c-support">SUPPORT-7</span><span class="lvl">7 debug</span></dt><dd><b>IT support</b> Troubleshooting and systems: Active Directory, Microsoft 365, ITSM and runbooks. <span class="ct">5 posts</span></dd></div></dl></details>
     </div>
   </header>
 
@@ -64,7 +64,9 @@
         <input type="search" placeholder="wazuh, vlan, powershell..." autocomplete="off" spellcheck="false" maxlength="80">
       </label>
       <div class="filters" role="group" aria-label="Filter posts by category">
-        <button type="button" class="fbtn" data-filter="all" aria-pressed="true">all <span class="ct">15</span></button>
+        <button type="button" class="fbtn" data-filter="all" aria-pressed="true">all <span class="ct">17</span></button>
+        <button type="button" class="fbtn" data-filter="news" aria-pressed="false"><span class="dot c-news" aria-hidden="true"></span>news <span class="ct">1</span></button>
+        <button type="button" class="fbtn" data-filter="ai" aria-pressed="false"><span class="dot c-ai" aria-hidden="true"></span>ai <span class="ct">1</span></button>
         <button type="button" class="fbtn" data-filter="network" aria-pressed="false"><span class="dot c-network" aria-hidden="true"></span>network <span class="ct">1</span></button>
         <button type="button" class="fbtn" data-filter="sec" aria-pressed="false"><span class="dot c-sec" aria-hidden="true"></span>sec <span class="ct">7</span></button>
         <button type="button" class="fbtn" data-filter="python" aria-pressed="false"><span class="dot c-python" aria-hidden="true"></span>python <span class="ct">2</span></button>
@@ -75,6 +77,8 @@
 
     <h2 class="month" data-month="m-2026-09">September 2026</h2>
     <ol class="loglist" id="m-2026-09">
+    <li data-cat="news" data-search="cisco ise&#x27;s perfect-10 zero-day: what cve-2026-76460 actually breaks cisco&#x27;s ise auth bypass, cve-2026-76460, is a perfect cvss 10.0 and already added to cisa&#x27;s exploited list. a plain-language walk through what the flaw actually does, why identity infrastructure is a uniquely bad place for it, and the exact command to check your own logs. cisco cve zero-day ise cisa kev patch management news security news"><a class="logrow" href="/blog/cisco-ise-zero-day-cve-2026-76460-api-auth-bypass"><time class="date" datetime="2026-09-26">Sep<b>26</b></time><div><div class="meta"><span class="sev c-news">NEWS-2</span><span class="fac">%BLOG-2-NEWS &middot; 7 min read</span></div><h3>Cisco ISE&#x27;s Perfect-10 Zero-Day: What CVE-2026-76460 Actually Breaks</h3><p>Cisco&#x27;s ISE auth bypass, CVE-2026-76460, is a perfect CVSS 10.0 and already added to CISA&#x27;s exploited list. A plain-language walk through what the flaw actually does, why identity infrastructure is a uniquely bad place for it, and the exact command to check your own logs.</p></div></a></li>
+    <li data-cat="ai" data-search="best ai tools for network engineers in 2026: what&#x27;s actually worth using the ccna exam now expects you to explain generative ai in network operations. here is an honest, hands-on sort of which ai tools actually help, from studying for the exam to drafting configs to testing automation before it touches anything real. ai network automation ccna github copilot ansible career ai ai"><a class="logrow" href="/blog/best-ai-tools-network-engineers-2026"><time class="date" datetime="2026-09-26">Sep<b>26</b></time><div><div class="meta"><span class="sev c-ai">AI-3</span><span class="fac">%BLOG-3-AI &middot; 10 min read</span></div><h3>Best AI Tools for Network Engineers in 2026: What&#x27;s Actually Worth Using</h3><p>The CCNA exam now expects you to explain generative AI in network operations. Here is an honest, hands-on sort of which AI tools actually help, from studying for the exam to drafting configs to testing automation before it touches anything real.</p></div></a></li>
     <li data-cat="sec" data-search="reading my own siem: a 24-hour threat hunt through the home lab a full 24-hour wazuh threat hunting report from the soc home lab, read cold: eight level-15 shellshock alerts pulled apart record by record, a zeek detection i had documented as broken turned out to be live, and an honest look at zero authentication failures. soc threat hunting wazuh zeek mitre att&amp;ck blue team homelab sec security"><a class="logrow" href="/blog/soc-homelab-threat-hunt-report"><time class="date" datetime="2026-09-25">Sep<b>25</b></time><div><div class="meta"><span class="sev c-sec">SEC-5</span><span class="fac">%BLOG-5-SEC &middot; 17 min read</span></div><h3>Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab</h3><p>A full 24-hour Wazuh threat hunting report from the SOC home lab, read cold: eight level-15 Shellshock alerts pulled apart record by record, a Zeek detection I had documented as broken turned out to be live, and an honest look at zero authentication failures.</p></div></a></li>
     <li data-cat="sec" data-search="first alerts: what my soc home lab caught, what it missed, and how i triaged it predictions written before running a single command, then a real scripted attack against my soc home lab: syn scan, sql injection confirmed by three independent tools, a beacon caught at a 0.001 coefficient of variation, and the triage tickets that followed. soc alert triage suricata wazuh zeek blue team mitre att&amp;ck sec security"><a class="logrow" href="/blog/soc-homelab-first-alerts-attack-simulation"><time class="date" datetime="2026-09-24">Sep<b>24</b></time><div><div class="meta"><span class="sev c-sec">SEC-5</span><span class="fac">%BLOG-5-SEC &middot; 19 min read</span></div><h3>First Alerts: What My SOC Home Lab Caught, What It Missed, and How I Triaged It</h3><p>Predictions written before running a single command, then a real scripted attack against my SOC home lab: SYN scan, SQL injection confirmed by three independent tools, a beacon caught at a 0.001 coefficient of variation, and the triage tickets that followed.</p></div></a></li>
     <li data-cat="sec" data-search="one pipeline, three jobs: wazuh, zeek and grafana in a soc home lab wazuh as the siem, zeek as a second pair of eyes on the same interface, and loki with grafana for hunting: the rule that keeps a home soc lab&#x27;s memory budget sane, and a real zeek notice that corrected an earlier assumption. wazuh zeek grafana loki siem detection engineering homelab sec security"><a class="logrow" href="/blog/soc-homelab-wazuh-zeek-grafana-pipeline"><time class="date" datetime="2026-09-23">Sep<b>23</b></time><div><div class="meta"><span class="sev c-sec">SEC-5</span><span class="fac">%BLOG-5-SEC &middot; 16 min read</span></div><h3>One Pipeline, Three Jobs: Wazuh, Zeek and Grafana in a SOC Home Lab</h3><p>Wazuh as the SIEM, Zeek as a second pair of eyes on the same interface, and Loki with Grafana for hunting: the rule that keeps a home SOC lab&#x27;s memory budget sane, and a real Zeek notice that corrected an earlier assumption.</p></div></a></li>
@@ -127,7 +131,7 @@
   </div>
   <div class="wrap"><div class="ftr-base">
     <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
-    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 25, 2026 &middot; uptime: learning since 2024</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 26, 2026 &middot; uptime: learning since 2024</span>
   </div></div>
 </footer>
 </body>

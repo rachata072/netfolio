@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#050D18">
 <meta name="color-scheme" content="dark">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/style.css?v=fac4bc101c">
+<link rel="stylesheet" href="/css/style.css?v=8f8c37b981">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
 <meta property="og:type" content="article">
@@ -33,7 +33,7 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work","description":"Why I cut a multi-firewall SOC design down to two VirtualBox VMs, the network and memory budget behind it, and the threat model that shaped the lab.","datePublished":"2026-09-21","dateModified":"2026-09-21","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"publisher":{"@type":"Person","name":"Trey"},"mainEntityOfPage":"https://breakfixlearn.com/blog/soc-homelab-designing-two-vm-lab","image":"https://breakfixlearn.com/assets/og/soc-homelab-designing-two-vm-lab.png","keywords":"SOC, Suricata, Zeek, Wazuh, VirtualBox, Blue Team, Homelab","articleSection":"Security","timeRequired":"PT14M"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://breakfixlearn.com/blog"},{"@type":"ListItem","position":3,"name":"Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Why build a two-VM SOC lab instead of a segmented network with a firewall appliance?","acceptedAnswer":{"@type":"Answer","text":"A firewall build with multiple network segments is a multi-day project on its own, and most of that extra time goes toward VLAN-style isolation and rule ordering rather than the actual SOC skill of reading an alert and deciding what it means. Two VMs on one flat network is the smallest lab that still produces a complete detection story: an attack, independent detections across three tools, and one place to triage. The segmented design is not abandoned, it is a good second project once this smaller one is solid."}},{"@type":"Question","name":"Why does Suricata's HOME_NET only include the sensor's own address instead of the whole subnet?","acceptedAnswer":{"@type":"Answer","text":"The attacker VM and the sensor VM sit on the same 192.168.56.0/24 host-only network. If HOME_NET were set to the whole subnet, the attacker would count as internal too, and the rules written to fire on inbound attacks from an external source would never evaluate as true. Setting HOME_NET to only the sensor's single address makes the attacker count as EXTERNAL_NET automatically, so every rule written the normal way still works even though both machines share a subnet in real life."}},{"@type":"Question","name":"Why does Wazuh run without a separate agent in this lab?","acceptedAnswer":{"@type":"Answer","text":"Wazuh's all-in-one install includes its own local agent by default, and because the manager, the target application, and the SSH service all live on the same VM, that local agent can already read every file it needs directly off the filesystem: Suricata's EVE JSON, Zeek's notice log, the target's own access log, and the host firewall log. Adding a second, remote agent would only be necessary once a real second host exists to monitor, and it would introduce agent enrollment and agent-to-manager TLS as new things that can quietly break."}},{"@type":"Question","name":"Is it a problem that the sensors and the target application run on the same virtual machine?","acceptedAnswer":{"@type":"Answer","text":"Yes, and it is worth stating plainly rather than glossing over. A real network puts sensors on a span port or a tap, physically separate from anything an attacker could reach, so a compromise of the target cannot also compromise the thing watching it. Here, a genuine compromise of the sensor VM could in principle let an attacker tamper with the very sensors meant to catch them. That is a real limit of this version of the lab, and a dedicated, separate sensor host is the natural next iteration once this smaller design is solid."}}]}</script>
-<script src="/js/main.js?v=7d994f174b" defer></script>
+<script src="/js/main.js?v=b6a070fa7c" defer></script>
 </head>
 <body>
 <div class="progress" aria-hidden="true"></div>
@@ -632,7 +632,7 @@
   </div>
   <div class="wrap"><div class="ftr-base">
     <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
-    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 25, 2026 &middot; uptime: learning since 2024</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 26, 2026 &middot; uptime: learning since 2024</span>
   </div></div>
 </footer>
 </body>

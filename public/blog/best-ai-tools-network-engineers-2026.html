@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Best AI Tools for Network Engineers in 2026 | Trey</title>
+<meta name="description" content="An honest, hands-on look at which AI tools actually help network engineers in 2026, sorted by job: studying, drafting configs, and testing automation.">
+<link rel="canonical" href="https://breakfixlearn.com/blog/best-ai-tools-network-engineers-2026">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=8f8c37b981">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="Best AI Tools for Network Engineers in 2026: What&#x27;s Actually Worth Using">
+<meta property="og:description" content="Every vendor shipped an AI assistant this year and the CCNA exam itself now expects you to know what generative AI is for. Here is an honest, hands-on sort of which tools actually earn a place in a network engineer&#x27;s workflow in 2026, and which are just a chatbot with a new logo.">
+<meta property="og:url" content="https://breakfixlearn.com/blog/best-ai-tools-network-engineers-2026">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/best-ai-tools-network-engineers-2026.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Best AI Tools for Network Engineers in 2026: What&#x27;s Actually Worth Using">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="article:published_time" content="2026-09-26">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="Network Automation">
+<meta property="article:tag" content="CCNA">
+<meta property="article:tag" content="GitHub Copilot">
+<meta property="article:tag" content="Ansible">
+<meta property="article:tag" content="Career">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Best AI Tools for Network Engineers in 2026: What's Actually Worth Using","description":"An honest, hands-on look at which AI tools actually help network engineers in 2026, sorted by job: studying, drafting configs, and testing automation.","datePublished":"2026-09-26","dateModified":"2026-09-26","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"publisher":{"@type":"Person","name":"Trey"},"mainEntityOfPage":"https://breakfixlearn.com/blog/best-ai-tools-network-engineers-2026","image":"https://breakfixlearn.com/assets/og/best-ai-tools-network-engineers-2026.png","keywords":"AI, Network Automation, CCNA, GitHub Copilot, Ansible, Career","articleSection":"AI","timeRequired":"PT10M"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://breakfixlearn.com/blog"},{"@type":"ListItem","position":3,"name":"Best AI Tools for Network Engineers in 2026: What's Actually Worth Using"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is the best AI tool for network engineers in 2026?","acceptedAnswer":{"@type":"Answer","text":"There is no single answer, because the tools do different jobs. For learning concepts and drafting a first-pass config, a general assistant like ChatGPT or Claude is the right tool. For managing gear you already own, the AI assistant built into that vendor's own platform, such as Cisco AI Canvas or Juniper Mist Marvis, has access to your actual telemetry and will outperform a general chatbot every time. For writing automation scripts, a coding assistant like GitHub Copilot, Cursor, or Claude Code speeds up the boring parts, but the script still has to be tested against real devices before you trust it."}},{"@type":"Question","name":"Can ChatGPT or Claude configure a router for me?","acceptedAnswer":{"@type":"Answer","text":"It can draft one. It cannot log into the router, run the command, or confirm the result, because it has no connection to your network. Treat its output as a first draft written by someone who has read every vendor's documentation but has never actually touched your gear: often correct, sometimes confidently wrong about a detail specific to your topology, and never something to paste into a production device without reading it first."}},{"@type":"Question","name":"Will AI replace network engineers?","acceptedAnswer":{"@type":"Answer","text":"Not the job, but it is already replacing some of the tasks inside it. AI is good at drafting a first-pass config, summarizing a wall of show command output, and writing boilerplate automation code. It is not good at deciding whether a change is safe to make on your specific network, negotiating a maintenance window, or noticing that a vendor's documentation is simply wrong for your platform version, which happens more often than any AI vendor likes to admit. The work shifts toward reviewing and validating what the AI produced rather than typing every line yourself."}},{"@type":"Question","name":"What did the CCNA exam actually change about AI?","acceptedAnswer":{"@type":"Answer","text":"The CCNA 200-301 v1.1 update added one exam objective asking candidates to explain generative and predictive AI and machine learning in network operations, at a conceptual level rather than a configuration level, plus a separate objective to recognize how Terraform and Ansible fit into automation and configuration management. Cisco's own guidance is explicit that these additions total about ten percent of the exam. It is worth knowing the vocabulary, not worth building a whole study plan around."}},{"@type":"Question","name":"Is GitHub Copilot or Claude Code better for writing network automation scripts?","acceptedAnswer":{"@type":"Answer","text":"They solve slightly different problems. Copilot is inline autocomplete inside your editor, which is fast for finishing a Netmiko loop or an Ansible task once you already know the shape of what you want. Claude Code and similar terminal agents can read your whole automation repository, plan a multi-file change, and explain why a script behaves the way it does, which matters more once a project grows past one script. Neither replaces testing the result against a lab before it touches a real device."}},{"@type":"Question","name":"Is it safe to run AI-generated automation against a production network?","acceptedAnswer":{"@type":"Answer","text":"Not directly. AI-generated Ansible playbooks and Python scripts can look completely correct and still fail against your actual devices, because the model has no idea what firmware version you are running or what a previous engineer already changed by hand. The safe pattern is the same one good engineers used before AI existed: test the change against a lab or a non-production device first, read the diff, and only then push it to something that matters."}}]}</script>
+<script src="/js/main.js?v=b6a070fa7c" defer></script>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article>
+  <header class="post-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/blog">blog</a><span aria-hidden="true">/</span><a href="/blog#ai">ai</a></nav>
+      <span class="sev c-ai">%BLOG-3-AI</span>
+      <h1 class="mt-2">Best AI Tools for Network Engineers in 2026: What&#x27;s Actually Worth Using</h1>
+      <p class="post-dek">Every vendor shipped an AI assistant this year and the CCNA exam itself now expects you to know what generative AI is for. Here is an honest, hands-on sort of which tools actually earn a place in a network engineer&#x27;s workflow in 2026, and which are just a chatbot with a new logo.</p>
+      <div class="post-meta"><time datetime="2026-09-26">Sep 26, 2026</time><span class="sep">/</span><span>10 min read</span><span class="sep">/</span><span>by Trey</span></div>
+      <div class="post-tags"><span class="chip">AI</span><span class="chip">Network Automation</span><span class="chip">CCNA</span><span class="chip">GitHub Copilot</span><span class="chip">Ansible</span><span class="chip">Career</span></div>
+    </div>
+  </header>
+  <div class="wrap post-layout">
+    <div class="post-main">
+<details class="toc-mobile"><summary>show ip route | toc (7 sections)</summary><ol><li><a href="#for-studying-and-drafting-general-purpose-ai">For studying and drafting: general-purpose AI</a></li><li><a href="#for-the-gear-you-already-run-the-ai-built-into-the-platform">For the gear you already run: the AI built into the platform</a></li><li><a href="#for-writing-automation-coding-assistants-tested-before-they">For writing automation: coding assistants, tested before they touch anything real</a></li><li><a href="#where-this-leaves-an-ai-driven-network-entirely-on-its-own">Where this leaves an AI-driven network entirely on its own</a></li><li><a href="#a-quick-reference-which-tool-for-which-job">A quick reference: which tool for which job</a></li><li><a href="#the-part-worth-remembering">The part worth remembering</a></li><li><a href="#frequently-asked-questions">Frequently asked questions</a></li></ol></details>
+<div class="prose">
+<p>
+  The CCNA exam changed this year. Cisco's 200-301 v1.1 update added a line asking candidates to
+  <a href="https://blogs.cisco.com/learning/understanding-the-updated-ccna-v1-1-with-ai-machine-learning-and-more" rel="noopener" target="_blank">explain generative and predictive AI, and machine learning, in network operations</a>,
+  alongside a second objective to recognize how Terraform and Ansible fit into configuration
+  management. It is a small change, about ten percent of the exam by Cisco's own account, and it
+  is not asking anyone to become a prompt engineer. But it is a useful signal: AI in networking
+  stopped being a conference buzzword somewhere in the last year and became something the
+  certification body considers baseline literacy.
+</p>
+<p>
+  I went looking for a straight answer to a simple question: which AI tools actually belong in a
+  network engineer's day, and which are a chatbot wearing a new logo. Most lists I found sort
+  every tool into one ranking and crown whichever product the author happens to sell. That is not
+  useful if you are trying to figure out what to actually open on a Tuesday morning. So this is
+  organized by job instead of by hype: what to use for studying and drafting, what to use if
+  you already run Cisco or Juniper gear, what to use for writing automation, and where every one
+  of them still needs a human checking its work.
+</p>
+
+<h2 id="for-studying-and-drafting-general-purpose-ai">For studying and drafting: general-purpose AI</h2>
+<p>
+  ChatGPT, Claude, and Gemini are the tools most engineers reach for first, and for a specific
+  set of jobs they are genuinely good: explaining a protocol you half remember from a lab three
+  months ago, drafting a first-pass config for a well-documented feature, translating a Cisco IOS
+  command into its Juniper Junos equivalent, or turning a wall of <code>show</code> output into a
+  plain-language summary before you go digging further. I use one of these most days, usually to
+  get a rough draft of something I already know how to verify, or to have a concept explained a
+  second way when the vendor documentation assumes I already know the answer.
+</p>
+<p>
+  The honest limits matter more than the strengths. None of these tools can log into your gear,
+  run a command, or confirm that what they suggested actually works. Ask for several device
+  configs in one sitting and small inconsistencies creep in, an IP that overlaps with one it gave
+  you three messages ago, a VLAN number that does not match what you said earlier. They also have
+  no memory of your specific topology from one session to the next unless you paste it back in
+  every time. Treat the output the way you would treat a draft from a smart colleague who has
+  read every manual but has never once touched your actual network: a strong starting point, never
+  the final answer.
+</p>
+
+<h2 id="for-the-gear-you-already-run-the-ai-built-into-the-platform">For the gear you already run: the AI built into the platform</h2>
+<p>
+  If your network is Cisco or Juniper, the AI assistant baked into that vendor's own management
+  platform has one advantage a general chatbot can never match: it can actually see your network.
+  <a href="https://blogs.cisco.com/ai/ai-canvas-controlled-availability" rel="noopener" target="_blank">Cisco AI Canvas</a>,
+  which reached controlled availability for US commercial customers in June 2026, is built as an
+  agentic workspace under Cisco Cloud Control where a natural-language question gets dispatched to
+  specialized agents that pull evidence from multiple domains in parallel and hand back a sourced
+  answer, with a deeper reasoning mode for problems that need a structured troubleshooting plan
+  rather than a quick lookup. On the Juniper side, Mist's Marvis assistant keeps shipping steady,
+  unglamorous improvements: the June 2026 update extended Marvis Minis, which simulate a client
+  device to test RADIUS, DHCP, ARP, and DNS, from wireless out to wired switch ports, so a switch
+  problem can be validated the same way a wireless one already was, without physically plugging
+  anything in.
+</p>
+<p>
+  Arista runs a similar play with AVA on top of CloudVision, and every other major vendor has some
+  version of this story now. The pattern across all of them is the same: genuinely useful if
+  that vendor's gear is what you actually manage, because the AI has real telemetry to reason
+  over instead of guessing from a description. Completely useless the moment your network mixes
+  vendors, because none of these assistants reach past their own product line. That is exactly
+  the gap a general AI or a vendor-neutral monitoring platform has to fill instead, and it is why
+  larger shops running mixed fleets end up paying for more than one of these tools rather than
+  picking a favorite.
+</p>
+
+<h2 id="for-writing-automation-coding-assistants-tested-before-they">For writing automation: coding assistants, tested before they touch anything real</h2>
+<p>
+  The category I actually use the most is AI coding assistants, because most of my own work is
+  writing Python and Ansible against real devices rather than configuring one box by hand. GitHub
+  Copilot is inline autocomplete inside the editor, and it is fast for finishing a Netmiko loop
+  or an Ansible task once you already know the shape of what you are building. Terminal-native
+  agents like Claude Code can read across an entire automation repository at once, which matters
+  more once a project grows past a single script, plan a multi-file change, and explain why an
+  existing script behaves the way it does rather than just completing the next line. Red Hat's
+  <a href="https://developers.redhat.com/products/ansible/lightspeed" rel="noopener" target="_blank">Ansible Lightspeed with IBM watsonx Code Assistant</a>
+  sits in its own lane as the option trained specifically on Ansible content rather than general
+  code, which shows in how often its playbook suggestions already match the module conventions
+  you would use by hand.
+</p>
+<p>
+  None of them know what firmware your switch is running or what a previous engineer already
+  changed by hand last quarter, and an AI-generated playbook that looks completely correct can
+  still fail the moment it meets a real device with real state. I wrote about exactly this problem
+  building
+  <a href="/blog/py-configbackup-netmiko-config-backup-alerts">a Netmiko config backup tool</a>:
+  the mocked test suite passed cleanly, and it was only running the script against a real two
+  router lab that surfaced two genuine bugs no amount of AI-assisted code review had caught. That
+  is the actual rule for AI-written automation, and it predates AI by decades: test it against a
+  lab or a non-production device, read the diff, and only then let it near something that matters.
+  A home lab is not optional here, it is the thing that turns an AI's confident guess into
+  something you can actually trust.
+</p>
+
+<h2 id="where-this-leaves-an-ai-driven-network-entirely-on-its-own">Where this leaves an AI-driven network entirely on its own</h2>
+<p>
+  There is a version of this story where a network runs itself: an agent watches telemetry,
+  decides something is wrong, and pushes a fix with no human in the loop. A handful of vendors are
+  pointed in that direction, and it is worth watching, but it is not where most networks are
+  today, and it is not where I would want to be as someone still building the judgment to know
+  when a fix is actually safe. The realistic 2026 workflow is closer to a relay: a general AI
+  helps you understand and draft, a vendor AI watches the gear you actually run, a coding
+  assistant speeds up writing the automation, and a human, ideally one who has broken things in a
+  lab enough times to have real instincts about what "safe" looks like, decides what actually
+  ships.
+</p>
+
+<h2 id="a-quick-reference-which-tool-for-which-job">A quick reference: which tool for which job</h2>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">Job</th><th scope="col">Reach for</th><th scope="col">Why</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name">Learning a protocol or studying for a cert</td><td class="int-desc">ChatGPT or Claude</td><td class="int-desc">Plain-language explanation, no network access needed</td></tr>
+      <tr><td class="int-name">Drafting a first-pass config</td><td class="int-desc">ChatGPT or Claude</td><td class="int-desc">Fast starting point; always verify before deploying</td></tr>
+      <tr><td class="int-name">Troubleshooting live Cisco infrastructure</td><td class="int-desc">Cisco AI Canvas</td><td class="int-desc">Reads your actual telemetry, not a description of it</td></tr>
+      <tr><td class="int-name">Troubleshooting live Juniper Mist wireless or wired</td><td class="int-desc">Marvis</td><td class="int-desc">Simulates real clients against RADIUS, DHCP, ARP, DNS</td></tr>
+      <tr><td class="int-name">Writing an Ansible playbook</td><td class="int-desc">Ansible Lightspeed, or Copilot</td><td class="int-desc">Trained on Ansible conventions specifically</td></tr>
+      <tr><td class="int-name">Refactoring a whole automation repo</td><td class="int-desc">Claude Code or Cursor</td><td class="int-desc">Full-repo context beats line-by-line autocomplete</td></tr>
+      <tr><td class="int-name">Deciding if an AI-generated change is safe</td><td class="int-desc">A lab, every time</td><td class="int-desc">No AI tool here replaces testing against real devices</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="the-part-worth-remembering">The part worth remembering</h2>
+<p>
+  The exam question that started this post is a good compass for the whole topic. Cisco does not
+  ask CCNA candidates to build an AI agent. It asks them to explain what generative and
+  predictive AI are for, at a conceptual level, and to recognize automation tooling when they see
+  it. That is the right amount of AI for most network engineers right now: enough to know which
+  tool fits which job and enough healthy suspicion of confident-sounding output to test it before
+  it goes anywhere near production. The tools above are worth learning. None of them are worth
+  trusting blind, and the ones built specifically for your own gear are worth more than a general
+  chatbot the moment something actually breaks.
+</p>
+
+<h2 id="frequently-asked-questions">Frequently asked questions</h2>
+<h3>What is the best AI tool for network engineers in 2026?</h3>
+<p>
+  There is no single answer, because the tools do different jobs. For learning concepts and
+  drafting a first-pass config, a general assistant like ChatGPT or Claude is the right tool. For
+  managing gear you already own, the AI assistant built into that vendor's own platform, such as
+  Cisco AI Canvas or Juniper Mist Marvis, has access to your actual telemetry and will outperform
+  a general chatbot every time. For writing automation scripts, a coding assistant like GitHub
+  Copilot, Cursor, or Claude Code speeds up the boring parts, but the script still has to be
+  tested against real devices before you trust it.
+</p>
+<h3>Can ChatGPT or Claude configure a router for me?</h3>
+<p>
+  It can draft one. It cannot log into the router, run the command, or confirm the result,
+  because it has no connection to your network. Treat its output as a first draft written by
+  someone who has read every vendor's documentation but has never actually touched your gear:
+  often correct, sometimes confidently wrong about a detail specific to your topology, and never
+  something to paste into a production device without reading it first.
+</p>
+<h3>Will AI replace network engineers?</h3>
+<p>
+  Not the job, but it is already replacing some of the tasks inside it. AI is good at drafting a
+  first-pass config, summarizing a wall of show command output, and writing boilerplate
+  automation code. It is not good at deciding whether a change is safe to make on your specific
+  network, negotiating a maintenance window, or noticing that a vendor's documentation is simply
+  wrong for your platform version, which happens more often than any AI vendor likes to admit.
+  The work shifts toward reviewing and validating what the AI produced rather than typing every
+  line yourself.
+</p>
+<h3>What did the CCNA exam actually change about AI?</h3>
+<p>
+  The CCNA 200-301 v1.1 update added one exam objective asking candidates to explain generative
+  and predictive AI and machine learning in network operations, at a conceptual level rather than
+  a configuration level, plus a separate objective to recognize how Terraform and Ansible fit into
+  automation and configuration management. Cisco's own guidance is explicit that these additions
+  total about ten percent of the exam. It is worth knowing the vocabulary, not worth building a
+  whole study plan around.
+</p>
+<h3>Is GitHub Copilot or Claude Code better for writing network automation scripts?</h3>
+<p>
+  They solve slightly different problems. Copilot is inline autocomplete inside your editor,
+  which is fast for finishing a Netmiko loop or an Ansible task once you already know the shape
+  of what you want. Claude Code and similar terminal agents can read your whole automation
+  repository, plan a multi-file change, and explain why a script behaves the way it does, which
+  matters more once a project grows past one script. Neither replaces testing the result against
+  a lab before it touches a real device.
+</p>
+<h3>Is it safe to run AI-generated automation against a production network?</h3>
+<p>
+  Not directly. AI-generated Ansible playbooks and Python scripts can look completely correct and
+  still fail against your actual devices, because the model has no idea what firmware version you
+  are running or what a previous engineer already changed by hand. The safe pattern is the same
+  one good engineers used before AI existed: test the change against a lab or a non-production
+  device first, read the diff, and only then push it to something that matters.
+</p>
+</div>
+      <footer class="post-end">
+        
+        <nav class="nexthop" aria-label="More posts"><a class="prev" href="/blog/soc-homelab-threat-hunt-report"><span class="k">&larr; previous hop</span>Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab</a><a class="next" href="/blog/cisco-ise-zero-day-cve-2026-76460-api-auth-bypass"><span class="k">next hop &rarr;</span>Cisco ISE&#x27;s Perfect-10 Zero-Day: What CVE-2026-76460 Actually Breaks</a></nav>
+      </footer>
+    </div>
+    <aside class="toc" aria-label="On this page"><span class="toc-title"><span class="h">#</span> show ip route | toc</span><ol><li><a href="#for-studying-and-drafting-general-purpose-ai">For studying and drafting: general-purpose AI</a></li><li><a href="#for-the-gear-you-already-run-the-ai-built-into-the-platform">For the gear you already run: the AI built into the platform</a></li><li><a href="#for-writing-automation-coding-assistants-tested-before-they">For writing automation: coding assistants, tested before they touch anything real</a></li><li><a href="#where-this-leaves-an-ai-driven-network-entirely-on-its-own">Where this leaves an AI-driven network entirely on its own</a></li><li><a href="#a-quick-reference-which-tool-for-which-job">A quick reference: which tool for which job</a></li><li><a href="#the-part-worth-remembering">The part worth remembering</a></li><li><a href="#frequently-asked-questions">Frequently asked questions</a></li></ol></aside>
+  </div>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 26, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

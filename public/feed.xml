@@ -5,8 +5,24 @@
   <link>https://breakfixlearn.com/</link>
   <description>CCNA lab walkthroughs, security write-ups, and Python network automation notes by Trey.</description>
   <language>en-ca</language>
-  <lastBuildDate>Fri, 25 Sep 2026 09:00:00 -0700</lastBuildDate>
+  <lastBuildDate>Sat, 26 Sep 2026 09:00:00 -0700</lastBuildDate>
   <atom:link href="https://breakfixlearn.com/feed.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>Cisco ISE&#x27;s Perfect-10 Zero-Day: What CVE-2026-76460 Actually Breaks</title>
+    <link>https://breakfixlearn.com/blog/cisco-ise-zero-day-cve-2026-76460-api-auth-bypass</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/cisco-ise-zero-day-cve-2026-76460-api-auth-bypass.html</guid>
+    <pubDate>Sat, 26 Sep 2026 09:00:00 -0700</pubDate>
+    <category>NEWS</category>
+    <description>Cisco&#x27;s ISE auth bypass, CVE-2026-76460, is a perfect CVSS 10.0 and already added to CISA&#x27;s exploited list. A plain-language walk through what the flaw actually does, why identity infrastructure is a uniquely bad place for it, and the exact command to check your own logs.</description>
+  </item>
+  <item>
+    <title>Best AI Tools for Network Engineers in 2026: What&#x27;s Actually Worth Using</title>
+    <link>https://breakfixlearn.com/blog/best-ai-tools-network-engineers-2026</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/best-ai-tools-network-engineers-2026.html</guid>
+    <pubDate>Sat, 26 Sep 2026 09:00:00 -0700</pubDate>
+    <category>AI</category>
+    <description>The CCNA exam now expects you to explain generative AI in network operations. Here is an honest, hands-on sort of which AI tools actually help, from studying for the exam to drafting configs to testing automation before it touches anything real.</description>
+  </item>
   <item>
     <title>Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab</title>
     <link>https://breakfixlearn.com/blog/soc-homelab-threat-hunt-report</link>

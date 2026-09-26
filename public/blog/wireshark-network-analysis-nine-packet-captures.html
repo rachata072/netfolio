@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#050D18">
 <meta name="color-scheme" content="dark">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/style.css?v=fac4bc101c">
+<link rel="stylesheet" href="/css/style.css?v=8f8c37b981">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
 <meta property="og:type" content="article">
@@ -32,7 +32,7 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"What Nine Packet Captures Taught Me About Networks I Thought I Already Understood","description":"Nine real packet captures (DNS, TCP, HTTP vs HTTPS, ICMP, packet loss, ARP, DHCP, Telnet vs SSH, FTP), each read and explained by hand for CCNA study.","datePublished":"2026-09-18","dateModified":"2026-09-18","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"publisher":{"@type":"Person","name":"Trey"},"mainEntityOfPage":"https://breakfixlearn.com/blog/wireshark-network-analysis-nine-packet-captures","image":"https://breakfixlearn.com/assets/og/wireshark-network-analysis-nine-packet-captures.png","keywords":"Wireshark, CCNA, TCP/IP, Packet Analysis, Network Security","articleSection":"Networking","timeRequired":"PT19M"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://breakfixlearn.com/blog"},{"@type":"ListItem","position":3,"name":"What Nine Packet Captures Taught Me About Networks I Thought I Already Understood"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Why does this project skip VLAN trunking, OSPF, and Spanning Tree?","acceptedAnswer":{"@type":"Answer","text":"Those three scenarios were in the original plan, but producing genuine traffic for any of them needs simulated or real switch and router infrastructure, GNS3 or Packet Tracer, beyond what this particular lab build covers. Rather than fake the evidence with a guessed-at write-up dressed up as a real capture, they were cut outright. They're a clean follow-up project once that infrastructure exists, not a corner quietly cut, and the repository says so directly instead of padding the scenario count."}},{"@type":"Question","name":"Why does the Telnet capture use a stand-in script instead of a real Telnet server?","acceptedAnswer":{"@type":"Answer","text":"It's a real subset of RFC 854 on the wire, genuine IAC WILL/DO option negotiation followed by a plaintext username and password prompt, because running a full system telnetd deterministically in the original build environment wasn't practical. Every byte in that capture is real and unedited. The SSH half, and the home-lab version of this same comparison described in the runbook, use a completely genuine system daemon end to end. The credential-exposure result is identical either way; only the server implementation differs."}},{"@type":"Question","name":"If ping to a real host fails, does that mean the network is down?","acceptedAnswer":{"@type":"Answer","text":"Not necessarily. Pinging a real public resolver from this project's build environment returned a hundred percent packet loss, four requests out, nothing back at all, while DNS lookups and HTTPS requests from that same environment worked perfectly. That pattern means something on the path is silently filtering ICMP specifically, a common and deliberate network-security control, not a broken network. Recognizing that distinction, instead of escalating a false alarm, is the actual troubleshooting skill this scenario exists to teach."}},{"@type":"Question","name":"What's the difference between a closed port and a filtered port?","acceptedAnswer":{"@type":"Answer","text":"A closed port replies immediately with a TCP RST, the host is reachable and something confirms nothing is listening there. A filtered port replies with nothing at all and simply times out, a firewall or ACL somewhere on the path silently dropped the packet, so you can't tell from the outside whether the host even exists. That distinction is the entire logic a port scanner like nmap uses to classify open, closed, and filtered, and it's why a timeout during troubleshooting is a completely different signal from an active refusal."}}]}</script>
-<script src="/js/main.js?v=7d994f174b" defer></script>
+<script src="/js/main.js?v=b6a070fa7c" defer></script>
 </head>
 <body>
 <div class="progress" aria-hidden="true"></div>
@@ -823,7 +823,7 @@
   </div>
   <div class="wrap"><div class="ftr-base">
     <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
-    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 25, 2026 &middot; uptime: learning since 2024</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 26, 2026 &middot; uptime: learning since 2024</span>
   </div></div>
 </footer>
 </body>
