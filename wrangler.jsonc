@@ -1,0 +1,16 @@
+// Cloudflare Workers config: deploys the static site in public/ as Worker static assets.
+// No Worker script ("main") is needed: every request is served straight from public/.
+// Docs: https://developers.cloudflare.com/workers/static-assets/
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  // must match the Worker name in the Cloudflare dashboard
+  "name": "breakfixlearn",
+  "compatibility_date": "2026-09-25",
+  "assets": {
+    "directory": "./public",
+    // /blog serves blog.html, /blog.html redirects to /blog (same as Pages did)
+    "html_handling": "auto-trailing-slash",
+    // unknown URLs get public/404.html with a real 404 status
+    "not_found_handling": "404-page"
+  }
+}

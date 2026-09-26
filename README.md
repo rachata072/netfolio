@@ -51,12 +51,20 @@ netfolio-v2/
     build.py  qa.py  serve.py  og.py  imgprep.py
 ```
 
-## Deploying (when you're happy with it)
+## Deploying
 
-Point the Cloudflare Pages project at this folder's `public/` as the output directory
-(or copy `public/` over the old one). No build command is needed on Cloudflare because
-the built files are committed. Keep 2FA on GitHub and Cloudflare: the deploy chain is
-the real attack surface of a static site.
+The site runs as a **Cloudflare Worker with static assets** (Workers & Pages >
+breakfixlearn). `wrangler.jsonc` in the repo root tells the build to upload
+`public/` as the site; there is no Worker script and no build step, because the
+built files are committed. Cloudflare's default deploy command (`npx wrangler deploy`)
+picks the config up automatically.
+
+- `_headers` in `public/` is applied by Workers exactly like it was on Pages (and is never served).
+- `/page.html` redirects to `/page`, and unknown URLs get `404.html` with a 404 status.
+- Pushing `main` deploys production. Pushing any other branch uploads a preview version.
+- Rollback: dashboard > Deployments > pick an older version > Deploy (or `git revert` + push).
+
+Keep 2FA on GitHub and Cloudflare: the deploy chain is the real attack surface of a static site.
 
 ## Design
 
