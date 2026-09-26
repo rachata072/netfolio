@@ -1,43 +1,124 @@
-# netfolio - Networking & Cybersecurity Portfolio
+# breakfixlearn v2
 
-A hand-built static site styled as a Cisco IOS session. No frameworks, no build
-step, no trackers, no cookies. Palette: Cisco midnight navy `#0B2240` + Cisco
-sky blue `#049FD9` + Cisco green `#6CC04A`.
+A redesign of breakfixlearn.com, built beside the original so it can be tested
+before anything is replaced. The original site in `../netfolio/` is untouched.
 
+Still 100% static: plain HTML, one CSS file, two small vanilla JS files, and
+self-hosted fonts. No framework, no CDN, no npm, no cookies. The only new thing is
+a small Python build script (standard library only) that writes the static pages
+for you, so you stop hand-editing the blog index, home page, RSS and sitemap.
 
-## Security posture (OWASP Top 10 mapping)
+## Test it locally
 
-This is a fully static site - the strongest security decision here is
-architectural: there is no server-side code to attack.
+```bash
+cd netfolio-v2
+python tools/serve.py          # open http://localhost:8080
+```
 
-| OWASP 2021 | How it's addressed |
+`serve.py` behaves like Cloudflare Pages: extension-less URLs (`/blog`), `.html`
+redirects, the 404 page, and every header in `public/_headers` including the
+strict CSP. Open DevTools > Console: if anything violates the CSP, you will see it
+here before it ever reaches production. (Opening the HTML files directly with
+file:// will look broken because links are root-absolute; use the server.)
+
+## Publish a new post
+
+1. Copy `src/post-template.html` to `src/posts/<slug>.html` and fill in the meta block.
+2. `python tools/build.py --og` (the `--og` part needs `pip install pillow`)
+3. `python tools/qa.py`
+4. `python tools/serve.py` and check it, then commit and push.
+
+The home page, blog index, month groups, filter counts, RSS feed, sitemap,
+table of contents, series box, and previous/next links all update from that one file.
+Projects live in `src/projects.json`.
+
+## Layout
+
+```
+netfolio-v2/
+  public/            <- deploy this folder (Cloudflare Pages build output dir)
+    css/ js/         hand-written, versioned by build.py (?v=hash)
+    assets/fonts/    IBM Plex Sans / Mono / Condensed, woff2, OFL licensed
+    assets/img/      post screenshots (only the ones posts actually use)
+    assets/og/       1200x630 link-preview images, generated
+    _headers         security + cache headers
+  src/
+    site.json        name, links, blog categories, series
+    projects.json    every project card
+    pages/*.html     home, projects, blog, privacy, 404 templates
+    posts/*.html     one file per post: meta JSON + article body
+  tools/
+    build.py  qa.py  serve.py  og.py  imgprep.py
+```
+
+## Deploying (when you're happy with it)
+
+Point the Cloudflare Pages project at this folder's `public/` as the output directory
+(or copy `public/` over the old one). No build command is needed on Cloudflare because
+the built files are committed. Keep 2FA on GitHub and Cloudflare: the deploy chain is
+the real attack surface of a static site.
+
+## Design
+
+"NOC console": the site reads like a network you are walking through, not a template.
+
+- Packet Tracer style grid canvas, Cisco palette (midnight #0D274D, Cisco blue
+  #049FD9, bright #00BCEB, status green, amber, Cisco red).
+- Home hero: a slowly rotating 3D "internet" globe behind the headline (`js/globe.js`,
+  ~4.5 KB gzipped, plain Canvas 2D, no WebGL or libraries). Routers linked in a mesh,
+  packets arcing between them, red packets dropped at a dashed security perimeter ring
+  with lock nodes. It pauses off screen and in background tabs, runs at 30 fps on phones,
+  leans toward the mouse on desktop, and shows one still frame for reduced-motion users.
+- Nav is a row of switch ports with link LEDs (green = the page you're on).
+- Home hero: an animated lab topology (internet > firewall > core switch > labs).
+  Packets flow, a red packet gets dropped at the firewall ACL. Pure SVG + SMIL, no JS,
+  and it switches off for people with reduced-motion enabled.
+- Projects are switch interfaces (`Gi1/0/x`, VLAN = category, up/up status).
+- The SOC series is a traceroute, one hop per post.
+- Blog is `show logging`: month groups, syslog severity badges, live search and filters.
+- Posts get a sticky table of contents, reading progress, copy buttons on code,
+  a repo box, and "next hop" navigation.
+
+## Bugs found in v1 and fixed here
+
+| # | Issue in the old site | Impact | Fix in v2 |
+|---|---|---|---|
+| 1 | CSP `connect-src 'self'` while Cloudflare Web Analytics is allowed in `script-src` | The beacon script loads but its report to `cloudflareinsights.com` is blocked, so analytics under-count or record nothing | `connect-src 'self' https://cloudflareinsights.com` |
+| 2 | Every internal link, canonical, sitemap and RSS URL ends in `.html` | Cloudflare Pages 308-redirects `*.html` to the extension-less URL: every click costs an extra round trip, and canonicals point at redirects (SEO) | All URLs are extension-less; `qa.py` fails the build on `.html` links |
+| 3 | 49 image files deployed that no page references (3.1 MB), including 34 raw JPG screenshots from M365 projects | Wasted deploy size, and raw screenshots publicly reachable by URL | Only referenced images copied into v2. Originals left untouched in v1; review them before re-adding |
+| 4 | `blog/building-my-first-ospf-lab.html` is the placeholder template ("you@lab") and is live | Thin/placeholder page indexable by Google | Not migrated. The template now lives in `src/post-template.html` and drafts never build |
+| 5 | 40 internal links in posts had `target="_blank"` | Your own pages opened in new tabs | Removed for internal links; `qa.py` blocks it |
+| 6 | Hero terminal used `aria-live` while typing character by character | Screen readers announce every keystroke | Typing animation removed; hero is static text + decorative SVG |
+| 7 | `tools/imgprep.py` wrote to `assets/img/` at the repo root | After the move to `public/`, new images landed outside the deployed folder | Writes to `public/assets/img/` |
+| 8 | Em dashes left in two posts (house style says none) | Reads as AI-written | Replaced; `qa.py` now checks |
+| 9 | Meta descriptions of 11 posts were 196-259 characters | Google truncates around 155-160 | Rewritten to 142-159 chars. The longer text is kept as the on-page intro and link-preview text |
+| 10 | No `og:image`, no Twitter card | LinkedIn / Slack previews were bare text | Per-post 1200x630 preview images + `summary_large_image` |
+| 11 | CSS/JS/fonts served with `max-age=0, must-revalidate` (Pages default) | Revalidation request on every page view | Hash-versioned URLs + `immutable` one-year cache |
+| 12 | Projects page listed 5 projects while posts linked 11 public repos | Most of your real work was invisible to recruiters | 13 project cards, each with its repo and write-up |
+| 13 | No skip link, nav unusable on narrow phones | Accessibility / mobile | Skip link, focus styles, phone layout for nav, tables and topology |
+
+Other hardening: `default-src 'none'` instead of `'self'`, `base-uri 'none'`,
+`form-action 'none'`, extra `Permissions-Policy` entries, `X-Permitted-Cross-Domain-Policies`.
+The blog filter only accepts URL hash values that exactly match a hard-coded filter
+(allow-list), and nothing from the URL or the search box is ever written into the page.
+
+## Security posture (OWASP Top 10: 2021)
+
+| Risk | How it's handled |
 |---|---|
-| A01 Broken Access Control | No auth, no server logic, no admin panel. Nothing to escalate. |
-| A02 Cryptographic Failures | HTTPS enforced by host + HSTS header. No secrets stored anywhere. |
-| A03 Injection / XSS | No user input is rendered. `js/main.js` only writes hard-coded constants via `textContent`/`createTextNode` - never `innerHTML`. Strict CSP (`script-src 'self'`) as defense-in-depth. |
-| A04 Insecure Design | Static-first design: blog is flat HTML, no comment system, no contact form (mailto instead). Smallest possible attack surface. |
-| A05 Security Misconfiguration | `_headers` sets CSP, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, HSTS, COOP/CORP. No directory listing on static hosts. |
-| A06 Vulnerable Components | Zero dependencies. No CDN scripts, no jQuery, no framework, no npm. Nothing to patch. |
-| A07 Auth Failures | No authentication exists. Protect the DEPLOY pipeline instead: enable 2FA on GitHub + your hosting account. |
-| A08 Integrity Failures | No third-party scripts, so no SRI needed. If you ever add one, use `integrity=` + `crossorigin` attributes. |
-| A09 Logging & Monitoring | Use your host's access logs / analytics (Cloudflare gives this free, privacy-friendly, no JS needed). |
-| A10 SSRF | No server-side requests exist. |
+| A01 Broken Access Control | No auth, no server logic, no admin panel. |
+| A02 Cryptographic Failures | HTTPS only, HSTS, no secrets anywhere in the repo. |
+| A03 Injection / XSS | No `innerHTML`/`eval` (qa.py enforces). All DOM writes are `textContent`/attributes. Build output is HTML-escaped. Strict CSP with no `unsafe-inline`. |
+| A04 Insecure Design | Static-first: no forms, no comments, mailto for contact. |
+| A05 Misconfiguration | `_headers`: CSP, frame-ancestors none, nosniff, referrer policy, permissions policy, COOP/CORP. |
+| A06 Vulnerable Components | Zero runtime dependencies. Fonts self-hosted. |
+| A07 Auth Failures | None on the site; protect GitHub + Cloudflare with 2FA. |
+| A08 Integrity Failures | No third-party scripts except Cloudflare's own beacon (injected by Cloudflare). |
+| A09 Logging & Monitoring | Cloudflare Web Analytics + access logs (now actually able to report, see bug #1). |
+| A10 SSRF | No server-side requests. |
 
-### Rules to keep it secure
-- Never paste third-party `<script src=...>` snippets without SRI and a CSP update - this is how portfolio sites usually get compromised (A08).
-- Want comments? Use giscus (GitHub Discussions) and add its origin explicitly to the CSP rather than loosening it to `*`.
-- Want a contact form? Use a hosted form endpoint (e.g., your host's forms feature) - never roll mail script.
-- Keep 2FA on GitHub and the hosting dashboard; the deploy chain IS your attack surface now.
+## Before going live
 
-## SEO checklist (already done, verify after deploy)
-
-- [x] Unique `<title>` + meta description per page
-- [x] Canonical URLs (update the domain!)
-- [x] Semantic HTML: one `<h1>` per page, `<article>`, `<nav>`, landmarks
-- [x] JSON-LD: `Person` on home, `BlogPosting` on posts
-- [x] Open Graph tags for link previews
-- [x] `sitemap.xml` + `robots.txt`
-- [ ] After deploy: submit sitemap in Google Search Console + Bing Webmaster Tools
-- [ ] After deploy: run Lighthouse (aim 95+ on all four categories)
-- [ ] Post consistently - for ranking, real content beats every tag on this list
-
+- Search Console + Bing Webmaster Tools: resubmit `sitemap.xml` (URLs changed to extension-less; the old `.html` URLs still redirect, so nothing breaks).
+- The privacy page date was bumped to Sep 25, 2026 because a "Fonts and scripts" section was added. Adjust it to your launch date.
+- Run Lighthouse on the deployed preview URL.

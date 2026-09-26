@@ -1,0 +1,31 @@
+<!--meta
+{
+  "out": "404.html",
+  "path": "/404",
+  "nav": "",
+  "title": "404 | Destination unreachable",
+  "description": "This page does not exist.",
+  "noindex": true,
+  "scripts": []
+}
+-->
+<main id="main">
+  <section class="wrap nf">
+    <span class="cli"><span class="h">edge#</span> <span class="v">ping</span> <span class="a">this-page</span></span>
+    <h1>404</h1>
+<pre class="runcfg">Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to this-page, timeout is 2 seconds:
+<span class="bad">U.U.U</span>
+Success rate is 0 percent (0/5)
+
+<span class="kw">edge#</span> <span class="va">show ip route this-page</span>
+<span class="bad">% Network not in table</span>
+
+<span class="cm">! the page moved, was renamed, or never existed</span></pre>
+    <div class="hero-cta">
+      <a class="btn btn-pri" href="/"><span class="p" aria-hidden="true">#</span>traceroute home</a>
+      <a class="btn btn-sec" href="/blog"><span class="p" aria-hidden="true">#</span>show logging</a>
+      <a class="btn btn-sec" href="/projects"><span class="p" aria-hidden="true">#</span>show projects</a>
+    </div>
+  </section>
+</main>

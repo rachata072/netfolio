@@ -1,0 +1,71 @@
+{
+  "url": "https://breakfixlearn.com",
+  "name": "breakfixlearn",
+  "author": "Trey",
+  "job_title": "CCNA-Certified Network Engineer",
+  "location": "Vancouver, BC",
+  "email": "treyrct858@gmail.com",
+  "github": "https://github.com/rachata072",
+  "linkedin": "https://www.linkedin.com/in/treywcp/",
+  "since": 2024,
+  "knows_about": [
+    "Networking",
+    "Cybersecurity",
+    "Python",
+    "Cisco IOS",
+    "Network Automation",
+    "SOC",
+    "Active Directory"
+  ],
+  "categories": {
+    "news": {
+      "code": "NEWS",
+      "sev": 2,
+      "level": "crit",
+      "name": "Security news",
+      "desc": "CVEs, breaches and advisories worth acting on, explained in plain language."
+    },
+    "ai": {
+      "code": "AI",
+      "sev": 3,
+      "level": "err",
+      "name": "AI",
+      "desc": "AI in networking and security: tools I test, how attackers use it, and where it breaks."
+    },
+    "network": {
+      "code": "NETWORK",
+      "sev": 4,
+      "level": "warning",
+      "name": "Networking",
+      "desc": "Routing, switching, subnetting and packet captures. CCNA labs live here."
+    },
+    "sec": {
+      "code": "SEC",
+      "sev": 5,
+      "level": "notice",
+      "name": "Security",
+      "desc": "Blue team work: SOC labs, detection, hardening and vulnerability management."
+    },
+    "python": {
+      "code": "PYTHON",
+      "sev": 6,
+      "level": "info",
+      "name": "Automation",
+      "desc": "Python, Netmiko and PowerShell scripts that remove the boring parts of admin work."
+    },
+    "support": {
+      "code": "SUPPORT",
+      "sev": 7,
+      "level": "debug",
+      "name": "IT support",
+      "desc": "Troubleshooting and systems: Active Directory, Microsoft 365, ITSM and runbooks."
+    }
+  },
+  "series": {
+    "soc-homelab": {
+      "name": "SOC-HomeLab",
+      "repo": "soc-homelab",
+      "project": "soc-lab"
+    }
+  }
+}

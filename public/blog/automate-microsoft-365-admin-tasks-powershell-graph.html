@@ -1,90 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-CA">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Automate Microsoft 365 Admin Work with PowerShell + Graph - Trey</title>
-  <meta name="description" content="I automated the seven Microsoft 365 admin tasks that fill a real IT ticket queue: onboarding, offboarding, groups, delegation, mail flow, and health checks.">
-  <link rel="canonical" href="https://breakfixlearn.com/blog/automate-microsoft-365-admin-tasks-powershell-graph.html">
-  <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
-  <link rel="stylesheet" href="../css/style.css">
-  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
-  <meta property="og:type" content="article">
-  <meta property="og:title" content="I Automated the Seven Microsoft 365 Admin Tasks That Actually Fill an IT Ticket Queue">
-  <meta property="og:description" content="I automated the seven Microsoft 365 admin tasks that fill a real IT ticket queue: onboarding, offboarding, groups, delegation, mail flow, and health checks.">
-  <meta property="og:url" content="https://breakfixlearn.com/blog/automate-microsoft-365-admin-tasks-powershell-graph.html">
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "headline": "I Automated the Seven Microsoft 365 Admin Tasks That Actually Fill an IT Ticket Queue",
-    "datePublished": "2026-08-24",
-    "author": { "@type": "Person", "name": "Trey" },
-    "mainEntityOfPage": "https://breakfixlearn.com/blog/automate-microsoft-365-admin-tasks-powershell-graph.html"
-  }
-  </script>
-  <!-- FAQPage schema - makes the FAQ section eligible for a rich-result snippet in search -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "Do I need a paid Microsoft 365 tenant to build this myself?",
-        "acceptedAnswer": { "@type": "Answer", "text": "No. Everything here was built and tested against a Microsoft 365 E3 environment provisioned through the standard 30-day free trial, covered in detail, including how to avoid getting billed after the trial ends, in the first project in this series. The Graph PowerShell SDK and Exchange Online Management module are both free." }
-      },
-      {
-        "@type": "Question",
-        "name": "Why use the Microsoft Graph PowerShell SDK instead of the older AzureAD module?",
-        "acceptedAnswer": { "@type": "Answer", "text": "The AzureAD and MSOnline PowerShell modules are being deprecated by Microsoft. Building new automation against the Graph SDK means it is built on the platform Microsoft is actively investing in and supporting going forward, rather than something already scheduled for retirement." }
-      },
-      {
-        "@type": "Question",
-        "name": "Is it safe to automate offboarding and access delegation given how serious the consequences of a mistake would be?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes, provided the automation is built thoughtfully: disabling and revoking access rather than deleting anything outright, gating any real deletion (like a group) behind an explicit confirmation, logging every action for accountability, and testing thoroughly in a sandbox before ever pointing the scripts at a real production tenant. Everything here was deliberately designed around that principle." }
-      },
-      {
-        "@type": "Question",
-        "name": "What happens if a script fails partway through?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Each action is handled independently and logged as it happens, so a partial failure shows up immediately in the console output and in the audit log rather than silently succeeding or silently failing. The accompanying runbook includes a troubleshooting table and a rollback procedure for exactly this scenario." }
-      },
-      {
-        "@type": "Question",
-        "name": "Does this replace HR's offboarding checklist, or a security team's access review process, entirely?",
-        "acceptedAnswer": { "@type": "Answer", "text": "No, and it is not meant to. It replaces the mechanical IT portions specifically: disabling access, revoking sessions, reclaiming licenses, scoping and auditing admin roles, and logging every action. Equipment return, exit interviews, and periodic manual access reviews remain exactly that, owned by the people who actually own them." }
-      },
-      {
-        "@type": "Question",
-        "name": "Who should be allowed to run these scripts in a real organization?",
-        "acceptedAnswer": { "@type": "Answer", "text": "It depends on the script, which is the whole point of the delegation piece. Onboarding and offboarding require User Administrator. Group management requires Groups Administrator. Role delegation itself requires Privileged Role Administrator, deliberately the narrowest and most tightly held of all of them. Mail flow troubleshooting requires Exchange Administrator, or Global Reader for read-only access. None of the scripts expand anyone's effective permissions, they simply make the actions a given role can already take faster, more consistent, and automatically logged." }
-      }
-    ]
-  }
-  </script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Automate Microsoft 365 Admin Work with PowerShell + Graph | Trey</title>
+<meta name="description" content="I automated the seven Microsoft 365 admin tasks that fill a real IT ticket queue: onboarding, offboarding, groups, delegation, mail flow, and health checks.">
+<link rel="canonical" href="https://breakfixlearn.com/blog/automate-microsoft-365-admin-tasks-powershell-graph">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=fac4bc101c">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="I Automated the Seven Microsoft 365 Admin Tasks That Actually Fill an IT Ticket Queue">
+<meta property="og:description" content="I automated the seven Microsoft 365 admin tasks that fill a real IT ticket queue: onboarding, offboarding, groups, delegation, mail flow, and health checks.">
+<meta property="og:url" content="https://breakfixlearn.com/blog/automate-microsoft-365-admin-tasks-powershell-graph">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/automate-microsoft-365-admin-tasks-powershell-graph.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="I Automated the Seven Microsoft 365 Admin Tasks That Actually Fill an IT Ticket Queue">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="article:published_time" content="2026-08-24">
+<meta property="article:tag" content="Microsoft 365">
+<meta property="article:tag" content="PowerShell">
+<meta property="article:tag" content="Cybersecurity">
+<meta property="article:tag" content="IT Support">
+<meta property="article:tag" content="Automation">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"I Automated the Seven Microsoft 365 Admin Tasks That Actually Fill an IT Ticket Queue","description":"I automated the seven Microsoft 365 admin tasks that fill a real IT ticket queue: onboarding, offboarding, groups, delegation, mail flow, and health checks.","datePublished":"2026-08-24","dateModified":"2026-08-24","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"publisher":{"@type":"Person","name":"Trey"},"mainEntityOfPage":"https://breakfixlearn.com/blog/automate-microsoft-365-admin-tasks-powershell-graph","image":"https://breakfixlearn.com/assets/og/automate-microsoft-365-admin-tasks-powershell-graph.png","keywords":"Microsoft 365, PowerShell, Cybersecurity, IT Support, Automation","articleSection":"IT support","timeRequired":"PT20M"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://breakfixlearn.com/blog"},{"@type":"ListItem","position":3,"name":"I Automated the Seven Microsoft 365 Admin Tasks That Actually Fill an IT Ticket Queue"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Do I need a paid Microsoft 365 tenant to build this myself?","acceptedAnswer":{"@type":"Answer","text":"No. Everything here was built and tested against a Microsoft 365 E3 environment provisioned through the standard 30-day free trial, covered in detail, including how to avoid getting billed after the trial ends, in the first project in this series. The Graph PowerShell SDK and Exchange Online Management module are both free."}},{"@type":"Question","name":"Why use the Microsoft Graph PowerShell SDK instead of the older AzureAD module?","acceptedAnswer":{"@type":"Answer","text":"The AzureAD and MSOnline PowerShell modules are being deprecated by Microsoft. Building new automation against the Graph SDK means it is built on the platform Microsoft is actively investing in and supporting going forward, rather than something already scheduled for retirement."}},{"@type":"Question","name":"Is it safe to automate offboarding and access delegation given how serious the consequences of a mistake would be?","acceptedAnswer":{"@type":"Answer","text":"Yes, provided the automation is built thoughtfully: disabling and revoking access rather than deleting anything outright, gating any real deletion (like a group) behind an explicit confirmation, logging every action for accountability, and testing thoroughly in a sandbox before ever pointing the scripts at a real production tenant. Everything here was deliberately designed around that principle."}},{"@type":"Question","name":"What happens if a script fails partway through?","acceptedAnswer":{"@type":"Answer","text":"Each action is handled independently and logged as it happens, so a partial failure shows up immediately in the console output and in the audit log rather than silently succeeding or silently failing. The accompanying runbook includes a troubleshooting table and a rollback procedure for exactly this scenario."}},{"@type":"Question","name":"Does this replace HR's offboarding checklist, or a security team's access review process, entirely?","acceptedAnswer":{"@type":"Answer","text":"No, and it is not meant to. It replaces the mechanical IT portions specifically: disabling access, revoking sessions, reclaiming licenses, scoping and auditing admin roles, and logging every action. Equipment return, exit interviews, and periodic manual access reviews remain exactly that, owned by the people who actually own them."}},{"@type":"Question","name":"Who should be allowed to run these scripts in a real organization?","acceptedAnswer":{"@type":"Answer","text":"It depends on the script, which is the whole point of the delegation piece. Onboarding and offboarding require User Administrator. Group management requires Groups Administrator. Role delegation itself requires Privileged Role Administrator, deliberately the narrowest and most tightly held of all of them. Mail flow troubleshooting requires Exchange Administrator, or Global Reader for read-only access. None of the scripts expand anyone's effective permissions, they simply make the actions a given role can already take faster, more consistent, and automatically logged."}}]}</script>
+<script src="/js/main.js?v=7d994f174b" defer></script>
 </head>
 <body>
-
-<header class="site-header">
+<div class="progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
   <div class="wrap">
-    <a class="brand" href="../index.html" aria-label="Home">
-      <span class="prompt">Trey@lab</span>:<span class="host">~</span>$ <span aria-hidden="true">_</span>
-    </a>
-    <nav class="site-nav" aria-label="Main navigation">
-      <a href="../index.html">home</a>
-      <a href="../projects.html">projects</a>
-      <a href="../blog.html" aria-current="page">blog</a>
-      <a href="../index.html#about">about</a>
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span>about</a></li>
+      </ul>
     </nav>
   </div>
 </header>
-
-<main>
-  <article class="article wrap">
-    <p class="mono post-eyebrow">%BLOG-6-SUPPORT</p>
-    <h1>I Automated the Seven Microsoft 365 Admin Tasks That Actually Fill an IT Ticket Queue</h1>
-    <p class="post-meta">Aug 24, 2026 · 20 min read · Microsoft 365, PowerShell, Cybersecurity, IT Support, Automation</p>
-
+<main id="main">
+<article>
+  <header class="post-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/blog">blog</a><span aria-hidden="true">/</span><a href="/blog#support">support</a></nav>
+      <span class="sev c-support">%BLOG-7-SUPPORT</span>
+      <h1 class="mt-2">I Automated the Seven Microsoft 365 Admin Tasks That Actually Fill an IT Ticket Queue</h1>
+      <p class="post-dek">I automated the seven Microsoft 365 admin tasks that fill a real IT ticket queue: onboarding, offboarding, groups, delegation, mail flow, and health checks.</p>
+      <div class="post-meta"><time datetime="2026-08-24">Aug 24, 2026</time><span class="sep">/</span><span>20 min read</span><span class="sep">/</span><span>by Trey</span><span class="sep">/</span><a href="https://github.com/rachata072/m365-identity-ops-automation" rel="noopener" target="_blank">source on github &#8599;</a></div>
+      <div class="post-tags"><span class="chip">Microsoft 365</span><span class="chip">PowerShell</span><span class="chip">Cybersecurity</span><span class="chip">IT Support</span><span class="chip">Automation</span></div>
+    </div>
+  </header>
+  <div class="wrap post-layout">
+    <div class="post-main">
+<details class="toc-mobile"><summary>show ip route | toc (18 sections)</summary><ol><li><a href="#the-problem-with-doing-it-by-hand">The problem with doing it by hand</a></li><li><a href="#why-this-is-worth-automating-specifically">Why this is worth automating specifically</a></li><li><a href="#what-i-built">What I built</a></li><li><a href="#walking-through-the-onboarding-script-in-more-detail">Walking through the onboarding script in more detail</a></li><li><a href="#walking-through-the-offboarding-script-in-more-detail">Walking through the offboarding script in more detail</a></li><li><a href="#managing-groups-and-recovering-from-the-one-you-delete-by-mi">Managing groups, and recovering from the one you delete by mistake</a></li><li><a href="#delegating-admin-access-instead-of-handing-out-global-admini">Delegating admin access instead of handing out Global Administrator</a></li><li><a href="#troubleshooting-mail-flow-without-opening-a-support-ticket-w">Troubleshooting mail flow without opening a support ticket with yourself</a></li><li><a href="#knowing-whether-it-is-microsoft-s-problem-or-yours">Knowing whether it is Microsoft&#x27;s problem or yours</a></li><li><a href="#why-deletion-is-gated-not-automated">Why deletion is gated, not automated</a></li><li><a href="#testing-this-safely-before-trusting-it">Testing this safely before trusting it</a></li><li><a href="#the-security-and-compliance-angle">The security and compliance angle</a></li><li><a href="#the-business-impact-in-concrete-terms">The business impact, in concrete terms</a></li><li><a href="#who-is-actually-affected-by-a-project-like-this-inside-a-rea">Who is actually affected by a project like this inside a real organization</a></li><li><a href="#what-i-learned-building-this">What I learned building this</a></li><li><a href="#how-this-fits-into-the-larger-project-series">How this fits into the larger project series</a></li><li><a href="#frequently-asked-questions">Frequently asked questions</a></li><li><a href="#try-it-yourself">Try it yourself</a></li></ol></details>
+<div class="prose">
     <p>
       Every organization running Microsoft 365 has the same handful of tickets on repeat,
       week after week, regardless of industry or size. Someone starts on Monday and needs
@@ -113,7 +94,7 @@
       before.
     </p>
 
-    <h2>The problem with doing it by hand</h2>
+    <h2 id="the-problem-with-doing-it-by-hand">The problem with doing it by hand</h2>
     <p>
       Manual onboarding in the Microsoft 365 admin center takes somewhere between fifteen
       and thirty minutes per person if you are being careful, longer if you are also
@@ -155,7 +136,7 @@
       troubleshooting the wrong problem, because nobody checked the obvious thing first.
     </p>
 
-    <h2>Why this is worth automating specifically</h2>
+    <h2 id="why-this-is-worth-automating-specifically">Why this is worth automating specifically</h2>
     <p>
       There is a version of this problem that gets solved by simply writing a better
       checklist and asking people to follow it more carefully. That version does not
@@ -175,7 +156,7 @@
       the time savings, although the time savings are real too.
     </p>
 
-    <h2>What I built</h2>
+    <h2 id="what-i-built">What I built</h2>
     <p>
       Seven PowerShell scripts, all built against the
       <a href="https://learn.microsoft.com/en-us/powershell/microsoftgraph/overview?view=graph-powershell-1.0" rel="noopener" target="_blank">Microsoft Graph PowerShell SDK</a>
@@ -245,7 +226,7 @@
       one.
     </p>
 
-    <h2>Walking through the onboarding script in more detail</h2>
+    <h2 id="walking-through-the-onboarding-script-in-more-detail">Walking through the onboarding script in more detail</h2>
     <p>
       The core of New-Hire.ps1 is a function that takes a first name, last name,
       department, job title, manager, license SKU, and a list of groups, and does five
@@ -300,7 +281,7 @@
       <figcaption>New-Hire.ps1 completing end to end: the account is licensed, the manager relationship is set, and a temporary password is generated for secure handoff.</figcaption>
     </figure>
 
-    <h2>Walking through the offboarding script in more detail</h2>
+    <h2 id="walking-through-the-offboarding-script-in-more-detail">Walking through the offboarding script in more detail</h2>
     <p>
       Offboard-User.ps1 follows a similar structure but with a different, more
       security-critical sequence, and the order here is deliberate rather than arbitrary.
@@ -373,7 +354,7 @@
       <figcaption>The verification step that actually matters: confirming in the admin center that the offboarding took effect, not just trusting the script's own success message.</figcaption>
     </figure>
 
-    <h2>Managing groups, and recovering from the one you delete by mistake</h2>
+    <h2 id="managing-groups-and-recovering-from-the-one-you-delete-by-mi">Managing groups, and recovering from the one you delete by mistake</h2>
     <p>
       Group sprawl is a quieter problem than a missed offboarding, but it is a real one.
       Groups get created for a project that ends six months later and nobody deletes the
@@ -415,7 +396,7 @@
       <figcaption>The recovery window in the admin center: a deleted Microsoft 365 group is not actually gone for 30 days, but only if you know to look here.</figcaption>
     </figure>
 
-    <h2>Delegating admin access instead of handing out Global Administrator</h2>
+    <h2 id="delegating-admin-access-instead-of-handing-out-global-admini">Delegating admin access instead of handing out Global Administrator</h2>
     <p>
       This is the part of the project I think matters most from a security standpoint, and
       it is also the part most likely to get skipped by a small IT team just trying to get
@@ -458,7 +439,7 @@
       <figcaption>ListHolders answering the question that matters: exactly who holds this role, right now, tenant-wide.</figcaption>
     </figure>
 
-    <h2>Troubleshooting mail flow without opening a support ticket with yourself</h2>
+    <h2 id="troubleshooting-mail-flow-without-opening-a-support-ticket-w">Troubleshooting mail flow without opening a support ticket with yourself</h2>
     <p>
       "Did my email actually send" is one of the single most common help desk tickets in
       any organization running email, and it is also one of the tickets most likely to have
@@ -500,7 +481,7 @@
       <figcaption>The GUI starting point for the same question the script answers in one command: Exchange admin center, then Mail flow, then Message trace.</figcaption>
     </figure>
 
-    <h2>Knowing whether it is Microsoft's problem or yours</h2>
+    <h2 id="knowing-whether-it-is-microsoft-s-problem-or-yours">Knowing whether it is Microsoft's problem or yours</h2>
     <p>
       The last piece is the one that looks the least impressive on paper and might
       actually save the most time in practice. Before troubleshooting a "Teams is broken
@@ -539,7 +520,7 @@
       <figcaption>The one-screen answer to whether it's Microsoft's problem or yours, checked before troubleshooting anything further.</figcaption>
     </figure>
 
-    <h2>Why deletion is gated, not automated</h2>
+    <h2 id="why-deletion-is-gated-not-automated">Why deletion is gated, not automated</h2>
     <p>
       This is a deliberate design choice, not an oversight, and it applies to both people
       and groups. The user-facing scripts disable, revoke, strip,
@@ -561,10 +542,10 @@
       out explicitly in documentation rather than leaving implicit.
     </p>
 
-    <h2>Testing this safely before trusting it</h2>
+    <h2 id="testing-this-safely-before-trusting-it">Testing this safely before trusting it</h2>
     <p>
       Everything here was built and tested against the
-      <a href="../blog/free-microsoft-365-sandbox-real-setup-guide.html" rel="noopener" target="_blank">Microsoft 365 developer tenant from the first project in this series</a>,
+      <a href="/blog/free-microsoft-365-sandbox-real-setup-guide">Microsoft 365 developer tenant from the first project in this series</a>,
       specifically so that mistakes during development cost nothing and affect nobody. I
       ran the onboarding script against fictitious users first, then verified every claimed
       action independently through the admin center rather than trusting the script's own
@@ -586,7 +567,7 @@
       that comes naturally by default.
     </p>
 
-    <h2>The security and compliance angle</h2>
+    <h2 id="the-security-and-compliance-angle">The security and compliance angle</h2>
     <p>
       It is worth being explicit about why the audit logging matters as much as the
       automation itself, because it is easy to treat logging as an afterthought bolted onto
@@ -607,7 +588,7 @@
       it does to "was this person's access removed on time."
     </p>
 
-    <h2>The business impact, in concrete terms</h2>
+    <h2 id="the-business-impact-in-concrete-terms">The business impact, in concrete terms</h2>
     <p>
       It is worth putting a rough number on the time savings, not because the number itself
       is the point, but because being able to frame a technical project in terms an
@@ -641,7 +622,7 @@
       troubleshooting a problem that was never theirs to fix in the first place.
     </p>
 
-    <h2>Who is actually affected by a project like this inside a real organization</h2>
+    <h2 id="who-is-actually-affected-by-a-project-like-this-inside-a-rea">Who is actually affected by a project like this inside a real organization</h2>
     <p>
       New hires benefit from a faster, more consistent account setup that has everything
       they need working correctly from their very first login. IT support and help desk
@@ -663,7 +644,7 @@
       of after a round of guessing.
     </p>
 
-    <h2>What I learned building this</h2>
+    <h2 id="what-i-learned-building-this">What I learned building this</h2>
     <p>
       The scripting itself, once I understood the Graph SDK's cmdlet patterns, was the
       easier half of this project. The harder, more valuable part was thinking through
@@ -704,10 +685,10 @@
       complete from automation that actually is.
     </p>
 
-    <h2>How this fits into the larger project series</h2>
+    <h2 id="how-this-fits-into-the-larger-project-series">How this fits into the larger project series</h2>
     <p>
       This project builds directly on
-      <a href="../blog/free-microsoft-365-sandbox-real-setup-guide.html" rel="noopener" target="_blank">the tenant foundation and MFA baseline established in the first project in this series</a>.
+      <a href="/blog/free-microsoft-365-sandbox-real-setup-guide">the tenant foundation and MFA baseline established in the first project in this series</a>.
       That ordering was deliberate: automating identity lifecycle management and delegated
       administration against an environment with no documented security baseline would have
       been building on a foundation I could not actually vouch for. Having MFA already
@@ -724,14 +705,14 @@
       are built incrementally, with each piece depending on the ones before it.
     </p>
 
-    <h2>Frequently asked questions</h2>
+    <h2 id="frequently-asked-questions">Frequently asked questions</h2>
 
     <h3>Do I need a paid Microsoft 365 tenant to build this myself?</h3>
     <p>
       No. Everything here was built and tested against a Microsoft 365 E3 environment
       provisioned through the standard 30-day free trial, covered in detail, including how
       to avoid getting billed after the trial ends, in the
-      <a href="../blog/free-microsoft-365-sandbox-real-setup-guide.html" rel="noopener" target="_blank">first project in this series</a>.
+      <a href="/blog/free-microsoft-365-sandbox-real-setup-guide">first project in this series</a>.
       The Graph PowerShell SDK and Exchange Online Management module are both free.
     </p>
 
@@ -780,7 +761,7 @@
       logged.
     </p>
 
-    <h2>Try it yourself</h2>
+    <h2 id="try-it-yourself">Try it yourself</h2>
     <p>
       The full PowerShell scripts, a step-by-step runbook covering every task through both
       the admin center and the command line, a troubleshooting table built from real errors
@@ -795,23 +776,51 @@
     <p>
       This is the second project in an ongoing series of hands-on IT support and
       cybersecurity projects I'm building for my portfolio
-      (<a href="../index.html#about" rel="noopener" target="_blank">more on my background here</a>).
+      (<a href="/#about">more on my background here</a>).
       Each one is scoped to solve a genuinely real problem an IT organization actually has,
       not to look impressive in a portfolio scroll without holding up under a closer look.
-      <a href="../blog.html" rel="noopener" target="_blank">More lab notes and write-ups land here</a>
+      <a href="/blog">More lab notes and write-ups land here</a>
       as each one ships.
     </p>
-
-    <p class="mono mt-3"><a href="../blog.html">&larr; show logging</a></p>
-  </article>
-</main>
-
-<footer class="site-footer">
-  <div class="wrap">
-    <span>© 2026 Trey · built by hand · no cookies · privacy-respecting analytics · <a href="../privacy.html">privacy</a></span>
-    <span><a href="../index.html">exit →</a></span>
+</div>
+      <footer class="post-end">
+        <div class="repo-box"><div><span class="k">source for this post</span><span class="v">github.com/rachata072/m365-identity-ops-automation</span></div><a class="btn btn-sec" href="https://github.com/rachata072/m365-identity-ops-automation" rel="noopener" target="_blank">view repo <span aria-hidden="true">&#8599;</span></a></div>
+        <nav class="nexthop" aria-label="More posts"><a class="prev" href="/blog/free-microsoft-365-sandbox-real-setup-guide"><span class="k">&larr; previous hop</span>Free Microsoft 365 Sandbox: The Real Setup Guide (2026)</a><a class="next" href="/blog/vulnerability-management-program-tenable-powershell-bash"><span class="k">next hop &rarr;</span>I Built a Vulnerability Management Program From Scratch, Policy to Remediation</a></nav>
+      </footer>
+    </div>
+    <aside class="toc" aria-label="On this page"><span class="toc-title"><span class="h">#</span> show ip route | toc</span><ol><li><a href="#the-problem-with-doing-it-by-hand">The problem with doing it by hand</a></li><li><a href="#why-this-is-worth-automating-specifically">Why this is worth automating specifically</a></li><li><a href="#what-i-built">What I built</a></li><li><a href="#walking-through-the-onboarding-script-in-more-detail">Walking through the onboarding script in more detail</a></li><li><a href="#walking-through-the-offboarding-script-in-more-detail">Walking through the offboarding script in more detail</a></li><li><a href="#managing-groups-and-recovering-from-the-one-you-delete-by-mi">Managing groups, and recovering from the one you delete by mistake</a></li><li><a href="#delegating-admin-access-instead-of-handing-out-global-admini">Delegating admin access instead of handing out Global Administrator</a></li><li><a href="#troubleshooting-mail-flow-without-opening-a-support-ticket-w">Troubleshooting mail flow without opening a support ticket with yourself</a></li><li><a href="#knowing-whether-it-is-microsoft-s-problem-or-yours">Knowing whether it is Microsoft&#x27;s problem or yours</a></li><li><a href="#why-deletion-is-gated-not-automated">Why deletion is gated, not automated</a></li><li><a href="#testing-this-safely-before-trusting-it">Testing this safely before trusting it</a></li><li><a href="#the-security-and-compliance-angle">The security and compliance angle</a></li><li><a href="#the-business-impact-in-concrete-terms">The business impact, in concrete terms</a></li><li><a href="#who-is-actually-affected-by-a-project-like-this-inside-a-rea">Who is actually affected by a project like this inside a real organization</a></li><li><a href="#what-i-learned-building-this">What I learned building this</a></li><li><a href="#how-this-fits-into-the-larger-project-series">How this fits into the larger project series</a></li><li><a href="#frequently-asked-questions">Frequently asked questions</a></li><li><a href="#try-it-yourself">Try it yourself</a></li></ol></aside>
   </div>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 25, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
 </footer>
-
 </body>
 </html>

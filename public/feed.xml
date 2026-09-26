@@ -1,161 +1,131 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
-  <title>breakfixlearn - network lab notes &amp; security news</title>
+  <title>breakfixlearn - network lab notes &amp; security write-ups</title>
   <link>https://breakfixlearn.com/</link>
-  <description>CCNA lab walkthroughs, plain-language security news breakdowns, and Python network automation notes.</description>
-  <language>en</language>
+  <description>CCNA lab walkthroughs, security write-ups, and Python network automation notes by Trey.</description>
+  <language>en-ca</language>
   <lastBuildDate>Fri, 25 Sep 2026 09:00:00 -0700</lastBuildDate>
   <atom:link href="https://breakfixlearn.com/feed.xml" rel="self" type="application/rss+xml"/>
-
-  <!-- TEMPLATE: when you publish a post, copy this <item> block to the TOP
-       of the list (newest first), then update <lastBuildDate> above.
-       Categories match the site convention: SEC, LAB, PYTHON.
-
-  <item>
-    <title>Post title here</title>
-    <link>https://breakfixlearn.com/blog/your-post.html</link>
-    <guid>https://breakfixlearn.com/blog/your-post.html</guid>
-    <pubDate>Mon, 01 Sep 2026 08:00:00 -0700</pubDate>
-    <category>LAB</category>
-    <description>One-sentence summary, same as the blog index entry.</description>
-  </item>
-  -->
-
   <item>
     <title>Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab</title>
-    <link>https://breakfixlearn.com/blog/soc-homelab-threat-hunt-report.html</link>
-    <guid>https://breakfixlearn.com/blog/soc-homelab-threat-hunt-report.html</guid>
+    <link>https://breakfixlearn.com/blog/soc-homelab-threat-hunt-report</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/soc-homelab-threat-hunt-report.html</guid>
     <pubDate>Fri, 25 Sep 2026 09:00:00 -0700</pubDate>
     <category>SEC</category>
     <description>A full 24-hour Wazuh threat hunting report from the SOC home lab, read cold: eight level-15 Shellshock alerts pulled apart record by record, a Zeek detection I had documented as broken turned out to be live, and an honest look at zero authentication failures.</description>
   </item>
-
   <item>
     <title>First Alerts: What My SOC Home Lab Caught, What It Missed, and How I Triaged It</title>
-    <link>https://breakfixlearn.com/blog/soc-homelab-first-alerts-attack-simulation.html</link>
-    <guid>https://breakfixlearn.com/blog/soc-homelab-first-alerts-attack-simulation.html</guid>
+    <link>https://breakfixlearn.com/blog/soc-homelab-first-alerts-attack-simulation</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/soc-homelab-first-alerts-attack-simulation.html</guid>
     <pubDate>Thu, 24 Sep 2026 09:00:00 -0700</pubDate>
     <category>SEC</category>
     <description>Predictions written before running a single command, then a real scripted attack against my SOC home lab: SYN scan, SQL injection confirmed by three independent tools, a beacon caught at a 0.001 coefficient of variation, and the triage tickets that followed.</description>
   </item>
-
   <item>
     <title>One Pipeline, Three Jobs: Wazuh, Zeek and Grafana in a SOC Home Lab</title>
-    <link>https://breakfixlearn.com/blog/soc-homelab-wazuh-zeek-grafana-pipeline.html</link>
-    <guid>https://breakfixlearn.com/blog/soc-homelab-wazuh-zeek-grafana-pipeline.html</guid>
+    <link>https://breakfixlearn.com/blog/soc-homelab-wazuh-zeek-grafana-pipeline</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/soc-homelab-wazuh-zeek-grafana-pipeline.html</guid>
     <pubDate>Wed, 23 Sep 2026 09:00:00 -0700</pubDate>
     <category>SEC</category>
-    <description>Wazuh as the SIEM, Zeek as a second pair of eyes on the same interface, and Loki with Grafana for hunting: the rule that keeps a home SOC lab's memory budget sane, and a real Zeek notice that corrected an earlier assumption.</description>
+    <description>Wazuh as the SIEM, Zeek as a second pair of eyes on the same interface, and Loki with Grafana for hunting: the rule that keeps a home SOC lab&#x27;s memory budget sane, and a real Zeek notice that corrected an earlier assumption.</description>
   </item>
-
   <item>
     <title>Suricata on the SOC VM: Installing and Tuning a Host-Based IDS</title>
-    <link>https://breakfixlearn.com/blog/soc-homelab-suricata-ids-installation.html</link>
-    <guid>https://breakfixlearn.com/blog/soc-homelab-suricata-ids-installation.html</guid>
+    <link>https://breakfixlearn.com/blog/soc-homelab-suricata-ids-installation</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/soc-homelab-suricata-ids-installation.html</guid>
     <pubDate>Tue, 22 Sep 2026 09:00:00 -0700</pubDate>
     <category>SEC</category>
     <description>Installing Suricata from the OISF PPA on a two-VM SOC home lab: why HOME_NET has to be one address instead of a subnet, three custom rules that always fire, and reading real EVE JSON alerts end to end.</description>
   </item>
-
   <item>
     <title>Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work</title>
-    <link>https://breakfixlearn.com/blog/soc-homelab-designing-two-vm-lab.html</link>
-    <guid>https://breakfixlearn.com/blog/soc-homelab-designing-two-vm-lab.html</guid>
+    <link>https://breakfixlearn.com/blog/soc-homelab-designing-two-vm-lab</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/soc-homelab-designing-two-vm-lab.html</guid>
     <pubDate>Mon, 21 Sep 2026 09:00:00 -0700</pubDate>
     <category>SEC</category>
     <description>Why I cut a segmented, multi-firewall SOC design down to two VirtualBox VMs, the networking and memory budget that came out of that decision, and the threat model that decided what belonged in the lab.</description>
   </item>
-
   <item>
-    <title>I Built a Netmiko Config Backup Tool So I'd Stop Losing Arguments With My Own Router</title>
-    <link>https://breakfixlearn.com/blog/py-configbackup-netmiko-config-backup-alerts.html</link>
-    <guid>https://breakfixlearn.com/blog/py-configbackup-netmiko-config-backup-alerts.html</guid>
+    <title>I Built a Netmiko Config Backup Tool So I&#x27;d Stop Losing Arguments With My Own Router</title>
+    <link>https://breakfixlearn.com/blog/py-configbackup-netmiko-config-backup-alerts</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/py-configbackup-netmiko-config-backup-alerts.html</guid>
     <pubDate>Sun, 20 Sep 2026 09:00:00 -0700</pubDate>
     <category>PYTHON</category>
     <description>A Python CLI that SSHes into every device in an inventory with Netmiko, backs up the running config, diffs it, and emails an alert on change, tested against a real two-router VyOS lab that caught two genuine bugs a mocked test suite never could.</description>
   </item>
-
   <item>
     <title>What Nine Packet Captures Taught Me About Networks I Thought I Already Understood</title>
-    <link>https://breakfixlearn.com/blog/wireshark-network-analysis-nine-packet-captures.html</link>
-    <guid>https://breakfixlearn.com/blog/wireshark-network-analysis-nine-packet-captures.html</guid>
+    <link>https://breakfixlearn.com/blog/wireshark-network-analysis-nine-packet-captures</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/wireshark-network-analysis-nine-packet-captures.html</guid>
     <pubDate>Fri, 18 Sep 2026 09:00:00 -0700</pubDate>
     <category>NETWORK</category>
     <description>Nine real packet captures, DNS, TCP, HTTP vs HTTPS, ICMP, packet loss, ARP, DHCP, Telnet vs SSH, and FTP, each one generated, read, and explained by hand for CCNA study and a networking portfolio.</description>
   </item>
-
   <item>
     <title>What Twenty Fake Helpdesk Tickets Taught Me About Real IT Support</title>
-    <link>https://breakfixlearn.com/blog/freshservice-service-desk-simulation-sla-tickets.html</link>
-    <guid>https://breakfixlearn.com/blog/freshservice-service-desk-simulation-sla-tickets.html</guid>
+    <link>https://breakfixlearn.com/blog/freshservice-service-desk-simulation-sla-tickets</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/freshservice-service-desk-simulation-sla-tickets.html</guid>
     <pubDate>Mon, 14 Sep 2026 09:00:00 -0700</pubDate>
     <category>SUPPORT</category>
     <description>Building a full Freshservice service desk from scratch: three SLA tiers, a category taxonomy, a service catalog, and twenty simulated helpdesk tickets designed to be genuinely representative of a real support queue.</description>
   </item>
-
   <item>
-    <title>I Built an Active Directory Home Lab That's More Than Three OUs and a Password Policy</title>
-    <link>https://breakfixlearn.com/blog/active-directory-home-lab-windows-server-2022-gpo.html</link>
-    <guid>https://breakfixlearn.com/blog/active-directory-home-lab-windows-server-2022-gpo.html</guid>
+    <title>I Built an Active Directory Home Lab That&#x27;s More Than Three OUs and a Password Policy</title>
+    <link>https://breakfixlearn.com/blog/active-directory-home-lab-windows-server-2022-gpo</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/active-directory-home-lab-windows-server-2022-gpo.html</guid>
     <pubDate>Thu, 10 Sep 2026 09:00:00 -0700</pubDate>
     <category>SUPPORT</category>
     <description>A from-scratch Active Directory lab on Windows Server 2022: OU design, Fine-Grained Password Policies, Windows LAPS, delegated help desk rights, WSUS patching, scripted provisioning, and a backup I actually tested.</description>
   </item>
-
   <item>
     <title>Building an IT Runbook That Would Actually Survive Contact With a Real Service Desk</title>
-    <link>https://breakfixlearn.com/blog/it-runbook-sops-real-service-desk.html</link>
-    <guid>https://breakfixlearn.com/blog/it-runbook-sops-real-service-desk.html</guid>
+    <link>https://breakfixlearn.com/blog/it-runbook-sops-real-service-desk</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/it-runbook-sops-real-service-desk.html</guid>
     <pubDate>Sat, 05 Sep 2026 09:00:00 -0700</pubDate>
     <category>SUPPORT</category>
-    <description>A five-document IT runbook covering onboarding, offboarding, password reset, laptop setup, and network troubleshooting, built from NIST, CIS Controls v8, and Microsoft's own documentation, including the lockout threshold assumption that turned out backwards.</description>
+    <description>A five-document IT runbook covering onboarding, offboarding, password reset, laptop setup, and network troubleshooting, built from NIST, CIS Controls v8, and Microsoft&#x27;s own documentation, including the lockout threshold assumption that turned out backwards.</description>
   </item>
-
   <item>
-    <title>I Kept Getting VLSM Wrong By Hand, So I Wrote a Tool That Can't</title>
-    <link>https://breakfixlearn.com/blog/vlsm-subnet-calculator-python-tool.html</link>
-    <guid>https://breakfixlearn.com/blog/vlsm-subnet-calculator-python-tool.html</guid>
+    <title>I Kept Getting VLSM Wrong By Hand, So I Wrote a Tool That Can&#x27;t</title>
+    <link>https://breakfixlearn.com/blog/vlsm-subnet-calculator-python-tool</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/vlsm-subnet-calculator-python-tool.html</guid>
     <pubDate>Fri, 04 Sep 2026 09:00:00 -0700</pubDate>
     <category>PYTHON</category>
     <description>A dependency-free Python CLI that plans VLSM subnetting from a CSV of departments and host counts, no manual bookkeeping, 30 tests, and the allocation-order decision that stops wasted address space.</description>
   </item>
-
   <item>
     <title>I Ran a Real Security Audit Against My Own Linux Machine, Here Is What Actually Broke</title>
-    <link>https://breakfixlearn.com/blog/linux-hardening-audit-lynis-rkhunter.html</link>
-    <guid>https://breakfixlearn.com/blog/linux-hardening-audit-lynis-rkhunter.html</guid>
+    <link>https://breakfixlearn.com/blog/linux-hardening-audit-lynis-rkhunter</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/linux-hardening-audit-lynis-rkhunter.html</guid>
     <pubDate>Thu, 03 Sep 2026 09:00:00 -0700</pubDate>
     <category>SEC</category>
     <description>Lynis and rkhunter against a real Ubuntu workstation: three warnings triaged, a crashed Fail2ban jail caught, and an honest account of the thirty eight suggestions I skipped.</description>
   </item>
-
   <item>
     <title>I Built a Vulnerability Management Program From Scratch, Policy to Remediation</title>
-    <link>https://breakfixlearn.com/blog/vulnerability-management-program-tenable-powershell-bash.html</link>
-    <guid>https://breakfixlearn.com/blog/vulnerability-management-program-tenable-powershell-bash.html</guid>
+    <link>https://breakfixlearn.com/blog/vulnerability-management-program-tenable-powershell-bash</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/vulnerability-management-program-tenable-powershell-bash.html</guid>
     <pubDate>Thu, 27 Aug 2026 09:00:00 -0700</pubDate>
     <category>SEC</category>
-    <description>Policy, stakeholder buy-in, Tenable scanning across Windows and Linux targets, and ten confirmed remediations in PowerShell and Bash, including the two attempts that didn't work out.</description>
+    <description>Policy, stakeholder buy-in, Tenable scanning across Windows and Linux targets, and ten confirmed remediations in PowerShell and Bash, including the two attempts that didn&#x27;t work out.</description>
   </item>
-
   <item>
     <title>I Automated the Seven Microsoft 365 Admin Tasks That Actually Fill an IT Ticket Queue</title>
-    <link>https://breakfixlearn.com/blog/automate-microsoft-365-admin-tasks-powershell-graph.html</link>
-    <guid>https://breakfixlearn.com/blog/automate-microsoft-365-admin-tasks-powershell-graph.html</guid>
-    <pubDate>Mon, 24 Aug 2026 10:00:00 -0700</pubDate>
+    <link>https://breakfixlearn.com/blog/automate-microsoft-365-admin-tasks-powershell-graph</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/automate-microsoft-365-admin-tasks-powershell-graph.html</guid>
+    <pubDate>Mon, 24 Aug 2026 09:00:00 -0700</pubDate>
     <category>SUPPORT</category>
     <description>Onboarding, offboarding, groups, delegated admin roles, mail flow, and service health, automated with the Microsoft Graph PowerShell SDK, with a real audit trail.</description>
   </item>
-
   <item>
     <title>Free Microsoft 365 Sandbox: The Real Setup Guide (2026)</title>
-    <link>https://breakfixlearn.com/blog/free-microsoft-365-sandbox-real-setup-guide.html</link>
-    <guid>https://breakfixlearn.com/blog/free-microsoft-365-sandbox-real-setup-guide.html</guid>
+    <link>https://breakfixlearn.com/blog/free-microsoft-365-sandbox-real-setup-guide</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/free-microsoft-365-sandbox-real-setup-guide.html</guid>
     <pubDate>Sun, 23 Aug 2026 09:00:00 -0700</pubDate>
     <category>SUPPORT</category>
-    <description>The Microsoft 365 developer sandbox isn't actually free for individuals. Here's the real accessible path (30-day E3 trial) and how to avoid getting billed.</description>
+    <description>The Microsoft 365 developer sandbox isn&#x27;t actually free for individuals. Here&#x27;s the real accessible path (30-day E3 trial) and how to avoid getting billed.</description>
   </item>
-
 </channel>
 </rss>

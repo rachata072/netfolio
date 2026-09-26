@@ -1,179 +1,134 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-CA">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blog - Trey | Security News &amp; Network Lab Notes</title>
-  <meta name="description" content="Security news breakdowns, network lab walkthroughs, and Python automation notes from a CCNA-certified engineer.">
-  <link rel="canonical" href="https://breakfixlearn.com/blog.html">
-  <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Blog - Trey">
-  <meta property="og:description" content="Security news breakdowns, CCNA labs, Python automation notes.">
-  <meta property="og:url" content="https://breakfixlearn.com/blog.html">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blog | Security Write-ups &amp; Network Lab Notes by Trey</title>
+<meta name="description" content="Security write-ups, network lab walkthroughs, Python automation notes, and IT support deep dives from a CCNA-certified engineer. Every post links to a public repo.">
+<link rel="canonical" href="https://breakfixlearn.com/blog">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=fac4bc101c">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="show logging: security write-ups and network lab notes">
+<meta property="og:description" content="Security write-ups, network lab walkthroughs, Python automation notes, and IT support deep dives from a CCNA-certified engineer. Every post links to a public repo.">
+<meta property="og:url" content="https://breakfixlearn.com/blog">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/blog.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="show logging: security write-ups and network lab notes">
+<meta name="twitter:card" content="summary_large_image">
+<script src="/js/main.js?v=7d994f174b" defer></script>
+<script src="/js/filter.js?v=7c3e277a89" defer></script>
 </head>
 <body>
-
-<header class="site-header">
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
   <div class="wrap">
-    <a class="brand" href="index.html" aria-label="Home">
-      <span class="prompt">Trey@lab</span>:<span class="host">~</span>$ <span aria-hidden="true">_</span>
-    </a>
-    <nav class="site-nav" aria-label="Main navigation">
-      <a href="index.html">home</a>
-      <a href="projects.html">projects</a>
-      <a href="blog.html" aria-current="page">blog</a>
-      <a href="index.html#about">about</a>
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span>about</a></li>
+      </ul>
     </nav>
   </div>
 </header>
-
-<main>
-  <section class="section" data-filter-group>
+<main id="main">
+  <header class="page-head">
     <div class="wrap">
-      <h1 class="cmd-heading">
-        <span class="prompt">edge-router#</span><span class="verb">show</span> logging<span class="filter-current" aria-hidden="true"></span>
-      </h1>
-
-      <p class="page-intro">
-        Lab walkthroughs, plain-language security news breakdowns, and Python
-        automation notes. Severity levels borrowed from syslog:
-        <span class="mono">5</span> = security news, <span class="mono">6</span> = lab notes.
+      <span class="cli"><span class="h">edge#</span> <span class="v">show</span> <span class="a">logging</span></span>
+      <h1>Logs</h1>
+      <p class="sec-lede">
+        Lab walkthroughs, security write-ups, and automation notes, 15 entries and
+        counting. Every post is tagged like a syslog message, <span class="mono nowrap">%BLOG-severity-FACILITY</span>:
+        the lower the number, the sooner it's worth reading.
       </p>
-
-      <div class="filter-bar" hidden>
-        <span class="pipe" aria-hidden="true">|</span>
-        <span id="blog-filter-label">include:</span>
-        <button type="button" class="filter-btn" data-filter="all" aria-pressed="true" aria-describedby="blog-filter-label">all</button>
-        <button type="button" class="filter-btn" data-filter="sec" aria-pressed="false" aria-describedby="blog-filter-label">SEC · security news</button>
-        <button type="button" class="filter-btn" data-filter="lab" aria-pressed="false" aria-describedby="blog-filter-label">LAB · lab notes</button>
-        <button type="button" class="filter-btn" data-filter="python" aria-pressed="false" aria-describedby="blog-filter-label">PYTHON · automation</button>
-        <button type="button" class="filter-btn" data-filter="support" aria-pressed="false" aria-describedby="blog-filter-label">SUPPORT · IT support</button>
-        <button type="button" class="filter-btn" data-filter="network" aria-pressed="false" aria-describedby="blog-filter-label">NETWORK · IP addressing</button>
-      </div>
-
-      <div class="syslog">
-        <a class="syslog-line" data-cat="sec" href="blog/soc-homelab-threat-hunt-report.html">
-          <span class="ts">Sep 25 2026 09:00:00</span>
-          <span class="fac cat-sec">%BLOG-5-SEC:</span>
-          <span class="msg">Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab</span>
-          <span class="summary">A full 24-hour Wazuh threat hunting report from the SOC home lab, read cold: eight level-15 Shellshock alerts pulled apart record by record, a Zeek detection I had documented as broken turned out to be live, and an honest look at zero authentication failures.</span>
-        </a>
-
-        <a class="syslog-line" data-cat="sec" href="blog/soc-homelab-first-alerts-attack-simulation.html">
-          <span class="ts">Sep 24 2026 09:00:00</span>
-          <span class="fac cat-sec">%BLOG-5-SEC:</span>
-          <span class="msg">First Alerts: What My SOC Home Lab Caught, What It Missed, and How I Triaged It</span>
-          <span class="summary">Predictions written before running a single command, then a real scripted attack against my SOC home lab: SYN scan, SQL injection confirmed by three independent tools, a beacon caught at a 0.001 coefficient of variation, and the triage tickets that followed.</span>
-        </a>
-
-        <a class="syslog-line" data-cat="sec" href="blog/soc-homelab-wazuh-zeek-grafana-pipeline.html">
-          <span class="ts">Sep 23 2026 09:00:00</span>
-          <span class="fac cat-sec">%BLOG-5-SEC:</span>
-          <span class="msg">One Pipeline, Three Jobs: Wazuh, Zeek and Grafana in a SOC Home Lab</span>
-          <span class="summary">Wazuh as the SIEM, Zeek as a second pair of eyes on the same interface, and Loki with Grafana for hunting: the rule that keeps a home SOC lab's memory budget sane, and a real Zeek notice that corrected an earlier assumption.</span>
-        </a>
-
-        <a class="syslog-line" data-cat="sec" href="blog/soc-homelab-suricata-ids-installation.html">
-          <span class="ts">Sep 22 2026 09:00:00</span>
-          <span class="fac cat-sec">%BLOG-5-SEC:</span>
-          <span class="msg">Suricata on the SOC VM: Installing and Tuning a Host-Based IDS</span>
-          <span class="summary">Installing Suricata from the OISF PPA on a two-VM SOC home lab: why HOME_NET has to be one address instead of a subnet, three custom rules that always fire, and reading real EVE JSON alerts end to end.</span>
-        </a>
-
-        <a class="syslog-line" data-cat="sec" href="blog/soc-homelab-designing-two-vm-lab.html">
-          <span class="ts">Sep 21 2026 09:00:00</span>
-          <span class="fac cat-sec">%BLOG-5-SEC:</span>
-          <span class="msg">Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work</span>
-          <span class="summary">Why I cut a segmented, multi-firewall SOC design down to two VirtualBox VMs, the networking and memory budget that came out of that decision, and the threat model that decided what belonged in the lab.</span>
-        </a>
-
-        <a class="syslog-line" data-cat="python" href="blog/py-configbackup-netmiko-config-backup-alerts.html">
-          <span class="ts">Sep 20 2026 09:00:00</span>
-          <span class="fac cat-python">%BLOG-6-PYTHON:</span>
-          <span class="msg">I Built a Netmiko Config Backup Tool So I'd Stop Losing Arguments With My Own Router</span>
-          <span class="summary">A Python CLI that SSHes into every device in an inventory with Netmiko, backs up the running config, diffs it, and emails an alert on change, tested against a real two-router VyOS lab that caught two genuine bugs a mocked test suite never could.</span>
-        </a>
-
-        <a class="syslog-line" data-cat="network" href="blog/wireshark-network-analysis-nine-packet-captures.html">
-          <span class="ts">Sep 18 2026 09:00:00</span>
-          <span class="fac cat-network">%BLOG-6-NETWORK:</span>
-          <span class="msg">What Nine Packet Captures Taught Me About Networks I Thought I Already Understood</span>
-          <span class="summary">Nine real packet captures, DNS, TCP, HTTP vs HTTPS, ICMP, packet loss, ARP, DHCP, Telnet vs SSH, and FTP, each one generated, read, and explained by hand for CCNA study and a networking portfolio.</span>
-        </a>
-
-        <a class="syslog-line" data-cat="support" href="blog/freshservice-service-desk-simulation-sla-tickets.html">
-          <span class="ts">Sep 14 2026 09:00:00</span>
-          <span class="fac cat-support">%BLOG-6-SUPPORT:</span>
-          <span class="msg">What Twenty Fake Helpdesk Tickets Taught Me About Real IT Support</span>
-          <span class="summary">Building a full Freshservice service desk from scratch: three SLA tiers, a category taxonomy, a service catalog, and twenty simulated helpdesk tickets designed to be genuinely representative of a real support queue.</span>
-        </a>
-
-        <a class="syslog-line" data-cat="support" href="blog/active-directory-home-lab-windows-server-2022-gpo.html">
-          <span class="ts">Sep 10 2026 09:00:00</span>
-          <span class="fac cat-support">%BLOG-6-SUPPORT:</span>
-          <span class="msg">I Built an Active Directory Home Lab That's More Than Three OUs and a Password Policy</span>
-          <span class="summary">A from-scratch Active Directory lab on Windows Server 2022: OU design, Fine-Grained Password Policies, Windows LAPS, delegated help desk rights, WSUS patching, scripted provisioning, and a backup I actually tested.</span>
-        </a>
-
-        <a class="syslog-line" data-cat="support" href="blog/it-runbook-sops-real-service-desk.html">
-          <span class="ts">Sep 05 2026 09:00:00</span>
-          <span class="fac cat-support">%BLOG-6-SUPPORT:</span>
-          <span class="msg">Building an IT Runbook That Would Actually Survive Contact With a Real Service Desk</span>
-          <span class="summary">A five-document IT runbook covering onboarding, offboarding, password reset, laptop setup, and network troubleshooting, built from NIST, CIS Controls v8, and Microsoft's own documentation, including the lockout threshold assumption that turned out backwards.</span>
-        </a>
-
-        <a class="syslog-line" data-cat="python" href="blog/vlsm-subnet-calculator-python-tool.html">
-          <span class="ts">Sep 04 2026 09:00:00</span>
-          <span class="fac cat-python">%BLOG-6-PYTHON:</span>
-          <span class="msg">I Kept Getting VLSM Wrong By Hand, So I Wrote a Tool That Can't</span>
-          <span class="summary">A dependency-free Python CLI that plans VLSM subnetting from a CSV of departments and host counts, no manual bookkeeping, 30 tests, and the allocation-order decision that stops wasted address space.</span>
-        </a>
-
-        <a class="syslog-line" data-cat="sec" href="blog/linux-hardening-audit-lynis-rkhunter.html">
-          <span class="ts">Sep 03 2026 09:00:00</span>
-          <span class="fac cat-sec">%BLOG-5-SEC:</span>
-          <span class="msg">I Ran a Real Security Audit Against My Own Linux Machine, Here Is What Actually Broke</span>
-          <span class="summary">Lynis and rkhunter against a real Ubuntu workstation: three warnings triaged, a crashed Fail2ban jail caught, and an honest account of the thirty eight suggestions I skipped.</span>
-        </a>
-
-        <a class="syslog-line" data-cat="sec" href="blog/vulnerability-management-program-tenable-powershell-bash.html">
-          <span class="ts">Aug 27 2026 09:00:00</span>
-          <span class="fac cat-sec">%BLOG-5-SEC:</span>
-          <span class="msg">I Built a Vulnerability Management Program From Scratch, Policy to Remediation</span>
-          <span class="summary">Policy, stakeholder buy-in, Tenable scanning across Windows and Linux targets, and ten confirmed remediations in PowerShell and Bash, including the two attempts that didn't work out.</span>
-        </a>
-
-        <a class="syslog-line" data-cat="support" href="blog/automate-microsoft-365-admin-tasks-powershell-graph.html">
-          <span class="ts">Aug 24 2026 10:00:00</span>
-          <span class="fac cat-support">%BLOG-6-SUPPORT:</span>
-          <span class="msg">I Automated the Seven Microsoft 365 Admin Tasks That Actually Fill an IT Ticket Queue</span>
-          <span class="summary">Onboarding, offboarding, groups, delegated admin roles, mail flow, and service health, automated with the Microsoft Graph PowerShell SDK, with a real audit trail.</span>
-        </a>
-
-        <a class="syslog-line" data-cat="support" href="blog/free-microsoft-365-sandbox-real-setup-guide.html">
-          <span class="ts">Aug 23 2026 09:00:00</span>
-          <span class="fac cat-support">%BLOG-6-SUPPORT:</span>
-          <span class="msg">Free Microsoft 365 Sandbox: The Real Setup Guide (2026)</span>
-          <span class="summary">The Microsoft 365 developer sandbox isn't actually free for individuals. Here's the real accessible path (30-day E3 trial) and how to avoid getting billed.</span>
-        </a>
-
-      </div>
-
-      <p class="filter-empty" hidden>% No log entries match this filter - more posts on the way.</p>
+      <details class="facilities" open><summary><span class="h">edge#</span> show logging facilities</summary><dl><div class="fac-row c-news is-empty"><dt><span class="sev c-news">NEWS-2</span><span class="lvl">2 crit</span></dt><dd><b>Security news</b> CVEs, breaches and advisories worth acting on, explained in plain language. <span class="ct">coming soon</span></dd></div><div class="fac-row c-ai is-empty"><dt><span class="sev c-ai">AI-3</span><span class="lvl">3 err</span></dt><dd><b>AI</b> AI in networking and security: tools I test, how attackers use it, and where it breaks. <span class="ct">coming soon</span></dd></div><div class="fac-row c-network"><dt><span class="sev c-network">NETWORK-4</span><span class="lvl">4 warning</span></dt><dd><b>Networking</b> Routing, switching, subnetting and packet captures. CCNA labs live here. <span class="ct">1 post</span></dd></div><div class="fac-row c-sec"><dt><span class="sev c-sec">SEC-5</span><span class="lvl">5 notice</span></dt><dd><b>Security</b> Blue team work: SOC labs, detection, hardening and vulnerability management. <span class="ct">7 posts</span></dd></div><div class="fac-row c-python"><dt><span class="sev c-python">PYTHON-6</span><span class="lvl">6 info</span></dt><dd><b>Automation</b> Python, Netmiko and PowerShell scripts that remove the boring parts of admin work. <span class="ct">2 posts</span></dd></div><div class="fac-row c-support"><dt><span class="sev c-support">SUPPORT-7</span><span class="lvl">7 debug</span></dt><dd><b>IT support</b> Troubleshooting and systems: Active Directory, Microsoft 365, ITSM and runbooks. <span class="ct">5 posts</span></dd></div></dl></details>
     </div>
+  </header>
+
+  <section class="wrap" data-filter-group aria-label="Blog posts">
+    <div class="toolbar" hidden>
+      <label class="search">
+        <span class="pipe" aria-hidden="true">|</span><span aria-hidden="true">include</span>
+        <span class="sr-only">Search posts</span>
+        <input type="search" placeholder="wazuh, vlan, powershell..." autocomplete="off" spellcheck="false" maxlength="80">
+      </label>
+      <div class="filters" role="group" aria-label="Filter posts by category">
+        <button type="button" class="fbtn" data-filter="all" aria-pressed="true">all <span class="ct">15</span></button>
+        <button type="button" class="fbtn" data-filter="network" aria-pressed="false"><span class="dot c-network" aria-hidden="true"></span>network <span class="ct">1</span></button>
+        <button type="button" class="fbtn" data-filter="sec" aria-pressed="false"><span class="dot c-sec" aria-hidden="true"></span>sec <span class="ct">7</span></button>
+        <button type="button" class="fbtn" data-filter="python" aria-pressed="false"><span class="dot c-python" aria-hidden="true"></span>python <span class="ct">2</span></button>
+        <button type="button" class="fbtn" data-filter="support" aria-pressed="false"><span class="dot c-support" aria-hidden="true"></span>support <span class="ct">5</span></button>
+      </div>
+    </div>
+    <p class="sr-only" data-status aria-live="polite"></p>
+
+    <h2 class="month" data-month="m-2026-09">September 2026</h2>
+    <ol class="loglist" id="m-2026-09">
+    <li data-cat="sec" data-search="reading my own siem: a 24-hour threat hunt through the home lab a full 24-hour wazuh threat hunting report from the soc home lab, read cold: eight level-15 shellshock alerts pulled apart record by record, a zeek detection i had documented as broken turned out to be live, and an honest look at zero authentication failures. soc threat hunting wazuh zeek mitre att&amp;ck blue team homelab sec security"><a class="logrow" href="/blog/soc-homelab-threat-hunt-report"><time class="date" datetime="2026-09-25">Sep<b>25</b></time><div><div class="meta"><span class="sev c-sec">SEC-5</span><span class="fac">%BLOG-5-SEC &middot; 17 min read</span></div><h3>Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab</h3><p>A full 24-hour Wazuh threat hunting report from the SOC home lab, read cold: eight level-15 Shellshock alerts pulled apart record by record, a Zeek detection I had documented as broken turned out to be live, and an honest look at zero authentication failures.</p></div></a></li>
+    <li data-cat="sec" data-search="first alerts: what my soc home lab caught, what it missed, and how i triaged it predictions written before running a single command, then a real scripted attack against my soc home lab: syn scan, sql injection confirmed by three independent tools, a beacon caught at a 0.001 coefficient of variation, and the triage tickets that followed. soc alert triage suricata wazuh zeek blue team mitre att&amp;ck sec security"><a class="logrow" href="/blog/soc-homelab-first-alerts-attack-simulation"><time class="date" datetime="2026-09-24">Sep<b>24</b></time><div><div class="meta"><span class="sev c-sec">SEC-5</span><span class="fac">%BLOG-5-SEC &middot; 19 min read</span></div><h3>First Alerts: What My SOC Home Lab Caught, What It Missed, and How I Triaged It</h3><p>Predictions written before running a single command, then a real scripted attack against my SOC home lab: SYN scan, SQL injection confirmed by three independent tools, a beacon caught at a 0.001 coefficient of variation, and the triage tickets that followed.</p></div></a></li>
+    <li data-cat="sec" data-search="one pipeline, three jobs: wazuh, zeek and grafana in a soc home lab wazuh as the siem, zeek as a second pair of eyes on the same interface, and loki with grafana for hunting: the rule that keeps a home soc lab&#x27;s memory budget sane, and a real zeek notice that corrected an earlier assumption. wazuh zeek grafana loki siem detection engineering homelab sec security"><a class="logrow" href="/blog/soc-homelab-wazuh-zeek-grafana-pipeline"><time class="date" datetime="2026-09-23">Sep<b>23</b></time><div><div class="meta"><span class="sev c-sec">SEC-5</span><span class="fac">%BLOG-5-SEC &middot; 16 min read</span></div><h3>One Pipeline, Three Jobs: Wazuh, Zeek and Grafana in a SOC Home Lab</h3><p>Wazuh as the SIEM, Zeek as a second pair of eyes on the same interface, and Loki with Grafana for hunting: the rule that keeps a home SOC lab&#x27;s memory budget sane, and a real Zeek notice that corrected an earlier assumption.</p></div></a></li>
+    <li data-cat="sec" data-search="suricata on the soc vm: installing and tuning a host-based ids installing suricata from the oisf ppa on a two-vm soc home lab: why home_net has to be one address instead of a subnet, three custom rules that always fire, and reading real eve json alerts end to end. suricata ids eve json ubuntu blue team homelab sec security"><a class="logrow" href="/blog/soc-homelab-suricata-ids-installation"><time class="date" datetime="2026-09-22">Sep<b>22</b></time><div><div class="meta"><span class="sev c-sec">SEC-5</span><span class="fac">%BLOG-5-SEC &middot; 15 min read</span></div><h3>Suricata on the SOC VM: Installing and Tuning a Host-Based IDS</h3><p>Installing Suricata from the OISF PPA on a two-VM SOC home lab: why HOME_NET has to be one address instead of a subnet, three custom rules that always fire, and reading real EVE JSON alerts end to end.</p></div></a></li>
+    <li data-cat="sec" data-search="designing a two-vm soc home lab: small scope, real detection work why i cut a segmented, multi-firewall soc design down to two virtualbox vms, the networking and memory budget that came out of that decision, and the threat model that decided what belonged in the lab. soc suricata zeek wazuh virtualbox blue team homelab sec security"><a class="logrow" href="/blog/soc-homelab-designing-two-vm-lab"><time class="date" datetime="2026-09-21">Sep<b>21</b></time><div><div class="meta"><span class="sev c-sec">SEC-5</span><span class="fac">%BLOG-5-SEC &middot; 14 min read</span></div><h3>Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work</h3><p>Why I cut a segmented, multi-firewall SOC design down to two VirtualBox VMs, the networking and memory budget that came out of that decision, and the threat model that decided what belonged in the lab.</p></div></a></li>
+    <li data-cat="python" data-search="i built a netmiko config backup tool so i&#x27;d stop losing arguments with my own router a python cli that sshes into every device in an inventory with netmiko, backs up the running config, diffs it, and emails an alert on change, tested against a real two-router vyos lab that caught two genuine bugs a mocked test suite never could. netmiko python network automation ssh vyos config management python automation"><a class="logrow" href="/blog/py-configbackup-netmiko-config-backup-alerts"><time class="date" datetime="2026-09-20">Sep<b>20</b></time><div><div class="meta"><span class="sev c-python">PYTHON-6</span><span class="fac">%BLOG-6-PYTHON &middot; 17 min read</span></div><h3>I Built a Netmiko Config Backup Tool So I&#x27;d Stop Losing Arguments With My Own Router</h3><p>A Python CLI that SSHes into every device in an inventory with Netmiko, backs up the running config, diffs it, and emails an alert on change, tested against a real two-router VyOS lab that caught two genuine bugs a mocked test suite never could.</p></div></a></li>
+    <li data-cat="network" data-search="what nine packet captures taught me about networks i thought i already understood nine real packet captures, dns, tcp, http vs https, icmp, packet loss, arp, dhcp, telnet vs ssh, and ftp, each one generated, read, and explained by hand for ccna study and a networking portfolio. wireshark ccna tcp/ip packet analysis network security network networking"><a class="logrow" href="/blog/wireshark-network-analysis-nine-packet-captures"><time class="date" datetime="2026-09-18">Sep<b>18</b></time><div><div class="meta"><span class="sev c-network">NETWORK-4</span><span class="fac">%BLOG-4-NETWORK &middot; 19 min read</span></div><h3>What Nine Packet Captures Taught Me About Networks I Thought I Already Understood</h3><p>Nine real packet captures, DNS, TCP, HTTP vs HTTPS, ICMP, packet loss, ARP, DHCP, Telnet vs SSH, and FTP, each one generated, read, and explained by hand for CCNA study and a networking portfolio.</p></div></a></li>
+    <li data-cat="support" data-search="what twenty fake helpdesk tickets taught me about real it support building a full freshservice service desk from scratch: three sla tiers, a category taxonomy, a service catalog, and twenty simulated helpdesk tickets designed to be genuinely representative of a real support queue. it support freshservice itsm sla design help desk support it support"><a class="logrow" href="/blog/freshservice-service-desk-simulation-sla-tickets"><time class="date" datetime="2026-09-14">Sep<b>14</b></time><div><div class="meta"><span class="sev c-support">SUPPORT-7</span><span class="fac">%BLOG-7-SUPPORT &middot; 15 min read</span></div><h3>What Twenty Fake Helpdesk Tickets Taught Me About Real IT Support</h3><p>Building a full Freshservice service desk from scratch: three SLA tiers, a category taxonomy, a service catalog, and twenty simulated helpdesk tickets designed to be genuinely representative of a real support queue.</p></div></a></li>
+    <li data-cat="support" data-search="i built an active directory home lab that&#x27;s more than three ous and a password policy a from-scratch active directory lab on windows server 2022: ou design, fine-grained password policies, windows laps, delegated help desk rights, wsus patching, scripted provisioning, and a backup i actually tested. active directory windows server 2022 group policy laps wsus powershell support it support"><a class="logrow" href="/blog/active-directory-home-lab-windows-server-2022-gpo"><time class="date" datetime="2026-09-10">Sep<b>10</b></time><div><div class="meta"><span class="sev c-support">SUPPORT-7</span><span class="fac">%BLOG-7-SUPPORT &middot; 24 min read</span></div><h3>I Built an Active Directory Home Lab That&#x27;s More Than Three OUs and a Password Policy</h3><p>A from-scratch Active Directory lab on Windows Server 2022: OU design, Fine-Grained Password Policies, Windows LAPS, delegated help desk rights, WSUS patching, scripted provisioning, and a backup I actually tested.</p></div></a></li>
+    <li data-cat="support" data-search="building an it runbook that would actually survive contact with a real service desk a five-document it runbook covering onboarding, offboarding, password reset, laptop setup, and network troubleshooting, built from nist, cis controls v8, and microsoft&#x27;s own documentation, including the lockout threshold assumption that turned out backwards. it documentation nist 800-63b cis controls service desk ccna support it support"><a class="logrow" href="/blog/it-runbook-sops-real-service-desk"><time class="date" datetime="2026-09-05">Sep<b>05</b></time><div><div class="meta"><span class="sev c-support">SUPPORT-7</span><span class="fac">%BLOG-7-SUPPORT &middot; 17 min read</span></div><h3>Building an IT Runbook That Would Actually Survive Contact With a Real Service Desk</h3><p>A five-document IT runbook covering onboarding, offboarding, password reset, laptop setup, and network troubleshooting, built from NIST, CIS Controls v8, and Microsoft&#x27;s own documentation, including the lockout threshold assumption that turned out backwards.</p></div></a></li>
+    <li data-cat="python" data-search="i kept getting vlsm wrong by hand, so i wrote a tool that can&#x27;t a dependency-free python cli that plans vlsm subnetting from a csv of departments and host counts, no manual bookkeeping, 30 tests, and the allocation-order decision that stops wasted address space. python networking vlsm subnetting ip addressing automation python automation"><a class="logrow" href="/blog/vlsm-subnet-calculator-python-tool"><time class="date" datetime="2026-09-04">Sep<b>04</b></time><div><div class="meta"><span class="sev c-python">PYTHON-6</span><span class="fac">%BLOG-6-PYTHON &middot; 16 min read</span></div><h3>I Kept Getting VLSM Wrong By Hand, So I Wrote a Tool That Can&#x27;t</h3><p>A dependency-free Python CLI that plans VLSM subnetting from a CSV of departments and host counts, no manual bookkeeping, 30 tests, and the allocation-order decision that stops wasted address space.</p></div></a></li>
+    <li data-cat="sec" data-search="i ran a real security audit against my own linux machine, here is what actually broke lynis and rkhunter against a real ubuntu workstation: three warnings triaged, a crashed fail2ban jail caught, and an honest account of the thirty eight suggestions i skipped. linux cybersecurity security auditing lynis rkhunter sec security"><a class="logrow" href="/blog/linux-hardening-audit-lynis-rkhunter"><time class="date" datetime="2026-09-03">Sep<b>03</b></time><div><div class="meta"><span class="sev c-sec">SEC-5</span><span class="fac">%BLOG-5-SEC &middot; 16 min read</span></div><h3>I Ran a Real Security Audit Against My Own Linux Machine, Here Is What Actually Broke</h3><p>Lynis and rkhunter against a real Ubuntu workstation: three warnings triaged, a crashed Fail2ban jail caught, and an honest account of the thirty eight suggestions I skipped.</p></div></a></li>
+    </ol>
+    <h2 class="month" data-month="m-2026-08">August 2026</h2>
+    <ol class="loglist" id="m-2026-08">
+    <li data-cat="sec" data-search="i built a vulnerability management program from scratch, policy to remediation policy, stakeholder buy-in, tenable scanning across windows and linux targets, and ten confirmed remediations in powershell and bash, including the two attempts that didn&#x27;t work out. cybersecurity vulnerability management powershell it security bash sec security"><a class="logrow" href="/blog/vulnerability-management-program-tenable-powershell-bash"><time class="date" datetime="2026-08-27">Aug<b>27</b></time><div><div class="meta"><span class="sev c-sec">SEC-5</span><span class="fac">%BLOG-5-SEC &middot; 18 min read</span></div><h3>I Built a Vulnerability Management Program From Scratch, Policy to Remediation</h3><p>Policy, stakeholder buy-in, Tenable scanning across Windows and Linux targets, and ten confirmed remediations in PowerShell and Bash, including the two attempts that didn&#x27;t work out.</p></div></a></li>
+    <li data-cat="support" data-search="i automated the seven microsoft 365 admin tasks that actually fill an it ticket queue onboarding, offboarding, groups, delegated admin roles, mail flow, and service health, automated with the microsoft graph powershell sdk, with a real audit trail. microsoft 365 powershell cybersecurity it support automation support it support"><a class="logrow" href="/blog/automate-microsoft-365-admin-tasks-powershell-graph"><time class="date" datetime="2026-08-24">Aug<b>24</b></time><div><div class="meta"><span class="sev c-support">SUPPORT-7</span><span class="fac">%BLOG-7-SUPPORT &middot; 20 min read</span></div><h3>I Automated the Seven Microsoft 365 Admin Tasks That Actually Fill an IT Ticket Queue</h3><p>Onboarding, offboarding, groups, delegated admin roles, mail flow, and service health, automated with the Microsoft Graph PowerShell SDK, with a real audit trail.</p></div></a></li>
+    <li data-cat="support" data-search="free microsoft 365 sandbox: the real setup guide (2026) the microsoft 365 developer sandbox isn&#x27;t actually free for individuals. here&#x27;s the real accessible path (30-day e3 trial) and how to avoid getting billed. microsoft 365 it support cybersecurity cloud computing career advice support it support"><a class="logrow" href="/blog/free-microsoft-365-sandbox-real-setup-guide"><time class="date" datetime="2026-08-23">Aug<b>23</b></time><div><div class="meta"><span class="sev c-support">SUPPORT-7</span><span class="fac">%BLOG-7-SUPPORT &middot; 15 min read</span></div><h3>Free Microsoft 365 Sandbox: The Real Setup Guide (2026)</h3><p>The Microsoft 365 developer sandbox isn&#x27;t actually free for individuals. Here&#x27;s the real accessible path (30-day E3 trial) and how to avoid getting billed.</p></div></a></li>
+    </ol>
+
+    <p class="empty" hidden>% No log entries match. Try a shorter search or clear the filter.</p>
+
+    <p class="legend mt-2"><a href="/feed.xml">subscribe via RSS &rarr;</a></p>
   </section>
 </main>
-
-<footer class="site-footer">
-  <div class="wrap">
-    <span>© 2026 Trey · built by hand · no cookies · privacy-respecting analytics · <a href="privacy.html">privacy</a></span>
-    <span><a href="index.html">exit →</a></span>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
   </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 25, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
 </footer>
-
-<script src="js/filter.js" defer></script>
 </body>
 </html>

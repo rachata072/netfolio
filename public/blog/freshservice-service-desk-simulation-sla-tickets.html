@@ -1,85 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-CA">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Twenty Simulated Helpdesk Tickets: Lessons in IT Support - Trey</title>
-  <meta name="description" content="Building a full Freshservice service desk from scratch: three SLA tiers, a category taxonomy, a service catalog, and twenty simulated helpdesk tickets designed to be genuinely representative of a real support queue.">
-  <link rel="canonical" href="https://breakfixlearn.com/blog/freshservice-service-desk-simulation-sla-tickets.html">
-  <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
-  <link rel="stylesheet" href="../css/style.css">
-  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
-  <meta property="og:type" content="article">
-  <meta property="og:title" content="What Twenty Fake Helpdesk Tickets Taught Me About Real IT Support">
-  <meta property="og:description" content="Building a full Freshservice service desk from scratch: three SLA tiers, a category taxonomy, a service catalog, and twenty simulated helpdesk tickets designed to be genuinely representative of a real support queue.">
-  <meta property="og:url" content="https://breakfixlearn.com/blog/freshservice-service-desk-simulation-sla-tickets.html">
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "headline": "What Twenty Fake Helpdesk Tickets Taught Me About Real IT Support",
-    "datePublished": "2026-09-14",
-    "author": { "@type": "Person", "name": "Trey" },
-    "mainEntityOfPage": "https://breakfixlearn.com/blog/freshservice-service-desk-simulation-sla-tickets.html"
-  }
-  </script>
-  <!-- FAQPage schema - makes the FAQ section eligible for a rich-result snippet in search -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "Is this a live, running Freshservice instance, or is it documentation?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Right now it's fully written and ready to build, not yet entered into a live Freshservice trial account. The category taxonomy, the service catalog, all three SLA tiers, and all twenty tickets are complete and documented, but the repository still has a checklist of twenty seven screenshots left to capture once the configuration is actually built in a live trial. The reasoning behind the decisions, not the screenshots, is the part meant to demonstrate judgment, the screenshots exist to make it verifiable." }
-      },
-      {
-        "@type": "Question",
-        "name": "Why build three SLA tiers instead of one policy for the whole company?",
-        "acceptedAnswer": { "@type": "Answer", "text": "One flat SLA treats every ticket identically, which feels fair but ignores that the actual business impact of a blocked ticket varies enormously by who's blocked and why. A blocked executive assistant during board call preparation, or a dead conference room screen before a client call, has a blast radius a blocked individual contributor's routine task usually doesn't. Three tiers, VIP and Executive Support, Standard Business Support, and General and Self-Service Support, let response and resolution targets map to actual business risk instead of an identical number applied out of habit." }
-      },
-      {
-        "@type": "Question",
-        "name": "Why revoke a terminated employee's active sessions instead of just disabling their account?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Disabling sign-in access stops new logins, but an already authenticated session on a phone or personal device can keep working even after a password change, unless active sessions and refresh tokens are explicitly revoked too. That's an easy step to skip when offboarding is happening under time pressure, timed to the minute against an HR meeting in another room, which is exactly when a checklist followed carefully needs to catch what a checklist followed quickly would miss." }
-      },
-      {
-        "@type": "Question",
-        "name": "Why redirect a request for local admin rights instead of just approving or denying it?",
-        "acceptedAnswer": { "@type": "Answer", "text": "The employee's underlying need, installing one legitimate piece of software, was completely reasonable, but standing admin access is a much bigger and more permanent grant than a single approved install, since it widens what any future compromise on that laptop could do, not just what one install can do. Separating what someone actually needs from what they literally asked for, and routing the real need through an approval and a managed installation, answers the request without either rejecting it outright or granting more than the task requires." }
-      },
-      {
-        "@type": "Question",
-        "name": "Why stop at a two-level category structure when Freshservice supports three?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Freshservice supports up to three levels of category, subcategory, and item hierarchy, but a third level almost always meant, in practice, that a category was too broad to begin with and should have been split into two categories instead of nested deeper into one. A ticket picker with too many nested levels slows down every agent, every day, for the entire life of the tool, a cost that compounds quietly and never shows up in a demo." }
-      }
-    ]
-  }
-  </script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Twenty Simulated Helpdesk Tickets: Lessons in IT Support | Trey</title>
+<meta name="description" content="Building a Freshservice service desk from scratch: three SLA tiers, a category taxonomy, a service catalog, and twenty realistic simulated helpdesk tickets.">
+<link rel="canonical" href="https://breakfixlearn.com/blog/freshservice-service-desk-simulation-sla-tickets">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=fac4bc101c">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="What Twenty Fake Helpdesk Tickets Taught Me About Real IT Support">
+<meta property="og:description" content="Building a full Freshservice service desk from scratch: three SLA tiers, a category taxonomy, a service catalog, and twenty simulated helpdesk tickets designed to be genuinely representative of a real support queue.">
+<meta property="og:url" content="https://breakfixlearn.com/blog/freshservice-service-desk-simulation-sla-tickets">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/freshservice-service-desk-simulation-sla-tickets.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="What Twenty Fake Helpdesk Tickets Taught Me About Real IT Support">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="article:published_time" content="2026-09-14">
+<meta property="article:tag" content="IT Support">
+<meta property="article:tag" content="Freshservice">
+<meta property="article:tag" content="ITSM">
+<meta property="article:tag" content="SLA Design">
+<meta property="article:tag" content="Help Desk">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"What Twenty Fake Helpdesk Tickets Taught Me About Real IT Support","description":"Building a Freshservice service desk from scratch: three SLA tiers, a category taxonomy, a service catalog, and twenty realistic simulated helpdesk tickets.","datePublished":"2026-09-14","dateModified":"2026-09-14","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"publisher":{"@type":"Person","name":"Trey"},"mainEntityOfPage":"https://breakfixlearn.com/blog/freshservice-service-desk-simulation-sla-tickets","image":"https://breakfixlearn.com/assets/og/freshservice-service-desk-simulation-sla-tickets.png","keywords":"IT Support, Freshservice, ITSM, SLA Design, Help Desk","articleSection":"IT support","timeRequired":"PT15M"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://breakfixlearn.com/blog"},{"@type":"ListItem","position":3,"name":"What Twenty Fake Helpdesk Tickets Taught Me About Real IT Support"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is this a live, running Freshservice instance, or is it documentation?","acceptedAnswer":{"@type":"Answer","text":"Right now it's fully written and ready to build, not yet entered into a live Freshservice trial account. The category taxonomy, the service catalog, all three SLA tiers, and all twenty tickets are complete and documented, but the repository still has a checklist of twenty seven screenshots left to capture once the configuration is actually built in a live trial. The reasoning behind the decisions, not the screenshots, is the part meant to demonstrate judgment, the screenshots exist to make it verifiable."}},{"@type":"Question","name":"Why build three SLA tiers instead of one policy for the whole company?","acceptedAnswer":{"@type":"Answer","text":"One flat SLA treats every ticket identically, which feels fair but ignores that the actual business impact of a blocked ticket varies enormously by who's blocked and why. A blocked executive assistant during board call preparation, or a dead conference room screen before a client call, has a blast radius a blocked individual contributor's routine task usually doesn't. Three tiers, VIP and Executive Support, Standard Business Support, and General and Self-Service Support, let response and resolution targets map to actual business risk instead of an identical number applied out of habit."}},{"@type":"Question","name":"Why revoke a terminated employee's active sessions instead of just disabling their account?","acceptedAnswer":{"@type":"Answer","text":"Disabling sign-in access stops new logins, but an already authenticated session on a phone or personal device can keep working even after a password change, unless active sessions and refresh tokens are explicitly revoked too. That's an easy step to skip when offboarding is happening under time pressure, timed to the minute against an HR meeting in another room, which is exactly when a checklist followed carefully needs to catch what a checklist followed quickly would miss."}},{"@type":"Question","name":"Why redirect a request for local admin rights instead of just approving or denying it?","acceptedAnswer":{"@type":"Answer","text":"The employee's underlying need, installing one legitimate piece of software, was completely reasonable, but standing admin access is a much bigger and more permanent grant than a single approved install, since it widens what any future compromise on that laptop could do, not just what one install can do. Separating what someone actually needs from what they literally asked for, and routing the real need through an approval and a managed installation, answers the request without either rejecting it outright or granting more than the task requires."}},{"@type":"Question","name":"Why stop at a two-level category structure when Freshservice supports three?","acceptedAnswer":{"@type":"Answer","text":"Freshservice supports up to three levels of category, subcategory, and item hierarchy, but a third level almost always meant, in practice, that a category was too broad to begin with and should have been split into two categories instead of nested deeper into one. A ticket picker with too many nested levels slows down every agent, every day, for the entire life of the tool, a cost that compounds quietly and never shows up in a demo."}}]}</script>
+<script src="/js/main.js?v=7d994f174b" defer></script>
 </head>
 <body>
-
-<header class="site-header">
+<div class="progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
   <div class="wrap">
-    <a class="brand" href="../index.html" aria-label="Home">
-      <span class="prompt">Trey@lab</span>:<span class="host">~</span>$ <span aria-hidden="true">_</span>
-    </a>
-    <nav class="site-nav" aria-label="Main navigation">
-      <a href="../index.html">home</a>
-      <a href="../projects.html">projects</a>
-      <a href="../blog.html" aria-current="page">blog</a>
-      <a href="../index.html#about">about</a>
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span>about</a></li>
+      </ul>
     </nav>
   </div>
 </header>
-
-<main>
-  <article class="article wrap">
-    <p class="mono post-eyebrow">%BLOG-6-SUPPORT</p>
-    <h1>What Twenty Fake Helpdesk Tickets Taught Me About Real IT Support</h1>
-    <p class="post-meta">Sep 14, 2026 · 15 min read · IT Support, Freshservice, ITSM, SLA Design, Help Desk</p>
-
+<main id="main">
+<article>
+  <header class="post-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/blog">blog</a><span aria-hidden="true">/</span><a href="/blog#support">support</a></nav>
+      <span class="sev c-support">%BLOG-7-SUPPORT</span>
+      <h1 class="mt-2">What Twenty Fake Helpdesk Tickets Taught Me About Real IT Support</h1>
+      <p class="post-dek">Building a full Freshservice service desk from scratch: three SLA tiers, a category taxonomy, a service catalog, and twenty simulated helpdesk tickets designed to be genuinely representative of a real support queue.</p>
+      <div class="post-meta"><time datetime="2026-09-14">Sep 14, 2026</time><span class="sep">/</span><span>15 min read</span><span class="sep">/</span><span>by Trey</span><span class="sep">/</span><a href="https://github.com/rachata072/itsm-service-desk-simulation" rel="noopener" target="_blank">source on github &#8599;</a></div>
+      <div class="post-tags"><span class="chip">IT Support</span><span class="chip">Freshservice</span><span class="chip">ITSM</span><span class="chip">SLA Design</span><span class="chip">Help Desk</span></div>
+    </div>
+  </header>
+  <div class="wrap post-layout">
+    <div class="post-main">
+<details class="toc-mobile"><summary>show ip route | toc (8 sections)</summary><ol><li><a href="#why-the-boring-parts-matter-more-than-they-sound">Why the boring parts matter more than they sound</a></li><li><a href="#designing-three-sla-tiers-instead-of-one-flat-policy">Designing three SLA tiers instead of one flat policy</a></li><li><a href="#a-few-tickets-that-taught-me-something">A few tickets that taught me something</a></li><li><a href="#how-this-maps-to-what-job-postings-actually-ask-for">How this maps to what job postings actually ask for</a></li><li><a href="#what-this-project-is-not-yet">What this project is not yet</a></li><li><a href="#what-i-d-tell-someone-starting-this-same-project">What I&#x27;d tell someone starting this same project</a></li><li><a href="#frequently-asked-questions">Frequently asked questions</a></li><li><a href="#where-this-goes-from-here">Where this goes from here</a></li></ol></details>
+<div class="prose">
     <!-- PENDING SCREENSHOT: resolved ticket list in the Freshservice agent view.
          Once the live Freshservice trial is built out, generate the responsive
          image with: python3 tools/imgprep.py ticket-list.png --slug freshservice-service-desk-simulation-sla-tickets
@@ -126,7 +112,7 @@
       still want to do to make this fully real instead of fully documented.
     </p>
 
-    <h2>Why the boring parts matter more than they sound</h2>
+    <h2 id="why-the-boring-parts-matter-more-than-they-sound">Why the boring parts matter more than they sound</h2>
     <p>
       Before writing a single ticket, I had to build the actual service desk
       configuration: categories, a service catalog, and SLA policies. It would
@@ -168,7 +154,7 @@
       defaulting to "just submit a blank ticket and explain."
     </p>
 
-    <h2>Designing three SLA tiers instead of one flat policy</h2>
+    <h2 id="designing-three-sla-tiers-instead-of-one-flat-policy">Designing three SLA tiers instead of one flat policy</h2>
     <p>
       This was the part of the project I found myself thinking about the most,
       days after I thought I had finished it.
@@ -201,7 +187,7 @@
       priority level, and each one has its own escalation ladder if a ticket is
       trending toward a breach, the same kind of shared, referenced-not-repeated
       structure I used for the escalation matrix in
-      <a href="../blog/it-runbook-sops-real-service-desk.html" rel="noopener" target="_blank">an earlier IT runbook project covering onboarding, offboarding, and password reset SOPs</a>.
+      <a href="/blog/it-runbook-sops-real-service-desk">an earlier IT runbook project covering onboarding, offboarding, and password reset SOPs</a>.
       I set business hours as Monday through Friday, eight in the morning to six
       in the evening, with one deliberate exception: Urgent priority tickets run
       on a twenty four hour clock regardless of tier, because a genuine emergency
@@ -227,7 +213,7 @@
       documented answer instead of a judgment call made under pressure.
     </p>
 
-    <h2>A few tickets that taught me something</h2>
+    <h2 id="a-few-tickets-that-taught-me-something">A few tickets that taught me something</h2>
     <p>
       I wrote all twenty tickets to feel like a real week, not twenty separate
       showcase pieces, but a handful of them stuck with me more than the others.
@@ -278,7 +264,7 @@
       That is a step that is easy to skip when everyone in the room is watching a
       clock, and it is exactly the kind of detail I ran into again automating the
       seven Microsoft 365 admin tasks in an
-      <a href="../blog/automate-microsoft-365-admin-tasks-powershell-graph.html" rel="noopener" target="_blank">earlier project on scripting onboarding and offboarding with the Graph PowerShell SDK</a>,
+      <a href="/blog/automate-microsoft-365-admin-tasks-powershell-graph">earlier project on scripting onboarding and offboarding with the Graph PowerShell SDK</a>,
       the kind of detail that separates a checklist followed carefully from a
       checklist followed quickly.
     </p>
@@ -327,13 +313,13 @@
       installation instead of either rejecting the request outright or approving
       it exactly as written, the same kind of narrowly-scoped delegation I ended
       up building for real in
-      <a href="../blog/active-directory-home-lab-windows-server-2022-gpo.html" rel="noopener" target="_blank">an Active Directory home lab, where a help desk security group gets exactly two delegated rights instead of full admin</a>.
+      <a href="/blog/active-directory-home-lab-windows-server-2022-gpo">an Active Directory home lab, where a help desk security group gets exactly two delegated rights instead of full admin</a>.
       I think this is one of the more realistic security tickets in the whole
       set, because it never involved anything malicious, just an ordinary request
       that needed a slightly narrower answer than the one asked for.
     </p>
 
-    <h2>How this maps to what job postings actually ask for</h2>
+    <h2 id="how-this-maps-to-what-job-postings-actually-ask-for">How this maps to what job postings actually ask for</h2>
     <p>
       Partway through writing the tickets, I went back and reread a stack of
       entry-level IT support, helpdesk, and junior systems administrator postings
@@ -377,7 +363,7 @@
       skill that line in the job posting is trying to describe.
     </p>
 
-    <h2>What this project is not yet</h2>
+    <h2 id="what-this-project-is-not-yet">What this project is not yet</h2>
     <p>
       I want to be honest about where this stands right now, the same way I have
       tried to be honest in every other project in this portfolio. Everything
@@ -399,7 +385,7 @@
       part I actually want a hiring manager or a recruiter to read closely.
     </p>
 
-    <h2>What I'd tell someone starting this same project</h2>
+    <h2 id="what-i-d-tell-someone-starting-this-same-project">What I'd tell someone starting this same project</h2>
     <p>
       If you're building something similar for your own portfolio, the
       temptation is going to be to write tickets that make you look clever. A
@@ -418,7 +404,7 @@
       actually looks like a person who is ready to run a real queue.
     </p>
 
-    <h2>Frequently asked questions</h2>
+    <h2 id="frequently-asked-questions">Frequently asked questions</h2>
 
     <h3>Is this a live, running Freshservice instance, or is it documentation?</h3>
     <p>
@@ -478,7 +464,7 @@
       tool, a cost that compounds quietly and never shows up in a demo.
     </p>
 
-    <h2>Where this goes from here</h2>
+    <h2 id="where-this-goes-from-here">Where this goes from here</h2>
     <p>
       The next concrete step for this project is running the actual build in a
       live Freshservice trial and capturing the twenty seven screenshots the
@@ -506,21 +492,49 @@
       can't get from a certification study guide alone. This is part of an
       ongoing series of IT support and cybersecurity projects I'm building for my
       portfolio
-      (<a href="../index.html#about" rel="noopener" target="_blank">more on my background here</a>).
-      <a href="../blog.html" rel="noopener" target="_blank">More lab notes and write-ups land here</a>
+      (<a href="/#about">more on my background here</a>).
+      <a href="/blog">More lab notes and write-ups land here</a>
       as each one ships.
     </p>
-
-    <p class="mono mt-3"><a href="../blog.html">&larr; show logging</a></p>
-  </article>
-</main>
-
-<footer class="site-footer">
-  <div class="wrap">
-    <span>© 2026 Trey · built by hand · no cookies · privacy-respecting analytics · <a href="../privacy.html">privacy</a></span>
-    <span><a href="../index.html">exit →</a></span>
+</div>
+      <footer class="post-end">
+        <div class="repo-box"><div><span class="k">source for this post</span><span class="v">github.com/rachata072/itsm-service-desk-simulation</span></div><a class="btn btn-sec" href="https://github.com/rachata072/itsm-service-desk-simulation" rel="noopener" target="_blank">view repo <span aria-hidden="true">&#8599;</span></a></div>
+        <nav class="nexthop" aria-label="More posts"><a class="prev" href="/blog/active-directory-home-lab-windows-server-2022-gpo"><span class="k">&larr; previous hop</span>I Built an Active Directory Home Lab That&#x27;s More Than Three OUs and a Password Policy</a><a class="next" href="/blog/wireshark-network-analysis-nine-packet-captures"><span class="k">next hop &rarr;</span>What Nine Packet Captures Taught Me About Networks I Thought I Already Understood</a></nav>
+      </footer>
+    </div>
+    <aside class="toc" aria-label="On this page"><span class="toc-title"><span class="h">#</span> show ip route | toc</span><ol><li><a href="#why-the-boring-parts-matter-more-than-they-sound">Why the boring parts matter more than they sound</a></li><li><a href="#designing-three-sla-tiers-instead-of-one-flat-policy">Designing three SLA tiers instead of one flat policy</a></li><li><a href="#a-few-tickets-that-taught-me-something">A few tickets that taught me something</a></li><li><a href="#how-this-maps-to-what-job-postings-actually-ask-for">How this maps to what job postings actually ask for</a></li><li><a href="#what-this-project-is-not-yet">What this project is not yet</a></li><li><a href="#what-i-d-tell-someone-starting-this-same-project">What I&#x27;d tell someone starting this same project</a></li><li><a href="#frequently-asked-questions">Frequently asked questions</a></li><li><a href="#where-this-goes-from-here">Where this goes from here</a></li></ol></aside>
   </div>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 25, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
 </footer>
-
 </body>
 </html>

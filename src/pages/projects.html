@@ -1,0 +1,44 @@
+<!--meta
+{
+  "out": "projects.html",
+  "path": "/projects",
+  "nav": "projects",
+  "title": "Projects | Trey's Networking, Automation & Security Labs",
+  "description": "Networking and security projects with public repos: a Suricata, Zeek and Wazuh SOC lab, Netmiko backups, VLSM tooling, Active Directory, and Microsoft 365.",
+  "og_title": "Projects: networking, automation and security labs",
+  "preload_display": true,
+  "scripts": ["filter"]
+}
+-->
+<main id="main">
+  <header class="page-head">
+    <div class="wrap">
+      <span class="cli"><span class="h">edge#</span> <span class="v">show</span> <span class="a">interfaces detail</span></span>
+      <h1>Projects</h1>
+      <p class="sec-lede">
+        {{PROJECT_SUMMARY}} Each shipped project has a public repo and a full write-up covering
+        what worked, what broke, and what I'd change.
+      </p>
+    </div>
+  </header>
+
+  <section class="wrap" data-filter-group aria-label="Project list">
+    <div class="toolbar" hidden>
+      <div class="filters" role="group" aria-label="Filter projects by VLAN">
+        {{PROJECT_FILTERS}}
+      </div>
+    </div>
+    <p class="sr-only" data-status aria-live="polite"></p>
+
+    <div class="pgrid">
+      {{PROJECT_CARDS}}
+    </div>
+    <p class="empty mt-2" hidden>% No interfaces match this filter.</p>
+
+    <p class="legend mt-2" aria-label="Status legend">
+      <span class="st st-up">up/up shipped</span>
+      <span class="st st-prog">up/down in progress</span>
+      <span class="st st-admin">admin down planned</span>
+    </p>
+  </section>
+</main>

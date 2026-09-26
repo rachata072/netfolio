@@ -1,0 +1,130 @@
+[
+  {
+    "id": "soc-lab",
+    "name": "SOC-HomeLab",
+    "cat": "security",
+    "status": "up",
+    "featured": true,
+    "repo": "soc-homelab",
+    "post": "soc-homelab-designing-two-vm-lab",
+    "post_label": "read the 5-part series",
+    "blurb": "A two-VM detection lab: Suricata IDS and Zeek watching the same interface, Wazuh as the SIEM, Grafana and Loki for hunting. Custom Suricata rules, a scripted attack simulation with a beacon-detection script, and a real 24-hour threat hunt through the SIEM's own alert volume.",
+    "tags": ["Suricata", "Zeek", "Wazuh", "Grafana", "Blue team"]
+  },
+  {
+    "id": "config-backup",
+    "name": "Py-ConfigBackup",
+    "cat": "automation",
+    "status": "up",
+    "repo": "py-configbackup",
+    "post": "py-configbackup-netmiko-config-backup-alerts",
+    "blurb": "A Netmiko CLI that SSHes into every device in an inventory file, backs up the running config, diffs it against the last backup, and emails an alert only when something changed. Tested against a real two-router VyOS lab built with containerlab, which caught two bugs a mocked test suite never could.",
+    "tags": ["Python", "Netmiko", "SSH", "VyOS"]
+  },
+  {
+    "id": "subnet-tool",
+    "name": "Py-SubnetCalc",
+    "cat": "automation",
+    "status": "up",
+    "repo": "py-subnetcalc",
+    "post": "vlsm-subnet-calculator-python-tool",
+    "blurb": "A dependency-free Python CLI that plans VLSM subnetting from a CSV of departments and host counts using the ipaddress standard library. 30 tests, and an allocation order that stops wasted address space.",
+    "tags": ["Python", "ipaddress", "VLSM", "pytest"]
+  },
+  {
+    "id": "wireshark",
+    "name": "Wireshark-Captures",
+    "cat": "network",
+    "status": "up",
+    "repo": "wireshark-network-analysis",
+    "post": "wireshark-network-analysis-nine-packet-captures",
+    "blurb": "Nine real packet captures: DNS, TCP, HTTP vs HTTPS, ICMP, packet loss, ARP, DHCP, Telnet vs SSH, and FTP. Each one generated, read, and explained by hand for CCNA study.",
+    "tags": ["Wireshark", "TCP/IP", "CCNA"]
+  },
+  {
+    "id": "vuln-mgmt",
+    "name": "Vuln-Mgmt-Program",
+    "cat": "security",
+    "status": "up",
+    "repo": "vulnerability-management",
+    "post": "vulnerability-management-program-tenable-powershell-bash",
+    "blurb": "A vulnerability management program from policy to remediation: stakeholder buy-in, Tenable scanning across Windows and Linux targets, and ten confirmed fixes in PowerShell and Bash, including the two attempts that didn't work out.",
+    "tags": ["Tenable", "PowerShell", "Bash"]
+  },
+  {
+    "id": "linux-audit",
+    "name": "Linux-Hardening-Audit",
+    "cat": "security",
+    "status": "up",
+    "repo": "linux-hardening-audit-lynis-rkhunter",
+    "post": "linux-hardening-audit-lynis-rkhunter",
+    "blurb": "Lynis and rkhunter against a real Ubuntu workstation: three warnings triaged, a crashed Fail2ban jail caught, and an honest account of the thirty eight suggestions I skipped.",
+    "tags": ["Lynis", "rkhunter", "Ubuntu", "Fail2ban"]
+  },
+  {
+    "id": "ad-lab",
+    "name": "AD-HomeLab",
+    "cat": "support",
+    "status": "up",
+    "repo": "active-directory-home-lab",
+    "post": "active-directory-home-lab-windows-server-2022-gpo",
+    "blurb": "Active Directory on Windows Server 2022: OU design, Fine-Grained Password Policies, Windows LAPS, delegated help desk rights, WSUS patching, scripted provisioning, and a backup I actually tested.",
+    "tags": ["Windows Server", "GPO", "LAPS", "WSUS"]
+  },
+  {
+    "id": "m365-ops",
+    "name": "M365-Identity-Ops",
+    "cat": "automation",
+    "status": "up",
+    "repo": "m365-identity-ops-automation",
+    "post": "automate-microsoft-365-admin-tasks-powershell-graph",
+    "blurb": "Onboarding, offboarding, groups, delegated admin roles, mail flow, and service health, automated with the Microsoft Graph PowerShell SDK, with a real audit trail.",
+    "tags": ["Microsoft 365", "Graph SDK", "PowerShell"]
+  },
+  {
+    "id": "itsm",
+    "name": "ITSM-ServiceDesk-Sim",
+    "cat": "support",
+    "status": "up",
+    "repo": "itsm-service-desk-simulation",
+    "post": "freshservice-service-desk-simulation-sla-tickets",
+    "blurb": "A Freshservice service desk built from scratch: three SLA tiers, a category taxonomy, a service catalog, and twenty simulated helpdesk tickets modeled on a real support queue.",
+    "tags": ["Freshservice", "ITSM", "SLA"]
+  },
+  {
+    "id": "runbook",
+    "name": "IT-Runbook-SOPs",
+    "cat": "support",
+    "status": "up",
+    "repo": "it-runbook-sops",
+    "post": "it-runbook-sops-real-service-desk",
+    "blurb": "A five-document IT runbook covering onboarding, offboarding, password reset, laptop setup, and network troubleshooting, built from NIST, CIS Controls v8, and Microsoft's own documentation.",
+    "tags": ["NIST 800-63B", "CIS v8", "SOPs"]
+  },
+  {
+    "id": "m365-lab",
+    "name": "M365-Admin-Lab",
+    "cat": "support",
+    "status": "up",
+    "repo": "m365-admin-lab",
+    "post": "free-microsoft-365-sandbox-real-setup-guide",
+    "blurb": "A Microsoft 365 test tenant on the path that is actually open to individuals, the 30-day E3 trial: users across three departments, MFA switched on before anything else, and the cancellation step that avoids the bill.",
+    "tags": ["Microsoft 365", "MFA", "Tenant setup"]
+  },
+  {
+    "id": "ospf-lab",
+    "name": "Lab-OSPF-01",
+    "cat": "network",
+    "status": "prog",
+    "blurb": "A three-area OSPF topology built first in Packet Tracer, then rebuilt on real IOS images. Covers ABRs, route summarization, a virtual link, and passive interfaces, with the full addressing plan and a verification cheat-sheet.",
+    "tags": ["OSPF", "Packet Tracer", "IOS"]
+  },
+  {
+    "id": "ccnp-notes",
+    "name": "CCNP-Security-Notes",
+    "cat": "security",
+    "status": "admin",
+    "blurb": "Study notes, lab write-ups, and a spaced-repetition flashcard deck for CCNP Security, replacing the CCNA-Notes project now that I've moved on to the professional-level security track.",
+    "tags": ["CCNP Security", "Study notes"]
+  }
+]

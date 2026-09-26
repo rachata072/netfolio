@@ -1,79 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-CA">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work - Trey</title>
-  <meta name="description" content="Why I cut a segmented, multi-firewall SOC design down to two VirtualBox VMs, the networking and memory budget that came out of that decision, and the threat model that decided what belonged in the lab.">
-  <link rel="canonical" href="https://breakfixlearn.com/blog/soc-homelab-designing-two-vm-lab.html">
-  <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
-  <link rel="stylesheet" href="../css/style.css">
-  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
-  <meta property="og:type" content="article">
-  <meta property="og:title" content="Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work">
-  <meta property="og:description" content="Why I cut a segmented, multi-firewall SOC design down to two VirtualBox VMs, the networking and memory budget that came out of that decision, and the threat model that decided what belonged in the lab.">
-  <meta property="og:url" content="https://breakfixlearn.com/blog/soc-homelab-designing-two-vm-lab.html">
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "headline": "Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work",
-    "datePublished": "2026-09-21",
-    "author": { "@type": "Person", "name": "Trey" },
-    "mainEntityOfPage": "https://breakfixlearn.com/blog/soc-homelab-designing-two-vm-lab.html"
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "Why build a two-VM SOC lab instead of a segmented network with a firewall appliance?",
-        "acceptedAnswer": { "@type": "Answer", "text": "A firewall build with multiple network segments is a multi-day project on its own, and most of that extra time goes toward VLAN-style isolation and rule ordering rather than the actual SOC skill of reading an alert and deciding what it means. Two VMs on one flat network is the smallest lab that still produces a complete detection story: an attack, independent detections across three tools, and one place to triage. The segmented design is not abandoned, it is a good second project once this smaller one is solid." }
-      },
-      {
-        "@type": "Question",
-        "name": "Why does Suricata's HOME_NET only include the sensor's own address instead of the whole subnet?",
-        "acceptedAnswer": { "@type": "Answer", "text": "The attacker VM and the sensor VM sit on the same 192.168.56.0/24 host-only network. If HOME_NET were set to the whole subnet, the attacker would count as internal too, and the rules written to fire on inbound attacks from an external source would never evaluate as true. Setting HOME_NET to only the sensor's single address makes the attacker count as EXTERNAL_NET automatically, so every rule written the normal way still works even though both machines share a subnet in real life." }
-      },
-      {
-        "@type": "Question",
-        "name": "Why does Wazuh run without a separate agent in this lab?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Wazuh's all-in-one install includes its own local agent by default, and because the manager, the target application, and the SSH service all live on the same VM, that local agent can already read every file it needs directly off the filesystem: Suricata's EVE JSON, Zeek's notice log, the target's own access log, and the host firewall log. Adding a second, remote agent would only be necessary once a real second host exists to monitor, and it would introduce agent enrollment and agent-to-manager TLS as new things that can quietly break." }
-      },
-      {
-        "@type": "Question",
-        "name": "Is it a problem that the sensors and the target application run on the same virtual machine?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes, and it is worth stating plainly rather than glossing over. A real network puts sensors on a span port or a tap, physically separate from anything an attacker could reach, so a compromise of the target cannot also compromise the thing watching it. Here, a genuine compromise of the sensor VM could in principle let an attacker tamper with the very sensors meant to catch them. That is a real limit of this version of the lab, and a dedicated, separate sensor host is the natural next iteration once this smaller design is solid." }
-      }
-    ]
-  }
-  </script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work | Trey</title>
+<meta name="description" content="Why I cut a multi-firewall SOC design down to two VirtualBox VMs, the network and memory budget behind it, and the threat model that shaped the lab.">
+<link rel="canonical" href="https://breakfixlearn.com/blog/soc-homelab-designing-two-vm-lab">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=fac4bc101c">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work">
+<meta property="og:description" content="Why I cut a segmented, multi-firewall SOC design down to two VirtualBox VMs, the networking and memory budget that came out of that decision, and the threat model that decided what belonged in the lab.">
+<meta property="og:url" content="https://breakfixlearn.com/blog/soc-homelab-designing-two-vm-lab">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/soc-homelab-designing-two-vm-lab.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="article:published_time" content="2026-09-21">
+<meta property="article:tag" content="SOC">
+<meta property="article:tag" content="Suricata">
+<meta property="article:tag" content="Zeek">
+<meta property="article:tag" content="Wazuh">
+<meta property="article:tag" content="VirtualBox">
+<meta property="article:tag" content="Blue Team">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work","description":"Why I cut a multi-firewall SOC design down to two VirtualBox VMs, the network and memory budget behind it, and the threat model that shaped the lab.","datePublished":"2026-09-21","dateModified":"2026-09-21","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"publisher":{"@type":"Person","name":"Trey"},"mainEntityOfPage":"https://breakfixlearn.com/blog/soc-homelab-designing-two-vm-lab","image":"https://breakfixlearn.com/assets/og/soc-homelab-designing-two-vm-lab.png","keywords":"SOC, Suricata, Zeek, Wazuh, VirtualBox, Blue Team, Homelab","articleSection":"Security","timeRequired":"PT14M"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://breakfixlearn.com/blog"},{"@type":"ListItem","position":3,"name":"Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Why build a two-VM SOC lab instead of a segmented network with a firewall appliance?","acceptedAnswer":{"@type":"Answer","text":"A firewall build with multiple network segments is a multi-day project on its own, and most of that extra time goes toward VLAN-style isolation and rule ordering rather than the actual SOC skill of reading an alert and deciding what it means. Two VMs on one flat network is the smallest lab that still produces a complete detection story: an attack, independent detections across three tools, and one place to triage. The segmented design is not abandoned, it is a good second project once this smaller one is solid."}},{"@type":"Question","name":"Why does Suricata's HOME_NET only include the sensor's own address instead of the whole subnet?","acceptedAnswer":{"@type":"Answer","text":"The attacker VM and the sensor VM sit on the same 192.168.56.0/24 host-only network. If HOME_NET were set to the whole subnet, the attacker would count as internal too, and the rules written to fire on inbound attacks from an external source would never evaluate as true. Setting HOME_NET to only the sensor's single address makes the attacker count as EXTERNAL_NET automatically, so every rule written the normal way still works even though both machines share a subnet in real life."}},{"@type":"Question","name":"Why does Wazuh run without a separate agent in this lab?","acceptedAnswer":{"@type":"Answer","text":"Wazuh's all-in-one install includes its own local agent by default, and because the manager, the target application, and the SSH service all live on the same VM, that local agent can already read every file it needs directly off the filesystem: Suricata's EVE JSON, Zeek's notice log, the target's own access log, and the host firewall log. Adding a second, remote agent would only be necessary once a real second host exists to monitor, and it would introduce agent enrollment and agent-to-manager TLS as new things that can quietly break."}},{"@type":"Question","name":"Is it a problem that the sensors and the target application run on the same virtual machine?","acceptedAnswer":{"@type":"Answer","text":"Yes, and it is worth stating plainly rather than glossing over. A real network puts sensors on a span port or a tap, physically separate from anything an attacker could reach, so a compromise of the target cannot also compromise the thing watching it. Here, a genuine compromise of the sensor VM could in principle let an attacker tamper with the very sensors meant to catch them. That is a real limit of this version of the lab, and a dedicated, separate sensor host is the natural next iteration once this smaller design is solid."}}]}</script>
+<script src="/js/main.js?v=7d994f174b" defer></script>
 </head>
 <body>
-
-<header class="site-header">
+<div class="progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
   <div class="wrap">
-    <a class="brand" href="../index.html" aria-label="Home">
-      <span class="prompt">Trey@lab</span>:<span class="host">~</span>$ <span aria-hidden="true">_</span>
-    </a>
-    <nav class="site-nav" aria-label="Main navigation">
-      <a href="../index.html">home</a>
-      <a href="../projects.html">projects</a>
-      <a href="../blog.html" aria-current="page">blog</a>
-      <a href="../index.html#about">about</a>
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span>about</a></li>
+      </ul>
     </nav>
   </div>
 </header>
-
-<main>
-  <article class="article wrap">
-    <p class="mono post-eyebrow">%BLOG-5-SEC</p>
-    <h1>Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work</h1>
-    <p class="post-meta">Sep 21, 2026 · 14 min read · SOC, Suricata, Zeek, Wazuh, VirtualBox, Blue Team, Homelab</p>
-
+<main id="main">
+<article>
+  <header class="post-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/blog">blog</a><span aria-hidden="true">/</span><a href="/blog#sec">sec</a></nav>
+      <span class="sev c-sec">%BLOG-5-SEC</span>
+      <h1 class="mt-2">Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work</h1>
+      <p class="post-dek">Why I cut a segmented, multi-firewall SOC design down to two VirtualBox VMs, the networking and memory budget that came out of that decision, and the threat model that decided what belonged in the lab.</p>
+      <div class="post-meta"><time datetime="2026-09-21">Sep 21, 2026</time><span class="sep">/</span><span>14 min read</span><span class="sep">/</span><span>by Trey</span><span class="sep">/</span><a href="https://github.com/rachata072/soc-homelab" rel="noopener" target="_blank">source on github &#8599;</a></div>
+      <div class="post-tags"><span class="chip">SOC</span><span class="chip">Suricata</span><span class="chip">Zeek</span><span class="chip">Wazuh</span><span class="chip">VirtualBox</span><span class="chip">Blue Team</span><span class="chip">Homelab</span></div>
+    </div>
+  </header>
+  <div class="wrap post-layout">
+    <div class="post-main">
+<nav class="series" aria-label="SOC-HomeLab series"><div class="series-head"><span>traceroute <b>SOC-HomeLab</b></span><span>hop 1 of 5</span></div><ol><li><span class="here" aria-current="page">Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work</span></li><li><a href="/blog/soc-homelab-suricata-ids-installation">Suricata on the SOC VM: Installing and Tuning a Host-Based IDS</a></li><li><a href="/blog/soc-homelab-wazuh-zeek-grafana-pipeline">One Pipeline, Three Jobs: Wazuh, Zeek and Grafana in a SOC Home Lab</a></li><li><a href="/blog/soc-homelab-first-alerts-attack-simulation">First Alerts: What My SOC Home Lab Caught, What It Missed, and How I Triaged It</a></li><li><a href="/blog/soc-homelab-threat-hunt-report">Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab</a></li></ol></nav>
+<details class="toc-mobile"><summary>show ip route | toc (14 sections)</summary><ol><li><a href="#what-i-set-out-to-build">What I set out to build</a></li><li><a href="#why-two-vms-not-a-segmented-network">Why two VMs, not a segmented network</a></li><li><a href="#virtualbox-networking-one-lab-network-plus-a-way-out-for-upd">VirtualBox networking: one lab network plus a way out for updates</a></li><li><a href="#the-lab-network-plan">The lab network plan</a></li><li><a href="#what-each-machine-does-and-why">What each machine does, and why</a></li><li><a href="#the-resource-budget">The resource budget</a></li><li><a href="#honest-limits-stated-up-front">Honest limits, stated up front</a></li><li><a href="#a-small-threat-model">A small threat model</a></li><li><a href="#how-i-will-know-it-worked">How I will know it worked</a></li><li><a href="#what-i-chose-not-to-build">What I chose not to build</a></li><li><a href="#the-scripts-making-the-build-repeatable">The scripts: making the build repeatable</a></li><li><a href="#what-this-design-taught-me-before-i-ran-a-single-attack">What this design taught me before I ran a single attack</a></li><li><a href="#frequently-asked-questions">Frequently asked questions</a></li><li><a href="#where-this-goes-from-here">Where this goes from here</a></li></ol></details>
+<div class="prose">
     <p>
       Most home lab posts start with a list of tools. I want to start with a different question,
       because the tool list is the easy part. The question is: what should this lab be able to
@@ -96,7 +90,7 @@
       the attacks the lab actually caught.
     </p>
 
-    <h2>What I set out to build</h2>
+    <h2 id="what-i-set-out-to-build">What I set out to build</h2>
     <p>
       The brief was simple to say and took a while to design. A small, free, self-contained lab
       where I attack a target and watch three independent tools catch it, then triage what I
@@ -124,7 +118,7 @@
       protect.
     </p>
 
-    <h2>Why two VMs, not a segmented network</h2>
+    <h2 id="why-two-vms-not-a-segmented-network">Why two VMs, not a segmented network</h2>
     <p>
       My first pass at this design was bigger. I sketched a firewall appliance in front of
       everything, four network segments, a separate client machine, and log forwarding from
@@ -158,7 +152,7 @@
       lab I actually finish.
     </p>
 
-    <h2>VirtualBox networking: one lab network plus a way out for updates</h2>
+    <h2 id="virtualbox-networking-one-lab-network-plus-a-way-out-for-upd">VirtualBox networking: one lab network plus a way out for updates</h2>
     <p>
       VirtualBox offers several network modes, and getting this part right is the difference
       between a lab that just works and hours of "why can't these two VMs see each other." I
@@ -195,7 +189,7 @@
       since a swapped card is the single most common reason a fresh build looks broken.
     </p>
 
-    <h2>The lab network plan</h2>
+    <h2 id="the-lab-network-plan">The lab network plan</h2>
     <p>Here is the full plan in one table.</p>
     <div class="int-table-scroll">
       <table class="int-brief">
@@ -227,7 +221,7 @@
       forwarding, no extra hop, the same address I use for everything else on the lab network.
     </p>
 
-    <h2>What each machine does, and why</h2>
+    <h2 id="what-each-machine-does-and-why">What each machine does, and why</h2>
     <p>
       <strong>soc-sensor</strong> carries almost the entire lab. It runs the target application
       and the full detection stack side by side, which is a trade-off I made deliberately and
@@ -286,10 +280,10 @@
     </p>
 
     <figure class="post-figure">
-      <img src="../assets/img/soc-homelab/soc-homelab-network-architecture-diagram-1200.webp"
-           srcset="../assets/img/soc-homelab/soc-homelab-network-architecture-diagram-480.webp 480w,
-                   ../assets/img/soc-homelab/soc-homelab-network-architecture-diagram-800.webp 800w,
-                   ../assets/img/soc-homelab/soc-homelab-network-architecture-diagram-1200.webp 1200w"
+      <img src="/assets/img/soc-homelab/soc-homelab-network-architecture-diagram-1200.webp"
+           srcset="/assets/img/soc-homelab/soc-homelab-network-architecture-diagram-480.webp 480w,
+                   /assets/img/soc-homelab/soc-homelab-network-architecture-diagram-800.webp 800w,
+                   /assets/img/soc-homelab/soc-homelab-network-architecture-diagram-1200.webp 1200w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Architecture diagram of the SOC-HomeLab: a Windows host reaching the Wazuh dashboard and Grafana over a host-only network, soc-sensor at 192.168.56.10 running Suricata, Zeek, DVWA, sshd, Wazuh, Loki and Grafana, soc-kali at 192.168.56.20 running nmap, nikto, hydra and sqlmap, with attack traffic confined to the 192.168.56.0/24 host-only network and a separate NAT adapter on each VM used only for package updates"
            loading="lazy" width="2400" height="1600">
@@ -328,7 +322,7 @@
       fix, rather than silently breaking because I duplicated logic Wazuh already had.
     </p>
 
-    <h2>The resource budget</h2>
+    <h2 id="the-resource-budget">The resource budget</h2>
     <p>
       Wazuh, Zeek, Loki and Grafana are not light, and all of them run on the same 16 GB VM as
       the target application. Building without a memory budget in hand is how a lab freezes at
@@ -387,7 +381,7 @@
       this series covers that pipeline in detail.
     </p>
 
-    <h2>Honest limits, stated up front</h2>
+    <h2 id="honest-limits-stated-up-front">Honest limits, stated up front</h2>
     <p>
       A design is also a list of trade-offs, and I would rather name mine than have someone else
       find them first.
@@ -419,7 +413,7 @@
       the real thing, and the results in this series say so.
     </p>
 
-    <h2>A small threat model</h2>
+    <h2 id="a-small-threat-model">A small threat model</h2>
     <p>
       A design without a threat model is decoration. Mine is modest, and writing it down kept me
       from adding features that did not serve it.
@@ -448,7 +442,7 @@
       active blocking, and no second network segment in this version.
     </p>
 
-    <h2>How I will know it worked</h2>
+    <h2 id="how-i-will-know-it-worked">How I will know it worked</h2>
     <p>
       I set success criteria before building, so I could not quietly redefine success after the
       fact. The lab works if a scripted attack against soc-sensor produces at least one alert in
@@ -473,7 +467,7 @@
       came about.
     </p>
 
-    <h2>What I chose not to build</h2>
+    <h2 id="what-i-chose-not-to-build">What I chose not to build</h2>
     <p>
       Every design is also a list of things left out, and I think listing them is a sign of
       maturity rather than weakness.
@@ -499,7 +493,7 @@
       expired.
     </p>
 
-    <h2>The scripts: making the build repeatable</h2>
+    <h2 id="the-scripts-making-the-build-repeatable">The scripts: making the build repeatable</h2>
     <p>
       A build I can only do by clicking through installers is a build I can only do once. So the
       repository has a numbered script for every stage: one that creates the two VirtualBox VMs
@@ -515,12 +509,12 @@
       same test again under the same starting conditions. A lab you can reset on demand is a lab
       you can actually run experiments on, instead of a lab you are afraid to touch. This is the
       same instinct behind
-      <a href="../blog/linux-hardening-audit-lynis-rkhunter.html" rel="noopener" target="_blank">a
+      <a href="/blog/linux-hardening-audit-lynis-rkhunter">a
       Linux hardening audit I ran against my own machine earlier in this series of security
       write-ups</a>: build the thing so you can safely break it again.
     </p>
 
-    <h2>What this design taught me before I ran a single attack</h2>
+    <h2 id="what-this-design-taught-me-before-i-ran-a-single-attack">What this design taught me before I ran a single attack</h2>
     <p>
       Even before any traffic flowed, the design work taught me three things I plan to carry
       into any real environment.
@@ -546,7 +540,7 @@
       question "what is this assuming about my network, and is that assumption true here?"
     </p>
 
-    <h2>Frequently asked questions</h2>
+    <h2 id="frequently-asked-questions">Frequently asked questions</h2>
     <h3>Why build a two-VM SOC lab instead of a segmented network with a firewall appliance?</h3>
     <p>
       A firewall build with multiple network segments is a multi-day project on its own, and
@@ -586,32 +580,60 @@
       solid.
     </p>
 
-    <h2>Where this goes from here</h2>
+    <h2 id="where-this-goes-from-here">Where this goes from here</h2>
     <p>
       The full runbook, the architecture document, every script, and the screenshot checklist
       are on GitHub:
       <a href="https://github.com/rachata072/soc-homelab" rel="noopener" target="_blank">github.com/rachata072/soc-homelab</a>.
       Part 2 of this series puts Suricata and Zeek to work on <code>enp0s8</code>:
-      <a href="soc-homelab-suricata-ids-installation.html" rel="noopener" target="_blank">Suricata on the SOC VM</a>.
+      <a href="/blog/soc-homelab-suricata-ids-installation">Suricata on the SOC VM</a>.
     </p>
     <p>
       This is part of an ongoing series of networking and cybersecurity projects I am building
       for my portfolio while studying for the CCNA
-      (<a href="../index.html#about" rel="noopener" target="_blank">more on my background here</a>).
-      <a href="../blog.html" rel="noopener" target="_blank">More lab notes and write-ups land here</a>
+      (<a href="/#about">more on my background here</a>).
+      <a href="/blog">More lab notes and write-ups land here</a>
       as each one ships.
     </p>
-
-    <p class="mono mt-3"><a href="../blog.html">&larr; show logging</a></p>
-  </article>
-</main>
-
-<footer class="site-footer">
-  <div class="wrap">
-    <span>© 2026 Trey · built by hand · no cookies · privacy-respecting analytics · <a href="../privacy.html">privacy</a></span>
-    <span><a href="../index.html">exit →</a></span>
+</div>
+      <footer class="post-end">
+        <div class="repo-box"><div><span class="k">source for this post</span><span class="v">github.com/rachata072/soc-homelab</span></div><a class="btn btn-sec" href="https://github.com/rachata072/soc-homelab" rel="noopener" target="_blank">view repo <span aria-hidden="true">&#8599;</span></a></div>
+        <nav class="nexthop" aria-label="More posts"><a class="prev" href="/blog/py-configbackup-netmiko-config-backup-alerts"><span class="k">&larr; previous hop</span>I Built a Netmiko Config Backup Tool So I&#x27;d Stop Losing Arguments With My Own Router</a><a class="next" href="/blog/soc-homelab-suricata-ids-installation"><span class="k">next hop &rarr;</span>Suricata on the SOC VM: Installing and Tuning a Host-Based IDS</a></nav>
+      </footer>
+    </div>
+    <aside class="toc" aria-label="On this page"><span class="toc-title"><span class="h">#</span> show ip route | toc</span><ol><li><a href="#what-i-set-out-to-build">What I set out to build</a></li><li><a href="#why-two-vms-not-a-segmented-network">Why two VMs, not a segmented network</a></li><li><a href="#virtualbox-networking-one-lab-network-plus-a-way-out-for-upd">VirtualBox networking: one lab network plus a way out for updates</a></li><li><a href="#the-lab-network-plan">The lab network plan</a></li><li><a href="#what-each-machine-does-and-why">What each machine does, and why</a></li><li><a href="#the-resource-budget">The resource budget</a></li><li><a href="#honest-limits-stated-up-front">Honest limits, stated up front</a></li><li><a href="#a-small-threat-model">A small threat model</a></li><li><a href="#how-i-will-know-it-worked">How I will know it worked</a></li><li><a href="#what-i-chose-not-to-build">What I chose not to build</a></li><li><a href="#the-scripts-making-the-build-repeatable">The scripts: making the build repeatable</a></li><li><a href="#what-this-design-taught-me-before-i-ran-a-single-attack">What this design taught me before I ran a single attack</a></li><li><a href="#frequently-asked-questions">Frequently asked questions</a></li><li><a href="#where-this-goes-from-here">Where this goes from here</a></li></ol></aside>
   </div>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 25, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
 </footer>
-
 </body>
 </html>

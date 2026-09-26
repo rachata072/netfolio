@@ -1,142 +1,124 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-CA">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Projects - Trey | Networking &amp; Cybersecurity Labs</title>
-  <meta name="description" content="Networking and cybersecurity projects: OSPF labs, Python network automation with Netmiko, VLSM subnet tools, and a home SOC lab.">
-  <link rel="canonical" href="https://breakfixlearn.com/projects.html">
-  <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Projects - Trey">
-  <meta property="og:description" content="OSPF labs, Python network automation, and a home SOC.">
-  <meta property="og:url" content="https://breakfixlearn.com/projects.html">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projects | Trey&#x27;s Networking, Automation &amp; Security Labs</title>
+<meta name="description" content="Networking and security projects with public repos: a Suricata, Zeek and Wazuh SOC lab, Netmiko backups, VLSM tooling, Active Directory, and Microsoft 365.">
+<link rel="canonical" href="https://breakfixlearn.com/projects">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=fac4bc101c">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="Projects: networking, automation and security labs">
+<meta property="og:description" content="Networking and security projects with public repos: a Suricata, Zeek and Wazuh SOC lab, Netmiko backups, VLSM tooling, Active Directory, and Microsoft 365.">
+<meta property="og:url" content="https://breakfixlearn.com/projects">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/projects.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Projects: networking, automation and security labs">
+<meta name="twitter:card" content="summary_large_image">
+<script src="/js/main.js?v=7d994f174b" defer></script>
+<script src="/js/filter.js?v=7c3e277a89" defer></script>
 </head>
 <body>
-
-<header class="site-header">
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
   <div class="wrap">
-    <a class="brand" href="index.html" aria-label="Home">
-      <span class="prompt">Trey@lab</span>:<span class="host">~</span>$ <span aria-hidden="true">_</span>
-    </a>
-    <nav class="site-nav" aria-label="Main navigation">
-      <a href="index.html">home</a>
-      <a href="projects.html" aria-current="page">projects</a>
-      <a href="blog.html">blog</a>
-      <a href="index.html#about">about</a>
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span>about</a></li>
+      </ul>
     </nav>
   </div>
 </header>
-
-<main>
-  <section class="section" data-filter-group>
+<main id="main">
+  <header class="page-head">
     <div class="wrap">
-      <h1 class="cmd-heading">
-        <span class="prompt">edge-router#</span><span class="verb">show</span> projects detail<span class="filter-current" aria-hidden="true"></span>
-      </h1>
-
-      <div class="filter-bar" hidden>
-        <span class="pipe" aria-hidden="true">|</span>
-        <span id="proj-filter-label">include:</span>
-        <button type="button" class="filter-btn" data-filter="all" aria-pressed="true" aria-describedby="proj-filter-label">all</button>
-        <button type="button" class="filter-btn" data-filter="routing" aria-pressed="false" aria-describedby="proj-filter-label">ROUTING &amp; switching</button>
-        <button type="button" class="filter-btn" data-filter="automation" aria-pressed="false" aria-describedby="proj-filter-label">AUTOMATION · python</button>
-        <button type="button" class="filter-btn" data-filter="security" aria-pressed="false" aria-describedby="proj-filter-label">SECURITY · blue team</button>
-      </div>
-
-      <div class="card-grid">
-
-        <article class="card" data-cat="routing" id="ospf-lab">
-          <h3>Lab-OSPF-01 <span class="status prog">· up/down</span></h3>
-          <p>
-            A three-area OSPF topology built first in Packet Tracer, then rebuilt on
-            real IOS images. Covers ABRs, route summarization, a virtual link, and
-            passive interfaces. Includes the full addressing plan and verification
-            command cheat-sheet. (In progress.)
-          </p>
-          <div class="meta">
-            <span class="tag">OSPF</span><span class="tag">Packet Tracer</span><span class="tag">IOS</span>
-          </div>
-        </article>
-
-        <article class="card" data-cat="automation" id="subnet-tool">
-          <h3><a href="https://github.com/rachata072/py-subnetcalc" rel="noopener" target="_blank">Py-SubnetCalc</a> <span class="status up">· up/up</span></h3>
-          <p>
-            A Python CLI that reads a list of departments and host counts, then produces
-            an optimal VLSM plan using the <code class="mono">ipaddress</code> standard
-            library. Built to stop making subnetting mistakes by hand - and to learn
-            argparse properly.
-          </p>
-          <div class="meta">
-            <span class="tag">Python</span><span class="tag">ipaddress</span><span class="tag">VLSM</span>
-          </div>
-        </article>
-
-        <article class="card" data-cat="automation" id="config-backup">
-          <h3><a href="https://github.com/rachata072/py-configbackup" rel="noopener" target="_blank">Py-ConfigBackup</a> <span class="status up">· up/up</span></h3>
-          <p>
-            A Netmiko CLI that SSHes into every device in an inventory file, backs up the
-            running config, diffs it against the last backup, and emails an alert only when
-            something actually changed. Tested end to end against a real two-router VyOS
-            lab built with containerlab, which caught two genuine bugs a mocked test suite
-            never could.
-          </p>
-          <div class="meta">
-            <span class="tag">Python</span><span class="tag">Netmiko</span><span class="tag">SSH</span><span class="tag">VyOS</span><span class="tag">Automation</span>
-          </div>
-          <p class="mono mt-1"><a href="blog/py-configbackup-netmiko-config-backup-alerts.html">read the write-up →</a></p>
-        </article>
-
-        <article class="card" data-cat="security" id="soc-lab">
-          <h3><a href="https://github.com/rachata072/soc-homelab" rel="noopener" target="_blank">SOC-HomeLab</a> <span class="status up">· up/up</span></h3>
-          <p>
-            A two-VM detection lab: Suricata IDS and Zeek watching the same interface,
-            Wazuh as the SIEM, Grafana and Loki for hunting. Custom Suricata rules, a
-            scripted attack simulation with a beacon-detection script, and a real 24-hour
-            threat hunt through the SIEM's own alert volume, five posts covering design
-            through triage.
-          </p>
-          <div class="meta">
-            <span class="tag">Suricata</span><span class="tag">Zeek</span><span class="tag">Wazuh</span><span class="tag">Grafana</span><span class="tag">Blue team</span>
-          </div>
-          <p class="mono mt-1"><a href="blog/soc-homelab-designing-two-vm-lab.html">read the 5-part write-up →</a></p>
-        </article>
-
-        <article class="card" data-cat="security" id="ccnp-notes">
-          <h3>CCNP-Security-Notes <span class="status admin">· admin down</span></h3>
-          <p>
-            Study notes, lab writeups, and a spaced-repetition flashcard deck for
-            CCNP Security, replacing the CCNA-Notes project now that I've moved on
-            to the professional-level security track. Cleaning them up for
-            publication.
-          </p>
-          <div class="meta">
-            <span class="tag">CCNP Security</span><span class="tag">Study notes</span>
-          </div>
-        </article>
-
-      </div>
-
-      <p class="filter-empty" hidden>% No projects match this filter yet.</p>
-
-      <p class="legend mt-2">
-        Status codes: <span class="up">up/up</span> = shipped ·
-        <span class="prog">up/down</span> = in progress ·
-        <span class="admin">admin down</span> = planned
+      <span class="cli"><span class="h">edge#</span> <span class="v">show</span> <span class="a">interfaces detail</span></span>
+      <h1>Projects</h1>
+      <p class="sec-lede">
+        13 interfaces, 11 up/up. Each shipped project has a public repo and a full write-up covering
+        what worked, what broke, and what I'd change.
       </p>
     </div>
+  </header>
+
+  <section class="wrap" data-filter-group aria-label="Project list">
+    <div class="toolbar" hidden>
+      <div class="filters" role="group" aria-label="Filter projects by VLAN">
+        <button type="button" class="fbtn" data-filter="all" aria-pressed="true">all <span class="ct">13</span></button>
+        <button type="button" class="fbtn" data-filter="network" aria-pressed="false">10 network <span class="ct">2</span></button>
+        <button type="button" class="fbtn" data-filter="automation" aria-pressed="false">20 automation <span class="ct">3</span></button>
+        <button type="button" class="fbtn" data-filter="security" aria-pressed="false">30 security <span class="ct">4</span></button>
+        <button type="button" class="fbtn" data-filter="support" aria-pressed="false">40 sysadmin <span class="ct">4</span></button>
+      </div>
+    </div>
+    <p class="sr-only" data-status aria-live="polite"></p>
+
+    <div class="pgrid">
+      <article class="pcard" id="soc-lab" data-cat="security" data-search="soc-homelab a two-vm detection lab: suricata ids and zeek watching the same interface, wazuh as the siem, grafana and loki for hunting. custom suricata rules, a scripted attack simulation with a beacon-detection script, and a real 24-hour threat hunt through the siem&#x27;s own alert volume. suricata zeek wazuh grafana blue team"><div class="pcard-bar"><span>Gi1/0/1 &middot; vlan 30 SECURITY</span><span class="st st-up">up/up</span></div><div class="pcard-body"><h2>SOC-HomeLab</h2><p>A two-VM detection lab: Suricata IDS and Zeek watching the same interface, Wazuh as the SIEM, Grafana and Loki for hunting. Custom Suricata rules, a scripted attack simulation with a beacon-detection script, and a real 24-hour threat hunt through the SIEM&#x27;s own alert volume.</p><div class="chips"><span class="chip">Suricata</span><span class="chip">Zeek</span><span class="chip">Wazuh</span><span class="chip">Grafana</span><span class="chip">Blue team</span></div></div><div class="pcard-links"><a href="/blog/soc-homelab-designing-two-vm-lab">read the 5-part series &rarr;</a><a href="https://github.com/rachata072/soc-homelab" rel="noopener" target="_blank">repo &#8599;</a></div></article>
+      <article class="pcard" id="config-backup" data-cat="automation" data-search="py-configbackup a netmiko cli that sshes into every device in an inventory file, backs up the running config, diffs it against the last backup, and emails an alert only when something changed. tested against a real two-router vyos lab built with containerlab, which caught two bugs a mocked test suite never could. python netmiko ssh vyos"><div class="pcard-bar"><span>Gi1/0/2 &middot; vlan 20 AUTOMATION</span><span class="st st-up">up/up</span></div><div class="pcard-body"><h2>Py-ConfigBackup</h2><p>A Netmiko CLI that SSHes into every device in an inventory file, backs up the running config, diffs it against the last backup, and emails an alert only when something changed. Tested against a real two-router VyOS lab built with containerlab, which caught two bugs a mocked test suite never could.</p><div class="chips"><span class="chip">Python</span><span class="chip">Netmiko</span><span class="chip">SSH</span><span class="chip">VyOS</span></div></div><div class="pcard-links"><a href="/blog/py-configbackup-netmiko-config-backup-alerts">read the write-up &rarr;</a><a href="https://github.com/rachata072/py-configbackup" rel="noopener" target="_blank">repo &#8599;</a></div></article>
+      <article class="pcard" id="subnet-tool" data-cat="automation" data-search="py-subnetcalc a dependency-free python cli that plans vlsm subnetting from a csv of departments and host counts using the ipaddress standard library. 30 tests, and an allocation order that stops wasted address space. python ipaddress vlsm pytest"><div class="pcard-bar"><span>Gi1/0/3 &middot; vlan 20 AUTOMATION</span><span class="st st-up">up/up</span></div><div class="pcard-body"><h2>Py-SubnetCalc</h2><p>A dependency-free Python CLI that plans VLSM subnetting from a CSV of departments and host counts using the ipaddress standard library. 30 tests, and an allocation order that stops wasted address space.</p><div class="chips"><span class="chip">Python</span><span class="chip">ipaddress</span><span class="chip">VLSM</span><span class="chip">pytest</span></div></div><div class="pcard-links"><a href="/blog/vlsm-subnet-calculator-python-tool">read the write-up &rarr;</a><a href="https://github.com/rachata072/py-subnetcalc" rel="noopener" target="_blank">repo &#8599;</a></div></article>
+      <article class="pcard" id="wireshark" data-cat="network" data-search="wireshark-captures nine real packet captures: dns, tcp, http vs https, icmp, packet loss, arp, dhcp, telnet vs ssh, and ftp. each one generated, read, and explained by hand for ccna study. wireshark tcp/ip ccna"><div class="pcard-bar"><span>Gi1/0/4 &middot; vlan 10 NETWORK</span><span class="st st-up">up/up</span></div><div class="pcard-body"><h2>Wireshark-Captures</h2><p>Nine real packet captures: DNS, TCP, HTTP vs HTTPS, ICMP, packet loss, ARP, DHCP, Telnet vs SSH, and FTP. Each one generated, read, and explained by hand for CCNA study.</p><div class="chips"><span class="chip">Wireshark</span><span class="chip">TCP/IP</span><span class="chip">CCNA</span></div></div><div class="pcard-links"><a href="/blog/wireshark-network-analysis-nine-packet-captures">read the write-up &rarr;</a><a href="https://github.com/rachata072/wireshark-network-analysis" rel="noopener" target="_blank">repo &#8599;</a></div></article>
+      <article class="pcard" id="vuln-mgmt" data-cat="security" data-search="vuln-mgmt-program a vulnerability management program from policy to remediation: stakeholder buy-in, tenable scanning across windows and linux targets, and ten confirmed fixes in powershell and bash, including the two attempts that didn&#x27;t work out. tenable powershell bash"><div class="pcard-bar"><span>Gi1/0/5 &middot; vlan 30 SECURITY</span><span class="st st-up">up/up</span></div><div class="pcard-body"><h2>Vuln-Mgmt-Program</h2><p>A vulnerability management program from policy to remediation: stakeholder buy-in, Tenable scanning across Windows and Linux targets, and ten confirmed fixes in PowerShell and Bash, including the two attempts that didn&#x27;t work out.</p><div class="chips"><span class="chip">Tenable</span><span class="chip">PowerShell</span><span class="chip">Bash</span></div></div><div class="pcard-links"><a href="/blog/vulnerability-management-program-tenable-powershell-bash">read the write-up &rarr;</a><a href="https://github.com/rachata072/vulnerability-management" rel="noopener" target="_blank">repo &#8599;</a></div></article>
+      <article class="pcard" id="linux-audit" data-cat="security" data-search="linux-hardening-audit lynis and rkhunter against a real ubuntu workstation: three warnings triaged, a crashed fail2ban jail caught, and an honest account of the thirty eight suggestions i skipped. lynis rkhunter ubuntu fail2ban"><div class="pcard-bar"><span>Gi1/0/6 &middot; vlan 30 SECURITY</span><span class="st st-up">up/up</span></div><div class="pcard-body"><h2>Linux-Hardening-Audit</h2><p>Lynis and rkhunter against a real Ubuntu workstation: three warnings triaged, a crashed Fail2ban jail caught, and an honest account of the thirty eight suggestions I skipped.</p><div class="chips"><span class="chip">Lynis</span><span class="chip">rkhunter</span><span class="chip">Ubuntu</span><span class="chip">Fail2ban</span></div></div><div class="pcard-links"><a href="/blog/linux-hardening-audit-lynis-rkhunter">read the write-up &rarr;</a><a href="https://github.com/rachata072/linux-hardening-audit-lynis-rkhunter" rel="noopener" target="_blank">repo &#8599;</a></div></article>
+      <article class="pcard" id="ad-lab" data-cat="support" data-search="ad-homelab active directory on windows server 2022: ou design, fine-grained password policies, windows laps, delegated help desk rights, wsus patching, scripted provisioning, and a backup i actually tested. windows server gpo laps wsus"><div class="pcard-bar"><span>Gi1/0/7 &middot; vlan 40 SYSADMIN</span><span class="st st-up">up/up</span></div><div class="pcard-body"><h2>AD-HomeLab</h2><p>Active Directory on Windows Server 2022: OU design, Fine-Grained Password Policies, Windows LAPS, delegated help desk rights, WSUS patching, scripted provisioning, and a backup I actually tested.</p><div class="chips"><span class="chip">Windows Server</span><span class="chip">GPO</span><span class="chip">LAPS</span><span class="chip">WSUS</span></div></div><div class="pcard-links"><a href="/blog/active-directory-home-lab-windows-server-2022-gpo">read the write-up &rarr;</a><a href="https://github.com/rachata072/active-directory-home-lab" rel="noopener" target="_blank">repo &#8599;</a></div></article>
+      <article class="pcard" id="m365-ops" data-cat="automation" data-search="m365-identity-ops onboarding, offboarding, groups, delegated admin roles, mail flow, and service health, automated with the microsoft graph powershell sdk, with a real audit trail. microsoft 365 graph sdk powershell"><div class="pcard-bar"><span>Gi1/0/8 &middot; vlan 20 AUTOMATION</span><span class="st st-up">up/up</span></div><div class="pcard-body"><h2>M365-Identity-Ops</h2><p>Onboarding, offboarding, groups, delegated admin roles, mail flow, and service health, automated with the Microsoft Graph PowerShell SDK, with a real audit trail.</p><div class="chips"><span class="chip">Microsoft 365</span><span class="chip">Graph SDK</span><span class="chip">PowerShell</span></div></div><div class="pcard-links"><a href="/blog/automate-microsoft-365-admin-tasks-powershell-graph">read the write-up &rarr;</a><a href="https://github.com/rachata072/m365-identity-ops-automation" rel="noopener" target="_blank">repo &#8599;</a></div></article>
+      <article class="pcard" id="itsm" data-cat="support" data-search="itsm-servicedesk-sim a freshservice service desk built from scratch: three sla tiers, a category taxonomy, a service catalog, and twenty simulated helpdesk tickets modeled on a real support queue. freshservice itsm sla"><div class="pcard-bar"><span>Gi1/0/9 &middot; vlan 40 SYSADMIN</span><span class="st st-up">up/up</span></div><div class="pcard-body"><h2>ITSM-ServiceDesk-Sim</h2><p>A Freshservice service desk built from scratch: three SLA tiers, a category taxonomy, a service catalog, and twenty simulated helpdesk tickets modeled on a real support queue.</p><div class="chips"><span class="chip">Freshservice</span><span class="chip">ITSM</span><span class="chip">SLA</span></div></div><div class="pcard-links"><a href="/blog/freshservice-service-desk-simulation-sla-tickets">read the write-up &rarr;</a><a href="https://github.com/rachata072/itsm-service-desk-simulation" rel="noopener" target="_blank">repo &#8599;</a></div></article>
+      <article class="pcard" id="runbook" data-cat="support" data-search="it-runbook-sops a five-document it runbook covering onboarding, offboarding, password reset, laptop setup, and network troubleshooting, built from nist, cis controls v8, and microsoft&#x27;s own documentation. nist 800-63b cis v8 sops"><div class="pcard-bar"><span>Gi1/0/10 &middot; vlan 40 SYSADMIN</span><span class="st st-up">up/up</span></div><div class="pcard-body"><h2>IT-Runbook-SOPs</h2><p>A five-document IT runbook covering onboarding, offboarding, password reset, laptop setup, and network troubleshooting, built from NIST, CIS Controls v8, and Microsoft&#x27;s own documentation.</p><div class="chips"><span class="chip">NIST 800-63B</span><span class="chip">CIS v8</span><span class="chip">SOPs</span></div></div><div class="pcard-links"><a href="/blog/it-runbook-sops-real-service-desk">read the write-up &rarr;</a><a href="https://github.com/rachata072/it-runbook-sops" rel="noopener" target="_blank">repo &#8599;</a></div></article>
+      <article class="pcard" id="m365-lab" data-cat="support" data-search="m365-admin-lab a microsoft 365 test tenant on the path that is actually open to individuals, the 30-day e3 trial: users across three departments, mfa switched on before anything else, and the cancellation step that avoids the bill. microsoft 365 mfa tenant setup"><div class="pcard-bar"><span>Gi1/0/11 &middot; vlan 40 SYSADMIN</span><span class="st st-up">up/up</span></div><div class="pcard-body"><h2>M365-Admin-Lab</h2><p>A Microsoft 365 test tenant on the path that is actually open to individuals, the 30-day E3 trial: users across three departments, MFA switched on before anything else, and the cancellation step that avoids the bill.</p><div class="chips"><span class="chip">Microsoft 365</span><span class="chip">MFA</span><span class="chip">Tenant setup</span></div></div><div class="pcard-links"><a href="/blog/free-microsoft-365-sandbox-real-setup-guide">read the write-up &rarr;</a><a href="https://github.com/rachata072/m365-admin-lab" rel="noopener" target="_blank">repo &#8599;</a></div></article>
+      <article class="pcard" id="ospf-lab" data-cat="network" data-search="lab-ospf-01 a three-area ospf topology built first in packet tracer, then rebuilt on real ios images. covers abrs, route summarization, a virtual link, and passive interfaces, with the full addressing plan and a verification cheat-sheet. ospf packet tracer ios"><div class="pcard-bar"><span>Gi1/0/12 &middot; vlan 10 NETWORK</span><span class="st st-prog">up/down</span></div><div class="pcard-body"><h2>Lab-OSPF-01</h2><p>A three-area OSPF topology built first in Packet Tracer, then rebuilt on real IOS images. Covers ABRs, route summarization, a virtual link, and passive interfaces, with the full addressing plan and a verification cheat-sheet.</p><div class="chips"><span class="chip">OSPF</span><span class="chip">Packet Tracer</span><span class="chip">IOS</span></div></div><div class="pcard-links"><span class="na">write-up coming</span></div></article>
+      <article class="pcard" id="ccnp-notes" data-cat="security" data-search="ccnp-security-notes study notes, lab write-ups, and a spaced-repetition flashcard deck for ccnp security, replacing the ccna-notes project now that i&#x27;ve moved on to the professional-level security track. ccnp security study notes"><div class="pcard-bar"><span>Gi1/0/13 &middot; vlan 30 SECURITY</span><span class="st st-admin">admin down</span></div><div class="pcard-body"><h2>CCNP-Security-Notes</h2><p>Study notes, lab write-ups, and a spaced-repetition flashcard deck for CCNP Security, replacing the CCNA-Notes project now that I&#x27;ve moved on to the professional-level security track.</p><div class="chips"><span class="chip">CCNP Security</span><span class="chip">Study notes</span></div></div><div class="pcard-links"><span class="na">write-up coming</span></div></article>
+    </div>
+    <p class="empty mt-2" hidden>% No interfaces match this filter.</p>
+
+    <p class="legend mt-2" aria-label="Status legend">
+      <span class="st st-up">up/up shipped</span>
+      <span class="st st-prog">up/down in progress</span>
+      <span class="st st-admin">admin down planned</span>
+    </p>
   </section>
 </main>
-
-<footer class="site-footer">
-  <div class="wrap">
-    <span>© 2026 Trey · built by hand · no cookies · privacy-respecting analytics · <a href="privacy.html">privacy</a></span>
-    <span><a href="index.html">exit →</a></span>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
   </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 25, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
 </footer>
-
-<script src="js/filter.js" defer></script>
 </body>
 </html>

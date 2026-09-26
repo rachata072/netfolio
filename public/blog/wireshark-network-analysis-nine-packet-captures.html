@@ -1,80 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-CA">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nine Packet Captures: A Wireshark CCNA Project - Trey</title>
-  <meta name="description" content="Nine real packet captures, DNS, TCP, HTTP vs HTTPS, ICMP, packet loss, ARP, DHCP, Telnet vs SSH, and FTP, each one generated, read, and explained by hand for CCNA study and a networking portfolio.">
-  <link rel="canonical" href="https://breakfixlearn.com/blog/wireshark-network-analysis-nine-packet-captures.html">
-  <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
-  <link rel="stylesheet" href="../css/style.css">
-  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
-  <meta property="og:type" content="article">
-  <meta property="og:title" content="What Nine Packet Captures Taught Me About Networks I Thought I Already Understood">
-  <meta property="og:description" content="Nine real packet captures, DNS, TCP, HTTP vs HTTPS, ICMP, packet loss, ARP, DHCP, Telnet vs SSH, and FTP, each one generated, read, and explained by hand for CCNA study and a networking portfolio.">
-  <meta property="og:url" content="https://breakfixlearn.com/blog/wireshark-network-analysis-nine-packet-captures.html">
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "headline": "What Nine Packet Captures Taught Me About Networks I Thought I Already Understood",
-    "datePublished": "2026-09-18",
-    "author": { "@type": "Person", "name": "Trey" },
-    "mainEntityOfPage": "https://breakfixlearn.com/blog/wireshark-network-analysis-nine-packet-captures.html"
-  }
-  </script>
-  <!-- FAQPage schema - makes the FAQ section eligible for a rich-result snippet in search -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "Why does this project skip VLAN trunking, OSPF, and Spanning Tree?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Those three scenarios were in the original plan, but producing genuine traffic for any of them needs simulated or real switch and router infrastructure, GNS3 or Packet Tracer, beyond what this particular lab build covers. Rather than fake the evidence with a guessed-at write-up dressed up as a real capture, they were cut outright. They're a clean follow-up project once that infrastructure exists, not a corner quietly cut, and the repository says so directly instead of padding the scenario count." }
-      },
-      {
-        "@type": "Question",
-        "name": "Why does the Telnet capture use a stand-in script instead of a real Telnet server?",
-        "acceptedAnswer": { "@type": "Answer", "text": "It's a real subset of RFC 854 on the wire, genuine IAC WILL/DO option negotiation followed by a plaintext username and password prompt, because running a full system telnetd deterministically in the original build environment wasn't practical. Every byte in that capture is real and unedited. The SSH half, and the home-lab version of this same comparison described in the runbook, use a completely genuine system daemon end to end. The credential-exposure result is identical either way; only the server implementation differs." }
-      },
-      {
-        "@type": "Question",
-        "name": "If ping to a real host fails, does that mean the network is down?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Not necessarily. Pinging a real public resolver from this project's build environment returned a hundred percent packet loss, four requests out, nothing back at all, while DNS lookups and HTTPS requests from that same environment worked perfectly. That pattern means something on the path is silently filtering ICMP specifically, a common and deliberate network-security control, not a broken network. Recognizing that distinction, instead of escalating a false alarm, is the actual troubleshooting skill this scenario exists to teach." }
-      },
-      {
-        "@type": "Question",
-        "name": "What's the difference between a closed port and a filtered port?",
-        "acceptedAnswer": { "@type": "Answer", "text": "A closed port replies immediately with a TCP RST, the host is reachable and something confirms nothing is listening there. A filtered port replies with nothing at all and simply times out, a firewall or ACL somewhere on the path silently dropped the packet, so you can't tell from the outside whether the host even exists. That distinction is the entire logic a port scanner like nmap uses to classify open, closed, and filtered, and it's why a timeout during troubleshooting is a completely different signal from an active refusal." }
-      }
-    ]
-  }
-  </script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nine Packet Captures: A Wireshark CCNA Project | Trey</title>
+<meta name="description" content="Nine real packet captures (DNS, TCP, HTTP vs HTTPS, ICMP, packet loss, ARP, DHCP, Telnet vs SSH, FTP), each read and explained by hand for CCNA study.">
+<link rel="canonical" href="https://breakfixlearn.com/blog/wireshark-network-analysis-nine-packet-captures">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=fac4bc101c">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="What Nine Packet Captures Taught Me About Networks I Thought I Already Understood">
+<meta property="og:description" content="Nine real packet captures, DNS, TCP, HTTP vs HTTPS, ICMP, packet loss, ARP, DHCP, Telnet vs SSH, and FTP, each one generated, read, and explained by hand for CCNA study and a networking portfolio.">
+<meta property="og:url" content="https://breakfixlearn.com/blog/wireshark-network-analysis-nine-packet-captures">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/wireshark-network-analysis-nine-packet-captures.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="What Nine Packet Captures Taught Me About Networks I Thought I Already Understood">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="article:published_time" content="2026-09-18">
+<meta property="article:tag" content="Wireshark">
+<meta property="article:tag" content="CCNA">
+<meta property="article:tag" content="TCP/IP">
+<meta property="article:tag" content="Packet Analysis">
+<meta property="article:tag" content="Network Security">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"What Nine Packet Captures Taught Me About Networks I Thought I Already Understood","description":"Nine real packet captures (DNS, TCP, HTTP vs HTTPS, ICMP, packet loss, ARP, DHCP, Telnet vs SSH, FTP), each read and explained by hand for CCNA study.","datePublished":"2026-09-18","dateModified":"2026-09-18","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"publisher":{"@type":"Person","name":"Trey"},"mainEntityOfPage":"https://breakfixlearn.com/blog/wireshark-network-analysis-nine-packet-captures","image":"https://breakfixlearn.com/assets/og/wireshark-network-analysis-nine-packet-captures.png","keywords":"Wireshark, CCNA, TCP/IP, Packet Analysis, Network Security","articleSection":"Networking","timeRequired":"PT19M"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://breakfixlearn.com/blog"},{"@type":"ListItem","position":3,"name":"What Nine Packet Captures Taught Me About Networks I Thought I Already Understood"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Why does this project skip VLAN trunking, OSPF, and Spanning Tree?","acceptedAnswer":{"@type":"Answer","text":"Those three scenarios were in the original plan, but producing genuine traffic for any of them needs simulated or real switch and router infrastructure, GNS3 or Packet Tracer, beyond what this particular lab build covers. Rather than fake the evidence with a guessed-at write-up dressed up as a real capture, they were cut outright. They're a clean follow-up project once that infrastructure exists, not a corner quietly cut, and the repository says so directly instead of padding the scenario count."}},{"@type":"Question","name":"Why does the Telnet capture use a stand-in script instead of a real Telnet server?","acceptedAnswer":{"@type":"Answer","text":"It's a real subset of RFC 854 on the wire, genuine IAC WILL/DO option negotiation followed by a plaintext username and password prompt, because running a full system telnetd deterministically in the original build environment wasn't practical. Every byte in that capture is real and unedited. The SSH half, and the home-lab version of this same comparison described in the runbook, use a completely genuine system daemon end to end. The credential-exposure result is identical either way; only the server implementation differs."}},{"@type":"Question","name":"If ping to a real host fails, does that mean the network is down?","acceptedAnswer":{"@type":"Answer","text":"Not necessarily. Pinging a real public resolver from this project's build environment returned a hundred percent packet loss, four requests out, nothing back at all, while DNS lookups and HTTPS requests from that same environment worked perfectly. That pattern means something on the path is silently filtering ICMP specifically, a common and deliberate network-security control, not a broken network. Recognizing that distinction, instead of escalating a false alarm, is the actual troubleshooting skill this scenario exists to teach."}},{"@type":"Question","name":"What's the difference between a closed port and a filtered port?","acceptedAnswer":{"@type":"Answer","text":"A closed port replies immediately with a TCP RST, the host is reachable and something confirms nothing is listening there. A filtered port replies with nothing at all and simply times out, a firewall or ACL somewhere on the path silently dropped the packet, so you can't tell from the outside whether the host even exists. That distinction is the entire logic a port scanner like nmap uses to classify open, closed, and filtered, and it's why a timeout during troubleshooting is a completely different signal from an active refusal."}}]}</script>
+<script src="/js/main.js?v=7d994f174b" defer></script>
 </head>
 <body>
-
-<header class="site-header">
+<div class="progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
   <div class="wrap">
-    <a class="brand" href="../index.html" aria-label="Home">
-      <span class="prompt">Trey@lab</span>:<span class="host">~</span>$ <span aria-hidden="true">_</span>
-    </a>
-    <nav class="site-nav" aria-label="Main navigation">
-      <a href="../index.html">home</a>
-      <a href="../projects.html">projects</a>
-      <a href="../blog.html" aria-current="page">blog</a>
-      <a href="../index.html#about">about</a>
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span>about</a></li>
+      </ul>
     </nav>
   </div>
 </header>
-
-<main>
-  <article class="article wrap">
-    <p class="mono post-eyebrow">%BLOG-6-NETWORK</p>
-    <h1>What Nine Packet Captures Taught Me About Networks I Thought I Already Understood</h1>
-    <p class="post-meta">Sep 18, 2026 · 19 min read · Wireshark, CCNA, TCP/IP, Packet Analysis, Network Security</p>
-
+<main id="main">
+<article>
+  <header class="post-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/blog">blog</a><span aria-hidden="true">/</span><a href="/blog#network">network</a></nav>
+      <span class="sev c-network">%BLOG-4-NETWORK</span>
+      <h1 class="mt-2">What Nine Packet Captures Taught Me About Networks I Thought I Already Understood</h1>
+      <p class="post-dek">Nine real packet captures, DNS, TCP, HTTP vs HTTPS, ICMP, packet loss, ARP, DHCP, Telnet vs SSH, and FTP, each one generated, read, and explained by hand for CCNA study and a networking portfolio.</p>
+      <div class="post-meta"><time datetime="2026-09-18">Sep 18, 2026</time><span class="sep">/</span><span>19 min read</span><span class="sep">/</span><span>by Trey</span><span class="sep">/</span><a href="https://github.com/rachata072/wireshark-network-analysis" rel="noopener" target="_blank">source on github &#8599;</a></div>
+      <div class="post-tags"><span class="chip">Wireshark</span><span class="chip">CCNA</span><span class="chip">TCP/IP</span><span class="chip">Packet Analysis</span><span class="chip">Network Security</span></div>
+    </div>
+  </header>
+  <div class="wrap post-layout">
+    <div class="post-main">
+<details class="toc-mobile"><summary>show ip route | toc (10 sections)</summary><ol><li><a href="#why-i-built-this-instead-of-just-reading-about-it">Why I built this instead of just reading about it</a></li><li><a href="#what-each-scenario-is-actually-teaching">What each scenario is actually teaching</a></li><li><a href="#the-moment-that-changed-how-i-built-the-rest-of-the-project">The moment that changed how I built the rest of the project</a></li><li><a href="#the-infrastructure-kept-fighting-back-and-that-turned-out-to">The infrastructure kept fighting back, and that turned out to be useful too</a></li><li><a href="#what-this-connects-to">What this connects to</a></li><li><a href="#the-workflow-that-turned-out-to-be-the-same-every-single-tim">The workflow that turned out to be the same every single time</a></li><li><a href="#turning-captures-into-interview-answers">Turning captures into interview answers</a></li><li><a href="#what-i-chose-to-leave-out-and-why-that-s-different-from-leav">What I chose to leave out, and why that&#x27;s different from leaving it unfinished</a></li><li><a href="#frequently-asked-questions">Frequently asked questions</a></li><li><a href="#where-this-goes-from-here">Where this goes from here</a></li></ol></details>
+<div class="prose">
     <p>
       I have spent the last several months studying for the CCNA, which means I have
       answered a lot of multiple-choice questions about TCP's three-way handshake, about
@@ -99,7 +90,7 @@
       which was exactly the point.
     </p>
 
-    <h2>Why I built this instead of just reading about it</h2>
+    <h2 id="why-i-built-this-instead-of-just-reading-about-it">Why I built this instead of just reading about it</h2>
     <p>
       There is a specific kind of knowledge that only survives contact with a real
       capture. You can read a hundred explanations of why TLS's Client Hello leaks the
@@ -134,7 +125,7 @@
       quietly cut.
     </p>
 
-    <h2>What each scenario is actually teaching</h2>
+    <h2 id="what-each-scenario-is-actually-teaching">What each scenario is actually teaching</h2>
     <p>
       <strong>DNS, seven ways.</strong> A single "here's a DNS query" capture doesn't teach much, so
       this scenario runs seven different lookups against a public resolver: an A record,
@@ -148,10 +139,10 @@
     </p>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/01-dns-packet-list-1200.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/01-dns-packet-list-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/01-dns-packet-list-800.webp 800w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/01-dns-packet-list-1200.webp 1200w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/01-dns-packet-list-1200.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/01-dns-packet-list-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/01-dns-packet-list-800.webp 800w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/01-dns-packet-list-1200.webp 1200w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark packet list showing all seven DNS query and response pairs against Google's public resolver, including the truncated cloudflare.com TXT lookup and the NXDOMAIN response for a domain that doesn't exist"
            loading="lazy" width="1917" height="912">
@@ -159,9 +150,9 @@
     </figure>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/01-dns-capinfos-verification-800.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/01-dns-capinfos-verification-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/01-dns-capinfos-verification-800.webp 800w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/01-dns-capinfos-verification-800.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/01-dns-capinfos-verification-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/01-dns-capinfos-verification-800.webp 800w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Terminal output of the capinfos command verifying the DNS capture file: 14 packets, correct file type, and capture duration, before drawing any conclusions from it"
            loading="lazy" width="882" height="486">
@@ -179,9 +170,9 @@
     </p>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-syn-packets-800.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-syn-packets-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-syn-packets-800.webp 800w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-syn-packets-800.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-syn-packets-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-syn-packets-800.webp 800w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark packet detail of the SYN packet opening a real TCP connection to pypi.org, showing the client's initial sequence number and negotiated TCP options"
            loading="lazy" width="952" height="901">
@@ -189,9 +180,9 @@
     </figure>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-fin-packets-800.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-fin-packets-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-fin-packets-800.webp 800w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-fin-packets-800.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-fin-packets-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-fin-packets-800.webp 800w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark packet detail of a FIN, ACK packet showing the server combining its acknowledgment of the client's FIN with its own FIN in a single segment"
            loading="lazy" width="947" height="905">
@@ -199,9 +190,9 @@
     </figure>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-rst-packet-800.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-rst-packet-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-rst-packet-800.webp 800w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-rst-packet-800.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-rst-packet-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-rst-packet-800.webp 800w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark packet detail of a RST, ACK packet sent immediately in response to a SYN aimed at a closed port, with no handshake attempted"
            loading="lazy" width="947" height="900">
@@ -209,9 +200,9 @@
     </figure>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-capinfos-verification-800.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-capinfos-verification-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-capinfos-verification-800.webp 800w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-capinfos-verification-800.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-capinfos-verification-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/02-tcp-capinfos-verification-800.webp 800w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Terminal output of capinfos verifying the merged TCP handshake and RST capture file before analysis in Wireshark"
            loading="lazy" width="880" height="511">
@@ -232,10 +223,10 @@
     </p>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/03-http-follow-stream-post-credentials-1200.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/03-http-follow-stream-post-credentials-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/03-http-follow-stream-post-credentials-800.webp 800w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/03-http-follow-stream-post-credentials-1200.webp 1200w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/03-http-follow-stream-post-credentials-1200.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/03-http-follow-stream-post-credentials-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/03-http-follow-stream-post-credentials-800.webp 800w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/03-http-follow-stream-post-credentials-1200.webp 1200w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark Follow TCP Stream window showing a plaintext HTTP POST request with the raw form body username=admin and password=Sup3rSecret123 fully readable"
            loading="lazy" width="1917" height="915">
@@ -243,10 +234,10 @@
     </figure>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/03-https-tls-client-hello-sni-1200.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/03-https-tls-client-hello-sni-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/03-https-tls-client-hello-sni-800.webp 800w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/03-https-tls-client-hello-sni-1200.webp 1200w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/03-https-tls-client-hello-sni-1200.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/03-https-tls-client-hello-sni-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/03-https-tls-client-hello-sni-800.webp 800w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/03-https-tls-client-hello-sni-1200.webp 1200w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark packet detail of a TLS 1.3 Client Hello showing the Server Name Indication extension naming pypi.org in plain text before any encryption begins"
            loading="lazy" width="1910" height="912">
@@ -268,10 +259,10 @@
     </p>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/04-icmp-packet-list-1200.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/04-icmp-packet-list-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/04-icmp-packet-list-800.webp 800w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/04-icmp-packet-list-1200.webp 1200w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/04-icmp-packet-list-1200.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/04-icmp-packet-list-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/04-icmp-packet-list-800.webp 800w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/04-icmp-packet-list-1200.webp 1200w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark packet list showing four working ICMP echo request and reply pairs over loopback, each request matched to its reply by identifier and sequence number"
            loading="lazy" width="1917" height="507">
@@ -279,9 +270,9 @@
     </figure>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/04-icmp-echo-requests-800.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/04-icmp-echo-requests-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/04-icmp-echo-requests-800.webp 800w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/04-icmp-echo-requests-800.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/04-icmp-echo-requests-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/04-icmp-echo-requests-800.webp 800w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark packet detail of an ICMP type 8 echo request, showing the identifier field that stays constant across the whole ping run"
            loading="lazy" width="955" height="882">
@@ -289,9 +280,9 @@
     </figure>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/04-icmp-echo-replies-800.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/04-icmp-echo-replies-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/04-icmp-echo-replies-800.webp 800w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/04-icmp-echo-replies-800.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/04-icmp-echo-replies-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/04-icmp-echo-replies-800.webp 800w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark packet detail of the matching ICMP type 0 echo reply, with the same identifier and sequence number as the corresponding request"
            loading="lazy" width="951" height="886">
@@ -315,10 +306,10 @@
     </p>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/05-packet-loss-io-graph-1200.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/05-packet-loss-io-graph-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/05-packet-loss-io-graph-800.webp 800w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/05-packet-loss-io-graph-1200.webp 1200w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/05-packet-loss-io-graph-1200.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/05-packet-loss-io-graph-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/05-packet-loss-io-graph-800.webp 800w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/05-packet-loss-io-graph-1200.webp 1200w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark I/O Graph of a 5 megabyte transfer under an induced 15 percent packet loss rule, showing a stair-step pattern of throughput collapsing then bursting in recovery"
            loading="lazy" width="1917" height="921">
@@ -326,10 +317,10 @@
     </figure>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/05-packet-loss-expert-information-1200.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/05-packet-loss-expert-information-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/05-packet-loss-expert-information-800.webp 800w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/05-packet-loss-expert-information-1200.webp 1200w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/05-packet-loss-expert-information-1200.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/05-packet-loss-expert-information-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/05-packet-loss-expert-information-800.webp 800w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/05-packet-loss-expert-information-1200.webp 1200w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark Expert Information window listing suspected retransmissions, duplicate ACKs, a fast retransmission, and a TCP window full warning found in the packet-loss capture"
            loading="lazy" width="1910" height="915">
@@ -373,9 +364,9 @@
     </p>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-request-reply-800.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-request-reply-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-request-reply-800.webp 800w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-request-reply-800.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-request-reply-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-request-reply-800.webp 800w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark packet list showing an ARP request broadcast and its unicast reply between two VirtualBox lab VMs after flushing the ARP cache"
            loading="lazy" width="947" height="881">
@@ -383,9 +374,9 @@
     </figure>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-reply-detail-800.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-reply-detail-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-reply-detail-800.webp 800w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-reply-detail-800.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-reply-detail-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-reply-detail-800.webp 800w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark packet detail of the ARP reply showing the resolved MAC address mapped to the target IP address"
            loading="lazy" width="938" height="902">
@@ -393,17 +384,17 @@
     </figure>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-spoof-terminal-480.webp"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-spoof-terminal-480.webp"
            alt="Terminal running the arpspoof tool from the Kali VM against the two lab VMs, printing repeated forged ARP reply announcements"
            loading="lazy" width="627" height="225">
       <figcaption>The bonus exercise: running arpspoof from the Kali VM, contained entirely inside the owned two-VM lab network.</figcaption>
     </figure>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-spoofing-detected-1200.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-spoofing-detected-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-spoofing-detected-800.webp 800w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-spoofing-detected-1200.webp 1200w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-spoofing-detected-1200.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-spoofing-detected-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-spoofing-detected-800.webp 800w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/06-arp-spoofing-detected-1200.webp 1200w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark flagging a duplicate IP address configured warning after detecting multiple conflicting ARP replies for the same address during the spoofing attempt"
            loading="lazy" width="1917" height="855">
@@ -411,9 +402,9 @@
     </figure>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-packet-list-800.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-packet-list-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-packet-list-800.webp 800w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-packet-list-800.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-packet-list-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-packet-list-800.webp 800w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark packet list showing a full DHCP Discover, Offer, Request, Ack cycle after releasing and renewing a lease on the lab client VM"
            loading="lazy" width="970" height="657">
@@ -421,9 +412,9 @@
     </figure>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-discover-800.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-discover-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-discover-800.webp 800w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-discover-800.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-discover-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-discover-800.webp 800w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark packet detail of the DHCP Discover message broadcast from the client, which has no IP address yet"
            loading="lazy" width="963" height="906">
@@ -431,9 +422,9 @@
     </figure>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-offer-800.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-offer-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-offer-800.webp 800w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-offer-800.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-offer-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-offer-800.webp 800w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark packet detail of the DHCP Offer message with the server proposing an IP address and lease terms to the client"
            loading="lazy" width="963" height="906">
@@ -441,9 +432,9 @@
     </figure>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-request-800.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-request-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-request-800.webp 800w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-request-800.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-request-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-request-800.webp 800w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark packet detail of the DHCP Request message, broadcast by the client so any competing DHCP server learns which offer was accepted"
            loading="lazy" width="963" height="902">
@@ -451,9 +442,9 @@
     </figure>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-ack-800.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-ack-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-ack-800.webp 800w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-ack-800.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-ack-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/07-dhcp-ack-800.webp 800w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark packet detail of the DHCP Ack message confirming the lease is finalized for the client"
            loading="lazy" width="957" height="901">
@@ -484,10 +475,10 @@
     </p>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/11-telnet-follow-stream-login-1200.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/11-telnet-follow-stream-login-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/11-telnet-follow-stream-login-800.webp 800w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/11-telnet-follow-stream-login-1200.webp 1200w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/11-telnet-follow-stream-login-1200.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/11-telnet-follow-stream-login-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/11-telnet-follow-stream-login-800.webp 800w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/11-telnet-follow-stream-login-1200.webp 1200w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark Follow TCP Stream window showing a real Telnet login prompt with the username and password fully readable in plain text"
            loading="lazy" width="1917" height="916">
@@ -495,10 +486,10 @@
     </figure>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/11-ssh-encrypted-packets-1200.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/11-ssh-encrypted-packets-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/11-ssh-encrypted-packets-800.webp 800w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/11-ssh-encrypted-packets-1200.webp 1200w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/11-ssh-encrypted-packets-1200.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/11-ssh-encrypted-packets-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/11-ssh-encrypted-packets-800.webp 800w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/11-ssh-encrypted-packets-1200.webp 1200w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark Follow TCP Stream of the SSH session showing the plaintext version banner and key exchange followed by fully opaque encrypted binary data"
            loading="lazy" width="1917" height="882">
@@ -506,17 +497,17 @@
     </figure>
 
     <figure class="post-figure">
-      <img src="../assets/img/wireshark-network-analysis-nine-packet-captures/12-ftp-follow-stream-control-1200.webp"
-           srcset="../assets/img/wireshark-network-analysis-nine-packet-captures/12-ftp-follow-stream-control-480.webp 480w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/12-ftp-follow-stream-control-800.webp 800w,
-                   ../assets/img/wireshark-network-analysis-nine-packet-captures/12-ftp-follow-stream-control-1200.webp 1200w"
+      <img src="/assets/img/wireshark-network-analysis-nine-packet-captures/12-ftp-follow-stream-control-1200.webp"
+           srcset="/assets/img/wireshark-network-analysis-nine-packet-captures/12-ftp-follow-stream-control-480.webp 480w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/12-ftp-follow-stream-control-800.webp 800w,
+                   /assets/img/wireshark-network-analysis-nine-packet-captures/12-ftp-follow-stream-control-1200.webp 1200w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wireshark Follow TCP Stream of the FTP control channel showing the USER and PASS commands in plaintext followed by the server entering extended passive mode for the data transfer"
            loading="lazy" width="1916" height="912">
       <figcaption>The FTP control channel: USER and PASS in plaintext, then the server announcing a brand-new port for the data channel, negotiated in-band.</figcaption>
     </figure>
 
-    <h2>The moment that changed how I built the rest of the project</h2>
+    <h2 id="the-moment-that-changed-how-i-built-the-rest-of-the-project">The moment that changed how I built the rest of the project</h2>
     <p>
       Partway through building this, I had a version of the Telnet scenario that used a
       small script to stand in for a real Telnet server, because the environment I built
@@ -557,12 +548,12 @@
       instead of letting a script do it for you.
     </p>
 
-    <h2>The infrastructure kept fighting back, and that turned out to be useful too</h2>
+    <h2 id="the-infrastructure-kept-fighting-back-and-that-turned-out-to">The infrastructure kept fighting back, and that turned out to be useful too</h2>
     <p>
       The ARP and DHCP networking detour wasn't the only place where getting the
       environment ready took longer than the actual capture. It was, though, the same
       category of lesson I ran into building the multi-VM side of an
-      <a href="../blog/active-directory-home-lab-windows-server-2022-gpo.html" rel="noopener" target="_blank">Active Directory home lab in this same VirtualBox environment</a>:
+      <a href="/blog/active-directory-home-lab-windows-server-2022-gpo">Active Directory home lab in this same VirtualBox environment</a>:
       the network underneath a lab is rarely as automatic as a diagram makes it look, and
       the Telnet, SSH, and FTP scenarios each hid their own small, specific lesson behind
       a generic-looking error message, none of them obvious until I went and read the
@@ -613,7 +604,7 @@
       obvious reason.
     </p>
 
-    <h2>What this connects to</h2>
+    <h2 id="what-this-connects-to">What this connects to</h2>
     <p>
       Every scenario in this project maps to a specific
       <a href="https://www.cisco.com/site/us/en/learn/training-certifications/exams/ccna.html" rel="noopener" target="_blank">CCNA 200-301</a>
@@ -625,7 +616,7 @@
       Programmability gets covered, by the small Python and Bash tooling this project
       uses to stand up test services and, eventually, to automate the captures once
       they're already understood by hand, the same instinct behind
-      <a href="../blog/vlsm-subnet-calculator-python-tool.html" rel="noopener" target="_blank">a Python subnetting tool I built earlier in this series</a>
+      <a href="/blog/vlsm-subnet-calculator-python-tool">a Python subnetting tool I built earlier in this series</a>
       specifically so I'd stop getting VLSM math wrong by hand. IP Connectivity, the
       domain that would have covered the OSPF scenario I ultimately cut, is the one gap,
       and I'd rather say so plainly than pretend the mapping is more complete than it is.
@@ -639,12 +630,12 @@
       home-lab ARP-spoofing detection exercise that connects Layer 2 attack behavior
       directly to a defense (Dynamic ARP Inspection) I'd otherwise only know as a name on
       an exam objective list. It's the same evidence-over-assertion habit behind
-      <a href="../blog/linux-hardening-audit-lynis-rkhunter.html" rel="noopener" target="_blank">an earlier audit I ran against my own Linux machine</a>:
+      <a href="/blog/linux-hardening-audit-lynis-rkhunter">an earlier audit I ran against my own Linux machine</a>:
       run the real tool, read the real output, and say honestly what it actually showed
       rather than what the textbook says it should show.
     </p>
 
-    <h2>The workflow that turned out to be the same every single time</h2>
+    <h2 id="the-workflow-that-turned-out-to-be-the-same-every-single-tim">The workflow that turned out to be the same every single time</h2>
     <p>
       Somewhere around the fifth scenario, I noticed I was doing the same nine things
       every time, regardless of which protocol I was capturing. Decide exactly what
@@ -677,7 +668,7 @@
       decision.
     </p>
 
-    <h2>Turning captures into interview answers</h2>
+    <h2 id="turning-captures-into-interview-answers">Turning captures into interview answers</h2>
     <p>
       The other thing I didn't expect going into this project was how directly it would
       translate into interview preparation. A lot of technical interview advice tells you
@@ -699,7 +690,7 @@
       different, and more convincing, thing to say.
     </p>
 
-    <h2>What I chose to leave out, and why that's different from leaving it unfinished</h2>
+    <h2 id="what-i-chose-to-leave-out-and-why-that-s-different-from-leav">What I chose to leave out, and why that's different from leaving it unfinished</h2>
     <p>
       All nine write-ups, the operational runbook, and the supporting documentation
       are finished, every capture is real, and every screenshot folder now holds
@@ -733,7 +724,7 @@
       something you can shortcut your way into either. You just have to do it.
     </p>
 
-    <h2>Frequently asked questions</h2>
+    <h2 id="frequently-asked-questions">Frequently asked questions</h2>
 
     <h3>Why does this project skip VLAN trunking, OSPF, and Spanning Tree?</h3>
     <p>
@@ -779,7 +770,7 @@
       is a completely different signal from an active refusal.
     </p>
 
-    <h2>Where this goes from here</h2>
+    <h2 id="where-this-goes-from-here">Where this goes from here</h2>
     <p>
       The full project, including the runbook, every write-up, and the real screenshots
       from every completed capture, is on GitHub:
@@ -791,21 +782,49 @@
     <p>
       This is part of an ongoing series of networking and cybersecurity projects I'm
       building for my portfolio while studying for the CCNA
-      (<a href="../index.html#about" rel="noopener" target="_blank">more on my background here</a>).
-      <a href="../blog.html" rel="noopener" target="_blank">More lab notes and write-ups land here</a>
+      (<a href="/#about">more on my background here</a>).
+      <a href="/blog">More lab notes and write-ups land here</a>
       as each one ships.
     </p>
-
-    <p class="mono mt-3"><a href="../blog.html">&larr; show logging</a></p>
-  </article>
-</main>
-
-<footer class="site-footer">
-  <div class="wrap">
-    <span>© 2026 Trey · built by hand · no cookies · privacy-respecting analytics · <a href="../privacy.html">privacy</a></span>
-    <span><a href="../index.html">exit →</a></span>
+</div>
+      <footer class="post-end">
+        <div class="repo-box"><div><span class="k">source for this post</span><span class="v">github.com/rachata072/wireshark-network-analysis</span></div><a class="btn btn-sec" href="https://github.com/rachata072/wireshark-network-analysis" rel="noopener" target="_blank">view repo <span aria-hidden="true">&#8599;</span></a></div>
+        <nav class="nexthop" aria-label="More posts"><a class="prev" href="/blog/freshservice-service-desk-simulation-sla-tickets"><span class="k">&larr; previous hop</span>What Twenty Fake Helpdesk Tickets Taught Me About Real IT Support</a><a class="next" href="/blog/py-configbackup-netmiko-config-backup-alerts"><span class="k">next hop &rarr;</span>I Built a Netmiko Config Backup Tool So I&#x27;d Stop Losing Arguments With My Own Router</a></nav>
+      </footer>
+    </div>
+    <aside class="toc" aria-label="On this page"><span class="toc-title"><span class="h">#</span> show ip route | toc</span><ol><li><a href="#why-i-built-this-instead-of-just-reading-about-it">Why I built this instead of just reading about it</a></li><li><a href="#what-each-scenario-is-actually-teaching">What each scenario is actually teaching</a></li><li><a href="#the-moment-that-changed-how-i-built-the-rest-of-the-project">The moment that changed how I built the rest of the project</a></li><li><a href="#the-infrastructure-kept-fighting-back-and-that-turned-out-to">The infrastructure kept fighting back, and that turned out to be useful too</a></li><li><a href="#what-this-connects-to">What this connects to</a></li><li><a href="#the-workflow-that-turned-out-to-be-the-same-every-single-tim">The workflow that turned out to be the same every single time</a></li><li><a href="#turning-captures-into-interview-answers">Turning captures into interview answers</a></li><li><a href="#what-i-chose-to-leave-out-and-why-that-s-different-from-leav">What I chose to leave out, and why that&#x27;s different from leaving it unfinished</a></li><li><a href="#frequently-asked-questions">Frequently asked questions</a></li><li><a href="#where-this-goes-from-here">Where this goes from here</a></li></ol></aside>
   </div>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 25, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
 </footer>
-
 </body>
 </html>

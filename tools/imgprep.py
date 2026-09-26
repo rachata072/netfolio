@@ -17,9 +17,9 @@ Usage:
     python3 tools/imgprep.py photos/*.jpg --slug soc-homelab --quality 80
 
 Output files:
-    assets/img/<slug>/<name>-480.webp
-    assets/img/<slug>/<name>-800.webp
-    assets/img/<slug>/<name>-1200.webp   (skipped if source is smaller)
+    public/assets/img/<slug>/<name>-480.webp
+    public/assets/img/<slug>/<name>-800.webp
+    public/assets/img/<slug>/<name>-1200.webp   (skipped if source is smaller)
 """
 
 import argparse
@@ -36,7 +36,7 @@ SITE_ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 
 def process(src: pathlib.Path, slug: str, quality: int) -> str:
-    out_dir = SITE_ROOT / "assets" / "img" / slug
+    out_dir = SITE_ROOT / "public" / "assets" / "img" / slug  # v2: images are deployed from public/
     out_dir.mkdir(parents=True, exist_ok=True)
 
     with Image.open(src) as im:

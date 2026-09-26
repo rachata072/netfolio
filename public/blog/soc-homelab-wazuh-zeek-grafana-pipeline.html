@@ -1,81 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-CA">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>One Pipeline, Three Jobs: Wazuh, Zeek and Grafana in a SOC Home Lab - Trey</title>
-  <meta name="description" content="Wazuh as the SIEM, Zeek as a second pair of eyes on the same interface, and Loki with Grafana for hunting: the rule that keeps a home SOC lab's memory budget sane, and a real Zeek notice that corrected an earlier assumption.">
-  <link rel="canonical" href="https://breakfixlearn.com/blog/soc-homelab-wazuh-zeek-grafana-pipeline.html">
-  <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
-  <link rel="stylesheet" href="../css/style.css">
-  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
-  <meta property="og:type" content="article">
-  <meta property="og:title" content="One Pipeline, Three Jobs: Wazuh, Zeek and Grafana in a SOC Home Lab">
-  <meta property="og:description" content="Wazuh as the SIEM, Zeek as a second pair of eyes on the same interface, and Loki with Grafana for hunting: the rule that keeps a home SOC lab's memory budget sane, and a real Zeek notice that corrected an earlier assumption.">
-  <meta property="og:url" content="https://breakfixlearn.com/blog/soc-homelab-wazuh-zeek-grafana-pipeline.html">
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "headline": "One Pipeline, Three Jobs: Wazuh, Zeek and Grafana in a SOC Home Lab",
-    "datePublished": "2026-09-23",
-    "author": { "@type": "Person", "name": "Trey" },
-    "mainEntityOfPage": "https://breakfixlearn.com/blog/soc-homelab-wazuh-zeek-grafana-pipeline.html"
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "Why do alerts go to Wazuh and telemetry go to Loki instead of putting everything in one place?",
-        "acceptedAnswer": { "@type": "Answer", "text": "A SIEM's indexer is expensive to feed because it indexes every event so that rules and searches stay fast, and that costs memory and disk. Zeek alone can produce millions of lines a day, and most of those lines will never become an alert. Sending all of that into Wazuh would make the biggest memory consumer in the lab bigger for very little benefit. Instead, anything that is already an alert, or should become one, goes to Wazuh, and everything else goes to Loki, which is built to be cheap for bulk text and fast to search by label and time." }
-      },
-      {
-        "@type": "Question",
-        "name": "Why extend Wazuh's built-in Suricata rule instead of writing rules from scratch?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Wazuh already ships a decoder and a base rule, 86601, that matches any Suricata alert event. Writing custom rules as children of that rule, rather than re-parsing the Suricata JSON independently, means that if a future Wazuh release improves how it decodes Suricata's output, the lab's own rules inherit that improvement automatically instead of silently breaking because they duplicated logic Wazuh already had." }
-      },
-      {
-        "@type": "Question",
-        "name": "Why does Zeek run as a single standalone node instead of a cluster?",
-        "acceptedAnswer": { "@type": "Answer", "text": "A Zeek cluster with a manager, logger, proxy and multiple workers earns its complexity when there are multiple physical taps or a link fast enough that one process cannot keep up. This lab has exactly one sensor interface carrying all of its traffic, so a single standalone node is the right size for the network it watches, not a shortcut. Extending node.cfg into a real cluster later is a configuration change, not a redesign, if a second sensor point is ever added." }
-      },
-      {
-        "@type": "Question",
-        "name": "Why was a documented Zeek detection gap later found to be wrong?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Zeek's SQL injection detection script, protocols/http/detect-sqli, could not be found on this lab's zeek-8.0 package when it was first checked, so it was documented as disabled and commented out of the loaded scripts. A later run showed a genuine HTTP::SQL_Injection_Victim notice in Zeek's own notice.log, read straight off disk, which only happens if that exact script is loaded and running. The most honest explanation is a package update or a mistake in the original check, not a mystery, and the fix was correcting the documentation with a dated note rather than quietly editing away the earlier, wrong claim." }
-      }
-    ]
-  }
-  </script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One Pipeline, Three Jobs: Wazuh, Zeek and Grafana in a SOC Home Lab | Trey</title>
+<meta name="description" content="Wazuh as the SIEM, Zeek as a second sensor, Loki and Grafana for hunting: the memory rule that keeps a home SOC lab sane, and a Zeek notice that corrected me.">
+<link rel="canonical" href="https://breakfixlearn.com/blog/soc-homelab-wazuh-zeek-grafana-pipeline">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=fac4bc101c">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="One Pipeline, Three Jobs: Wazuh, Zeek and Grafana in a SOC Home Lab">
+<meta property="og:description" content="Wazuh as the SIEM, Zeek as a second pair of eyes on the same interface, and Loki with Grafana for hunting: the rule that keeps a home SOC lab&#x27;s memory budget sane, and a real Zeek notice that corrected an earlier assumption.">
+<meta property="og:url" content="https://breakfixlearn.com/blog/soc-homelab-wazuh-zeek-grafana-pipeline">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/soc-homelab-wazuh-zeek-grafana-pipeline.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="One Pipeline, Three Jobs: Wazuh, Zeek and Grafana in a SOC Home Lab">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="article:published_time" content="2026-09-23">
+<meta property="article:tag" content="Wazuh">
+<meta property="article:tag" content="Zeek">
+<meta property="article:tag" content="Grafana">
+<meta property="article:tag" content="Loki">
+<meta property="article:tag" content="SIEM">
+<meta property="article:tag" content="Detection Engineering">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"One Pipeline, Three Jobs: Wazuh, Zeek and Grafana in a SOC Home Lab","description":"Wazuh as the SIEM, Zeek as a second sensor, Loki and Grafana for hunting: the memory rule that keeps a home SOC lab sane, and a Zeek notice that corrected me.","datePublished":"2026-09-23","dateModified":"2026-09-23","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"publisher":{"@type":"Person","name":"Trey"},"mainEntityOfPage":"https://breakfixlearn.com/blog/soc-homelab-wazuh-zeek-grafana-pipeline","image":"https://breakfixlearn.com/assets/og/soc-homelab-wazuh-zeek-grafana-pipeline.png","keywords":"Wazuh, Zeek, Grafana, Loki, SIEM, Detection Engineering, Homelab","articleSection":"Security","timeRequired":"PT16M"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://breakfixlearn.com/blog"},{"@type":"ListItem","position":3,"name":"One Pipeline, Three Jobs: Wazuh, Zeek and Grafana in a SOC Home Lab"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Why do alerts go to Wazuh and telemetry go to Loki instead of putting everything in one place?","acceptedAnswer":{"@type":"Answer","text":"A SIEM's indexer is expensive to feed because it indexes every event so that rules and searches stay fast, and that costs memory and disk. Zeek alone can produce millions of lines a day, and most of those lines will never become an alert. Sending all of that into Wazuh would make the biggest memory consumer in the lab bigger for very little benefit. Instead, anything that is already an alert, or should become one, goes to Wazuh, and everything else goes to Loki, which is built to be cheap for bulk text and fast to search by label and time."}},{"@type":"Question","name":"Why extend Wazuh's built-in Suricata rule instead of writing rules from scratch?","acceptedAnswer":{"@type":"Answer","text":"Wazuh already ships a decoder and a base rule, 86601, that matches any Suricata alert event. Writing custom rules as children of that rule, rather than re-parsing the Suricata JSON independently, means that if a future Wazuh release improves how it decodes Suricata's output, the lab's own rules inherit that improvement automatically instead of silently breaking because they duplicated logic Wazuh already had."}},{"@type":"Question","name":"Why does Zeek run as a single standalone node instead of a cluster?","acceptedAnswer":{"@type":"Answer","text":"A Zeek cluster with a manager, logger, proxy and multiple workers earns its complexity when there are multiple physical taps or a link fast enough that one process cannot keep up. This lab has exactly one sensor interface carrying all of its traffic, so a single standalone node is the right size for the network it watches, not a shortcut. Extending node.cfg into a real cluster later is a configuration change, not a redesign, if a second sensor point is ever added."}},{"@type":"Question","name":"Why was a documented Zeek detection gap later found to be wrong?","acceptedAnswer":{"@type":"Answer","text":"Zeek's SQL injection detection script, protocols/http/detect-sqli, could not be found on this lab's zeek-8.0 package when it was first checked, so it was documented as disabled and commented out of the loaded scripts. A later run showed a genuine HTTP::SQL_Injection_Victim notice in Zeek's own notice.log, read straight off disk, which only happens if that exact script is loaded and running. The most honest explanation is a package update or a mistake in the original check, not a mystery, and the fix was correcting the documentation with a dated note rather than quietly editing away the earlier, wrong claim."}}]}</script>
+<script src="/js/main.js?v=7d994f174b" defer></script>
 </head>
 <body>
-
-<header class="site-header">
+<div class="progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
   <div class="wrap">
-    <a class="brand" href="../index.html" aria-label="Home">
-      <span class="prompt">Trey@lab</span>:<span class="host">~</span>$ <span aria-hidden="true">_</span>
-    </a>
-    <nav class="site-nav" aria-label="Main navigation">
-      <a href="../index.html">home</a>
-      <a href="../projects.html">projects</a>
-      <a href="../blog.html" aria-current="page">blog</a>
-      <a href="../index.html#about">about</a>
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span>about</a></li>
+      </ul>
     </nav>
   </div>
 </header>
-
-<main>
-  <article class="article wrap">
-    <p class="mono post-eyebrow">%BLOG-5-SEC</p>
-    <h1>One Pipeline, Three Jobs: Wazuh, Zeek and Grafana in a SOC Home Lab</h1>
-    <p class="post-meta">Sep 23, 2026 · 16 min read · Wazuh, Zeek, Grafana, Loki, SIEM, Detection Engineering, Homelab</p>
-
+<main id="main">
+<article>
+  <header class="post-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/blog">blog</a><span aria-hidden="true">/</span><a href="/blog#sec">sec</a></nav>
+      <span class="sev c-sec">%BLOG-5-SEC</span>
+      <h1 class="mt-2">One Pipeline, Three Jobs: Wazuh, Zeek and Grafana in a SOC Home Lab</h1>
+      <p class="post-dek">Wazuh as the SIEM, Zeek as a second pair of eyes on the same interface, and Loki with Grafana for hunting: the rule that keeps a home SOC lab&#x27;s memory budget sane, and a real Zeek notice that corrected an earlier assumption.</p>
+      <div class="post-meta"><time datetime="2026-09-23">Sep 23, 2026</time><span class="sep">/</span><span>16 min read</span><span class="sep">/</span><span>by Trey</span><span class="sep">/</span><a href="https://github.com/rachata072/soc-homelab" rel="noopener" target="_blank">source on github &#8599;</a></div>
+      <div class="post-tags"><span class="chip">Wazuh</span><span class="chip">Zeek</span><span class="chip">Grafana</span><span class="chip">Loki</span><span class="chip">SIEM</span><span class="chip">Detection Engineering</span><span class="chip">Homelab</span></div>
+    </div>
+  </header>
+  <div class="wrap post-layout">
+    <div class="post-main">
+<nav class="series" aria-label="SOC-HomeLab series"><div class="series-head"><span>traceroute <b>SOC-HomeLab</b></span><span>hop 3 of 5</span></div><ol><li><a href="/blog/soc-homelab-designing-two-vm-lab">Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work</a></li><li><a href="/blog/soc-homelab-suricata-ids-installation">Suricata on the SOC VM: Installing and Tuning a Host-Based IDS</a></li><li><span class="here" aria-current="page">One Pipeline, Three Jobs: Wazuh, Zeek and Grafana in a SOC Home Lab</span></li><li><a href="/blog/soc-homelab-first-alerts-attack-simulation">First Alerts: What My SOC Home Lab Caught, What It Missed, and How I Triaged It</a></li><li><a href="/blog/soc-homelab-threat-hunt-report">Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab</a></li></ol></nav>
+<details class="toc-mobile"><summary>show ip route | toc (9 sections)</summary><ol><li><a href="#the-rule-that-shaped-everything-alerts-in-the-siem-telemetry">The rule that shaped everything: alerts in the SIEM, telemetry in the log platform</a></li><li><a href="#job-one-wazuh-raises-and-correlates-alerts">Job one: Wazuh raises and correlates alerts</a></li><li><a href="#job-two-zeek-describes-what-happened">Job two: Zeek describes what happened</a></li><li><a href="#job-three-loki-alloy-and-grafana-let-a-human-see">Job three: Loki, Alloy and Grafana let a human see</a></li><li><a href="#making-the-whole-thing-debuggable">Making the whole thing debuggable</a></li><li><a href="#security-decisions-inside-the-lab">Security decisions inside the lab</a></li><li><a href="#what-i-would-tell-someone-starting-this">What I would tell someone starting this</a></li><li><a href="#frequently-asked-questions">Frequently asked questions</a></li><li><a href="#what-comes-next">What comes next</a></li></ol></details>
+<div class="prose">
     <p>
-      By the end of <a href="soc-homelab-suricata-ids-installation.html" rel="noopener" target="_blank">the
+      By the end of <a href="/blog/soc-homelab-suricata-ids-installation">the
       previous post</a>, Suricata alerts were landing in a file on my sensor VM as clean JSON. A
       file is not a security operation, though. Someone has to read it, correlate it with other
       evidence, decide what matters and show the result. This post covers the machinery that does
@@ -96,7 +90,7 @@
       trade-off, and I come back to it below rather than pretend it does not matter.
     </p>
 
-    <h2>The rule that shaped everything: alerts in the SIEM, telemetry in the log platform</h2>
+    <h2 id="the-rule-that-shaped-everything-alerts-in-the-siem-telemetry">The rule that shaped everything: alerts in the SIEM, telemetry in the log platform</h2>
     <p>
       A SIEM is expensive to feed. Its indexer stores and indexes every event so that rules and
       searches are fast, and that costs memory and disk. A network sensor like Zeek produces
@@ -120,7 +114,7 @@
       here." The log platform is the place you go to answer "what else did this source do?"
     </p>
 
-    <h2>Job one: Wazuh raises and correlates alerts</h2>
+    <h2 id="job-one-wazuh-raises-and-correlates-alerts">Job one: Wazuh raises and correlates alerts</h2>
     <h3>Installing it on a budget</h3>
     <p>
       Wazuh has three parts: a manager that analyzes events, an indexer that stores alerts, and a
@@ -227,9 +221,9 @@
     </p>
 
     <figure class="post-figure">
-      <img src="../assets/img/soc-homelab/wazuh-logtest-rule-100100-firing-800.webp"
-           srcset="../assets/img/soc-homelab/wazuh-logtest-rule-100100-firing-480.webp 480w,
-                   ../assets/img/soc-homelab/wazuh-logtest-rule-100100-firing-800.webp 800w"
+      <img src="/assets/img/soc-homelab/wazuh-logtest-rule-100100-firing-800.webp"
+           srcset="/assets/img/soc-homelab/wazuh-logtest-rule-100100-firing-480.webp 480w,
+                   /assets/img/soc-homelab/wazuh-logtest-rule-100100-firing-800.webp 800w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Terminal output of wazuh-logtest Phase 3 showing rule 100100 firing at level 12 for a pasted SOC-HomeLab TEST SQLi UNION SELECT alert, with its groups and firedtimes fields"
            loading="lazy" width="890" height="212">
@@ -252,7 +246,7 @@
       hiding it. A single VM means a host compromise could also tamper with its own sensors and
       its own log files, and it means I am reading host evidence and network evidence from the
       same failure domain, the same limit I named in
-      <a href="soc-homelab-designing-two-vm-lab.html" rel="noopener" target="_blank">the design
+      <a href="/blog/soc-homelab-designing-two-vm-lab">the design
       post</a>. A design with more than one host would put at least one real Wazuh agent on a
       separate machine, and I would say so in an interview if asked how I would harden this.
     </p>
@@ -264,7 +258,7 @@
       ones.
     </p>
 
-    <h2>Job two: Zeek describes what happened</h2>
+    <h2 id="job-two-zeek-describes-what-happened">Job two: Zeek describes what happened</h2>
     <h3>Why Zeek in addition to an IDS</h3>
     <p>
       Suricata matches signatures, which means it can only tell you about things somebody has
@@ -313,9 +307,9 @@
     </p>
 
     <figure class="post-figure">
-      <img src="../assets/img/soc-homelab/zeekctl-status-node-running-800.webp"
-           srcset="../assets/img/soc-homelab/zeekctl-status-node-running-480.webp 480w,
-                   ../assets/img/soc-homelab/zeekctl-status-node-running-800.webp 800w"
+      <img src="/assets/img/soc-homelab/zeekctl-status-node-running-800.webp"
+           srcset="/assets/img/soc-homelab/zeekctl-status-node-running-480.webp 480w,
+                   /assets/img/soc-homelab/zeekctl-status-node-running-800.webp 800w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Terminal output of zeekctl status showing the standalone Zeek node running on soc-sensor, alongside a directory listing of the current log files it is writing"
            loading="lazy" width="888" height="337">
@@ -385,17 +379,17 @@
     </p>
 
     <figure class="post-figure">
-      <img src="../assets/img/soc-homelab/zeek-sql-injection-victim-notice-wazuh-1200.webp"
-           srcset="../assets/img/soc-homelab/zeek-sql-injection-victim-notice-wazuh-480.webp 480w,
-                   ../assets/img/soc-homelab/zeek-sql-injection-victim-notice-wazuh-800.webp 800w,
-                   ../assets/img/soc-homelab/zeek-sql-injection-victim-notice-wazuh-1200.webp 1200w"
+      <img src="/assets/img/soc-homelab/zeek-sql-injection-victim-notice-wazuh-1200.webp"
+           srcset="/assets/img/soc-homelab/zeek-sql-injection-victim-notice-wazuh-480.webp 480w,
+                   /assets/img/soc-homelab/zeek-sql-injection-victim-notice-wazuh-800.webp 800w,
+                   /assets/img/soc-homelab/zeek-sql-injection-victim-notice-wazuh-1200.webp 1200w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wazuh Discover record showing a genuine Zeek HTTP::SQL_Injection_Victim notice read from notice.log, with data.source set to zeek-notice, confirming the SQL injection detection script was loaded and working despite an earlier troubleshooting note that said it was missing"
            loading="lazy" width="1907" height="731">
       <figcaption>The record that corrected an earlier assumption: a genuine Zeek SQL injection notice, sourced straight from notice.log, on a build I had documented as missing that exact script.</figcaption>
     </figure>
 
-    <h2>Job three: Loki, Alloy and Grafana let a human see</h2>
+    <h2 id="job-three-loki-alloy-and-grafana-let-a-human-see">Job three: Loki, Alloy and Grafana let a human see</h2>
     <h3>Loki: cheap to store, fast to search by label</h3>
     <p>
       Loki is a log database from Grafana Labs. Unlike a full text index, it indexes only a small
@@ -470,17 +464,17 @@
     </p>
 
     <figure class="post-figure">
-      <img src="../assets/img/soc-homelab/grafana-soc-homelab-overview-dashboard-1200.webp"
-           srcset="../assets/img/soc-homelab/grafana-soc-homelab-overview-dashboard-480.webp 480w,
-                   ../assets/img/soc-homelab/grafana-soc-homelab-overview-dashboard-800.webp 800w,
-                   ../assets/img/soc-homelab/grafana-soc-homelab-overview-dashboard-1200.webp 1200w"
+      <img src="/assets/img/soc-homelab/grafana-soc-homelab-overview-dashboard-1200.webp"
+           srcset="/assets/img/soc-homelab/grafana-soc-homelab-overview-dashboard-480.webp 480w,
+                   /assets/img/soc-homelab/grafana-soc-homelab-overview-dashboard-800.webp 800w,
+                   /assets/img/soc-homelab/grafana-soc-homelab-overview-dashboard-1200.webp 1200w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Grafana SOC-HomeLab Overview dashboard during an attack run, showing 4853 Suricata alerts, 4896 Wazuh alerts level 10 and up, 10 Zeek notices, 31 firewall blocks, a severity time series with a spike around 15:30, and top signature and source tables"
            loading="lazy" width="1598" height="792">
       <figcaption>The Overview dashboard mid attack-sim run: 4,853 Suricata alerts, 4,896 Wazuh alerts at level 10 or higher, 10 Zeek notices, and 31 host firewall blocks, all inside about an hour.</figcaption>
     </figure>
 
-    <h2>Making the whole thing debuggable</h2>
+    <h2 id="making-the-whole-thing-debuggable">Making the whole thing debuggable</h2>
     <p>
       A pipeline with several hops fails in several places. I built the health check script to
       test every hop and print pass or fail. It checks that services are running, that ports are
@@ -499,7 +493,7 @@
       is one you will actually use, and one you can hand to someone else.
     </p>
 
-    <h2>Security decisions inside the lab</h2>
+    <h2 id="security-decisions-inside-the-lab">Security decisions inside the lab</h2>
     <p>
       Even a lab deserves basic hygiene, and it makes for good talking points. The SOC VM runs a
       default-deny host firewall (ufw) that allows only the lab network, 192.168.56.0/24, to reach
@@ -513,11 +507,11 @@
       192.168.56.10, rather than published on every interface, and the documentation says clearly
       that it must never be exposed outside the lab network, the same "least exposure by default"
       instinct behind
-      <a href="../blog/linux-hardening-audit-lynis-rkhunter.html" rel="noopener" target="_blank">a
+      <a href="/blog/linux-hardening-audit-lynis-rkhunter">a
       Linux hardening audit I ran against my own machine</a> earlier in this security series.
     </p>
 
-    <h2>What I would tell someone starting this</h2>
+    <h2 id="what-i-would-tell-someone-starting-this">What I would tell someone starting this</h2>
     <p>Budget memory first, then install. Cap the Java heap.</p>
     <p>Put alerts in the SIEM and telemetry in the log platform. Do not make your indexer carry data that you only search occasionally.</p>
     <p>Extend the built-in rules instead of replacing them, and test every rule with logtest before you rely on it.</p>
@@ -530,7 +524,7 @@
       convincing than the original claim ever was.
     </p>
 
-    <h2>Frequently asked questions</h2>
+    <h2 id="frequently-asked-questions">Frequently asked questions</h2>
     <h3>Why do alerts go to Wazuh and telemetry go to Loki instead of putting everything in one place?</h3>
     <p>
       A SIEM's indexer is expensive to feed because it indexes every event so that rules and
@@ -569,30 +563,58 @@
       away the earlier, wrong claim.
     </p>
 
-    <h2>What comes next</h2>
+    <h2 id="what-comes-next">What comes next</h2>
     <p>
       In the next post, I run the attacks. I predict what each tool should see, run a scripted
       attack from Kali against the SOC VM, record what actually happened, and triage a few alerts
       using the playbooks in the repository. I also show the Python digest that lists sources seen
       by more than one tool, and a beacon hunter that finds regular connection intervals in Zeek
       data:
-      <a href="soc-homelab-first-alerts-attack-simulation.html" rel="noopener" target="_blank">First
+      <a href="/blog/soc-homelab-first-alerts-attack-simulation">First
       Alerts</a>.
     </p>
     <p>
       Repository: <a href="https://github.com/rachata072/soc-homelab" rel="noopener" target="_blank">github.com/rachata072/soc-homelab</a>
     </p>
-
-    <p class="mono mt-3"><a href="../blog.html">&larr; show logging</a></p>
-  </article>
-</main>
-
-<footer class="site-footer">
-  <div class="wrap">
-    <span>© 2026 Trey · built by hand · no cookies · privacy-respecting analytics · <a href="../privacy.html">privacy</a></span>
-    <span><a href="../index.html">exit →</a></span>
+</div>
+      <footer class="post-end">
+        <div class="repo-box"><div><span class="k">source for this post</span><span class="v">github.com/rachata072/soc-homelab</span></div><a class="btn btn-sec" href="https://github.com/rachata072/soc-homelab" rel="noopener" target="_blank">view repo <span aria-hidden="true">&#8599;</span></a></div>
+        <nav class="nexthop" aria-label="More posts"><a class="prev" href="/blog/soc-homelab-suricata-ids-installation"><span class="k">&larr; previous hop</span>Suricata on the SOC VM: Installing and Tuning a Host-Based IDS</a><a class="next" href="/blog/soc-homelab-first-alerts-attack-simulation"><span class="k">next hop &rarr;</span>First Alerts: What My SOC Home Lab Caught, What It Missed, and How I Triaged It</a></nav>
+      </footer>
+    </div>
+    <aside class="toc" aria-label="On this page"><span class="toc-title"><span class="h">#</span> show ip route | toc</span><ol><li><a href="#the-rule-that-shaped-everything-alerts-in-the-siem-telemetry">The rule that shaped everything: alerts in the SIEM, telemetry in the log platform</a></li><li><a href="#job-one-wazuh-raises-and-correlates-alerts">Job one: Wazuh raises and correlates alerts</a></li><li><a href="#job-two-zeek-describes-what-happened">Job two: Zeek describes what happened</a></li><li><a href="#job-three-loki-alloy-and-grafana-let-a-human-see">Job three: Loki, Alloy and Grafana let a human see</a></li><li><a href="#making-the-whole-thing-debuggable">Making the whole thing debuggable</a></li><li><a href="#security-decisions-inside-the-lab">Security decisions inside the lab</a></li><li><a href="#what-i-would-tell-someone-starting-this">What I would tell someone starting this</a></li><li><a href="#frequently-asked-questions">Frequently asked questions</a></li><li><a href="#what-comes-next">What comes next</a></li></ol></aside>
   </div>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 25, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
 </footer>
-
 </body>
 </html>

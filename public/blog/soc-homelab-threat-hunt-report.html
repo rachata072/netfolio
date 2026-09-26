@@ -1,74 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-CA">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab - Trey</title>
-  <meta name="description" content="A full 24-hour Wazuh threat hunting report from the SOC home lab, read cold: eight level-15 Shellshock alerts pulled apart record by record, a Zeek detection I had documented as broken turned out to be live, and an honest look at zero authentication failures.">
-  <link rel="canonical" href="https://breakfixlearn.com/blog/soc-homelab-threat-hunt-report.html">
-  <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
-  <link rel="stylesheet" href="../css/style.css">
-  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
-  <meta property="og:type" content="article">
-  <meta property="og:title" content="Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab">
-  <meta property="og:description" content="A full 24-hour Wazuh threat hunting report read cold: eight level-15 Shellshock alerts pulled apart record by record, a Zeek detection I had documented as broken turned out to be live, and an honest look at zero authentication failures.">
-  <meta property="og:url" content="https://breakfixlearn.com/blog/soc-homelab-threat-hunt-report.html">
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "headline": "Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab",
-    "datePublished": "2026-09-25",
-    "author": { "@type": "Person", "name": "Trey" },
-    "mainEntityOfPage": "https://breakfixlearn.com/blog/soc-homelab-threat-hunt-report.html"
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "Why does a level 15 Shellshock alert not automatically mean the server was compromised?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Wazuh's rule matched a string pattern in the incoming HTTP request, specifically the classic Shellshock function-definition syntax inside the Referer and User-Agent headers. That confirms the probe was sent. It does not confirm the probe was executed, because the access log the rule reads from only records what came in, never what the server did with it afterward. In this lab, the response was an ordinary 302 redirect with no reflected output, and the target's Apache and PHP stack was never invoking those headers through CGI in the first place, so the correct read is a delivered but inert probe, not a successful attack." }
-      },
-      {
-        "@type": "Question",
-        "name": "Why is a MITRE ATT&CK technique tag on an alert a hypothesis rather than a confirmed fact?",
-        "acceptedAnswer": { "@type": "Answer", "text": "The technique label comes from metadata written into the rule by whoever authored it, not from Wazuh confirming the technique's behavior actually occurred. A rule named after Process Injection can fire on a much more mundane string match, like a cmd= parameter in a URL, that only resembles the technique's description. The tag tells you where to look, and the raw alert record underneath it is what actually proves or disproves the hypothesis." }
-      },
-      {
-        "@type": "Question",
-        "name": "What should you check before writing up zero detected authentication failures as a security gap?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Two things, in order: whether the brute-force attempt actually happened inside the time window you are reviewing, and whether password authentication was already disabled at the SSH daemon level before the attempt reached the authentication log at all. If PasswordAuthentication is set to no, failed password attempts get rejected before PAM ever logs them, which means zero logged failures is the hardening control working correctly, not a detection gap. Writing up an unverified negative as a finding is the same mistake as writing up an unverified positive." }
-      }
-    ]
-  }
-  </script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab | Trey</title>
+<meta name="description" content="A 24-hour Wazuh threat hunt read cold: eight level-15 Shellshock alerts dissected, a Zeek detection I&#x27;d called broken found working, and zero auth failures.">
+<link rel="canonical" href="https://breakfixlearn.com/blog/soc-homelab-threat-hunt-report">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=fac4bc101c">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab">
+<meta property="og:description" content="A full 24-hour Wazuh threat hunting report read cold: eight level-15 Shellshock alerts pulled apart record by record, a Zeek detection I had documented as broken turned out to be live, and an honest look at zero authentication failures.">
+<meta property="og:url" content="https://breakfixlearn.com/blog/soc-homelab-threat-hunt-report">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/soc-homelab-threat-hunt-report.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="article:published_time" content="2026-09-25">
+<meta property="article:tag" content="SOC">
+<meta property="article:tag" content="Threat Hunting">
+<meta property="article:tag" content="Wazuh">
+<meta property="article:tag" content="Zeek">
+<meta property="article:tag" content="MITRE ATT&amp;CK">
+<meta property="article:tag" content="Blue Team">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab","description":"A 24-hour Wazuh threat hunt read cold: eight level-15 Shellshock alerts dissected, a Zeek detection I'd called broken found working, and zero auth failures.","datePublished":"2026-09-25","dateModified":"2026-09-25","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"publisher":{"@type":"Person","name":"Trey"},"mainEntityOfPage":"https://breakfixlearn.com/blog/soc-homelab-threat-hunt-report","image":"https://breakfixlearn.com/assets/og/soc-homelab-threat-hunt-report.png","keywords":"SOC, Threat Hunting, Wazuh, Zeek, MITRE ATT&CK, Blue Team, Homelab","articleSection":"Security","timeRequired":"PT17M"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://breakfixlearn.com/blog"},{"@type":"ListItem","position":3,"name":"Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Why does a level 15 Shellshock alert not automatically mean the server was compromised?","acceptedAnswer":{"@type":"Answer","text":"Wazuh's rule matched a string pattern in the incoming HTTP request, specifically the classic Shellshock function-definition syntax inside the Referer and User-Agent headers. That confirms the probe was sent. It does not confirm the probe was executed, because the access log the rule reads from only records what came in, never what the server did with it afterward. In this lab, the response was an ordinary 302 redirect with no reflected output, and the target's Apache and PHP stack was never invoking those headers through CGI in the first place, so the correct read is a delivered but inert probe, not a successful attack."}},{"@type":"Question","name":"Why is a MITRE ATT&CK technique tag on an alert a hypothesis rather than a confirmed fact?","acceptedAnswer":{"@type":"Answer","text":"The technique label comes from metadata written into the rule by whoever authored it, not from Wazuh confirming the technique's behavior actually occurred. A rule named after Process Injection can fire on a much more mundane string match, like a cmd= parameter in a URL, that only resembles the technique's description. The tag tells you where to look, and the raw alert record underneath it is what actually proves or disproves the hypothesis."}},{"@type":"Question","name":"What should you check before writing up zero detected authentication failures as a security gap?","acceptedAnswer":{"@type":"Answer","text":"Two things, in order: whether the brute-force attempt actually happened inside the time window you are reviewing, and whether password authentication was already disabled at the SSH daemon level before the attempt reached the authentication log at all. If PasswordAuthentication is set to no, failed password attempts get rejected before PAM ever logs them, which means zero logged failures is the hardening control working correctly, not a detection gap. Writing up an unverified negative as a finding is the same mistake as writing up an unverified positive."}}]}</script>
+<script src="/js/main.js?v=7d994f174b" defer></script>
 </head>
 <body>
-
-<header class="site-header">
+<div class="progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
   <div class="wrap">
-    <a class="brand" href="../index.html" aria-label="Home">
-      <span class="prompt">Trey@lab</span>:<span class="host">~</span>$ <span aria-hidden="true">_</span>
-    </a>
-    <nav class="site-nav" aria-label="Main navigation">
-      <a href="../index.html">home</a>
-      <a href="../projects.html">projects</a>
-      <a href="../blog.html" aria-current="page">blog</a>
-      <a href="../index.html#about">about</a>
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span>about</a></li>
+      </ul>
     </nav>
   </div>
 </header>
-
-<main>
-  <article class="article wrap">
-    <p class="mono post-eyebrow">%BLOG-5-SEC</p>
-    <h1>Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab</h1>
-    <p class="post-meta">Sep 25, 2026 · 17 min read · SOC, Threat Hunting, Wazuh, Zeek, MITRE ATT&amp;CK, Blue Team, Homelab</p>
-
+<main id="main">
+<article>
+  <header class="post-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/blog">blog</a><span aria-hidden="true">/</span><a href="/blog#sec">sec</a></nav>
+      <span class="sev c-sec">%BLOG-5-SEC</span>
+      <h1 class="mt-2">Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab</h1>
+      <p class="post-dek">A full 24-hour Wazuh threat hunting report read cold: eight level-15 Shellshock alerts pulled apart record by record, a Zeek detection I had documented as broken turned out to be live, and an honest look at zero authentication failures.</p>
+      <div class="post-meta"><time datetime="2026-09-25">Sep 25, 2026</time><span class="sep">/</span><span>17 min read</span><span class="sep">/</span><span>by Trey</span><span class="sep">/</span><a href="https://github.com/rachata072/soc-homelab" rel="noopener" target="_blank">source on github &#8599;</a></div>
+      <div class="post-tags"><span class="chip">SOC</span><span class="chip">Threat Hunting</span><span class="chip">Wazuh</span><span class="chip">Zeek</span><span class="chip">MITRE ATT&amp;CK</span><span class="chip">Blue Team</span><span class="chip">Homelab</span></div>
+    </div>
+  </header>
+  <div class="wrap post-layout">
+    <div class="post-main">
+<nav class="series" aria-label="SOC-HomeLab series"><div class="series-head"><span>traceroute <b>SOC-HomeLab</b></span><span>hop 5 of 5</span></div><ol><li><a href="/blog/soc-homelab-designing-two-vm-lab">Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work</a></li><li><a href="/blog/soc-homelab-suricata-ids-installation">Suricata on the SOC VM: Installing and Tuning a Host-Based IDS</a></li><li><a href="/blog/soc-homelab-wazuh-zeek-grafana-pipeline">One Pipeline, Three Jobs: Wazuh, Zeek and Grafana in a SOC Home Lab</a></li><li><a href="/blog/soc-homelab-first-alerts-attack-simulation">First Alerts: What My SOC Home Lab Caught, What It Missed, and How I Triaged It</a></li><li><span class="here" aria-current="page">Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab</span></li></ol></nav>
+<details class="toc-mobile"><summary>show ip route | toc (15 sections)</summary><ol><li><a href="#why-generate-a-report-instead-of-just-reading-the-dashboard">Why generate a report instead of just reading the dashboard</a></li><li><a href="#the-headline-numbers">The headline numbers</a></li><li><a href="#what-mitre-att-ck-tagging-is-actually-telling-you">What MITRE ATT&amp;CK tagging is actually telling you</a></li><li><a href="#alert-volume-condensed">Alert volume, condensed</a></li><li><a href="#finding-1-the-highest-severity-alert-in-the-report-and-why-c">Finding 1: the highest severity alert in the report, and why closing it took more than reading the rule name</a></li><li><a href="#finding-2-a-detection-i-had-documented-as-broken-turned-out">Finding 2: a detection I had documented as broken turned out to be working</a></li><li><a href="#the-smaller-findings-and-why-i-did-not-skip-them">The smaller findings, and why I did not skip them</a></li><li><a href="#writing-the-ticket-not-just-the-finding">Writing the ticket, not just the finding</a></li><li><a href="#the-part-that-does-not-show-up-in-any-single-finding-keeping">The part that does not show up in any single finding: keeping the evidence honest</a></li><li><a href="#two-images-built-specifically-for-this-project">Two images built specifically for this project</a></li><li><a href="#what-changed-in-the-documentation-because-of-this-hunt">What changed in the documentation because of this hunt</a></li><li><a href="#what-this-hunt-shows-and-what-it-does-not">What this hunt shows, and what it does not</a></li><li><a href="#takeaways">Takeaways</a></li><li><a href="#frequently-asked-questions">Frequently asked questions</a></li><li><a href="#where-this-goes-from-here">Where this goes from here</a></li></ol></details>
+<div class="prose">
     <p>
       The first four posts in this series were about building a detection stack and testing it
       with a single, scripted attack run. That is a controlled experiment: I know exactly what I
@@ -96,7 +95,7 @@
       later is not much better than no finding at all.
     </p>
 
-    <h2>Why generate a report instead of just reading the dashboard</h2>
+    <h2 id="why-generate-a-report-instead-of-just-reading-the-dashboard">Why generate a report instead of just reading the dashboard</h2>
     <p>
       Wazuh has a Threat Hunting module with a built-in report generator, and it is easy to
       overlook if you are used to reading alerts live off the dashboard as they land, which is
@@ -125,7 +124,7 @@
       send.
     </p>
 
-    <h2>The headline numbers</h2>
+    <h2 id="the-headline-numbers">The headline numbers</h2>
     <div class="int-table-scroll">
       <table class="int-brief">
         <thead><tr><th scope="col">Field</th><th scope="col">Value</th></tr></thead>
@@ -156,7 +155,7 @@
       spike before writing anything else up.
     </p>
 
-    <h2>What MITRE ATT&amp;CK tagging is actually telling you</h2>
+    <h2 id="what-mitre-att-ck-tagging-is-actually-telling-you">What MITRE ATT&amp;CK tagging is actually telling you</h2>
     <p>
       Wazuh's report includes a Top 10 MITRE ATT&amp;CKs panel, and it is worth being honest about
       what that panel is and is not. It is not Wazuh confirming that a technique happened. It is
@@ -194,7 +193,7 @@
       reading it.
     </p>
 
-    <h2>Alert volume, condensed</h2>
+    <h2 id="alert-volume-condensed">Alert volume, condensed</h2>
     <p>
       The full counts live in the committed PDF. The shape of it, condensed to what actually
       mattered for triage: generic web-server 400 responses and multiple-400-from-one-source
@@ -226,7 +225,7 @@
     <p>
       Shellshock probe alerts, rule 31166, landed 112 times, all Nikto's built-in Shellshock check
       running against DVWA, expected behavior for step 03 of
-      <a href="soc-homelab-first-alerts-attack-simulation.html" rel="noopener" target="_blank">the
+      <a href="/blog/soc-homelab-first-alerts-attack-simulation">the
       attack simulation from the previous post</a>, and the seed for Finding 1 below.
     </p>
     <p>
@@ -242,7 +241,7 @@
       Assessment findings unrelated to any of the attack traffic. Those became Findings 2 and 5.
     </p>
 
-    <h2>Finding 1: the highest severity alert in the report, and why closing it took more than reading the rule name</h2>
+    <h2 id="finding-1-the-highest-severity-alert-in-the-report-and-why-c">Finding 1: the highest severity alert in the report, and why closing it took more than reading the rule name</h2>
     <p>
       Eight alerts at level 15, the top of the scale, all rule 31168, "Shellshock attack
       detected." This is the single item Wazuh's own Top 3 Agents With Level 15 Alerts panel
@@ -264,9 +263,9 @@ full_log            192.168.56.20 - - [25/Sep/2026:13:13:02 +0000] "GET /index.p
                     "() { _; } &gt;_[$($())] { echo 93e4r0-cve-2014-6278: true; echo; }"
                     "() { :; }; echo 93e4r0-cve-2014-6271: true;echo;echo;"</code></pre>
     <figure class="post-figure">
-      <img src="../assets/img/soc-homelab/wazuh-alert-detail-shellshock-rule-31168-800.webp"
-           srcset="../assets/img/soc-homelab/wazuh-alert-detail-shellshock-rule-31168-480.webp 480w,
-                   ../assets/img/soc-homelab/wazuh-alert-detail-shellshock-rule-31168-800.webp 800w"
+      <img src="/assets/img/soc-homelab/wazuh-alert-detail-shellshock-rule-31168-800.webp"
+           srcset="/assets/img/soc-homelab/wazuh-alert-detail-shellshock-rule-31168-480.webp 480w,
+                   /assets/img/soc-homelab/wazuh-alert-detail-shellshock-rule-31168-800.webp 800w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wazuh Document Details view for rule 31168, Shellshock attack detected, showing the raw full_log field with the CVE-2014-6271 and CVE-2014-6278 probe strings in the Referer and User-Agent headers"
            loading="lazy" width="953" height="742">
@@ -312,7 +311,7 @@ full_log            192.168.56.20 - - [25/Sep/2026:13:13:02 +0000] "GET /index.p
       do next, and that decision has to come from the evidence, not the severity label alone.
     </p>
 
-    <h2>Finding 2: a detection I had documented as broken turned out to be working</h2>
+    <h2 id="finding-2-a-detection-i-had-documented-as-broken-turned-out">Finding 2: a detection I had documented as broken turned out to be working</h2>
     <p>
       This is the finding I am most glad I pulled the raw record for, because it directly
       contradicts something I had written down as settled fact earlier in this series.
@@ -343,10 +342,10 @@ full_log          {"ts":1790298942.473597,"uid":"CuXNdG9rlxQQ85l","note":"HTTP::
                   "msg":"An SQL injection victim was discovered!","src":"192.168.56.20","dst":"192.168.56.10",
                   "actions":["Notice::ACTION_LOG"],"email_dest":[],"suppress_for":3600,"source":"zeek-notice"}</code></pre>
     <figure class="post-figure">
-      <img src="../assets/img/soc-homelab/zeek-sql-injection-victim-notice-wazuh-1200.webp"
-           srcset="../assets/img/soc-homelab/zeek-sql-injection-victim-notice-wazuh-480.webp 480w,
-                   ../assets/img/soc-homelab/zeek-sql-injection-victim-notice-wazuh-800.webp 800w,
-                   ../assets/img/soc-homelab/zeek-sql-injection-victim-notice-wazuh-1200.webp 1200w"
+      <img src="/assets/img/soc-homelab/zeek-sql-injection-victim-notice-wazuh-1200.webp"
+           srcset="/assets/img/soc-homelab/zeek-sql-injection-victim-notice-wazuh-480.webp 480w,
+                   /assets/img/soc-homelab/zeek-sql-injection-victim-notice-wazuh-800.webp 800w,
+                   /assets/img/soc-homelab/zeek-sql-injection-victim-notice-wazuh-1200.webp 1200w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Wazuh Discover record for a Zeek HTTP::SQL_Injection_Victim notice, sourced from notice.log, confirming the detect-sqli script is loaded and firing on this Zeek install"
            loading="lazy" width="1907" height="731">
@@ -369,7 +368,7 @@ full_log          {"ts":1790298942.473597,"uid":"CuXNdG9rlxQQ85l","note":"HTTP::
       same correction: SQL injection detection goes from two independently corroborating tools to
       three, Suricata, Zeek, and Wazuh all catching the same traffic independently, the same
       three-way agreement I photographed in
-      <a href="soc-homelab-wazuh-zeek-grafana-pipeline.html" rel="noopener" target="_blank">the
+      <a href="/blog/soc-homelab-wazuh-zeek-grafana-pipeline">the
       pipeline post</a> once I confirmed it. I was careful about the scope of that correction,
       though. The scan detection script and the SSH brute-force detection script are still
       documented as unavailable on this install, and I did not touch that claim, because this
@@ -386,7 +385,7 @@ full_log          {"ts":1790298942.473597,"uid":"CuXNdG9rlxQQ85l","note":"HTTP::
       that sentence would make the claim stronger.
     </p>
 
-    <h2>The smaller findings, and why I did not skip them</h2>
+    <h2 id="the-smaller-findings-and-why-i-did-not-skip-them">The smaller findings, and why I did not skip them</h2>
     <p>
       Four other things came out of this report, none of them dramatic on their own, all worth
       recording honestly rather than leaving as an unexplained line in a table.
@@ -422,13 +421,13 @@ full_log          {"ts":1790298942.473597,"uid":"CuXNdG9rlxQQ85l","note":"HTTP::
       during the window, meaning time synchronization on the sensor stopped being enforced. That
       second one matters specifically for a lab built around correlating timestamps across four
       different tools, the same correlation habit that made the beacon-hunting math and
-      <a href="soc-homelab-first-alerts-attack-simulation.html" rel="noopener" target="_blank">the
+      <a href="/blog/soc-homelab-first-alerts-attack-simulation">the
       triage tickets in the previous post</a> possible in the first place. If the sensor's own
       clock drifts, every cross-tool correlation in this whole project gets a little less
       trustworthy, and a SIEM whose own clock cannot be trusted undermines the story it is telling
       about everything else. That is worth fixing on its own, and it lines up closely with the
       kind of gap I went looking for directly in
-      <a href="linux-hardening-audit-lynis-rkhunter.html" rel="noopener" target="_blank">an
+      <a href="/blog/linux-hardening-audit-lynis-rkhunter">an
       earlier hardening audit</a>: a clean scan or a passing benchmark score is worth very little
       if you never go looking for what it missed.
     </p>
@@ -442,7 +441,7 @@ full_log          {"ts":1790298942.473597,"uid":"CuXNdG9rlxQQ85l","note":"HTTP::
       rather than a single clean test run.
     </p>
 
-    <h2>Writing the ticket, not just the finding</h2>
+    <h2 id="writing-the-ticket-not-just-the-finding">Writing the ticket, not just the finding</h2>
     <p>
       A finding that lives only in a markdown heading is not the same thing as a closed incident.
       The triage playbook in this repository includes a ticket template, and I used it for the
@@ -470,10 +469,10 @@ Action:       Closed as benign, with evidence attached.
 Follow-up:    Confirm mod_cgi is genuinely absent from the DVWA container rather than inferring
               it from the app type alone, cheap to check, removes the last assumption.</code></pre>
     <figure class="post-figure">
-      <img src="../assets/img/soc-homelab/completed-triage-ticket-shellshock-closed-benign-800.webp"
-           srcset="../assets/img/soc-homelab/completed-triage-ticket-shellshock-closed-benign-480.webp 480w,
-                   ../assets/img/soc-homelab/completed-triage-ticket-shellshock-closed-benign-800.webp 800w,
-                   ../assets/img/soc-homelab/completed-triage-ticket-shellshock-closed-benign-1200.webp 1200w"
+      <img src="/assets/img/soc-homelab/completed-triage-ticket-shellshock-closed-benign-800.webp"
+           srcset="/assets/img/soc-homelab/completed-triage-ticket-shellshock-closed-benign-480.webp 480w,
+                   /assets/img/soc-homelab/completed-triage-ticket-shellshock-closed-benign-800.webp 800w,
+                   /assets/img/soc-homelab/completed-triage-ticket-shellshock-closed-benign-1200.webp 1200w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Rendered triage ticket for Wazuh rule 31168, Shellshock attack detected, showing detected time, source, destination, evidence, assessment, impact, action and follow-up fields, closed as benign"
            loading="lazy" width="2400" height="1416">
@@ -485,7 +484,7 @@ Follow-up:    Confirm mod_cgi is genuinely absent from the DVWA container rather
       text, and it doubles as the required capture for the triage playbook document.
     </p>
 
-    <h2>The part that does not show up in any single finding: keeping the evidence honest</h2>
+    <h2 id="the-part-that-does-not-show-up-in-any-single-finding-keeping">The part that does not show up in any single finding: keeping the evidence honest</h2>
     <p>
       Something I did not expect to spend real time on going into this post was the housekeeping
       around the evidence itself. Screenshots had accumulated across four separate build-and-test
@@ -522,17 +521,17 @@ Follow-up:    Confirm mod_cgi is genuinely absent from the DVWA container rather
       learn from.
     </p>
 
-    <h2>Two images built specifically for this project</h2>
+    <h2 id="two-images-built-specifically-for-this-project">Two images built specifically for this project</h2>
     <p>
       The architecture diagram is the clean version of the ASCII layout that has appeared
       throughout the series, the same two-VM, one-network design, redrawn so it reads clearly at a
       glance rather than requiring a monospace font to line up correctly.
     </p>
     <figure class="post-figure">
-      <img src="../assets/img/soc-homelab/soc-homelab-network-architecture-diagram-1200.webp"
-           srcset="../assets/img/soc-homelab/soc-homelab-network-architecture-diagram-480.webp 480w,
-                   ../assets/img/soc-homelab/soc-homelab-network-architecture-diagram-800.webp 800w,
-                   ../assets/img/soc-homelab/soc-homelab-network-architecture-diagram-1200.webp 1200w"
+      <img src="/assets/img/soc-homelab/soc-homelab-network-architecture-diagram-1200.webp"
+           srcset="/assets/img/soc-homelab/soc-homelab-network-architecture-diagram-480.webp 480w,
+                   /assets/img/soc-homelab/soc-homelab-network-architecture-diagram-800.webp 800w,
+                   /assets/img/soc-homelab/soc-homelab-network-architecture-diagram-1200.webp 1200w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Clean network architecture diagram of the SOC-HomeLab two-VM, one-network design, showing the Kali attacker and the sensor VM running Suricata, Zeek and Wazuh on a single host-only adapter"
            loading="lazy" width="2400" height="1600">
@@ -548,17 +547,17 @@ Follow-up:    Confirm mod_cgi is genuinely absent from the DVWA container rather
       each one saw, and did not see, is where the actual confidence comes from.
     </p>
     <figure class="post-figure">
-      <img src="../assets/img/soc-homelab/one-attack-three-tools-suricata-zeek-wazuh-1200.webp"
-           srcset="../assets/img/soc-homelab/one-attack-three-tools-suricata-zeek-wazuh-480.webp 480w,
-                   ../assets/img/soc-homelab/one-attack-three-tools-suricata-zeek-wazuh-800.webp 800w,
-                   ../assets/img/soc-homelab/one-attack-three-tools-suricata-zeek-wazuh-1200.webp 1200w"
+      <img src="/assets/img/soc-homelab/one-attack-three-tools-suricata-zeek-wazuh-1200.webp"
+           srcset="/assets/img/soc-homelab/one-attack-three-tools-suricata-zeek-wazuh-480.webp 480w,
+                   /assets/img/soc-homelab/one-attack-three-tools-suricata-zeek-wazuh-800.webp 800w,
+                   /assets/img/soc-homelab/one-attack-three-tools-suricata-zeek-wazuh-1200.webp 1200w"
            sizes="(max-width: 800px) 100vw, 800px"
            alt="Three panels side by side showing the same SQL injection attack seen through Suricata's alert view, Zeek's connection log, and Wazuh's correlated threat hunting event, all filtered to the same source address"
            loading="lazy" width="2240" height="535">
       <figcaption>One attack, three vantage points. This single picture is the argument the whole series has been building toward.</figcaption>
     </figure>
 
-    <h2>What changed in the documentation because of this hunt</h2>
+    <h2 id="what-changed-in-the-documentation-because-of-this-hunt">What changed in the documentation because of this hunt</h2>
     <p>
       I want to be specific about what this report actually changed, rather than leaving it as a
       vague "lessons learned" gesture, because the specific edits are themselves a small case study
@@ -588,7 +587,7 @@ Follow-up:    Confirm mod_cgi is genuinely absent from the DVWA container rather
       wrong and got corrected in the open.
     </p>
 
-    <h2>What this hunt shows, and what it does not</h2>
+    <h2 id="what-this-hunt-shows-and-what-it-does-not">What this hunt shows, and what it does not</h2>
     <p>
       In keeping with the honesty this whole series has tried to hold itself to, I want to end
       with the limits of this particular exercise rather than let the two confirmed findings stand
@@ -615,7 +614,7 @@ Follow-up:    Confirm mod_cgi is genuinely absent from the DVWA container rather
       have it surface later as something I skipped.
     </p>
 
-    <h2>Takeaways</h2>
+    <h2 id="takeaways">Takeaways</h2>
     <p>Generate a formal report on a fixed window occasionally, not just alerts as they scroll by live. A report forces a defined scope and gives you a second, independently generated artifact to check your own tooling against.</p>
     <p>A severity label and a technique tag are both hypotheses, not verdicts. The raw record underneath the label is what turns a hypothesis into a finding you can defend.</p>
     <p>When new evidence contradicts something you already wrote down and published, correct it in the open, with a dated note, rather than quietly editing it away. The correction is more convincing than the original claim ever was.</p>
@@ -623,7 +622,7 @@ Follow-up:    Confirm mod_cgi is genuinely absent from the DVWA container rather
     <p>Evidence organization is not separate from the finding. A screenshot numbered out of order or an image built but never referenced is a small failure that compounds across a whole repository.</p>
     <p>Three independent tools agreeing on one event is worth more than any single tool's alert, and building the habit of looking for that agreement, rather than trusting the first alert you see, is the actual skill this whole project is meant to practice.</p>
 
-    <h2>Frequently asked questions</h2>
+    <h2 id="frequently-asked-questions">Frequently asked questions</h2>
     <h3>Why does a level 15 Shellshock alert not automatically mean the server was compromised?</h3>
     <p>
       Wazuh's rule matched a string pattern in the incoming HTTP request, specifically the
@@ -653,7 +652,7 @@ Follow-up:    Confirm mod_cgi is genuinely absent from the DVWA container rather
       finding is the same mistake as writing up an unverified positive.
     </p>
 
-    <h2>Where this goes from here</h2>
+    <h2 id="where-this-goes-from-here">Where this goes from here</h2>
     <p>
       Two things are still open at the end of this series as it stands: confirming which
       explanation accounts for the zero authentication failures, and fixing the two Security
@@ -668,19 +667,47 @@ Follow-up:    Confirm mod_cgi is genuinely absent from the DVWA container rather
       real day's worth of alerts taught me more than any single scripted test run did.
     </p>
     <p>
-      Repository: <a href="https://github.com/rachata072/soc-homelab" rel="noopener" target="_blank">github.com/rachata072/soc-homelab</a>. More about how I approach lab projects like this is on <a href="../index.html#about" rel="noopener" target="_blank">the about page</a>.
+      Repository: <a href="https://github.com/rachata072/soc-homelab" rel="noopener" target="_blank">github.com/rachata072/soc-homelab</a>. More about how I approach lab projects like this is on <a href="/#about">the about page</a>.
     </p>
-
-    <p class="mono mt-3"><a href="../blog.html">&larr; show logging</a></p>
-  </article>
-</main>
-
-<footer class="site-footer">
-  <div class="wrap">
-    <span>© 2026 Trey · built by hand · no cookies · privacy-respecting analytics · <a href="../privacy.html">privacy</a></span>
-    <span><a href="../index.html">exit →</a></span>
+</div>
+      <footer class="post-end">
+        <div class="repo-box"><div><span class="k">source for this post</span><span class="v">github.com/rachata072/soc-homelab</span></div><a class="btn btn-sec" href="https://github.com/rachata072/soc-homelab" rel="noopener" target="_blank">view repo <span aria-hidden="true">&#8599;</span></a></div>
+        <nav class="nexthop" aria-label="More posts"><a class="prev" href="/blog/soc-homelab-first-alerts-attack-simulation"><span class="k">&larr; previous hop</span>First Alerts: What My SOC Home Lab Caught, What It Missed, and How I Triaged It</a></nav>
+      </footer>
+    </div>
+    <aside class="toc" aria-label="On this page"><span class="toc-title"><span class="h">#</span> show ip route | toc</span><ol><li><a href="#why-generate-a-report-instead-of-just-reading-the-dashboard">Why generate a report instead of just reading the dashboard</a></li><li><a href="#the-headline-numbers">The headline numbers</a></li><li><a href="#what-mitre-att-ck-tagging-is-actually-telling-you">What MITRE ATT&amp;CK tagging is actually telling you</a></li><li><a href="#alert-volume-condensed">Alert volume, condensed</a></li><li><a href="#finding-1-the-highest-severity-alert-in-the-report-and-why-c">Finding 1: the highest severity alert in the report, and why closing it took more than reading the rule name</a></li><li><a href="#finding-2-a-detection-i-had-documented-as-broken-turned-out">Finding 2: a detection I had documented as broken turned out to be working</a></li><li><a href="#the-smaller-findings-and-why-i-did-not-skip-them">The smaller findings, and why I did not skip them</a></li><li><a href="#writing-the-ticket-not-just-the-finding">Writing the ticket, not just the finding</a></li><li><a href="#the-part-that-does-not-show-up-in-any-single-finding-keeping">The part that does not show up in any single finding: keeping the evidence honest</a></li><li><a href="#two-images-built-specifically-for-this-project">Two images built specifically for this project</a></li><li><a href="#what-changed-in-the-documentation-because-of-this-hunt">What changed in the documentation because of this hunt</a></li><li><a href="#what-this-hunt-shows-and-what-it-does-not">What this hunt shows, and what it does not</a></li><li><a href="#takeaways">Takeaways</a></li><li><a href="#frequently-asked-questions">Frequently asked questions</a></li><li><a href="#where-this-goes-from-here">Where this goes from here</a></li></ol></aside>
   </div>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 25, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
 </footer>
-
 </body>
 </html>

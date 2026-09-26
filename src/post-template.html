@@ -1,0 +1,53 @@
+<!--meta
+{
+  "title": "The headline shown on the post page",
+  "seo_title": "Optional shorter title for Google (drop this line to reuse title)",
+  "description": "Meta description for Google. 120 to 160 characters. tools/qa.py checks the length.",
+  "og_description": "Longer teaser used on the post page under the title and in link previews.",
+  "summary": "One or two sentences shown on the blog index, the home page, and in the RSS feed.",
+  "date": "2026-10-01",
+  "category": "network",
+  "read_min": 10,
+  "tags": ["OSPF", "CCNA", "Packet Tracer"],
+  "repo": "name-of-github-repo",
+  "draft": true
+}
+-->
+<!--
+  HOW TO PUBLISH
+  1. Copy this file to src/posts/<url-slug>.html  (the file name becomes /blog/<url-slug>)
+  2. category is one of: news, ai, network, sec, python, support   (see src/site.json)
+  3. Optional keys: "series": "soc-homelab" + "series_part": 6, "updated": "2026-10-05",
+     "list_title": "shorter title for lists", "faq": [["Question?", "Answer."]]
+  4. Remove "draft": true when it is ready.
+  5. python tools/build.py --og     (--og needs Pillow; it makes the LinkedIn preview image)
+  6. python tools/qa.py
+  7. python tools/serve.py  and check http://localhost:8080
+  Home page, blog index, RSS, sitemap, prev/next links and the table of contents are
+  all generated. Do not hand-edit files in public/ that build.py writes.
+-->
+
+<p>
+  Opening paragraph. Every &lt;h2&gt; automatically gets an id and a table-of-contents entry.
+</p>
+
+<h2>First section</h2>
+<p>Text with <code>inline code</code> and a <a href="/blog/vlsm-subnet-calculator-python-tool">link to another post</a> (no .html).</p>
+
+<pre><code>R1# show ip ospf neighbor
+R1# show ip route ospf</code></pre>
+
+<!-- Images: python tools/imgprep.py screenshot.png --slug your-post-slug  prints this block -->
+<figure class="post-figure">
+  <img src="/assets/img/your-post-slug/topology-800.webp"
+       srcset="/assets/img/your-post-slug/topology-480.webp 480w,
+               /assets/img/your-post-slug/topology-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="450" loading="lazy" decoding="async"
+       alt="Describe what the screenshot proves, not just what it is">
+  <figcaption>Caption in plain words.</figcaption>
+</figure>
+
+<h2>Frequently asked questions</h2>
+<h3>A question people search for?</h3>
+<p>The answer. Mirror these in the "faq" meta key to get FAQ rich results.</p>

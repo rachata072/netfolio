@@ -1,0 +1,46 @@
+<!--meta
+{
+  "out": "blog.html",
+  "path": "/blog",
+  "nav": "blog",
+  "title": "Blog | Security Write-ups & Network Lab Notes by Trey",
+  "description": "Security write-ups, network lab walkthroughs, Python automation notes, and IT support deep dives from a CCNA-certified engineer. Every post links to a public repo.",
+  "og_title": "show logging: security write-ups and network lab notes",
+  "preload_display": true,
+  "scripts": ["filter"]
+}
+-->
+<main id="main">
+  <header class="page-head">
+    <div class="wrap">
+      <span class="cli"><span class="h">edge#</span> <span class="v">show</span> <span class="a">logging</span></span>
+      <h1>Logs</h1>
+      <p class="sec-lede">
+        Lab walkthroughs, security write-ups, and automation notes, {{POST_COUNT}} entries and
+        counting. Every post is tagged like a syslog message, <span class="mono nowrap">%BLOG-severity-FACILITY</span>:
+        the lower the number, the sooner it's worth reading.
+      </p>
+      {{BLOG_LEGEND}}
+    </div>
+  </header>
+
+  <section class="wrap" data-filter-group aria-label="Blog posts">
+    <div class="toolbar" hidden>
+      <label class="search">
+        <span class="pipe" aria-hidden="true">|</span><span aria-hidden="true">include</span>
+        <span class="sr-only">Search posts</span>
+        <input type="search" placeholder="wazuh, vlan, powershell..." autocomplete="off" spellcheck="false" maxlength="80">
+      </label>
+      <div class="filters" role="group" aria-label="Filter posts by category">
+        {{BLOG_FILTERS}}
+      </div>
+    </div>
+    <p class="sr-only" data-status aria-live="polite"></p>
+
+    {{BLOG_LIST}}
+
+    <p class="empty" hidden>% No log entries match. Try a shorter search or clear the filter.</p>
+
+    <p class="legend mt-2"><a href="/feed.xml">subscribe via RSS &rarr;</a></p>
+  </section>
+</main>

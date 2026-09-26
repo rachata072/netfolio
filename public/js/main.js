@@ -1,99 +1,94 @@
-/* ============================================================
-   Terminal hero animation.
-   Security notes (OWASP A03 Injection / XSS):
-   - All rendered content is a hard-coded constant below.
-   - Nothing from the URL, query string, or user input is ever
-     written to the DOM. If you later render dynamic data, use
-     document.createTextNode / textContent - never innerHTML.
-   ============================================================ */
+/* ==========================================================================
+   breakfixlearn v2 - site behaviour (progressive enhancement only).
+   Security (OWASP A03): no innerHTML anywhere. Every DOM write is
+   textContent, classList, or an attribute set to a constant. Nothing is
+   read from the URL, storage, or user input in this file.
+   ========================================================================== */
 (function () {
   "use strict";
 
-  var out = document.getElementById("terminal-output");
-  if (!out) return;
-
-  // [cssClass, text] pairs. Edit your details here.
-  var LINES = [
-    [["prompt", "edge-router>"], ["cmd", " enable"]],
-    [["prompt", "edge-router#"], ["cmd", " show portfolio brief"]],
-    [["key", "Name       : "], ["val", "Trey"]],
-    [["key", "Focus      : "], ["val", "Network Engineering \u00B7 Cybersecurity"]],
-    [["key", "Certs      : "], ["val", "CCNA"]],
-    [["key", "Learning   : "], ["val", "Python for network automation"]],
-    [["key", "Location   : "], ["val", "Vancouver, BC"]],
-    [["key", "Status     : "], ["up", "up/up - open to opportunities"]]
-  ];
-
-  function span(cls, text) {
-    var s = document.createElement("span");
-    s.className = cls;
-    s.appendChild(document.createTextNode(text)); // safe: text node only
-    return s;
-  }
-
-  function renderInstant() {
-    out.textContent = "";
-    LINES.forEach(function (line, i) {
-      line.forEach(function (part) { out.appendChild(span(part[0], part[1])); });
-      if (i < LINES.length - 1) out.appendChild(document.createTextNode("\n"));
-    });
-    out.appendChild(document.createTextNode("\n"));
-    out.appendChild(span("prompt", "edge-router#"));
-    out.appendChild(document.createTextNode(" "));
-    out.appendChild(span("cursor", ""));
-  }
-
+  var doc = document.documentElement;
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reduced) { renderInstant(); return; }
+  doc.classList.add("js");
 
-  // Typed animation
-  var cursor = span("cursor", "");
-  out.textContent = "";
-  out.appendChild(cursor);
+  /* ---------- blog facility legend: start collapsed on phones ---------- */
+  var fac = document.querySelector("details.facilities");
+  if (fac && window.matchMedia("(max-width: 48rem)").matches) fac.removeAttribute("open");
 
-  var li = 0, pi = 0, ci = 0;
-  var current = null;
-
-  function step() {
-    if (li >= LINES.length) {
-      out.insertBefore(document.createTextNode("\n"), cursor);
-      out.insertBefore(span("prompt", "edge-router#"), cursor);
-      out.insertBefore(document.createTextNode(" "), cursor);
-      return; // done - cursor keeps blinking
-    }
-
-    var line = LINES[li];
-    var part = line[pi];
-
-    if (ci === 0) {
-      current = span(part[0], "");
-      out.insertBefore(current, cursor);
-    }
-
-    // Command lines type char-by-char; output lines appear whole,
-    // like a real router printing its response.
-    var isCommand = li < 2;
-    if (isCommand) {
-      ci += 1;
-      current.textContent = part[1].slice(0, ci);
-      if (ci < part[1].length) { setTimeout(step, 34); return; }
-    } else {
-      current.textContent = part[1];
-      ci = part[1].length;
-    }
-
-    // part finished
-    ci = 0;
-    pi += 1;
-    if (pi >= line.length) {
-      pi = 0;
-      li += 1;
-      out.insertBefore(document.createTextNode("\n"), cursor);
-      setTimeout(step, isCommand ? 420 : 90); // pause after "Enter"
-      return;
-    }
-    setTimeout(step, isCommand ? 34 : 15);
+  /* ---------- reveal on scroll ---------- */
+  var rv = document.querySelectorAll(".rv");
+  if (rv.length && "IntersectionObserver" in window && !reduced) {
+    var vh = window.innerHeight;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+      });
+    }, { rootMargin: "0px 0px -8% 0px" });
+    rv.forEach(function (el) {
+      // anything already on screen is shown in the same frame (no flash)
+      if (el.getBoundingClientRect().top < vh) el.classList.add("in");
+      else io.observe(el);
+    });
+  } else {
+    rv.forEach(function (el) { el.classList.add("in"); });
   }
 
-  setTimeout(step, 500);
+  /* ---------- reading progress (post pages) ---------- */
+  var bar = document.querySelector(".progress");
+  var article = document.querySelector(".prose");
+  if (bar && article) {
+    var ticking = false;
+    var update = function () {
+      var r = article.getBoundingClientRect();
+      var total = r.height - window.innerHeight;
+      var p = total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : 1;
+      bar.style.transform = "scaleX(" + p.toFixed(4) + ")"; // CSSOM, not inline markup: CSP-safe
+      ticking = false;
+    };
+    window.addEventListener("scroll", function () {
+      if (!ticking) { ticking = true; window.requestAnimationFrame(update); }
+    }, { passive: true });
+    update();
+  }
+
+  /* ---------- table of contents: highlight current section ---------- */
+  var tocLinks = document.querySelectorAll(".toc a[href^='#']");
+  if (tocLinks.length && "IntersectionObserver" in window) {
+    var map = {};
+    tocLinks.forEach(function (a) { map[a.getAttribute("href").slice(1)] = a; });
+    var current = null;
+    var setCurrent = function (id) {
+      if (current === id || !map[id]) return;
+      if (current && map[current]) map[current].removeAttribute("aria-current");
+      map[id].setAttribute("aria-current", "true");
+      current = id;
+    };
+    var heads = document.querySelectorAll(".prose h2[id]");
+    var tocIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) setCurrent(e.target.id); });
+    }, { rootMargin: "0px 0px -70% 0px" });
+    heads.forEach(function (h) { tocIO.observe(h); });
+  }
+
+  /* ---------- copy buttons on code blocks ---------- */
+  if (navigator.clipboard && window.isSecureContext) {
+    document.querySelectorAll(".prose pre").forEach(function (pre) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "copy";
+      btn.textContent = "copy";
+      btn.setAttribute("aria-label", "Copy code to clipboard");
+      btn.addEventListener("click", function () {
+        var code = pre.querySelector("code") || pre;
+        navigator.clipboard.writeText(code.textContent).then(function () {
+          btn.textContent = "copied";
+          btn.classList.add("ok");
+          setTimeout(function () { btn.textContent = "copy"; btn.classList.remove("ok"); }, 1600);
+        }, function () {
+          btn.textContent = "error";
+        });
+      });
+      pre.appendChild(btn);
+    });
+  }
 })();
