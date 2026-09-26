@@ -112,12 +112,12 @@
     "tags": ["Microsoft 365", "MFA", "Tenant setup"]
   },
   {
-    "id": "ospf-lab",
-    "name": "Lab-OSPF-01",
+    "id": "enterprise-cml",
+    "name": "Enterprise-Lab-CML",
     "cat": "network",
     "status": "prog",
-    "blurb": "A three-area OSPF topology built first in Packet Tracer, then rebuilt on real IOS images. Covers ABRs, route summarization, a virtual link, and passive interfaces, with the full addressing plan and a verification cheat-sheet.",
-    "tags": ["OSPF", "Packet Tracer", "IOS"]
+    "blurb": "An enterprise network lab built in Cisco Modeling Labs (CML) on real Cisco IOS images instead of a simulator: core, distribution and access layers, VLANs, routing and redundancy, documented with the full topology, addressing plan and verification commands.",
+    "tags": ["CML", "Cisco IOS", "Enterprise", "Routing & Switching"]
   },
   {
     "id": "ccnp-notes",
