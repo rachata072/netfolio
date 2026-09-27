@@ -5,8 +5,16 @@
   <link>https://breakfixlearn.com/</link>
   <description>CCNA lab walkthroughs, security write-ups, and Python network automation notes by Trey.</description>
   <language>en-ca</language>
-  <lastBuildDate>Sat, 26 Sep 2026 09:00:00 -0700</lastBuildDate>
+  <lastBuildDate>Sun, 27 Sep 2026 09:00:00 -0700</lastBuildDate>
   <atom:link href="https://breakfixlearn.com/feed.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>The Sudo Bug That Turns Your Clock Against You: CVE-2026-96512</title>
+    <link>https://breakfixlearn.com/blog/sudo-cve-2026-96512-time-based-bypass</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/sudo-cve-2026-96512-time-based-bypass.html</guid>
+    <pubDate>Sun, 27 Sep 2026 09:00:00 -0700</pubDate>
+    <category>NEWS</category>
+    <description>CVE-2026-96512 lets an already-authenticated local user manipulate sudo&#x27;s TZ environment variable to shift its notion of time by roughly 25 hours, making expired NOTAFTER sudo rules look current or NOTBEFORE rules usable early. It only matters if your sudoers file uses time-bound rules without a trailing Z, and the fix for now is one character.</description>
+  </item>
   <item>
     <title>Cisco ISE&#x27;s Perfect-10 Zero-Day: What CVE-2026-76460 Actually Breaks</title>
     <link>https://breakfixlearn.com/blog/cisco-ise-zero-day-cve-2026-76460-api-auth-bypass</link>
