@@ -89,7 +89,9 @@ dropped at the firewall, the hero globe turns slowly. All of it stops for
 - **Button secondary** `.btn.btn-sec`: transparent panel, `line-2` border, text colour;
   hover border blue, text `blue-hi`.
 - **Nav port** `.port`: mono 0.8 rem, LED dot (grey, amber on hover, green + glow when
-  current), port number hidden under 64 rem, five ports fit down to 320 px.
+  current), port number hidden under 64 rem, five ports fit on one row from 320 px;
+  with large system text they wrap inside the border, never past it. Hover styles only
+  under `(hover: hover)` so a tap on a phone does not leave a port looking selected.
 - **Console** `.console`: panel at 92 %, `line-2` border, 8 px radius, a mono title bar
   (`lab-core / topology.pkt`) and optional status or controls on the right.
 - **Filter button** `.fbtn`: mono chip with count; pressed = blue fill + `on-blue`.

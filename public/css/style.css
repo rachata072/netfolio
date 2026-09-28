@@ -217,7 +217,12 @@ p { margin: 0 0 1rem; }
   letter-spacing: 0.02em;
   transition: background-color 0.15s, color 0.15s;
 }
-.port:hover { background: var(--panel); color: var(--text); text-decoration: none; }
+/* hover only where a real pointer can hover: on phones a tap left "sheets" looking selected */
+@media (hover: hover) {
+  .port:hover { background: var(--panel); color: var(--text); text-decoration: none; }
+  .port:hover .led { background: var(--amber); }
+}
+.port:hover { text-decoration: none; }
 .port .pn { color: var(--text-3); font-size: 0.72rem; }
 .led {
   width: 7px; height: 7px;
@@ -226,13 +231,12 @@ p { margin: 0 0 1rem; }
   background: #203a5c;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
-.port:hover .led { background: var(--amber); }
 .port[aria-current="page"] { background: var(--panel-2); color: var(--text); }
 .port[aria-current="page"] .led {
   background: var(--up);
   box-shadow: 0 0 8px rgba(108, 192, 74, 0.8);
 }
-@media (prefers-reduced-motion: no-preference) {
+@media (prefers-reduced-motion: no-preference) and (hover: hover) {
   .port:hover .led { animation: activity 0.35s steps(2) infinite; }
 }
 @keyframes activity { 50% { opacity: 0.25; } }
@@ -1426,9 +1430,13 @@ a, button, summary { -webkit-tap-highlight-color: rgba(0, 188, 235, 0.18); }
 @media (max-width: 64rem) { .port .pn { display: none; } .port { padding-inline: 0.6rem; } }
 @media (max-width: 52rem) { .port .lg { display: none; } }
 @media (max-width: 46rem) { .brand .b3 { display: none; } }
-@media (max-width: 25rem) {
-  .ports { gap: 0.1rem; padding: 0.2rem; }
-  .port { gap: 0.3rem; padding-inline: 0.15rem; font-size: 0.7rem; letter-spacing: 0; }
+/* Phones: five ports on one row from 320 px up, measured with playwright-cli at
+   320-640 px and 100/115/130 % text size. If a large system font still does not fit,
+   the row wraps inside the border instead of spilling out of it. */
+@media (max-width: 40rem) {
+  .ports { flex-wrap: wrap; gap: 0.15rem; padding: 0.2rem; }
+  .ports li { flex: 1 1 auto; }
+  .port { gap: 0.3rem; padding-inline: 0.25rem; font-size: 0.72rem; letter-spacing: 0; white-space: nowrap; }
   .port .led { width: 5px; height: 5px; }
 }
 
@@ -1644,3 +1652,7 @@ a, button, summary { -webkit-tap-highlight-color: rgba(0, 188, 235, 0.18); }
 .next-up .rack-list li { grid-template-columns: 3.9rem minmax(0, 1fr) auto; }
 .next-up .rack-list li .rid { color: var(--k); }
 .next-up h3 .sid { text-transform: lowercase; }
+@media (max-width: 22.5rem) {
+  .ports { gap: 0.1rem; }
+  .port { gap: 0.25rem; padding-inline: 0.12rem; font-size: 0.68rem; }
+}
