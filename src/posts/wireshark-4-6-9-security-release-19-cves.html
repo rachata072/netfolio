@@ -1,0 +1,196 @@
+<!--meta
+{
+  "title": "Wireshark 4.6.9: When the Tool You Trust to Read Traffic Has 19 Ways to Bite Back",
+  "seo_title": "Wireshark 4.6.9 Security Update: 19 CVEs Explained",
+  "description": "Wireshark 4.6.9 fixes 19 CVEs plus a few unnumbered RCE bugs. What actually broke, why a packet analyzer has an attack surface, and what to check first.",
+  "og_description": "Wireshark is the tool you open to look at suspicious traffic safely. Version 4.6.9 is a reminder that the tool doing the looking has to parse that traffic first, and 19 CVEs plus a couple of unnumbered RCE bugs later, parsing is exactly where it can go wrong.",
+  "summary": "Wireshark 4.6.9 and the parallel 4.4.19 release patch 19 CVE-numbered bugs, mostly dissector crashes and infinite loops, plus several code-execution bugs reported through Trend Micro's Zero Day Initiative that do not have CVE numbers yet. A plain-language walk through what actually broke, why a passive-looking analysis tool has an attack surface in the first place, and what to check before opening your next capture.",
+  "date": "2026-09-28",
+  "category": "news",
+  "read_min": 7,
+  "tags": ["Wireshark", "CVE", "Packet Analysis", "CCNA", "Patch Management", "Dissectors"],
+  "faq": [
+    [
+      "How many vulnerabilities does Wireshark 4.6.9 fix?",
+      "Nineteen CVE-numbered issues, spanning protocol dissectors, capture file parsers, the Sharkd utility, and profile import. Wireshark also quietly fixed several additional code-execution bugs in the same release, reported through Trend Micro's Zero Day Initiative, that do not have CVE numbers assigned yet."
+    ],
+    [
+      "What is a Wireshark dissector, and why does it matter here?",
+      "A dissector is the code that reads a specific protocol's bytes off the wire and turns them into the readable fields you see in Wireshark's interface, one dissector for ZigBee, one for SCTP, one for X11, and so on. Every dissector is a small parser written to handle whatever bytes show up, and a parser handling attacker-controlled bytes is exactly the kind of code that tends to have crash and memory-safety bugs, which is what most of this release's 19 fixes are."
+      ],
+    [
+      "Can opening a malicious packet capture actually compromise my machine?",
+      "Some of the bugs in this release say yes. Two RCE-class issues, an LBMC fragment reassembly integer overflow and a LoRaWAN decryption numeric truncation bug, were reported as remote code execution triggered by crafted capture data, not just a crash. Wireshark's own dissectors run with whatever privileges the person running Wireshark has, so a capture file is not inert data the way it looks."
+    ],
+    [
+      "Should I upgrade from Wireshark 4.4 instead of 4.6?",
+      "Both branches got a security release the same week, 4.6.9 for the current stable line and 4.4.19 for the old-stable line, and both roll up the same set of fixes. Pick whichever branch you're already on and take that branch's release. Staying on an older point release in either branch leaves the same 19 CVEs open."
+    ],
+    [
+      "What is the most severe bug in this release?",
+      "CVE-2026-96419 stands out because it does not require opening a suspicious capture at all, it triggers from importing a specially crafted configuration profile, and Wireshark's own advisory describes the outcome as a crash or possible code execution. Profiles get shared between analysts and teams more casually than capture files do, which makes this one worth knowing about specifically."
+    ],
+    [
+      "What should I actually do about this release?",
+      "Upgrade to 4.6.9 or 4.4.19 depending on your branch, treat unsolicited capture files and shared configuration profiles the same way you'd treat an unsolicited attachment, and if you regularly open captures from outside sources, do it in a VM or sandboxed environment rather than on your main analysis workstation."
+    ]
+  ]
+}
+-->
+<p>
+  Wireshark is the tool a lot of us reach for specifically because it feels safe: point it at traffic,
+  read what's inside, nothing on the wire can touch you back, it's just bytes on a screen. Version
+  4.6.9, released September 23, 2026, is a useful reminder that this isn't quite true. Wireshark
+  shipped 19 CVE-numbered fixes in this release, alongside several unnumbered remote-code-execution
+  bugs reported through Trend Micro's Zero Day Initiative, and every one of them exists because
+  something has to actually parse those bytes before you get to read them safely. That something is
+  Wireshark's dissectors, and parsing untrusted input is exactly where security bugs like to live.
+</p>
+
+<h2>What actually shipped in 4.6.9</h2>
+<p>
+  The fix count breaks down cleanly once you group it by what kind of bug it is rather than which
+  protocol it's in. Most of the 19 CVEs are straightforward crashes: malformed traffic in the ZigBee
+  ZCL, SCTP, SPDY, CSN.1, MBIM, RF4CE, X11, IEEE 802.11, and Catapult DCT2000 dissectors, plus the
+  Sharkd utility, can be crafted to crash Wireshark outright. A smaller set are infinite loops rather
+  than crashes, in the TTL and TIFF file parsers and in USB HID processing, which is its own kind of
+  denial of service since Wireshark just hangs instead of failing cleanly. A couple are memory leaks,
+  in the IEEE C37.118 Synchrophasor dissector and again in USB HID, and one, in the Microsoft Network
+  Monitor capture parser, is described as an excessive loop that degrades performance rather than
+  hanging outright.
+</p>
+<p>
+  None of that is exotic. Crash and hang bugs in file parsers are the most common class of security
+  finding there is, and Wireshark's dissector count runs into the thousands, so 19 fixes in a single
+  release is not itself alarming. What's worth separating out is the small number of bugs in this
+  same release that go past crash-and-hang into actual code execution.
+</p>
+
+<h2>The two kinds of "code execution" in this release, and why they're different</h2>
+<p>
+  Wireshark's own advisory for <a href="https://www.wireshark.org/docs/relnotes/wireshark-4.6.9.html" rel="noopener" target="_blank">wnpa-sec-2026-106, CVE-2026-96419</a>,
+  describes a crash and possible code execution triggered by importing a specially crafted
+  configuration profile. That's worth sitting with for a second: a Wireshark profile, the kind of
+  file analysts export and hand off to a teammate or download from a shared repo of useful
+  display-filter presets, is not something most people think of as executable content. This bug
+  says it can be.
+</p>
+<p>
+  Separately, and not tracked under a CVE number yet, Wireshark's release notes credit Trend Micro's
+  Zero Day Initiative with reporting an integer overflow in LBMC fragment reassembly and a numeric
+  truncation error in LoRaWAN decryption, both described as remote code execution. Unlike the profile
+  bug, these trigger from the capture data itself, meaning a malicious packet or a malicious capture
+  file someone hands you could, in principle, do more than just crash your analyzer. ZDI-reported
+  bugs commonly ship a release ahead of their CVE assignment, so don't read the missing CVE number as
+  the bug being less real, it just hasn't been catalogued yet.
+</p>
+<p>
+  Between those two, the practical lesson is the same either way: Wireshark's attack surface isn't
+  only "traffic on the network you're capturing." It's also every profile, every saved capture, every
+  .pcapng file someone emails you for a second opinion. All of it gets parsed before you see it.
+</p>
+
+<h2>Every affected component in this release, at a glance</h2>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">Component</th><th scope="col">Bug type</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name">ZigBee ZCL, SCTP, SPDY, CSN.1, MBIM dissectors</td><td class="int-desc">Crash</td></tr>
+      <tr><td class="int-name">RF4CE, X11, IEEE 802.11, Catapult DCT2000 dissectors</td><td class="int-desc">Crash</td></tr>
+      <tr><td class="int-name">Sharkd utility</td><td class="int-desc">Crash</td></tr>
+      <tr><td class="int-name">TTL, TIFF parsers; USB HID</td><td class="int-desc">Infinite loop</td></tr>
+      <tr><td class="int-name">IEEE C37.118 Synchrophasor; USB HID</td><td class="int-desc">Memory leak</td></tr>
+      <tr><td class="int-name">Microsoft Network Monitor parser</td><td class="int-desc">Excessive loop / performance DoS</td></tr>
+      <tr><td class="int-name">PEAK CAN TRC, Toshiba file parsers</td><td class="int-desc">Crash</td></tr>
+      <tr><td class="int-name">Frame metadissector</td><td class="int-desc">Crash</td></tr>
+      <tr><td class="int-name">Profile import (CVE-2026-96419)</td><td class="int-desc">Crash / possible code execution</td></tr>
+      <tr><td class="int-name">LBMC reassembly, LoRaWAN decryption (ZDI, no CVE yet)</td><td class="int-desc">Code execution</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>Why a "read-only" tool has an attack surface at all</h2>
+<p>
+  I think about this the same way I thought about the <a href="/blog/wireshark-network-analysis-nine-packet-captures">nine packet captures I worked through for CCNA study</a>:
+  Wireshark's entire value is turning raw, hostile-by-default bytes into something a human can read
+  safely. But turning bytes into something readable requires code that understands the format of
+  those bytes well enough to parse them, and that code runs with the same permissions as whoever
+  opened Wireshark. If the person crafting those bytes knows the parser well enough, they're not
+  handing you data anymore, they're handing you input to a program, and every program that accepts
+  untrusted input has to get every single parsing decision right or it doesn't.
+</p>
+<p>
+  This is precisely why a security tool being widely used doesn't make it exempt from this. Wireshark
+  has one of the most heavily audited codebases in open-source networking software, specifically
+  because thousands of people who understand protocol parsing use it daily and plenty of them go
+  looking for exactly these bugs. Nineteen fixes in one release isn't a sign the project is careless,
+  it's closer to a sign the review process is actually working, catching issues before they show up
+  as something worse than a CVE number.
+</p>
+
+<h2>What to actually do about it</h2>
+<p>
+  Upgrade. Wireshark 4.6.9 covers the 4.6 branch and 4.4.19 covers old-stable, released the same
+  week and rolling up the same fixes, so whichever branch you're on has a release waiting. Beyond
+  the version bump, two habits are worth picking up regardless of how urgent any single CVE here is.
+  Treat a Wireshark configuration profile you didn't create yourself the same way you'd treat an
+  email attachment: don't import one from an unfamiliar source just because it promises useful
+  display filters. And if part of your job, lab work, or CCNA study involves opening capture files
+  that came from somewhere other than your own traffic, run that analysis in a VM or a disposable
+  environment rather than your daily driver, the same way you'd handle a suspicious executable rather
+  than a trusted one.
+</p>
+<p>
+  None of this is a reason to distrust Wireshark specifically. It's a reason to remember that the
+  tool sitting between you and hostile traffic is still software, parsing bytes it did not choose,
+  and software that parses untrusted bytes is exactly the kind of software worth keeping current.
+</p>
+
+<h2>Frequently asked questions</h2>
+<h3>How many vulnerabilities does Wireshark 4.6.9 fix?</h3>
+<p>
+  Nineteen CVE-numbered issues, spanning protocol dissectors, capture file parsers, the Sharkd
+  utility, and profile import. Wireshark also quietly fixed several additional code-execution bugs
+  in the same release, reported through Trend Micro's Zero Day Initiative, that do not have CVE
+  numbers assigned yet.
+</p>
+<h3>What is a Wireshark dissector, and why does it matter here?</h3>
+<p>
+  A dissector is the code that reads a specific protocol's bytes off the wire and turns them into
+  the readable fields you see in Wireshark's interface, one dissector for ZigBee, one for SCTP, one
+  for X11, and so on. Every dissector is a small parser written to handle whatever bytes show up,
+  and a parser handling attacker-controlled bytes is exactly the kind of code that tends to have
+  crash and memory-safety bugs, which is what most of this release's 19 fixes are.
+</p>
+<h3>Can opening a malicious packet capture actually compromise my machine?</h3>
+<p>
+  Some of the bugs in this release say yes. Two RCE-class issues, an LBMC fragment reassembly
+  integer overflow and a LoRaWAN decryption numeric truncation bug, were reported as remote code
+  execution triggered by crafted capture data, not just a crash. Wireshark's own dissectors run with
+  whatever privileges the person running Wireshark has, so a capture file is not inert data the way
+  it looks.
+</p>
+<h3>Should I upgrade from Wireshark 4.4 instead of 4.6?</h3>
+<p>
+  Both branches got a security release the same week, 4.6.9 for the current stable line and 4.4.19
+  for the old-stable line, and both roll up the same set of fixes. Pick whichever branch you're
+  already on and take that branch's release. Staying on an older point release in either branch
+  leaves the same 19 CVEs open.
+</p>
+<h3>What is the most severe bug in this release?</h3>
+<p>
+  CVE-2026-96419 stands out because it does not require opening a suspicious capture at all, it
+  triggers from importing a specially crafted configuration profile, and Wireshark's own advisory
+  describes the outcome as a crash or possible code execution. Profiles get shared between analysts
+  and teams more casually than capture files do, which makes this one worth knowing about
+  specifically.
+</p>
+<h3>What should I actually do about this release?</h3>
+<p>
+  Upgrade to 4.6.9 or 4.4.19 depending on your branch, treat unsolicited capture files and shared
+  configuration profiles the same way you'd treat an unsolicited attachment, and if you regularly
+  open captures from outside sources, do it in a VM or sandboxed environment rather than on your
+  main analysis workstation.
+</p>

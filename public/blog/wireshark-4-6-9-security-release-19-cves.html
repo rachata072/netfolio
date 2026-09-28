@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireshark 4.6.9 Security Update: 19 CVEs Explained | Trey</title>
+<meta name="description" content="Wireshark 4.6.9 fixes 19 CVEs plus a few unnumbered RCE bugs. What actually broke, why a packet analyzer has an attack surface, and what to check first.">
+<link rel="canonical" href="https://breakfixlearn.com/blog/wireshark-4-6-9-security-release-19-cves">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=670396ed07">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="Wireshark 4.6.9: When the Tool You Trust to Read Traffic Has 19 Ways to Bite Back">
+<meta property="og:description" content="Wireshark is the tool you open to look at suspicious traffic safely. Version 4.6.9 is a reminder that the tool doing the looking has to parse that traffic first, and 19 CVEs plus a couple of unnumbered RCE bugs later, parsing is exactly where it can go wrong.">
+<meta property="og:url" content="https://breakfixlearn.com/blog/wireshark-4-6-9-security-release-19-cves">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/wireshark-4-6-9-security-release-19-cves.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Wireshark 4.6.9: When the Tool You Trust to Read Traffic Has 19 Ways to Bite Back">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="article:published_time" content="2026-09-28">
+<meta property="article:tag" content="Wireshark">
+<meta property="article:tag" content="CVE">
+<meta property="article:tag" content="Packet Analysis">
+<meta property="article:tag" content="CCNA">
+<meta property="article:tag" content="Patch Management">
+<meta property="article:tag" content="Dissectors">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Wireshark 4.6.9: When the Tool You Trust to Read Traffic Has 19 Ways to Bite Back","description":"Wireshark 4.6.9 fixes 19 CVEs plus a few unnumbered RCE bugs. What actually broke, why a packet analyzer has an attack surface, and what to check first.","datePublished":"2026-09-28","dateModified":"2026-09-28","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"publisher":{"@type":"Person","name":"Trey"},"mainEntityOfPage":"https://breakfixlearn.com/blog/wireshark-4-6-9-security-release-19-cves","image":"https://breakfixlearn.com/assets/og/wireshark-4-6-9-security-release-19-cves.webp","keywords":"Wireshark, CVE, Packet Analysis, CCNA, Patch Management, Dissectors","articleSection":"Security news","timeRequired":"PT7M"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://breakfixlearn.com/blog"},{"@type":"ListItem","position":3,"name":"Wireshark 4.6.9: When the Tool You Trust to Read Traffic Has 19 Ways to Bite Back"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How many vulnerabilities does Wireshark 4.6.9 fix?","acceptedAnswer":{"@type":"Answer","text":"Nineteen CVE-numbered issues, spanning protocol dissectors, capture file parsers, the Sharkd utility, and profile import. Wireshark also quietly fixed several additional code-execution bugs in the same release, reported through Trend Micro's Zero Day Initiative, that do not have CVE numbers assigned yet."}},{"@type":"Question","name":"What is a Wireshark dissector, and why does it matter here?","acceptedAnswer":{"@type":"Answer","text":"A dissector is the code that reads a specific protocol's bytes off the wire and turns them into the readable fields you see in Wireshark's interface, one dissector for ZigBee, one for SCTP, one for X11, and so on. Every dissector is a small parser written to handle whatever bytes show up, and a parser handling attacker-controlled bytes is exactly the kind of code that tends to have crash and memory-safety bugs, which is what most of this release's 19 fixes are."}},{"@type":"Question","name":"Can opening a malicious packet capture actually compromise my machine?","acceptedAnswer":{"@type":"Answer","text":"Some of the bugs in this release say yes. Two RCE-class issues, an LBMC fragment reassembly integer overflow and a LoRaWAN decryption numeric truncation bug, were reported as remote code execution triggered by crafted capture data, not just a crash. Wireshark's own dissectors run with whatever privileges the person running Wireshark has, so a capture file is not inert data the way it looks."}},{"@type":"Question","name":"Should I upgrade from Wireshark 4.4 instead of 4.6?","acceptedAnswer":{"@type":"Answer","text":"Both branches got a security release the same week, 4.6.9 for the current stable line and 4.4.19 for the old-stable line, and both roll up the same set of fixes. Pick whichever branch you're already on and take that branch's release. Staying on an older point release in either branch leaves the same 19 CVEs open."}},{"@type":"Question","name":"What is the most severe bug in this release?","acceptedAnswer":{"@type":"Answer","text":"CVE-2026-96419 stands out because it does not require opening a suspicious capture at all, it triggers from importing a specially crafted configuration profile, and Wireshark's own advisory describes the outcome as a crash or possible code execution. Profiles get shared between analysts and teams more casually than capture files do, which makes this one worth knowing about specifically."}},{"@type":"Question","name":"What should I actually do about this release?","acceptedAnswer":{"@type":"Answer","text":"Upgrade to 4.6.9 or 4.4.19 depending on your branch, treat unsolicited capture files and shared configuration profiles the same way you'd treat an unsolicited attachment, and if you regularly open captures from outside sources, do it in a VM or sandboxed environment rather than on your main analysis workstation."}}]}</script>
+<script src="/js/main.js?v=ae8a6db91f" defer></script>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article>
+  <header class="post-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/blog">blog</a><span aria-hidden="true">/</span><a href="/blog#news">news</a></nav>
+      <span class="sev c-news">%BLOG-2-NEWS</span>
+      <h1 class="mt-2">Wireshark 4.6.9: When the Tool You Trust to Read Traffic Has 19 Ways to Bite Back</h1>
+      <p class="post-dek">Wireshark is the tool you open to look at suspicious traffic safely. Version 4.6.9 is a reminder that the tool doing the looking has to parse that traffic first, and 19 CVEs plus a couple of unnumbered RCE bugs later, parsing is exactly where it can go wrong.</p>
+      <div class="post-meta"><time datetime="2026-09-28">Sep 28, 2026</time><span class="sep">/</span><span>7 min read</span><span class="sep">/</span><span>by Trey</span></div>
+      <div class="post-tags"><span class="chip">Wireshark</span><span class="chip">CVE</span><span class="chip">Packet Analysis</span><span class="chip">CCNA</span><span class="chip">Patch Management</span><span class="chip">Dissectors</span></div>
+    </div>
+  </header>
+  <div class="wrap post-layout">
+    <div class="post-main">
+<details class="toc-mobile"><summary>show ip route | toc (6 sections)</summary><ol><li><a href="#what-actually-shipped-in-4-6-9">What actually shipped in 4.6.9</a></li><li><a href="#the-two-kinds-of-code-execution-in-this-release-and-why-they">The two kinds of &quot;code execution&quot; in this release, and why they&#x27;re different</a></li><li><a href="#every-affected-component-in-this-release-at-a-glance">Every affected component in this release, at a glance</a></li><li><a href="#why-a-read-only-tool-has-an-attack-surface-at-all">Why a &quot;read-only&quot; tool has an attack surface at all</a></li><li><a href="#what-to-actually-do-about-it">What to actually do about it</a></li><li><a href="#frequently-asked-questions">Frequently asked questions</a></li></ol></details>
+<div class="prose">
+<p>
+  Wireshark is the tool a lot of us reach for specifically because it feels safe: point it at traffic,
+  read what's inside, nothing on the wire can touch you back, it's just bytes on a screen. Version
+  4.6.9, released September 23, 2026, is a useful reminder that this isn't quite true. Wireshark
+  shipped 19 CVE-numbered fixes in this release, alongside several unnumbered remote-code-execution
+  bugs reported through Trend Micro's Zero Day Initiative, and every one of them exists because
+  something has to actually parse those bytes before you get to read them safely. That something is
+  Wireshark's dissectors, and parsing untrusted input is exactly where security bugs like to live.
+</p>
+
+<h2 id="what-actually-shipped-in-4-6-9">What actually shipped in 4.6.9</h2>
+<p>
+  The fix count breaks down cleanly once you group it by what kind of bug it is rather than which
+  protocol it's in. Most of the 19 CVEs are straightforward crashes: malformed traffic in the ZigBee
+  ZCL, SCTP, SPDY, CSN.1, MBIM, RF4CE, X11, IEEE 802.11, and Catapult DCT2000 dissectors, plus the
+  Sharkd utility, can be crafted to crash Wireshark outright. A smaller set are infinite loops rather
+  than crashes, in the TTL and TIFF file parsers and in USB HID processing, which is its own kind of
+  denial of service since Wireshark just hangs instead of failing cleanly. A couple are memory leaks,
+  in the IEEE C37.118 Synchrophasor dissector and again in USB HID, and one, in the Microsoft Network
+  Monitor capture parser, is described as an excessive loop that degrades performance rather than
+  hanging outright.
+</p>
+<p>
+  None of that is exotic. Crash and hang bugs in file parsers are the most common class of security
+  finding there is, and Wireshark's dissector count runs into the thousands, so 19 fixes in a single
+  release is not itself alarming. What's worth separating out is the small number of bugs in this
+  same release that go past crash-and-hang into actual code execution.
+</p>
+
+<h2 id="the-two-kinds-of-code-execution-in-this-release-and-why-they">The two kinds of "code execution" in this release, and why they're different</h2>
+<p>
+  Wireshark's own advisory for <a href="https://www.wireshark.org/docs/relnotes/wireshark-4.6.9.html" rel="noopener" target="_blank">wnpa-sec-2026-106, CVE-2026-96419</a>,
+  describes a crash and possible code execution triggered by importing a specially crafted
+  configuration profile. That's worth sitting with for a second: a Wireshark profile, the kind of
+  file analysts export and hand off to a teammate or download from a shared repo of useful
+  display-filter presets, is not something most people think of as executable content. This bug
+  says it can be.
+</p>
+<p>
+  Separately, and not tracked under a CVE number yet, Wireshark's release notes credit Trend Micro's
+  Zero Day Initiative with reporting an integer overflow in LBMC fragment reassembly and a numeric
+  truncation error in LoRaWAN decryption, both described as remote code execution. Unlike the profile
+  bug, these trigger from the capture data itself, meaning a malicious packet or a malicious capture
+  file someone hands you could, in principle, do more than just crash your analyzer. ZDI-reported
+  bugs commonly ship a release ahead of their CVE assignment, so don't read the missing CVE number as
+  the bug being less real, it just hasn't been catalogued yet.
+</p>
+<p>
+  Between those two, the practical lesson is the same either way: Wireshark's attack surface isn't
+  only "traffic on the network you're capturing." It's also every profile, every saved capture, every
+  .pcapng file someone emails you for a second opinion. All of it gets parsed before you see it.
+</p>
+
+<h2 id="every-affected-component-in-this-release-at-a-glance">Every affected component in this release, at a glance</h2>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">Component</th><th scope="col">Bug type</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name">ZigBee ZCL, SCTP, SPDY, CSN.1, MBIM dissectors</td><td class="int-desc">Crash</td></tr>
+      <tr><td class="int-name">RF4CE, X11, IEEE 802.11, Catapult DCT2000 dissectors</td><td class="int-desc">Crash</td></tr>
+      <tr><td class="int-name">Sharkd utility</td><td class="int-desc">Crash</td></tr>
+      <tr><td class="int-name">TTL, TIFF parsers; USB HID</td><td class="int-desc">Infinite loop</td></tr>
+      <tr><td class="int-name">IEEE C37.118 Synchrophasor; USB HID</td><td class="int-desc">Memory leak</td></tr>
+      <tr><td class="int-name">Microsoft Network Monitor parser</td><td class="int-desc">Excessive loop / performance DoS</td></tr>
+      <tr><td class="int-name">PEAK CAN TRC, Toshiba file parsers</td><td class="int-desc">Crash</td></tr>
+      <tr><td class="int-name">Frame metadissector</td><td class="int-desc">Crash</td></tr>
+      <tr><td class="int-name">Profile import (CVE-2026-96419)</td><td class="int-desc">Crash / possible code execution</td></tr>
+      <tr><td class="int-name">LBMC reassembly, LoRaWAN decryption (ZDI, no CVE yet)</td><td class="int-desc">Code execution</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="why-a-read-only-tool-has-an-attack-surface-at-all">Why a "read-only" tool has an attack surface at all</h2>
+<p>
+  I think about this the same way I thought about the <a href="/blog/wireshark-network-analysis-nine-packet-captures">nine packet captures I worked through for CCNA study</a>:
+  Wireshark's entire value is turning raw, hostile-by-default bytes into something a human can read
+  safely. But turning bytes into something readable requires code that understands the format of
+  those bytes well enough to parse them, and that code runs with the same permissions as whoever
+  opened Wireshark. If the person crafting those bytes knows the parser well enough, they're not
+  handing you data anymore, they're handing you input to a program, and every program that accepts
+  untrusted input has to get every single parsing decision right or it doesn't.
+</p>
+<p>
+  This is precisely why a security tool being widely used doesn't make it exempt from this. Wireshark
+  has one of the most heavily audited codebases in open-source networking software, specifically
+  because thousands of people who understand protocol parsing use it daily and plenty of them go
+  looking for exactly these bugs. Nineteen fixes in one release isn't a sign the project is careless,
+  it's closer to a sign the review process is actually working, catching issues before they show up
+  as something worse than a CVE number.
+</p>
+
+<h2 id="what-to-actually-do-about-it">What to actually do about it</h2>
+<p>
+  Upgrade. Wireshark 4.6.9 covers the 4.6 branch and 4.4.19 covers old-stable, released the same
+  week and rolling up the same fixes, so whichever branch you're on has a release waiting. Beyond
+  the version bump, two habits are worth picking up regardless of how urgent any single CVE here is.
+  Treat a Wireshark configuration profile you didn't create yourself the same way you'd treat an
+  email attachment: don't import one from an unfamiliar source just because it promises useful
+  display filters. And if part of your job, lab work, or CCNA study involves opening capture files
+  that came from somewhere other than your own traffic, run that analysis in a VM or a disposable
+  environment rather than your daily driver, the same way you'd handle a suspicious executable rather
+  than a trusted one.
+</p>
+<p>
+  None of this is a reason to distrust Wireshark specifically. It's a reason to remember that the
+  tool sitting between you and hostile traffic is still software, parsing bytes it did not choose,
+  and software that parses untrusted bytes is exactly the kind of software worth keeping current.
+</p>
+
+<h2 id="frequently-asked-questions">Frequently asked questions</h2>
+<h3>How many vulnerabilities does Wireshark 4.6.9 fix?</h3>
+<p>
+  Nineteen CVE-numbered issues, spanning protocol dissectors, capture file parsers, the Sharkd
+  utility, and profile import. Wireshark also quietly fixed several additional code-execution bugs
+  in the same release, reported through Trend Micro's Zero Day Initiative, that do not have CVE
+  numbers assigned yet.
+</p>
+<h3>What is a Wireshark dissector, and why does it matter here?</h3>
+<p>
+  A dissector is the code that reads a specific protocol's bytes off the wire and turns them into
+  the readable fields you see in Wireshark's interface, one dissector for ZigBee, one for SCTP, one
+  for X11, and so on. Every dissector is a small parser written to handle whatever bytes show up,
+  and a parser handling attacker-controlled bytes is exactly the kind of code that tends to have
+  crash and memory-safety bugs, which is what most of this release's 19 fixes are.
+</p>
+<h3>Can opening a malicious packet capture actually compromise my machine?</h3>
+<p>
+  Some of the bugs in this release say yes. Two RCE-class issues, an LBMC fragment reassembly
+  integer overflow and a LoRaWAN decryption numeric truncation bug, were reported as remote code
+  execution triggered by crafted capture data, not just a crash. Wireshark's own dissectors run with
+  whatever privileges the person running Wireshark has, so a capture file is not inert data the way
+  it looks.
+</p>
+<h3>Should I upgrade from Wireshark 4.4 instead of 4.6?</h3>
+<p>
+  Both branches got a security release the same week, 4.6.9 for the current stable line and 4.4.19
+  for the old-stable line, and both roll up the same set of fixes. Pick whichever branch you're
+  already on and take that branch's release. Staying on an older point release in either branch
+  leaves the same 19 CVEs open.
+</p>
+<h3>What is the most severe bug in this release?</h3>
+<p>
+  CVE-2026-96419 stands out because it does not require opening a suspicious capture at all, it
+  triggers from importing a specially crafted configuration profile, and Wireshark's own advisory
+  describes the outcome as a crash or possible code execution. Profiles get shared between analysts
+  and teams more casually than capture files do, which makes this one worth knowing about
+  specifically.
+</p>
+<h3>What should I actually do about this release?</h3>
+<p>
+  Upgrade to 4.6.9 or 4.4.19 depending on your branch, treat unsolicited capture files and shared
+  configuration profiles the same way you'd treat an unsolicited attachment, and if you regularly
+  open captures from outside sources, do it in a VM or sandboxed environment rather than on your
+  main analysis workstation.
+</p>
+</div>
+      <footer class="post-end">
+        
+        <nav class="nexthop" aria-label="More posts"><a class="prev" href="/blog/sudo-cve-2026-96512-time-based-bypass"><span class="k">&larr; previous hop</span>The Sudo Bug That Turns Your Clock Against You: CVE-2026-96512</a></nav>
+      </footer>
+    </div>
+    <aside class="toc" aria-label="On this page"><span class="toc-title"><span class="h">#</span> show ip route | toc</span><ol><li><a href="#what-actually-shipped-in-4-6-9">What actually shipped in 4.6.9</a></li><li><a href="#the-two-kinds-of-code-execution-in-this-release-and-why-they">The two kinds of &quot;code execution&quot; in this release, and why they&#x27;re different</a></li><li><a href="#every-affected-component-in-this-release-at-a-glance">Every affected component in this release, at a glance</a></li><li><a href="#why-a-read-only-tool-has-an-attack-surface-at-all">Why a &quot;read-only&quot; tool has an attack surface at all</a></li><li><a href="#what-to-actually-do-about-it">What to actually do about it</a></li><li><a href="#frequently-asked-questions">Frequently asked questions</a></li></ol></aside>
+  </div>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 28, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

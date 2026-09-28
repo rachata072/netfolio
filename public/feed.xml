@@ -5,8 +5,16 @@
   <link>https://breakfixlearn.com/</link>
   <description>CCNA lab walkthroughs, security write-ups, and Python network automation notes by Trey.</description>
   <language>en-ca</language>
-  <lastBuildDate>Sun, 27 Sep 2026 09:00:00 -0700</lastBuildDate>
+  <lastBuildDate>Mon, 28 Sep 2026 09:00:00 -0700</lastBuildDate>
   <atom:link href="https://breakfixlearn.com/feed.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>Wireshark 4.6.9: When the Tool You Trust to Read Traffic Has 19 Ways to Bite Back</title>
+    <link>https://breakfixlearn.com/blog/wireshark-4-6-9-security-release-19-cves</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/wireshark-4-6-9-security-release-19-cves.html</guid>
+    <pubDate>Mon, 28 Sep 2026 09:00:00 -0700</pubDate>
+    <category>NEWS</category>
+    <description>Wireshark 4.6.9 and the parallel 4.4.19 release patch 19 CVE-numbered bugs, mostly dissector crashes and infinite loops, plus several code-execution bugs reported through Trend Micro&#x27;s Zero Day Initiative that do not have CVE numbers yet. A plain-language walk through what actually broke, why a passive-looking analysis tool has an attack surface in the first place, and what to check before opening your next capture.</description>
+  </item>
   <item>
     <title>The Sudo Bug That Turns Your Clock Against You: CVE-2026-96512</title>
     <link>https://breakfixlearn.com/blog/sudo-cve-2026-96512-time-based-bypass</link>
