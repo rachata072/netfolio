@@ -1,0 +1,100 @@
+<!--
+  Text version of NET-02, shown under the sheet image on /cheat-sheets/net-02.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<h2 id="ports">Port map: 32 ports to know</h2>
+<p>Port, protocol and transport. Ports 23, 21/20, 69, 80, 110, 143, 161/162 and 514 send data in cleartext; 22, 443, 587 with TLS, 993, 995, 636, 6514 and 5061 are encrypted.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Group</th><th scope="col">Port</th><th scope="col">Protocol</th><th scope="col">Transport</th></tr></thead>
+  <tbody>
+    <tr><th scope="row" rowspan="8">Remote and files</th><td>20/21</td><td>FTP</td><td>TCP</td></tr>
+    <tr><td>22</td><td>SSH</td><td>TCP</td></tr>
+    <tr><td>23</td><td>Telnet</td><td>TCP</td></tr>
+    <tr><td>69</td><td>TFTP</td><td>UDP</td></tr>
+    <tr><td>137 to 139</td><td>NetBIOS</td><td>UDP/TCP</td></tr>
+    <tr><td>445</td><td>SMB/CIFS</td><td>TCP</td></tr>
+    <tr><td>3389</td><td>RDP</td><td>TCP/UDP</td></tr>
+    <tr><td>5900</td><td>VNC</td><td>TCP</td></tr>
+    <tr><th scope="row" rowspan="8">Web and email</th><td>80</td><td>HTTP</td><td>TCP</td></tr>
+    <tr><td>443</td><td>HTTPS</td><td>TCP/UDP</td></tr>
+    <tr><td>25</td><td>SMTP</td><td>TCP</td></tr>
+    <tr><td>587</td><td>Mail submission</td><td>TCP</td></tr>
+    <tr><td>110</td><td>POP3</td><td>TCP</td></tr>
+    <tr><td>995</td><td>POP3S</td><td>TCP</td></tr>
+    <tr><td>143</td><td>IMAP</td><td>TCP</td></tr>
+    <tr><td>993</td><td>IMAPS</td><td>TCP</td></tr>
+    <tr><th scope="row" rowspan="8">Network services</th><td>53</td><td>DNS</td><td>UDP/TCP</td></tr>
+    <tr><td>67/68</td><td>DHCP</td><td>UDP</td></tr>
+    <tr><td>123</td><td>NTP</td><td>UDP</td></tr>
+    <tr><td>161/162</td><td>SNMP</td><td>UDP</td></tr>
+    <tr><td>514</td><td>Syslog</td><td>UDP</td></tr>
+    <tr><td>6514</td><td>Syslog over TLS</td><td>TCP</td></tr>
+    <tr><td>5060</td><td>SIP</td><td>UDP/TCP</td></tr>
+    <tr><td>5061</td><td>SIP over TLS</td><td>TCP</td></tr>
+    <tr><th scope="row" rowspan="8">Identity and data</th><td>88</td><td>Kerberos</td><td>UDP/TCP</td></tr>
+    <tr><td>389</td><td>LDAP</td><td>TCP/UDP</td></tr>
+    <tr><td>636</td><td>LDAPS</td><td>TCP</td></tr>
+    <tr><td>49</td><td>TACACS+</td><td>TCP</td></tr>
+    <tr><td>1812/1813</td><td>RADIUS</td><td>UDP</td></tr>
+    <tr><td>1433</td><td>MS SQL</td><td>TCP</td></tr>
+    <tr><td>3306</td><td>MySQL</td><td>TCP</td></tr>
+    <tr><td>5432</td><td>PostgreSQL</td><td>TCP</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="secure">Swap cleartext for secure</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Instead of</th><th scope="col">Use</th><th scope="col">How it is protected</th></tr></thead>
+  <tbody>
+    <tr><td>Telnet 23</td><td>SSH 22</td><td>Encrypted</td></tr>
+    <tr><td>FTP 21, TFTP 69</td><td>SFTP or SCP on 22</td><td>Over SSH</td></tr>
+    <tr><td>HTTP 80</td><td>HTTPS 443</td><td>TLS</td></tr>
+    <tr><td>POP3 110, IMAP 143</td><td>995, 993</td><td>Implicit TLS</td></tr>
+    <tr><td>LDAP 389</td><td>LDAPS 636</td><td>TLS, or StartTLS on 389</td></tr>
+    <tr><td>SNMP v1/v2c</td><td>SNMPv3</td><td>Adds authentication and encryption</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="ranges">Port ranges</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Range</th><th scope="col">Name</th><th scope="col">Used for</th></tr></thead>
+  <tbody>
+    <tr><td>0 to 1023</td><th scope="row">Well-known</th><td>System services</td></tr>
+    <tr><td>1024 to 49151</td><th scope="row">Registered</th><td>Vendor applications</td></tr>
+    <tr><td>49152 to 65535</td><th scope="row">Dynamic</th><td>Client source ports</td></tr>
+  </tbody>
+</table></div>
+<p>TCP is reliable and uses a handshake: web, SSH, mail, SMB. UDP is fast with no handshake: DNS, DHCP, NTP, VoIP. DNS also uses TCP 53 for zone transfers and big replies. Source: RFC 6335.</p>
+
+<h2 id="listening">What is listening on this host?</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">Where</th><th scope="col">What it answers</th></tr></thead>
+  <tbody>
+    <tr><td><code>netstat -ano | findstr LISTENING</code></td><td>Windows</td><td>Listening ports and PIDs</td></tr>
+    <tr><td><code>Get-NetTCPConnection -State Listen</code></td><td>PowerShell</td><td>Listening TCP ports</td></tr>
+    <tr><td><code>ss -tulpn</code></td><td>Linux</td><td>Listening TCP and UDP ports</td></tr>
+    <tr><td><code>Test-NetConnection 192.0.2.10 -Port 22</code></td><td>PowerShell</td><td>Is the remote port open?</td></tr>
+    <tr><td><code>tasklist /FI "PID eq 4321"</code></td><td>Windows</td><td>Who owns the PID?</td></tr>
+    <tr><td><code>lsof -i :443</code></td><td>Linux</td><td>Who uses 443?</td></tr>
+  </tbody>
+</table></div>
+<p class="note note-caution"><b>Caution.</b> <code>ss -p</code> and <code>lsof</code> need sudo to see other users' processes. Exit the root shell when done.</p>
+
+<h2 id="firewall">Firewall rules of thumb</h2>
+<p class="note note-caution"><b>Danger.</b> Never open these to the internet: 23 Telnet, 135 to 139, 445 SMB, 3389 RDP, 1433, 3306 and 161 SNMP.</p>
+<ul>
+  <li><b>Default:</b> deny all inbound, allow only what a service needs.</li>
+  <li><b>Remote access:</b> RDP or SSH through a VPN or gateway with MFA.</li>
+  <li><b>Verify:</b> a port is a hint, not proof. Check the service.</li>
+  <li><b>Log:</b> log denied traffic and review it weekly.</li>
+</ul>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>FTP: 21 is control, 20 is data (active mode)</li>
+  <li>SNMP: 161 is the manager polling, 162 is traps</li>
+  <li>RADIUS is UDP, TACACS+ is TCP 49</li>
+  <li>DHCP: server 67, client 68, both UDP</li>
+  <li>Mail: 25 server to server, 587 client sends</li>
+  <li>SSH 22 also carries SFTP and SCP</li>
+</ul>

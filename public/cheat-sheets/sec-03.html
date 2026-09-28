@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SEC-03 Wireshark display filters Cheat Sheet (PDF) | breakfixlearn</title>
+<meta name="description" content="Free one-page Wireshark display filter cheat sheet: syntax, operators, troubleshooting and security hunting filters. PDF (Letter, A4) and image.">
+<link rel="canonical" href="https://breakfixlearn.com/cheat-sheets/sec-03">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=59472e0728">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="Wireshark display filters cheat sheet (SEC-03)">
+<meta property="og:description" content="Display filter anatomy, operators, everyday filters, troubleshooting filters and security hunting filters, with capture vs display filter rules.">
+<meta property="og:url" content="https://breakfixlearn.com/cheat-sheets/sec-03">
+<meta property="og:image" content="https://breakfixlearn.com/cheat-sheets/files/bfl-sec-03-wireshark-filters_v1.0_social.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SEC-03 Wireshark display filters cheat sheet preview">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"SEC-03 Wireshark display filters cheat sheet","description":"Free one-page Wireshark display filter cheat sheet: syntax, operators, troubleshooting and security hunting filters. PDF (Letter, A4) and image.","url":"https://breakfixlearn.com/cheat-sheets/sec-03","learningResourceType":"Cheat sheet","educationalLevel":"Beginner","teaches":"Wireshark display filters","keywords":"Wireshark, Display filters, Packet analysis, Troubleshooting, Threat hunting","inLanguage":"en","isAccessibleForFree":true,"license":"https://creativecommons.org/licenses/by-nc/4.0/","version":"1.0","datePublished":"2026-09-28","dateModified":"2026-09-28","image":"https://breakfixlearn.com/cheat-sheets/files/bfl-sec-03-wireshark-filters_v1.0_social.webp","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"encoding":[{"@type":"MediaObject","name":"SEC-03 Wireshark display filters (US Letter)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-sec-03-wireshark-filters_v1.0_print-letter.pdf","encodingFormat":"application/pdf","contentSize":"176 KB","sha256":"5618523bf8c4f89c9e7fe09b0727b887c41fc1fdf9be37d176771216f53cbd85"},{"@type":"MediaObject","name":"SEC-03 Wireshark display filters (A4)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-sec-03-wireshark-filters_v1.0_print-a4.pdf","encodingFormat":"application/pdf","contentSize":"176 KB","sha256":"0a4412e2f164c0d980bd678a817434f8e63c3962e68d2caf0b3bb1e82ca63277"},{"@type":"MediaObject","name":"SEC-03 Wireshark display filters (Screen)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-sec-03-wireshark-filters_v1.0_web.pdf","encodingFormat":"application/pdf","contentSize":"156 KB","sha256":"37b28ef97625621e30e8dc8c616636e9cfe2c44e0e91b684a770d06ba3302e19"},{"@type":"MediaObject","name":"SEC-03 Wireshark display filters (Hi-res image)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-sec-03-wireshark-filters_v1.0_full.webp","encodingFormat":"image/webp","contentSize":"518 KB","sha256":"e88011e69bbdcb184d5296f7c2fc0df969a4bce7402858d7a2fd7d0d1a211c70"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Cheat sheets","item":"https://breakfixlearn.com/cheat-sheets"},{"@type":"ListItem","position":3,"name":"SEC-03 Wireshark display filters"}]}</script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article class="sheet">
+  <header class="post-head sheet-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/cheat-sheets">cheat-sheets</a><span aria-hidden="true">/</span><a href="/cheat-sheets#cybersecurity">sec</a></nav>
+      <p class="scard-meta"><span class="sid k-cybersecurity">SEC-03</span><span>Cybersecurity</span></p>
+      <h1>Wireshark display filters</h1>
+      <p class="post-dek"><b>Use this when:</b> you need the few packets that matter in a capture: one host, one conversation, errors or suspicious traffic.</p>
+      <div class="post-meta"><span>Wireshark 4.x, Security+ and CCNA</span><span class="sep">/</span><span>v1.0</span><span class="sep">/</span><time datetime="2026-09-28">Sep 28, 2026</time><span class="sep">/</span><span>1 page</span><span class="sep">/</span><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license noopener" target="_blank">CC BY-NC 4.0</a></div>
+    </div>
+  </header>
+  <div class="wrap sheet-grid">
+    <figure class="sheet-paper">
+      <a href="/cheat-sheets/files/bfl-sec-03-wireshark-filters_v1.0_full.webp" aria-label="Open the full-size SEC-03 image (2550 by 3300 pixels)">
+        <img src="/cheat-sheets/files/bfl-sec-03-wireshark-filters_v1.0_web.webp" srcset="/cheat-sheets/files/bfl-sec-03-wireshark-filters_v1.0_web.webp 1200w, /cheat-sheets/files/bfl-sec-03-wireshark-filters_v1.0_full.webp 2550w" sizes="(max-width: 60rem) calc(100vw - 2rem), 46rem"
+             width="1200" height="1553" fetchpriority="high" decoding="async"
+             alt="SEC-03 Wireshark display filters cheat sheet. Every table on it is repeated as text below.">
+      </a>
+      <figcaption>Tap the sheet for the full-size image. The <a href="#text-version">text version</a> below is screen-reader friendly.</figcaption>
+    </figure>
+    <aside class="sheet-side" aria-labelledby="dl-h">
+      <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">copy</span> <span class="a">sec-03 flash:</span></span>
+      <h2 id="dl-h" class="side-h">Download</h2>
+      <ul class="dl-list"><li><a class="dl dl-pri" href="/cheat-sheets/files/bfl-sec-03-wireshark-filters_v1.0_print-letter.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>US Letter</b><span class="dl-m">print &middot; 176 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-sec-03-wireshark-filters_v1.0_print-a4.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>A4</b><span class="dl-m">print &middot; 176 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-sec-03-wireshark-filters_v1.0_web.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>Screen</b><span class="dl-m">links work &middot; 156 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-sec-03-wireshark-filters_v1.0_full.webp" download><span class="dl-k">WebP</span><span class="dl-t"><b>Hi-res image</b><span class="dl-m">2550 &times; 3300 &middot; 518 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li></ul>
+      <p class="dl-open"><a href="/cheat-sheets/files/bfl-sec-03-wireshark-filters_v1.0_web.pdf">Open the PDF in your browser</a> instead of downloading it.</p>
+      <details class="sums">
+        <summary>Verify your download (SHA-256)</summary>
+        <div class="tbl"><table class="sheet-files"><thead><tr><th scope="col">File</th><th scope="col">SHA-256</th></tr></thead><tbody><tr><td translate="no">bfl-sec-03-wireshark-filters_v1.0_web.pdf</td><td translate="no">37b28ef97625621e30e8dc8c616636e9cfe2c44e0e91b684a770d06ba3302e19</td></tr><tr><td translate="no">bfl-sec-03-wireshark-filters_v1.0_print-letter.pdf</td><td translate="no">5618523bf8c4f89c9e7fe09b0727b887c41fc1fdf9be37d176771216f53cbd85</td></tr><tr><td translate="no">bfl-sec-03-wireshark-filters_v1.0_print-a4.pdf</td><td translate="no">0a4412e2f164c0d980bd678a817434f8e63c3962e68d2caf0b3bb1e82ca63277</td></tr><tr><td translate="no">bfl-sec-03-wireshark-filters_v1.0_full.webp</td><td translate="no">e88011e69bbdcb184d5296f7c2fc0df969a4bce7402858d7a2fd7d0d1a211c70</td></tr></tbody></table></div>
+        <p>Compare the hash with the one printed by
+          <code translate="no">Get-FileHash .\file.pdf -Algorithm SHA256</code> (PowerShell) or
+          <code translate="no">sha256sum file.pdf</code> (Linux, macOS: <code translate="no">shasum -a 256</code>). Different hash, different file: delete it.</p>
+      </details>
+      <p class="side-note">Free for personal and classroom use under CC BY-NC 4.0. Keep the credit line; don't sell it. Spotted a mistake? <a href="mailto:treyrct858@gmail.com?subject=SEC-03%20v1.0%20correction">Email a correction</a>.</p>
+    </aside>
+  </div>
+  <section class="wrap sheet-text" aria-labelledby="text-version">
+    <div class="prose">
+      <h2 id="text-version">Text version</h2>
+      <p>Everything on the sheet, as plain HTML: handy for screen readers, copy-paste and search.</p>
+<p class="note note-auth"><b>Authorized use only.</b> Capture only on networks you own or may monitor. Captures can hold passwords and personal data: store them encrypted and delete them when done.</p>
+
+<h3 id="anatomy">Anatomy of a display filter</h3>
+<p>Type it in the bar above the packet list. Example: <code translate="no">ip.addr == 192.0.2.10 &amp;&amp; tcp.port in {80,443}</code>, made of a field, an operator, a value, logic, a second field, a set operator and set values. The bar turns green for a valid filter, red for a syntax error and yellow when you should check it.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col"></th><th scope="col">Display filter</th><th scope="col">Capture filter</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">When</th><td>After capture, change anytime</td><td>Before capture, fixed</td></tr>
+    <tr><th scope="row">Syntax</th><td>Wireshark fields</td><td>BPF (libpcap)</td></tr>
+    <tr><th scope="row">Example</th><td><code translate="no">tcp.port == 80</code></td><td><code translate="no">tcp port 80</code></td></tr>
+    <tr><th scope="row">Use for</th><td>Finding packets</td><td>Smaller files</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="operators">Operators</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">C-like</th><th scope="col">English</th><th scope="col">Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><code translate="no">==</code></td><td>eq</td><td>Equal (any value matches)</td></tr>
+    <tr><td><code translate="no">!=</code></td><td>ne</td><td>Not equal (all values, 3.6+)</td></tr>
+    <tr><td><code translate="no">&gt; &lt; &gt;= &lt;=</code></td><td>gt lt ge le</td><td>Compare numbers</td></tr>
+    <tr><td><code translate="no">&amp;&amp; || !</code></td><td>and or not</td><td>Combine or negate</td></tr>
+    <tr><td><code translate="no">contains</code></td><td></td><td>Field has this text</td></tr>
+    <tr><td><code translate="no">matches</code></td><td></td><td>Regex, for example <code translate="no">"(?i)login"</code></td></tr>
+    <tr><td><code translate="no">in {...}</code></td><td></td><td>In a set: <code translate="no">{443, 8000..8080}</code></td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="everyday">Everyday filters</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Filter</th><th scope="col">Shows</th></tr></thead>
+  <tbody>
+    <tr><td><code translate="no">ip.addr == 192.0.2.10</code></td><td>To or from a host</td></tr>
+    <tr><td><code translate="no">ip.src == 192.0.2.0/24</code></td><td>From a subnet</td></tr>
+    <tr><td><code translate="no">!(ip.addr == 192.0.2.10)</code></td><td>Hide a host</td></tr>
+    <tr><td><code translate="no">tcp.port == 443 || udp.port == 53</code></td><td>HTTPS or DNS</td></tr>
+    <tr><td><code translate="no">dns</code>, <code translate="no">dhcp</code>, <code translate="no">arp</code>, <code translate="no">icmp</code></td><td>One protocol</td></tr>
+    <tr><td><code translate="no">tcp.stream eq 5</code></td><td>One conversation</td></tr>
+    <tr><td><code translate="no">eth.addr == 00:00:5e:00:53:01</code></td><td>By MAC</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="troubleshoot">Troubleshoot</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Filter</th><th scope="col">Shows</th></tr></thead>
+  <tbody>
+    <tr><td><code translate="no">tcp.analysis.flags</code></td><td>Any TCP problem</td></tr>
+    <tr><td><code translate="no">tcp.analysis.retransmission</code></td><td>Lost packets</td></tr>
+    <tr><td><code translate="no">tcp.flags.reset == 1</code></td><td>Refused or reset</td></tr>
+    <tr><td><code translate="no">tcp.analysis.zero_window</code></td><td>Receiver full</td></tr>
+    <tr><td><code translate="no">dns.flags.rcode != 0</code></td><td>DNS errors</td></tr>
+    <tr><td><code translate="no">http.response.code &gt;= 400</code></td><td>Web errors</td></tr>
+    <tr><td><code translate="no">arp.duplicate-address-detected</code></td><td>IP conflict</td></tr>
+    <tr><td><code translate="no">icmp.type == 3</code></td><td>Unreachable</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="hunting">Security hunting</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Filter</th><th scope="col">Shows</th></tr></thead>
+  <tbody>
+    <tr><td><code translate="no">tcp.flags.syn == 1 &amp;&amp; tcp.flags.ack == 0</code></td><td>SYN scans</td></tr>
+    <tr><td><code translate="no">ftp || telnet || http.authorization</code></td><td>Cleartext logins</td></tr>
+    <tr><td><code translate="no">http.request.method == "POST"</code></td><td>Form submits</td></tr>
+    <tr><td><code translate="no">tls.handshake.type == 1</code></td><td>Client Hello, see the SNI</td></tr>
+    <tr><td><code translate="no">frame contains "password"</code></td><td>Leaked secrets</td></tr>
+  </tbody>
+</table></div>
+<p class="note note-caution"><b>Caution.</b> Do not run Wireshark as root or admin. Capture through dumpcap (the wireshark group on Linux) so the GUI stays unprivileged.</p>
+
+<h3 id="remember">Remember</h3>
+<ul>
+  <li>Right-click a field, then Apply as Filter</li>
+  <li>Capture filter <code translate="no">tcp port 80</code> is not the same as display filter <code translate="no">tcp.port == 80</code></li>
+  <li>To exclude a host, use <code translate="no">!(ip.addr == x)</code></li>
+  <li>Text values need quotes: <code translate="no">"POST"</code></li>
+  <li>Follow, then TCP Stream rebuilds a conversation</li>
+  <li>Save a filter as a button with the + on the bar</li>
+</ul>
+      <h3>Sources</h3>
+      <ul><li><a href="https://www.wireshark.org/docs/wsug_html_chunked/" rel="noopener" target="_blank">Wireshark User&#x27;s Guide</a></li><li><a href="https://www.wireshark.org/docs/dfref/" rel="noopener" target="_blank">Wireshark display filter reference</a></li><li><a href="https://wiki.wireshark.org/DisplayFilters" rel="noopener" target="_blank">Wireshark wiki, display filters</a></li><li><a href="https://www.rfc-editor.org/rfc/rfc8446" rel="noopener" target="_blank">RFC 8446, TLS 1.3</a></li></ul>
+      <h3>Go deeper on the blog</h3><ul><li><a href="/blog/wireshark-network-analysis-nine-packet-captures">What Nine Packet Captures Taught Me About Networks I Thought I Already Understood</a></li><li><a href="/blog/wireshark-4-6-9-security-release-19-cves">Wireshark 4.6.9: When the Tool You Trust to Read Traffic Has 19 Ways to Bite Back</a></li></ul>
+    </div>
+    <nav class="nexthop" aria-label="More cheat sheets"><a class="prev" href="/cheat-sheets/sec-02"><span class="k">&larr; previous sheet</span>SEC-02 Nmap scanning</a><a class="next" href="/cheat-sheets/it-01"><span class="k">next sheet &rarr;</span>IT-01 Troubleshooting methodology (CompTIA 7 steps)</a></nav>
+  </section>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 29, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

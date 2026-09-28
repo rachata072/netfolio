@@ -1,0 +1,95 @@
+<!--
+  Text version of IT-02, shown under the sheet image on /cheat-sheets/it-02.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<h2 id="run">Run box launchers</h2>
+<p>Press Win + R, type the name, and press Enter. Ctrl + Shift + Enter runs it as admin. <code>lusrmgr.msc</code> and <code>gpedit.msc</code> exist on Pro and Enterprise editions only.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Type</th><th scope="col">Opens</th></tr></thead>
+  <tbody>
+    <tr><td><code>devmgmt.msc</code></td><td>Device Manager</td></tr>
+    <tr><td><code>services.msc</code></td><td>Services</td></tr>
+    <tr><td><code>eventvwr.msc</code></td><td>Event Viewer</td></tr>
+    <tr><td><code>compmgmt.msc</code></td><td>Computer Management</td></tr>
+    <tr><td><code>diskmgmt.msc</code></td><td>Disk Management</td></tr>
+    <tr><td><code>taskschd.msc</code></td><td>Task Scheduler</td></tr>
+    <tr><td><code>lusrmgr.msc</code></td><td>Local users and groups</td></tr>
+    <tr><td><code>gpedit.msc</code></td><td>Local Group Policy</td></tr>
+    <tr><td><code>appwiz.cpl</code></td><td>Programs and Features</td></tr>
+    <tr><td><code>ncpa.cpl</code></td><td>Network adapters</td></tr>
+    <tr><td><code>sysdm.cpl</code></td><td>System properties</td></tr>
+    <tr><td><code>msinfo32</code></td><td>System Information</td></tr>
+    <tr><td><code>resmon</code></td><td>Resource Monitor</td></tr>
+    <tr><td><code>perfmon</code></td><td>Performance Monitor</td></tr>
+    <tr><td><code>msconfig</code></td><td>Boot and startup</td></tr>
+    <tr><td><code>cleanmgr</code></td><td>Disk Cleanup</td></tr>
+    <tr><td><code>mstsc</code></td><td>Remote Desktop</td></tr>
+    <tr><td><code>control</code></td><td>Control Panel</td></tr>
+    <tr><td><code>winver</code></td><td>Windows version</td></tr>
+    <tr><td><code>regedit</code> <span class="flag flag-caution">danger</span></td><td>Registry Editor</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="network">Network</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>ipconfig /all</code></td><td>IP, DNS, MAC and lease</td></tr>
+    <tr><td><code>ipconfig /release</code> and <code>/renew</code> <span class="flag flag-caution">caution</span></td><td>New DHCP lease</td></tr>
+    <tr><td><code>ipconfig /flushdns</code></td><td>Clear the DNS cache</td></tr>
+    <tr><td><code>ping -n 4 192.0.2.1</code></td><td>Is it reachable?</td></tr>
+    <tr><td><code>tracert</code>, <code>pathping</code></td><td>Where does it break?</td></tr>
+    <tr><td><code>nslookup example.com</code></td><td>DNS answer</td></tr>
+    <tr><td><code>netstat -ano</code></td><td>Ports and PIDs</td></tr>
+    <tr><td><code>net use Z: \\srv\share</code></td><td>Map a drive</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="system">System and repair</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>sfc /scannow</code> (admin)</td><td>Repair system files</td></tr>
+    <tr><td><code>DISM /Online /Cleanup-Image /RestoreHealth</code> (admin)</td><td>Repair the Windows image</td></tr>
+    <tr><td><code>chkdsk C: /f</code> (admin) <span class="flag flag-caution">caution</span></td><td>Fix disk errors</td></tr>
+    <tr><td><code>systeminfo</code></td><td>OS, uptime and patches</td></tr>
+    <tr><td><code>whoami</code>, <code>hostname</code></td><td>Who and where</td></tr>
+    <tr><td><code>gpupdate /force</code></td><td>Reapply policy</td></tr>
+    <tr><td><code>gpresult /r</code></td><td>Policies applied</td></tr>
+    <tr><td><code>net user jdoe /domain</code></td><td>Locked? Password expiry</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="processes">Processes and power</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>tasklist</code></td><td>Running processes</td></tr>
+    <tr><td><code>taskkill /PID 4321 /F</code> <span class="flag flag-caution">caution</span></td><td>Force close</td></tr>
+    <tr><td><code>shutdown /r /t 0</code> <span class="flag flag-caution">caution</span></td><td>Restart now</td></tr>
+    <tr><td><code>shutdown /a</code></td><td>Cancel a shutdown</td></tr>
+  </tbody>
+</table></div>
+<p class="note note-caution"><b>Caution.</b> <code>/F</code> and <code>/release</code> can lose unsaved work or drop a remote session. <code>chkdsk C: /f</code> runs at the next reboot. Tell the user first.</p>
+
+<h2 id="danger">Danger zone</h2>
+<p class="note note-caution"><b>Danger.</b> These erase or overwrite data. Double-check the drive letter or path and have a backup.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">Effect</th></tr></thead>
+  <tbody>
+    <tr><td><code>format D:</code></td><td>Wipes the volume</td></tr>
+    <tr><td><code>diskpart</code>, then <code>clean</code></td><td>Deletes every partition</td></tr>
+    <tr><td><code>robocopy src dst /MIR</code></td><td>Deletes extra files at the destination</td></tr>
+    <tr><td><code>del /s /q *.*</code></td><td>Deletes silently, no Recycle Bin</td></tr>
+    <tr><td><code>regedit</code></td><td>One wrong key can stop boot</td></tr>
+  </tbody>
+</table></div>
+<p>Handy: <code>cmd /?</code> shows help, Tab completes paths, <code>| clip</code> copies output, <code>&gt; log.txt</code> saves it.</p>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>Run DISM first, then <code>sfc /scannow</code> if files are corrupt</li>
+  <li>169.254.x.x after <code>/renew</code> means no DHCP server replied</li>
+  <li>.msc is a console snap-in; .cpl is a Control Panel item</li>
+  <li>Use an admin prompt only for the task, then close it</li>
+</ul>

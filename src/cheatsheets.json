@@ -4,66 +4,586 @@
     "url": "https://creativecommons.org/licenses/by-nc/4.0/"
   },
   "categories": {
-    "networking": { "code": "NET", "name": "Networking" },
-    "cybersecurity": { "code": "SEC", "name": "Cybersecurity" },
-    "it-support": { "code": "IT", "name": "IT Support" },
-    "ai": { "code": "AI", "name": "AI & Prompt Engineering", "short": "AI & prompts" }
+    "networking": {
+      "code": "NET",
+      "name": "Networking"
+    },
+    "cybersecurity": {
+      "code": "SEC",
+      "name": "Cybersecurity"
+    },
+    "it-support": {
+      "code": "IT",
+      "name": "IT Support"
+    },
+    "ai": {
+      "code": "AI",
+      "name": "AI & Prompt Engineering",
+      "short": "AI & prompts"
+    }
   },
   "sheets": [
     {
-      "id": "NET-01", "slug": "osi-model", "title": "OSI & TCP/IP models", "cat": "networking", "wave": 1, "status": "live",
-      "version": "1.0", "date": "2026-09-28", "exam": "CCNA 200-301 v1.1 & v2.0",
+      "id": "NET-01",
+      "slug": "osi-model",
+      "title": "OSI & TCP/IP models",
+      "cat": "networking",
+      "wave": 1,
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-09-28",
+      "exam": "CCNA 200-301 v1.1 & v2.0",
       "use_when": "You troubleshoot layer by layer, or need to place a protocol, device or attack at its layer.",
       "summary": "All seven OSI layers mapped to TCP/IP, with PDUs, protocols, encapsulation, TCP vs UDP, bottom-up troubleshooting commands and attacks by layer.",
       "description": "Free one-page OSI and TCP/IP cheat sheet: layers, PDUs, protocols, encapsulation, TCP vs UDP and bottom-up troubleshooting. PDF (Letter, A4) and image.",
-      "tags": ["OSI", "TCP/IP", "Encapsulation", "TCP", "UDP", "Troubleshooting"],
-      "sources": [
-        ["ISO/IEC 7498-1:1994, OSI basic reference model", "https://www.iso.org/standard/20269.html"],
-        ["RFC 1122, requirements for Internet hosts", "https://www.rfc-editor.org/rfc/rfc1122"],
-        ["RFC 9293, Transmission Control Protocol", "https://www.rfc-editor.org/rfc/rfc9293"],
-        ["RFC 768, User Datagram Protocol", "https://www.rfc-editor.org/rfc/rfc768"],
-        ["Cisco CCNA 200-301 exam topics", "https://learningnetwork.cisco.com/s/ccna-exam-topics"]
+      "tags": [
+        "OSI",
+        "TCP/IP",
+        "Encapsulation",
+        "TCP",
+        "UDP",
+        "Troubleshooting"
       ],
-      "related": ["wireshark-network-analysis-nine-packet-captures"]
+      "sources": [
+        [
+          "ISO/IEC 7498-1:1994, OSI basic reference model",
+          "https://www.iso.org/standard/20269.html"
+        ],
+        [
+          "RFC 1122, requirements for Internet hosts",
+          "https://www.rfc-editor.org/rfc/rfc1122"
+        ],
+        [
+          "RFC 9293, Transmission Control Protocol",
+          "https://www.rfc-editor.org/rfc/rfc9293"
+        ],
+        [
+          "RFC 768, User Datagram Protocol",
+          "https://www.rfc-editor.org/rfc/rfc768"
+        ],
+        [
+          "Cisco CCNA 200-301 exam topics",
+          "https://learningnetwork.cisco.com/s/ccna-exam-topics"
+        ]
+      ],
+      "related": [
+        "wireshark-network-analysis-nine-packet-captures"
+      ]
     },
-    { "id": "NET-02", "title": "Common ports & protocols", "cat": "networking", "wave": 1, "status": "planned" },
-    { "id": "NET-03", "title": "IPv4 subnetting & VLSM", "cat": "networking", "wave": 1, "status": "planned" },
-    { "id": "NET-04", "title": "IPv6 essentials", "cat": "networking", "wave": 2, "status": "planned" },
-    { "id": "NET-05", "title": "Cisco IOS CLI essentials", "cat": "networking", "wave": 2, "status": "planned" },
-    { "id": "NET-06", "title": "VLANs & 802.1Q trunking", "cat": "networking", "wave": 2, "status": "planned" },
-    { "id": "NET-07", "title": "STP/RSTP & EtherChannel", "cat": "networking", "wave": 2, "status": "planned" },
-    { "id": "NET-08", "title": "Static routing & OSPFv2", "cat": "networking", "wave": 3, "status": "planned" },
-    { "id": "NET-09", "title": "ACLs & wildcard masks", "cat": "networking", "wave": 2, "status": "planned" },
-    { "id": "NET-10", "title": "NAT/PAT, DHCP & DNS services", "cat": "networking", "wave": 3, "status": "planned" },
-    { "id": "NET-11", "title": "Wireless 802.11 & WLAN security", "cat": "networking", "wave": 3, "status": "planned" },
-    { "id": "NET-12", "title": "Python network automation (Netmiko, REST, JSON)", "cat": "networking", "wave": 3, "status": "planned" },
-    { "id": "SEC-01", "title": "Security fundamentals & key terms", "cat": "cybersecurity", "wave": 2, "status": "planned" },
-    { "id": "SEC-02", "title": "Nmap scanning", "cat": "cybersecurity", "wave": 1, "status": "planned" },
-    { "id": "SEC-03", "title": "Wireshark display filters", "cat": "cybersecurity", "wave": 1, "status": "planned" },
-    { "id": "SEC-04", "title": "Linux security commands", "cat": "cybersecurity", "wave": 2, "status": "planned" },
-    { "id": "SEC-05", "title": "Windows & PowerShell for defenders", "cat": "cybersecurity", "wave": 2, "status": "planned" },
-    { "id": "SEC-06", "title": "Common attacks & mitigations (MITRE ATT&CK)", "cat": "cybersecurity", "wave": 2, "status": "planned" },
-    { "id": "SEC-07", "title": "OWASP Top 10 web risks", "cat": "cybersecurity", "wave": 2, "status": "planned" },
-    { "id": "SEC-08", "title": "Incident response lifecycle", "cat": "cybersecurity", "wave": 3, "status": "planned" },
-    { "id": "SEC-09", "title": "Cryptography & hashing", "cat": "cybersecurity", "wave": 3, "status": "planned" },
-    { "id": "SEC-10", "title": "Host firewalls (ufw, nftables, Windows Firewall)", "cat": "cybersecurity", "wave": 3, "status": "planned" },
-    { "id": "SEC-11", "title": "Log analysis & SIEM queries", "cat": "cybersecurity", "wave": 3, "status": "planned" },
-    { "id": "SEC-12", "title": "Risk & compliance frameworks (NIST CSF, CIS, ISO 27001)", "cat": "cybersecurity", "wave": 3, "status": "planned" },
-    { "id": "IT-01", "title": "Troubleshooting methodology (CompTIA 7 steps)", "cat": "it-support", "wave": 1, "status": "planned" },
-    { "id": "IT-02", "title": "Windows CMD & Run commands", "cat": "it-support", "wave": 1, "status": "planned" },
-    { "id": "IT-03", "title": "PowerShell for help desk", "cat": "it-support", "wave": 2, "status": "planned" },
-    { "id": "IT-04", "title": "Network troubleshooting for help desk", "cat": "it-support", "wave": 2, "status": "planned" },
-    { "id": "IT-05", "title": "Active Directory & Microsoft 365 account tasks", "cat": "it-support", "wave": 2, "status": "planned" },
-    { "id": "IT-06", "title": "PC hardware & boot troubleshooting", "cat": "it-support", "wave": 3, "status": "planned" },
-    { "id": "IT-07", "title": "Linux basics for support", "cat": "it-support", "wave": 3, "status": "planned" },
-    { "id": "IT-08", "title": "ITIL, tickets & user communication", "cat": "it-support", "wave": 3, "status": "planned" },
-    { "id": "AI-01", "title": "Prompt anatomy (role, task, context, format)", "cat": "ai", "wave": 1, "status": "planned" },
-    { "id": "AI-02", "title": "Prompt patterns (few-shot, step-by-step, structured output)", "cat": "ai", "wave": 2, "status": "planned" },
-    { "id": "AI-03", "title": "Prompts for IT & networking tasks", "cat": "ai", "wave": 2, "status": "planned" },
-    { "id": "AI-04", "title": "AI security risks (OWASP LLM Top 10)", "cat": "ai", "wave": 2, "status": "planned" },
-    { "id": "AI-05", "title": "Checking AI output & hallucinations", "cat": "ai", "wave": 3, "status": "planned" },
-    { "id": "AI-06", "title": "AI glossary (tokens, context, RAG, agents)", "cat": "ai", "wave": 3, "status": "planned" },
-    { "id": "AI-07", "title": "Calling AI APIs with Python", "cat": "ai", "wave": 3, "status": "planned" },
-    { "id": "AI-08", "title": "Data privacy & responsible AI use", "cat": "ai", "wave": 3, "status": "planned" }
+    {
+      "id": "NET-02",
+      "slug": "ports-protocols",
+      "title": "Common ports & protocols",
+      "cat": "networking",
+      "wave": 1,
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-09-28",
+      "exam": "CCNA, Network+ and A+ Core 1",
+      "use_when": "You read a firewall rule, scan or netstat output and need the service behind a port.",
+      "summary": "32 ports to know, grouped by job, with cleartext-to-secure swaps, port ranges, listening-port commands and firewall rules of thumb.",
+      "description": "Free one-page common ports and protocols cheat sheet: 32 ports, TCP vs UDP, secure replacements, netstat and ss commands. PDF (Letter, A4) and image.",
+      "tags": [
+        "Ports",
+        "Protocols",
+        "TCP",
+        "UDP",
+        "Firewall",
+        "netstat"
+      ],
+      "sources": [
+        [
+          "IANA service name and port number registry",
+          "https://www.iana.org/assignments/service-name-port-numbers/service-names-port-numbers.xhtml"
+        ],
+        [
+          "RFC 6335, port number ranges",
+          "https://www.rfc-editor.org/rfc/rfc6335"
+        ],
+        [
+          "RFC 8314, cleartext considered obsolete for mail",
+          "https://www.rfc-editor.org/rfc/rfc8314"
+        ],
+        [
+          "CompTIA A+ certification objectives",
+          "https://www.comptia.org/en-us/certifications/a/"
+        ],
+        [
+          "Microsoft Learn, Test-NetConnection",
+          "https://learn.microsoft.com/en-us/powershell/module/nettcpip/test-netconnection"
+        ]
+      ],
+      "related": [
+        "wireshark-network-analysis-nine-packet-captures"
+      ]
+    },
+    {
+      "id": "NET-03",
+      "slug": "subnetting",
+      "title": "IPv4 subnetting & VLSM",
+      "cat": "networking",
+      "wave": 1,
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-09-28",
+      "exam": "CCNA 200-301 topic 1.6",
+      "use_when": "You size a subnet, find the network, broadcast and host range, or plan addresses with VLSM.",
+      "summary": "Subnet chart from /8 to /32, the 4-step method to solve any IP, a worked VLSM plan, special address ranges and the commands to check addresses.",
+      "description": "Free one-page IPv4 subnetting and VLSM cheat sheet: CIDR chart, wildcard masks, 4-step method, VLSM example, RFC 1918 ranges. PDF (Letter, A4) and image.",
+      "tags": [
+        "Subnetting",
+        "VLSM",
+        "CIDR",
+        "IPv4",
+        "Wildcard mask"
+      ],
+      "sources": [
+        [
+          "RFC 950, Internet standard subnetting procedure",
+          "https://www.rfc-editor.org/rfc/rfc950"
+        ],
+        [
+          "RFC 1918, address allocation for private internets",
+          "https://www.rfc-editor.org/rfc/rfc1918"
+        ],
+        [
+          "RFC 3021, 31-bit prefixes on point-to-point links",
+          "https://www.rfc-editor.org/rfc/rfc3021"
+        ],
+        [
+          "RFC 6890, special-purpose address registries",
+          "https://www.rfc-editor.org/rfc/rfc6890"
+        ],
+        [
+          "Cisco CCNA 200-301 exam topics",
+          "https://learningnetwork.cisco.com/s/ccna-exam-topics"
+        ]
+      ],
+      "related": [
+        "vlsm-subnet-calculator-python-tool"
+      ]
+    },
+    {
+      "id": "NET-04",
+      "title": "IPv6 essentials",
+      "cat": "networking",
+      "wave": 2,
+      "status": "planned"
+    },
+    {
+      "id": "NET-05",
+      "title": "Cisco IOS CLI essentials",
+      "cat": "networking",
+      "wave": 2,
+      "status": "planned"
+    },
+    {
+      "id": "NET-06",
+      "title": "VLANs & 802.1Q trunking",
+      "cat": "networking",
+      "wave": 2,
+      "status": "planned"
+    },
+    {
+      "id": "NET-07",
+      "title": "STP/RSTP & EtherChannel",
+      "cat": "networking",
+      "wave": 2,
+      "status": "planned"
+    },
+    {
+      "id": "NET-08",
+      "title": "Static routing & OSPFv2",
+      "cat": "networking",
+      "wave": 3,
+      "status": "planned"
+    },
+    {
+      "id": "NET-09",
+      "title": "ACLs & wildcard masks",
+      "cat": "networking",
+      "wave": 2,
+      "status": "planned"
+    },
+    {
+      "id": "NET-10",
+      "title": "NAT/PAT, DHCP & DNS services",
+      "cat": "networking",
+      "wave": 3,
+      "status": "planned"
+    },
+    {
+      "id": "NET-11",
+      "title": "Wireless 802.11 & WLAN security",
+      "cat": "networking",
+      "wave": 3,
+      "status": "planned"
+    },
+    {
+      "id": "NET-12",
+      "title": "Python network automation (Netmiko, REST, JSON)",
+      "cat": "networking",
+      "wave": 3,
+      "status": "planned"
+    },
+    {
+      "id": "SEC-01",
+      "title": "Security fundamentals & key terms",
+      "cat": "cybersecurity",
+      "wave": 2,
+      "status": "planned"
+    },
+    {
+      "id": "SEC-02",
+      "slug": "nmap",
+      "title": "Nmap scanning",
+      "cat": "cybersecurity",
+      "wave": 1,
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-09-28",
+      "exam": "Security+, CySA+ and PenTest+",
+      "use_when": "You need live hosts, open ports and service versions on a network you are allowed to test.",
+      "summary": "How a SYN scan reads a port, ready-made recipes, options by job, NSE script risks, timing templates and a pre-scan checklist.",
+      "description": "Free one-page Nmap cheat sheet: SYN scan states, common commands, options, NSE risks, timing templates, authorized-use checklist. PDF (Letter, A4) and image.",
+      "tags": [
+        "Nmap",
+        "Port scanning",
+        "NSE",
+        "Recon",
+        "Ethical hacking"
+      ],
+      "sources": [
+        [
+          "Nmap Reference Guide",
+          "https://nmap.org/book/man.html"
+        ],
+        [
+          "Nmap Network Scanning (nmap.org/book)",
+          "https://nmap.org/book/toc.html"
+        ]
+      ],
+      "related": [
+        "soc-homelab-first-alerts-attack-simulation"
+      ]
+    },
+    {
+      "id": "SEC-03",
+      "slug": "wireshark-filters",
+      "title": "Wireshark display filters",
+      "cat": "cybersecurity",
+      "wave": 1,
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-09-28",
+      "exam": "Wireshark 4.x, Security+ and CCNA",
+      "use_when": "You need the few packets that matter in a capture: one host, one conversation, errors or suspicious traffic.",
+      "summary": "Display filter anatomy, operators, everyday filters, troubleshooting filters and security hunting filters, with capture vs display filter rules.",
+      "description": "Free one-page Wireshark display filter cheat sheet: syntax, operators, troubleshooting and security hunting filters. PDF (Letter, A4) and image.",
+      "tags": [
+        "Wireshark",
+        "Display filters",
+        "Packet analysis",
+        "Troubleshooting",
+        "Threat hunting"
+      ],
+      "sources": [
+        [
+          "Wireshark User's Guide",
+          "https://www.wireshark.org/docs/wsug_html_chunked/"
+        ],
+        [
+          "Wireshark display filter reference",
+          "https://www.wireshark.org/docs/dfref/"
+        ],
+        [
+          "Wireshark wiki, display filters",
+          "https://wiki.wireshark.org/DisplayFilters"
+        ],
+        [
+          "RFC 8446, TLS 1.3",
+          "https://www.rfc-editor.org/rfc/rfc8446"
+        ]
+      ],
+      "related": [
+        "wireshark-network-analysis-nine-packet-captures",
+        "wireshark-4-6-9-security-release-19-cves"
+      ]
+    },
+    {
+      "id": "SEC-04",
+      "title": "Linux security commands",
+      "cat": "cybersecurity",
+      "wave": 2,
+      "status": "planned"
+    },
+    {
+      "id": "SEC-05",
+      "title": "Windows & PowerShell for defenders",
+      "cat": "cybersecurity",
+      "wave": 2,
+      "status": "planned"
+    },
+    {
+      "id": "SEC-06",
+      "title": "Common attacks & mitigations (MITRE ATT&CK)",
+      "cat": "cybersecurity",
+      "wave": 2,
+      "status": "planned"
+    },
+    {
+      "id": "SEC-07",
+      "title": "OWASP Top 10 web risks",
+      "cat": "cybersecurity",
+      "wave": 2,
+      "status": "planned"
+    },
+    {
+      "id": "SEC-08",
+      "title": "Incident response lifecycle",
+      "cat": "cybersecurity",
+      "wave": 3,
+      "status": "planned"
+    },
+    {
+      "id": "SEC-09",
+      "title": "Cryptography & hashing",
+      "cat": "cybersecurity",
+      "wave": 3,
+      "status": "planned"
+    },
+    {
+      "id": "SEC-10",
+      "title": "Host firewalls (ufw, nftables, Windows Firewall)",
+      "cat": "cybersecurity",
+      "wave": 3,
+      "status": "planned"
+    },
+    {
+      "id": "SEC-11",
+      "title": "Log analysis & SIEM queries",
+      "cat": "cybersecurity",
+      "wave": 3,
+      "status": "planned"
+    },
+    {
+      "id": "SEC-12",
+      "title": "Risk & compliance frameworks (NIST CSF, CIS, ISO 27001)",
+      "cat": "cybersecurity",
+      "wave": 3,
+      "status": "planned"
+    },
+    {
+      "id": "IT-01",
+      "slug": "troubleshooting-methodology",
+      "title": "Troubleshooting methodology (CompTIA 7 steps)",
+      "cat": "it-support",
+      "wave": 1,
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-09-28",
+      "exam": "CompTIA A+ and Network+ N10-009",
+      "use_when": "A ticket lands and you want a repeatable path from \"it's broken\" to fixed, verified and documented.",
+      "summary": "The CompTIA troubleshooting steps, questions to ask, ways to find the cause, a ticket note template, escalation checklist and priority matrix.",
+      "description": "Free one-page IT troubleshooting methodology cheat sheet: CompTIA steps, user questions, ticket notes, escalation and P1 to P4 priority. PDF (Letter, A4) and image.",
+      "tags": [
+        "Troubleshooting",
+        "Help desk",
+        "CompTIA",
+        "Ticketing",
+        "Escalation"
+      ],
+      "sources": [
+        [
+          "CompTIA A+ certification objectives",
+          "https://www.comptia.org/en-us/certifications/a/"
+        ],
+        [
+          "CompTIA Network+ certification objectives",
+          "https://www.comptia.org/en-us/certifications/network/"
+        ],
+        [
+          "NIST SP 800-61r3, incident response",
+          "https://csrc.nist.gov/pubs/sp/800/61/r3/final"
+        ]
+      ],
+      "related": [
+        "it-runbook-sops-real-service-desk",
+        "freshservice-service-desk-simulation-sla-tickets"
+      ]
+    },
+    {
+      "id": "IT-02",
+      "slug": "windows-cmd",
+      "title": "Windows CMD & Run commands",
+      "cat": "it-support",
+      "wave": 1,
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-09-28",
+      "exam": "CompTIA A+ Core 2 (220-1202)",
+      "use_when": "You need a Windows tool fast: open a console with Win + R or fix a PC from the command line.",
+      "summary": "Run-box launchers, network, repair and process commands, and a danger zone of commands that erase data.",
+      "description": "Free one-page Windows CMD and Run commands cheat sheet: .msc and .cpl launchers, ipconfig, sfc, DISM, chkdsk, taskkill. PDF (Letter, A4) and image.",
+      "tags": [
+        "Windows",
+        "CMD",
+        "Run box",
+        "ipconfig",
+        "sfc",
+        "DISM"
+      ],
+      "sources": [
+        [
+          "Microsoft Learn, Windows commands reference",
+          "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/windows-commands"
+        ],
+        [
+          "Microsoft Learn, repair a Windows image with DISM",
+          "https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/repair-a-windows-image"
+        ],
+        [
+          "CompTIA A+ certification objectives",
+          "https://www.comptia.org/en-us/certifications/a/"
+        ]
+      ],
+      "related": [
+        "it-runbook-sops-real-service-desk"
+      ]
+    },
+    {
+      "id": "IT-03",
+      "title": "PowerShell for help desk",
+      "cat": "it-support",
+      "wave": 2,
+      "status": "planned"
+    },
+    {
+      "id": "IT-04",
+      "title": "Network troubleshooting for help desk",
+      "cat": "it-support",
+      "wave": 2,
+      "status": "planned"
+    },
+    {
+      "id": "IT-05",
+      "title": "Active Directory & Microsoft 365 account tasks",
+      "cat": "it-support",
+      "wave": 2,
+      "status": "planned"
+    },
+    {
+      "id": "IT-06",
+      "title": "PC hardware & boot troubleshooting",
+      "cat": "it-support",
+      "wave": 3,
+      "status": "planned"
+    },
+    {
+      "id": "IT-07",
+      "title": "Linux basics for support",
+      "cat": "it-support",
+      "wave": 3,
+      "status": "planned"
+    },
+    {
+      "id": "IT-08",
+      "title": "ITIL, tickets & user communication",
+      "cat": "it-support",
+      "wave": 3,
+      "status": "planned"
+    },
+    {
+      "id": "AI-01",
+      "slug": "prompt-anatomy",
+      "title": "Prompt anatomy (role, task, context, format)",
+      "cat": "ai",
+      "wave": 1,
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-09-28",
+      "exam": "Claude, ChatGPT and Gemini",
+      "use_when": "You want an AI assistant to give a useful, checkable answer on the first try.",
+      "summary": "The 6 parts of a strong prompt, a before and after example, power techniques, how to iterate and how to use AI safely.",
+      "description": "Free one-page prompt engineering cheat sheet: role, task, context, limits, format, examples, techniques and AI safety. PDF (Letter, A4) and image.",
+      "tags": [
+        "Prompt engineering",
+        "AI",
+        "Claude",
+        "ChatGPT",
+        "Gemini",
+        "LLM security"
+      ],
+      "sources": [
+        [
+          "Anthropic, prompt engineering overview",
+          "https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/overview"
+        ],
+        [
+          "OpenAI, prompt engineering guide",
+          "https://platform.openai.com/docs/guides/prompt-engineering"
+        ],
+        [
+          "Google, Gemini prompting strategies",
+          "https://ai.google.dev/gemini-api/docs/prompting-strategies"
+        ],
+        [
+          "OWASP Top 10 for LLM applications (2025)",
+          "https://genai.owasp.org/llm-top-10/"
+        ]
+      ],
+      "related": [
+        "best-ai-tools-network-engineers-2026"
+      ]
+    },
+    {
+      "id": "AI-02",
+      "title": "Prompt patterns (few-shot, step-by-step, structured output)",
+      "cat": "ai",
+      "wave": 2,
+      "status": "planned"
+    },
+    {
+      "id": "AI-03",
+      "title": "Prompts for IT & networking tasks",
+      "cat": "ai",
+      "wave": 2,
+      "status": "planned"
+    },
+    {
+      "id": "AI-04",
+      "title": "AI security risks (OWASP LLM Top 10)",
+      "cat": "ai",
+      "wave": 2,
+      "status": "planned"
+    },
+    {
+      "id": "AI-05",
+      "title": "Checking AI output & hallucinations",
+      "cat": "ai",
+      "wave": 3,
+      "status": "planned"
+    },
+    {
+      "id": "AI-06",
+      "title": "AI glossary (tokens, context, RAG, agents)",
+      "cat": "ai",
+      "wave": 3,
+      "status": "planned"
+    },
+    {
+      "id": "AI-07",
+      "title": "Calling AI APIs with Python",
+      "cat": "ai",
+      "wave": 3,
+      "status": "planned"
+    },
+    {
+      "id": "AI-08",
+      "title": "Data privacy & responsible AI use",
+      "cat": "ai",
+      "wave": 3,
+      "status": "planned"
+    }
   ]
 }

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NET-02 Common ports &amp; protocols Cheat Sheet (PDF) | breakfixlearn</title>
+<meta name="description" content="Free one-page common ports and protocols cheat sheet: 32 ports, TCP vs UDP, secure replacements, netstat and ss commands. PDF (Letter, A4) and image.">
+<link rel="canonical" href="https://breakfixlearn.com/cheat-sheets/net-02">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=59472e0728">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="Common ports &amp; protocols cheat sheet (NET-02)">
+<meta property="og:description" content="32 ports to know, grouped by job, with cleartext-to-secure swaps, port ranges, listening-port commands and firewall rules of thumb.">
+<meta property="og:url" content="https://breakfixlearn.com/cheat-sheets/net-02">
+<meta property="og:image" content="https://breakfixlearn.com/cheat-sheets/files/bfl-net-02-ports-protocols_v1.0_social.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="NET-02 Common ports &amp; protocols cheat sheet preview">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"NET-02 Common ports & protocols cheat sheet","description":"Free one-page common ports and protocols cheat sheet: 32 ports, TCP vs UDP, secure replacements, netstat and ss commands. PDF (Letter, A4) and image.","url":"https://breakfixlearn.com/cheat-sheets/net-02","learningResourceType":"Cheat sheet","educationalLevel":"Beginner","teaches":"Common ports & protocols","keywords":"Ports, Protocols, TCP, UDP, Firewall, netstat","inLanguage":"en","isAccessibleForFree":true,"license":"https://creativecommons.org/licenses/by-nc/4.0/","version":"1.0","datePublished":"2026-09-28","dateModified":"2026-09-28","image":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-02-ports-protocols_v1.0_social.webp","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"encoding":[{"@type":"MediaObject","name":"NET-02 Common ports & protocols (US Letter)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-02-ports-protocols_v1.0_print-letter.pdf","encodingFormat":"application/pdf","contentSize":"186 KB","sha256":"3c5581f6aa29525683dc756ae9ee1ee612fb9bdc4458774906c869f4e56d3448"},{"@type":"MediaObject","name":"NET-02 Common ports & protocols (A4)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-02-ports-protocols_v1.0_print-a4.pdf","encodingFormat":"application/pdf","contentSize":"186 KB","sha256":"96ac68e6ccd6fc2656b383fbe30f99187cce27180c4caba711f7dbf5693f839d"},{"@type":"MediaObject","name":"NET-02 Common ports & protocols (Screen)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-02-ports-protocols_v1.0_web.pdf","encodingFormat":"application/pdf","contentSize":"171 KB","sha256":"386a2c7545f529a1dad5d5576844be1767f0c5cb18461861acf0c169c258a178"},{"@type":"MediaObject","name":"NET-02 Common ports & protocols (Hi-res image)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-02-ports-protocols_v1.0_full.webp","encodingFormat":"image/webp","contentSize":"562 KB","sha256":"978290cbd0a13719639a7a8fc01c243e5079e9aff814dc96a77488b14f99cc57"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Cheat sheets","item":"https://breakfixlearn.com/cheat-sheets"},{"@type":"ListItem","position":3,"name":"NET-02 Common ports & protocols"}]}</script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article class="sheet">
+  <header class="post-head sheet-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/cheat-sheets">cheat-sheets</a><span aria-hidden="true">/</span><a href="/cheat-sheets#networking">net</a></nav>
+      <p class="scard-meta"><span class="sid k-networking">NET-02</span><span>Networking</span></p>
+      <h1>Common ports &amp; protocols</h1>
+      <p class="post-dek"><b>Use this when:</b> you read a firewall rule, scan or netstat output and need the service behind a port.</p>
+      <div class="post-meta"><span>CCNA, Network+ and A+ Core 1</span><span class="sep">/</span><span>v1.0</span><span class="sep">/</span><time datetime="2026-09-28">Sep 28, 2026</time><span class="sep">/</span><span>1 page</span><span class="sep">/</span><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license noopener" target="_blank">CC BY-NC 4.0</a></div>
+    </div>
+  </header>
+  <div class="wrap sheet-grid">
+    <figure class="sheet-paper">
+      <a href="/cheat-sheets/files/bfl-net-02-ports-protocols_v1.0_full.webp" aria-label="Open the full-size NET-02 image (2550 by 3300 pixels)">
+        <img src="/cheat-sheets/files/bfl-net-02-ports-protocols_v1.0_web.webp" srcset="/cheat-sheets/files/bfl-net-02-ports-protocols_v1.0_web.webp 1200w, /cheat-sheets/files/bfl-net-02-ports-protocols_v1.0_full.webp 2550w" sizes="(max-width: 60rem) calc(100vw - 2rem), 46rem"
+             width="1200" height="1553" fetchpriority="high" decoding="async"
+             alt="NET-02 Common ports &amp; protocols cheat sheet. Every table on it is repeated as text below.">
+      </a>
+      <figcaption>Tap the sheet for the full-size image. The <a href="#text-version">text version</a> below is screen-reader friendly.</figcaption>
+    </figure>
+    <aside class="sheet-side" aria-labelledby="dl-h">
+      <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">copy</span> <span class="a">net-02 flash:</span></span>
+      <h2 id="dl-h" class="side-h">Download</h2>
+      <ul class="dl-list"><li><a class="dl dl-pri" href="/cheat-sheets/files/bfl-net-02-ports-protocols_v1.0_print-letter.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>US Letter</b><span class="dl-m">print &middot; 186 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-net-02-ports-protocols_v1.0_print-a4.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>A4</b><span class="dl-m">print &middot; 186 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-net-02-ports-protocols_v1.0_web.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>Screen</b><span class="dl-m">links work &middot; 171 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-net-02-ports-protocols_v1.0_full.webp" download><span class="dl-k">WebP</span><span class="dl-t"><b>Hi-res image</b><span class="dl-m">2550 &times; 3300 &middot; 562 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li></ul>
+      <p class="dl-open"><a href="/cheat-sheets/files/bfl-net-02-ports-protocols_v1.0_web.pdf">Open the PDF in your browser</a> instead of downloading it.</p>
+      <details class="sums">
+        <summary>Verify your download (SHA-256)</summary>
+        <div class="tbl"><table class="sheet-files"><thead><tr><th scope="col">File</th><th scope="col">SHA-256</th></tr></thead><tbody><tr><td translate="no">bfl-net-02-ports-protocols_v1.0_web.pdf</td><td translate="no">386a2c7545f529a1dad5d5576844be1767f0c5cb18461861acf0c169c258a178</td></tr><tr><td translate="no">bfl-net-02-ports-protocols_v1.0_print-letter.pdf</td><td translate="no">3c5581f6aa29525683dc756ae9ee1ee612fb9bdc4458774906c869f4e56d3448</td></tr><tr><td translate="no">bfl-net-02-ports-protocols_v1.0_print-a4.pdf</td><td translate="no">96ac68e6ccd6fc2656b383fbe30f99187cce27180c4caba711f7dbf5693f839d</td></tr><tr><td translate="no">bfl-net-02-ports-protocols_v1.0_full.webp</td><td translate="no">978290cbd0a13719639a7a8fc01c243e5079e9aff814dc96a77488b14f99cc57</td></tr></tbody></table></div>
+        <p>Compare the hash with the one printed by
+          <code translate="no">Get-FileHash .\file.pdf -Algorithm SHA256</code> (PowerShell) or
+          <code translate="no">sha256sum file.pdf</code> (Linux, macOS: <code translate="no">shasum -a 256</code>). Different hash, different file: delete it.</p>
+      </details>
+      <p class="side-note">Free for personal and classroom use under CC BY-NC 4.0. Keep the credit line; don't sell it. Spotted a mistake? <a href="mailto:treyrct858@gmail.com?subject=NET-02%20v1.0%20correction">Email a correction</a>.</p>
+    </aside>
+  </div>
+  <section class="wrap sheet-text" aria-labelledby="text-version">
+    <div class="prose">
+      <h2 id="text-version">Text version</h2>
+      <p>Everything on the sheet, as plain HTML: handy for screen readers, copy-paste and search.</p>
+<h3 id="ports">Port map: 32 ports to know</h3>
+<p>Port, protocol and transport. Ports 23, 21/20, 69, 80, 110, 143, 161/162 and 514 send data in cleartext; 22, 443, 587 with TLS, 993, 995, 636, 6514 and 5061 are encrypted.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Group</th><th scope="col">Port</th><th scope="col">Protocol</th><th scope="col">Transport</th></tr></thead>
+  <tbody>
+    <tr><th scope="row" rowspan="8">Remote and files</th><td>20/21</td><td>FTP</td><td>TCP</td></tr>
+    <tr><td>22</td><td>SSH</td><td>TCP</td></tr>
+    <tr><td>23</td><td>Telnet</td><td>TCP</td></tr>
+    <tr><td>69</td><td>TFTP</td><td>UDP</td></tr>
+    <tr><td>137 to 139</td><td>NetBIOS</td><td>UDP/TCP</td></tr>
+    <tr><td>445</td><td>SMB/CIFS</td><td>TCP</td></tr>
+    <tr><td>3389</td><td>RDP</td><td>TCP/UDP</td></tr>
+    <tr><td>5900</td><td>VNC</td><td>TCP</td></tr>
+    <tr><th scope="row" rowspan="8">Web and email</th><td>80</td><td>HTTP</td><td>TCP</td></tr>
+    <tr><td>443</td><td>HTTPS</td><td>TCP/UDP</td></tr>
+    <tr><td>25</td><td>SMTP</td><td>TCP</td></tr>
+    <tr><td>587</td><td>Mail submission</td><td>TCP</td></tr>
+    <tr><td>110</td><td>POP3</td><td>TCP</td></tr>
+    <tr><td>995</td><td>POP3S</td><td>TCP</td></tr>
+    <tr><td>143</td><td>IMAP</td><td>TCP</td></tr>
+    <tr><td>993</td><td>IMAPS</td><td>TCP</td></tr>
+    <tr><th scope="row" rowspan="8">Network services</th><td>53</td><td>DNS</td><td>UDP/TCP</td></tr>
+    <tr><td>67/68</td><td>DHCP</td><td>UDP</td></tr>
+    <tr><td>123</td><td>NTP</td><td>UDP</td></tr>
+    <tr><td>161/162</td><td>SNMP</td><td>UDP</td></tr>
+    <tr><td>514</td><td>Syslog</td><td>UDP</td></tr>
+    <tr><td>6514</td><td>Syslog over TLS</td><td>TCP</td></tr>
+    <tr><td>5060</td><td>SIP</td><td>UDP/TCP</td></tr>
+    <tr><td>5061</td><td>SIP over TLS</td><td>TCP</td></tr>
+    <tr><th scope="row" rowspan="8">Identity and data</th><td>88</td><td>Kerberos</td><td>UDP/TCP</td></tr>
+    <tr><td>389</td><td>LDAP</td><td>TCP/UDP</td></tr>
+    <tr><td>636</td><td>LDAPS</td><td>TCP</td></tr>
+    <tr><td>49</td><td>TACACS+</td><td>TCP</td></tr>
+    <tr><td>1812/1813</td><td>RADIUS</td><td>UDP</td></tr>
+    <tr><td>1433</td><td>MS SQL</td><td>TCP</td></tr>
+    <tr><td>3306</td><td>MySQL</td><td>TCP</td></tr>
+    <tr><td>5432</td><td>PostgreSQL</td><td>TCP</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="secure">Swap cleartext for secure</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Instead of</th><th scope="col">Use</th><th scope="col">How it is protected</th></tr></thead>
+  <tbody>
+    <tr><td>Telnet 23</td><td>SSH 22</td><td>Encrypted</td></tr>
+    <tr><td>FTP 21, TFTP 69</td><td>SFTP or SCP on 22</td><td>Over SSH</td></tr>
+    <tr><td>HTTP 80</td><td>HTTPS 443</td><td>TLS</td></tr>
+    <tr><td>POP3 110, IMAP 143</td><td>995, 993</td><td>Implicit TLS</td></tr>
+    <tr><td>LDAP 389</td><td>LDAPS 636</td><td>TLS, or StartTLS on 389</td></tr>
+    <tr><td>SNMP v1/v2c</td><td>SNMPv3</td><td>Adds authentication and encryption</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="ranges">Port ranges</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Range</th><th scope="col">Name</th><th scope="col">Used for</th></tr></thead>
+  <tbody>
+    <tr><td>0 to 1023</td><th scope="row">Well-known</th><td>System services</td></tr>
+    <tr><td>1024 to 49151</td><th scope="row">Registered</th><td>Vendor applications</td></tr>
+    <tr><td>49152 to 65535</td><th scope="row">Dynamic</th><td>Client source ports</td></tr>
+  </tbody>
+</table></div>
+<p>TCP is reliable and uses a handshake: web, SSH, mail, SMB. UDP is fast with no handshake: DNS, DHCP, NTP, VoIP. DNS also uses TCP 53 for zone transfers and big replies. Source: RFC 6335.</p>
+
+<h3 id="listening">What is listening on this host?</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">Where</th><th scope="col">What it answers</th></tr></thead>
+  <tbody>
+    <tr><td><code translate="no">netstat -ano | findstr LISTENING</code></td><td>Windows</td><td>Listening ports and PIDs</td></tr>
+    <tr><td><code translate="no">Get-NetTCPConnection -State Listen</code></td><td>PowerShell</td><td>Listening TCP ports</td></tr>
+    <tr><td><code translate="no">ss -tulpn</code></td><td>Linux</td><td>Listening TCP and UDP ports</td></tr>
+    <tr><td><code translate="no">Test-NetConnection 192.0.2.10 -Port 22</code></td><td>PowerShell</td><td>Is the remote port open?</td></tr>
+    <tr><td><code translate="no">tasklist /FI "PID eq 4321"</code></td><td>Windows</td><td>Who owns the PID?</td></tr>
+    <tr><td><code translate="no">lsof -i :443</code></td><td>Linux</td><td>Who uses 443?</td></tr>
+  </tbody>
+</table></div>
+<p class="note note-caution"><b>Caution.</b> <code translate="no">ss -p</code> and <code translate="no">lsof</code> need sudo to see other users' processes. Exit the root shell when done.</p>
+
+<h3 id="firewall">Firewall rules of thumb</h3>
+<p class="note note-caution"><b>Danger.</b> Never open these to the internet: 23 Telnet, 135 to 139, 445 SMB, 3389 RDP, 1433, 3306 and 161 SNMP.</p>
+<ul>
+  <li><b>Default:</b> deny all inbound, allow only what a service needs.</li>
+  <li><b>Remote access:</b> RDP or SSH through a VPN or gateway with MFA.</li>
+  <li><b>Verify:</b> a port is a hint, not proof. Check the service.</li>
+  <li><b>Log:</b> log denied traffic and review it weekly.</li>
+</ul>
+
+<h3 id="remember">Remember</h3>
+<ul>
+  <li>FTP: 21 is control, 20 is data (active mode)</li>
+  <li>SNMP: 161 is the manager polling, 162 is traps</li>
+  <li>RADIUS is UDP, TACACS+ is TCP 49</li>
+  <li>DHCP: server 67, client 68, both UDP</li>
+  <li>Mail: 25 server to server, 587 client sends</li>
+  <li>SSH 22 also carries SFTP and SCP</li>
+</ul>
+      <h3>Sources</h3>
+      <ul><li><a href="https://www.iana.org/assignments/service-name-port-numbers/service-names-port-numbers.xhtml" rel="noopener" target="_blank">IANA service name and port number registry</a></li><li><a href="https://www.rfc-editor.org/rfc/rfc6335" rel="noopener" target="_blank">RFC 6335, port number ranges</a></li><li><a href="https://www.rfc-editor.org/rfc/rfc8314" rel="noopener" target="_blank">RFC 8314, cleartext considered obsolete for mail</a></li><li><a href="https://www.comptia.org/en-us/certifications/a/" rel="noopener" target="_blank">CompTIA A+ certification objectives</a></li><li><a href="https://learn.microsoft.com/en-us/powershell/module/nettcpip/test-netconnection" rel="noopener" target="_blank">Microsoft Learn, Test-NetConnection</a></li></ul>
+      <h3>Go deeper on the blog</h3><ul><li><a href="/blog/wireshark-network-analysis-nine-packet-captures">What Nine Packet Captures Taught Me About Networks I Thought I Already Understood</a></li></ul>
+    </div>
+    <nav class="nexthop" aria-label="More cheat sheets"><a class="prev" href="/cheat-sheets/net-01"><span class="k">&larr; previous sheet</span>NET-01 OSI &amp; TCP/IP models</a><a class="next" href="/cheat-sheets/net-03"><span class="k">next sheet &rarr;</span>NET-03 IPv4 subnetting &amp; VLSM</a></nav>
+  </section>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 29, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

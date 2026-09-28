@@ -1,0 +1,83 @@
+<!--
+  Text version of SEC-03, shown under the sheet image on /cheat-sheets/sec-03.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<p class="note note-auth"><b>Authorized use only.</b> Capture only on networks you own or may monitor. Captures can hold passwords and personal data: store them encrypted and delete them when done.</p>
+
+<h2 id="anatomy">Anatomy of a display filter</h2>
+<p>Type it in the bar above the packet list. Example: <code>ip.addr == 192.0.2.10 &amp;&amp; tcp.port in {80,443}</code>, made of a field, an operator, a value, logic, a second field, a set operator and set values. The bar turns green for a valid filter, red for a syntax error and yellow when you should check it.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col"></th><th scope="col">Display filter</th><th scope="col">Capture filter</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">When</th><td>After capture, change anytime</td><td>Before capture, fixed</td></tr>
+    <tr><th scope="row">Syntax</th><td>Wireshark fields</td><td>BPF (libpcap)</td></tr>
+    <tr><th scope="row">Example</th><td><code>tcp.port == 80</code></td><td><code>tcp port 80</code></td></tr>
+    <tr><th scope="row">Use for</th><td>Finding packets</td><td>Smaller files</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="operators">Operators</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">C-like</th><th scope="col">English</th><th scope="col">Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><code>==</code></td><td>eq</td><td>Equal (any value matches)</td></tr>
+    <tr><td><code>!=</code></td><td>ne</td><td>Not equal (all values, 3.6+)</td></tr>
+    <tr><td><code>&gt; &lt; &gt;= &lt;=</code></td><td>gt lt ge le</td><td>Compare numbers</td></tr>
+    <tr><td><code>&amp;&amp; || !</code></td><td>and or not</td><td>Combine or negate</td></tr>
+    <tr><td><code>contains</code></td><td></td><td>Field has this text</td></tr>
+    <tr><td><code>matches</code></td><td></td><td>Regex, for example <code>"(?i)login"</code></td></tr>
+    <tr><td><code>in {...}</code></td><td></td><td>In a set: <code>{443, 8000..8080}</code></td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="everyday">Everyday filters</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Filter</th><th scope="col">Shows</th></tr></thead>
+  <tbody>
+    <tr><td><code>ip.addr == 192.0.2.10</code></td><td>To or from a host</td></tr>
+    <tr><td><code>ip.src == 192.0.2.0/24</code></td><td>From a subnet</td></tr>
+    <tr><td><code>!(ip.addr == 192.0.2.10)</code></td><td>Hide a host</td></tr>
+    <tr><td><code>tcp.port == 443 || udp.port == 53</code></td><td>HTTPS or DNS</td></tr>
+    <tr><td><code>dns</code>, <code>dhcp</code>, <code>arp</code>, <code>icmp</code></td><td>One protocol</td></tr>
+    <tr><td><code>tcp.stream eq 5</code></td><td>One conversation</td></tr>
+    <tr><td><code>eth.addr == 00:00:5e:00:53:01</code></td><td>By MAC</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="troubleshoot">Troubleshoot</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Filter</th><th scope="col">Shows</th></tr></thead>
+  <tbody>
+    <tr><td><code>tcp.analysis.flags</code></td><td>Any TCP problem</td></tr>
+    <tr><td><code>tcp.analysis.retransmission</code></td><td>Lost packets</td></tr>
+    <tr><td><code>tcp.flags.reset == 1</code></td><td>Refused or reset</td></tr>
+    <tr><td><code>tcp.analysis.zero_window</code></td><td>Receiver full</td></tr>
+    <tr><td><code>dns.flags.rcode != 0</code></td><td>DNS errors</td></tr>
+    <tr><td><code>http.response.code &gt;= 400</code></td><td>Web errors</td></tr>
+    <tr><td><code>arp.duplicate-address-detected</code></td><td>IP conflict</td></tr>
+    <tr><td><code>icmp.type == 3</code></td><td>Unreachable</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="hunting">Security hunting</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Filter</th><th scope="col">Shows</th></tr></thead>
+  <tbody>
+    <tr><td><code>tcp.flags.syn == 1 &amp;&amp; tcp.flags.ack == 0</code></td><td>SYN scans</td></tr>
+    <tr><td><code>ftp || telnet || http.authorization</code></td><td>Cleartext logins</td></tr>
+    <tr><td><code>http.request.method == "POST"</code></td><td>Form submits</td></tr>
+    <tr><td><code>tls.handshake.type == 1</code></td><td>Client Hello, see the SNI</td></tr>
+    <tr><td><code>frame contains "password"</code></td><td>Leaked secrets</td></tr>
+  </tbody>
+</table></div>
+<p class="note note-caution"><b>Caution.</b> Do not run Wireshark as root or admin. Capture through dumpcap (the wireshark group on Linux) so the GUI stays unprivileged.</p>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>Right-click a field, then Apply as Filter</li>
+  <li>Capture filter <code>tcp port 80</code> is not the same as display filter <code>tcp.port == 80</code></li>
+  <li>To exclude a host, use <code>!(ip.addr == x)</code></li>
+  <li>Text values need quotes: <code>"POST"</code></li>
+  <li>Follow, then TCP Stream rebuilds a conversation</li>
+  <li>Save a filter as a button with the + on the bar</li>
+</ul>

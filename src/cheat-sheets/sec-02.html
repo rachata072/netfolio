@@ -1,0 +1,95 @@
+<!--
+  Text version of SEC-02, shown under the sheet image on /cheat-sheets/sec-02.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<p class="note note-auth"><b>Authorized use only.</b> Scan only networks you own or have written permission to test. Practice in your lab or on scanme.nmap.org.</p>
+
+<h2 id="syn">How a SYN scan reads a port</h2>
+<p>The SYN scan (<code>-sS</code>) is the default when you run Nmap as root or admin.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Nmap sends</th><th scope="col">Target replies</th><th scope="col">Port state</th></tr></thead>
+  <tbody>
+    <tr><td>SYN</td><td>SYN/ACK</td><td>open</td></tr>
+    <tr><td>SYN</td><td>RST</td><td>closed</td></tr>
+    <tr><td>SYN</td><td>No reply</td><td>filtered</td></tr>
+  </tbody>
+</table></div>
+<p>An ICMP unreachable also means filtered. On an open port Nmap answers the SYN/ACK with RST, so the handshake never completes ("half-open").</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">State</th><th scope="col">Meaning</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">open</th><td>An application accepts connections</td></tr>
+    <tr><th scope="row">closed</th><td>Reachable, nothing listening</td></tr>
+    <tr><th scope="row">filtered</th><td>A firewall blocks the probe</td></tr>
+    <tr><th scope="row">unfiltered</th><td>ACK scan: state unknown</td></tr>
+    <tr><th scope="row">open|filtered</th><td>No reply, common with UDP</td></tr>
+    <tr><th scope="row">closed|filtered</th><td>Idle scan only</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="recipes">Recipes</h2>
+<p>Target used in the examples: 192.0.2.10.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>nmap -sn 192.0.2.0/24</code></td><td>Live hosts only</td></tr>
+    <tr><td><code>nmap 192.0.2.10</code></td><td>Top 1,000 TCP ports</td></tr>
+    <tr><td><code>nmap -p 22,80,443 192.0.2.10</code></td><td>Only these ports</td></tr>
+    <tr><td><code>nmap -p- 192.0.2.10</code></td><td>All 65,535 TCP ports</td></tr>
+    <tr><td><code>sudo nmap -sS -sV -T4 192.0.2.10</code></td><td>SYN scan plus service versions</td></tr>
+    <tr><td><code>sudo nmap -sU --top-ports 20 192.0.2.10</code></td><td>Top UDP ports (slow)</td></tr>
+    <tr><td><code>nmap -Pn 192.0.2.10</code></td><td>Host blocks ping</td></tr>
+    <tr><td><code>sudo nmap -A 192.0.2.10</code> <span class="flag flag-caution">caution</span></td><td>OS, versions and scripts</td></tr>
+    <tr><td><code>nmap -sV -oA scan1 192.0.2.10</code></td><td>Save output in 3 formats</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="options">Options by job</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Job</th><th scope="col">Options</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Discover</th><td><code>-sn</code> ping only, <code>-Pn</code> skip ping, <code>-n</code> no DNS</td></tr>
+    <tr><th scope="row">Technique</th><td><code>-sS</code> SYN, <code>-sT</code> connect, <code>-sU</code> UDP, <code>-sA</code> ACK</td></tr>
+    <tr><th scope="row">Ports</th><td><code>-p 1-100</code>, <code>-p-</code> all, <code>-F</code> top 100, <code>--top-ports N</code></td></tr>
+    <tr><th scope="row">Detect</th><td><code>-sV</code> versions, <code>-O</code> OS, <code>-sC</code> default scripts, <code>-A</code> all</td></tr>
+    <tr><th scope="row">Output</th><td><code>-oN</code>, <code>-oX</code>, <code>-oG</code>, <code>-oA</code> all formats, <code>-v</code> verbose</td></tr>
+    <tr><th scope="row">IPv6</th><td><code>-6 2001:db8::10</code></td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="nse">NSE scripts: know the risk</h2>
+<p>Script categories: safe, default, discovery, intrusive, vuln, brute, dos, exploit.</p>
+<p class="note note-caution"><b>Danger.</b> The <code>vuln</code>, <code>brute</code>, <code>dos</code>, <code>exploit</code> and <code>all</code> categories can crash services and lock accounts. Use them in scope only.</p>
+<p class="note note-caution"><b>Caution.</b> Scripts are not sandboxed. Never run unreviewed <code>.nse</code> files.</p>
+
+<h2 id="timing">Timing templates</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Template</th><th scope="col">Name</th></tr></thead>
+  <tbody>
+    <tr><td>-T0</td><td>paranoid</td></tr>
+    <tr><td>-T1</td><td>sneaky</td></tr>
+    <tr><td>-T2</td><td>polite</td></tr>
+    <tr><td>-T3</td><td>normal (default)</td></tr>
+    <tr><td>-T4</td><td>aggressive</td></tr>
+    <tr><td>-T5</td><td>insane</td></tr>
+  </tbody>
+</table></div>
+<p>T3 is the default. The Nmap book recommends T4 on fast, reliable networks. T5 trades accuracy for speed and can overload fragile devices such as printers, PLCs and old switches.</p>
+
+<h2 id="before">Before you scan</h2>
+<ul>
+  <li>Written scope: IPs, dates and hours</li>
+  <li>Emergency contact and excluded hosts</li>
+  <li>Start at T3 with a small port range</li>
+  <li>Save output with <code>-oA</code></li>
+</ul>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>Root or admin runs <code>-sS</code> by default; a normal user gets <code>-sT</code></li>
+  <li>No <code>-p</code> means the 1,000 most common TCP ports</li>
+  <li>filtered means something dropped the probe</li>
+  <li><code>-sV</code> checks the real service, not just the port</li>
+  <li>UDP is slow; expect open|filtered</li>
+  <li>Save every scan with <code>-oA</code> for your report</li>
+</ul>

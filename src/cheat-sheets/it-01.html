@@ -1,0 +1,100 @@
+<!--
+  Text version of IT-01, shown under the sheet image on /cheat-sheets/it-01.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<h2 id="steps">The 6 steps (CompTIA A+)</h2>
+<p>Network+ uses 7 steps: step 4 is split into "plan" and "implement or escalate". If a theory is wrong, loop back. If two theories fail or the problem is outside your access, escalate with your notes.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">#</th><th scope="col">Step</th><th scope="col">What you do</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><th scope="row">Identify the problem</th><td>Ask the user, find what changed, reproduce it</td></tr>
+    <tr><td>2</td><th scope="row">Establish a theory</th><td>Question the obvious; research the KB and vendor docs</td></tr>
+    <tr><td>3</td><th scope="row">Test the theory</th><td>Confirmed? Plan the fix. Not? Form a new theory</td></tr>
+    <tr><td>4</td><th scope="row">Plan and implement</th><td>Check side effects, back up, then apply the fix</td></tr>
+    <tr><td>5</td><th scope="row">Verify and prevent</th><td>The user confirms it works; stop it recurring</td></tr>
+    <tr><td>6</td><th scope="row">Document</th><td>Findings, actions, outcome and lessons learned</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="ask">Step 1: ask the user</h2>
+<ul>
+  <li>When did it start? Did it ever work?</li>
+  <li>What changed: an update, a new device, a moved desk?</li>
+  <li>What is the exact error text? Can you send a screenshot?</li>
+  <li>Is it just you, or others too? Do other devices have it?</li>
+  <li>Can you show me the steps?</li>
+</ul>
+
+<h2 id="obvious">Step 2: question the obvious</h2>
+<ul>
+  <li>Power, cable, Wi-Fi switched on?</li>
+  <li>Restarted (really)?</li>
+  <li>Updates pending?</li>
+  <li>Caps Lock or keyboard layout?</li>
+  <li>Right account or tenant?</li>
+  <li>Disk or mailbox full?</li>
+  <li>Date and time correct?</li>
+  <li>Service outage page?</li>
+</ul>
+
+<h2 id="methods">Ways to find the cause</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Method</th><th scope="col">How</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Bottom-up</th><td>OSI L1 to L7: cable, link, IP, app</td></tr>
+    <tr><th scope="row">Top-down</th><td>Start at the app when the network looks fine</td></tr>
+    <tr><th scope="row">Divide and conquer</th><td>Start in the middle: ping the gateway</td></tr>
+    <tr><th scope="row">Compare</th><td>Diff against a working device or user</td></tr>
+    <tr><th scope="row">One change</th><td>Change one thing, test, then the next</td></tr>
+  </tbody>
+</table></div>
+<p class="note note-caution"><b>Caution.</b> Back up user data before reimaging, resetting profiles or replacing disks.</p>
+<p class="note note-caution"><b>Danger.</b> Suspect malware or a breach? Stop. Disconnect from the network, do not wipe, and escalate to security. Verify identity before any password reset.</p>
+
+<h2 id="note">Step 6: ticket note template</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Field</th><th scope="col">Example</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Symptom</th><td>Outlook won't connect, 3 users, since 09:10</td></tr>
+    <tr><th scope="row">Cause</th><td>Expired password on shared mailbox</td></tr>
+    <tr><th scope="row">Fix</th><td>Reset via admin portal, re-signed in</td></tr>
+    <tr><th scope="row">Verified</th><td>User sent test mail 09:42</td></tr>
+    <tr><th scope="row">Prevent</th><td>Added expiry alert</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="escalate">Escalate with</h2>
+<ul>
+  <li>Impact: who and how many</li>
+  <li>Steps to reproduce</li>
+  <li>What you tried and the result</li>
+  <li>Logs and screenshots</li>
+  <li>Priority and the SLA clock</li>
+  <li>Best contact time</li>
+</ul>
+
+<h2 id="priority">Set priority</h2>
+<p>Example matrix; follow your own SLA.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Impact / urgency</th><th scope="col">High urgency</th><th scope="col">Medium urgency</th><th scope="col">Low urgency</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">High impact</th><td>P1</td><td>P2</td><td>P3</td></tr>
+    <tr><th scope="row">Medium impact</th><td>P2</td><td>P3</td><td>P4</td></tr>
+    <tr><th scope="row">Low impact</th><td>P3</td><td>P4</td><td>P4</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="talk">Talk to the user</h2>
+<ul>
+  <li>Say what you will do next and when you will update them</li>
+  <li>Skip jargon; repeat the issue back in their words</li>
+  <li>Never blame the user; thank them for the details</li>
+</ul>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>You can't prove a fix if you can't reproduce the problem</li>
+  <li>Escalate early, with what you tried and the evidence</li>
+  <li>Tell the user what you are doing and give an ETA</li>
+  <li>Close the ticket only after the user confirms</li>
+</ul>

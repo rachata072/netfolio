@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SEC-02 Nmap scanning Cheat Sheet (PDF) | breakfixlearn</title>
+<meta name="description" content="Free one-page Nmap cheat sheet: SYN scan states, common commands, options, NSE risks, timing templates, authorized-use checklist. PDF (Letter, A4) and image.">
+<link rel="canonical" href="https://breakfixlearn.com/cheat-sheets/sec-02">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=59472e0728">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="Nmap scanning cheat sheet (SEC-02)">
+<meta property="og:description" content="How a SYN scan reads a port, ready-made recipes, options by job, NSE script risks, timing templates and a pre-scan checklist.">
+<meta property="og:url" content="https://breakfixlearn.com/cheat-sheets/sec-02">
+<meta property="og:image" content="https://breakfixlearn.com/cheat-sheets/files/bfl-sec-02-nmap_v1.0_social.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SEC-02 Nmap scanning cheat sheet preview">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"SEC-02 Nmap scanning cheat sheet","description":"Free one-page Nmap cheat sheet: SYN scan states, common commands, options, NSE risks, timing templates, authorized-use checklist. PDF (Letter, A4) and image.","url":"https://breakfixlearn.com/cheat-sheets/sec-02","learningResourceType":"Cheat sheet","educationalLevel":"Beginner","teaches":"Nmap scanning","keywords":"Nmap, Port scanning, NSE, Recon, Ethical hacking","inLanguage":"en","isAccessibleForFree":true,"license":"https://creativecommons.org/licenses/by-nc/4.0/","version":"1.0","datePublished":"2026-09-28","dateModified":"2026-09-28","image":"https://breakfixlearn.com/cheat-sheets/files/bfl-sec-02-nmap_v1.0_social.webp","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"encoding":[{"@type":"MediaObject","name":"SEC-02 Nmap scanning (US Letter)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-sec-02-nmap_v1.0_print-letter.pdf","encodingFormat":"application/pdf","contentSize":"202 KB","sha256":"5c62e0e6458e1fe2b69eb84e50ef0f33a0bb9fa0fac961c729f88e35b2430c43"},{"@type":"MediaObject","name":"SEC-02 Nmap scanning (A4)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-sec-02-nmap_v1.0_print-a4.pdf","encodingFormat":"application/pdf","contentSize":"203 KB","sha256":"473c819fb077984b8bddcbe3fa4078f295fe272942fcef1a8ba23f6dcf86a55b"},{"@type":"MediaObject","name":"SEC-02 Nmap scanning (Screen)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-sec-02-nmap_v1.0_web.pdf","encodingFormat":"application/pdf","contentSize":"177 KB","sha256":"fca703020943b49fc604e4dbeb179e3c22fad7d9c5a53c4aaa53169800a3ebd9"},{"@type":"MediaObject","name":"SEC-02 Nmap scanning (Hi-res image)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-sec-02-nmap_v1.0_full.webp","encodingFormat":"image/webp","contentSize":"541 KB","sha256":"fa60cdb04bf5e7e287432b6ffb9a13eece6dafd2e7332b7d5e8a3e077d7043d8"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Cheat sheets","item":"https://breakfixlearn.com/cheat-sheets"},{"@type":"ListItem","position":3,"name":"SEC-02 Nmap scanning"}]}</script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article class="sheet">
+  <header class="post-head sheet-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/cheat-sheets">cheat-sheets</a><span aria-hidden="true">/</span><a href="/cheat-sheets#cybersecurity">sec</a></nav>
+      <p class="scard-meta"><span class="sid k-cybersecurity">SEC-02</span><span>Cybersecurity</span></p>
+      <h1>Nmap scanning</h1>
+      <p class="post-dek"><b>Use this when:</b> you need live hosts, open ports and service versions on a network you are allowed to test.</p>
+      <div class="post-meta"><span>Security+, CySA+ and PenTest+</span><span class="sep">/</span><span>v1.0</span><span class="sep">/</span><time datetime="2026-09-28">Sep 28, 2026</time><span class="sep">/</span><span>1 page</span><span class="sep">/</span><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license noopener" target="_blank">CC BY-NC 4.0</a></div>
+    </div>
+  </header>
+  <div class="wrap sheet-grid">
+    <figure class="sheet-paper">
+      <a href="/cheat-sheets/files/bfl-sec-02-nmap_v1.0_full.webp" aria-label="Open the full-size SEC-02 image (2550 by 3300 pixels)">
+        <img src="/cheat-sheets/files/bfl-sec-02-nmap_v1.0_web.webp" srcset="/cheat-sheets/files/bfl-sec-02-nmap_v1.0_web.webp 1200w, /cheat-sheets/files/bfl-sec-02-nmap_v1.0_full.webp 2550w" sizes="(max-width: 60rem) calc(100vw - 2rem), 46rem"
+             width="1200" height="1553" fetchpriority="high" decoding="async"
+             alt="SEC-02 Nmap scanning cheat sheet. Every table on it is repeated as text below.">
+      </a>
+      <figcaption>Tap the sheet for the full-size image. The <a href="#text-version">text version</a> below is screen-reader friendly.</figcaption>
+    </figure>
+    <aside class="sheet-side" aria-labelledby="dl-h">
+      <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">copy</span> <span class="a">sec-02 flash:</span></span>
+      <h2 id="dl-h" class="side-h">Download</h2>
+      <ul class="dl-list"><li><a class="dl dl-pri" href="/cheat-sheets/files/bfl-sec-02-nmap_v1.0_print-letter.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>US Letter</b><span class="dl-m">print &middot; 202 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-sec-02-nmap_v1.0_print-a4.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>A4</b><span class="dl-m">print &middot; 203 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-sec-02-nmap_v1.0_web.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>Screen</b><span class="dl-m">links work &middot; 177 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-sec-02-nmap_v1.0_full.webp" download><span class="dl-k">WebP</span><span class="dl-t"><b>Hi-res image</b><span class="dl-m">2550 &times; 3300 &middot; 541 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li></ul>
+      <p class="dl-open"><a href="/cheat-sheets/files/bfl-sec-02-nmap_v1.0_web.pdf">Open the PDF in your browser</a> instead of downloading it.</p>
+      <details class="sums">
+        <summary>Verify your download (SHA-256)</summary>
+        <div class="tbl"><table class="sheet-files"><thead><tr><th scope="col">File</th><th scope="col">SHA-256</th></tr></thead><tbody><tr><td translate="no">bfl-sec-02-nmap_v1.0_web.pdf</td><td translate="no">fca703020943b49fc604e4dbeb179e3c22fad7d9c5a53c4aaa53169800a3ebd9</td></tr><tr><td translate="no">bfl-sec-02-nmap_v1.0_print-letter.pdf</td><td translate="no">5c62e0e6458e1fe2b69eb84e50ef0f33a0bb9fa0fac961c729f88e35b2430c43</td></tr><tr><td translate="no">bfl-sec-02-nmap_v1.0_print-a4.pdf</td><td translate="no">473c819fb077984b8bddcbe3fa4078f295fe272942fcef1a8ba23f6dcf86a55b</td></tr><tr><td translate="no">bfl-sec-02-nmap_v1.0_full.webp</td><td translate="no">fa60cdb04bf5e7e287432b6ffb9a13eece6dafd2e7332b7d5e8a3e077d7043d8</td></tr></tbody></table></div>
+        <p>Compare the hash with the one printed by
+          <code translate="no">Get-FileHash .\file.pdf -Algorithm SHA256</code> (PowerShell) or
+          <code translate="no">sha256sum file.pdf</code> (Linux, macOS: <code translate="no">shasum -a 256</code>). Different hash, different file: delete it.</p>
+      </details>
+      <p class="side-note">Free for personal and classroom use under CC BY-NC 4.0. Keep the credit line; don't sell it. Spotted a mistake? <a href="mailto:treyrct858@gmail.com?subject=SEC-02%20v1.0%20correction">Email a correction</a>.</p>
+    </aside>
+  </div>
+  <section class="wrap sheet-text" aria-labelledby="text-version">
+    <div class="prose">
+      <h2 id="text-version">Text version</h2>
+      <p>Everything on the sheet, as plain HTML: handy for screen readers, copy-paste and search.</p>
+<p class="note note-auth"><b>Authorized use only.</b> Scan only networks you own or have written permission to test. Practice in your lab or on scanme.nmap.org.</p>
+
+<h3 id="syn">How a SYN scan reads a port</h3>
+<p>The SYN scan (<code translate="no">-sS</code>) is the default when you run Nmap as root or admin.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Nmap sends</th><th scope="col">Target replies</th><th scope="col">Port state</th></tr></thead>
+  <tbody>
+    <tr><td>SYN</td><td>SYN/ACK</td><td>open</td></tr>
+    <tr><td>SYN</td><td>RST</td><td>closed</td></tr>
+    <tr><td>SYN</td><td>No reply</td><td>filtered</td></tr>
+  </tbody>
+</table></div>
+<p>An ICMP unreachable also means filtered. On an open port Nmap answers the SYN/ACK with RST, so the handshake never completes ("half-open").</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">State</th><th scope="col">Meaning</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">open</th><td>An application accepts connections</td></tr>
+    <tr><th scope="row">closed</th><td>Reachable, nothing listening</td></tr>
+    <tr><th scope="row">filtered</th><td>A firewall blocks the probe</td></tr>
+    <tr><th scope="row">unfiltered</th><td>ACK scan: state unknown</td></tr>
+    <tr><th scope="row">open|filtered</th><td>No reply, common with UDP</td></tr>
+    <tr><th scope="row">closed|filtered</th><td>Idle scan only</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="recipes">Recipes</h3>
+<p>Target used in the examples: 192.0.2.10.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code translate="no">nmap -sn 192.0.2.0/24</code></td><td>Live hosts only</td></tr>
+    <tr><td><code translate="no">nmap 192.0.2.10</code></td><td>Top 1,000 TCP ports</td></tr>
+    <tr><td><code translate="no">nmap -p 22,80,443 192.0.2.10</code></td><td>Only these ports</td></tr>
+    <tr><td><code translate="no">nmap -p- 192.0.2.10</code></td><td>All 65,535 TCP ports</td></tr>
+    <tr><td><code translate="no">sudo nmap -sS -sV -T4 192.0.2.10</code></td><td>SYN scan plus service versions</td></tr>
+    <tr><td><code translate="no">sudo nmap -sU --top-ports 20 192.0.2.10</code></td><td>Top UDP ports (slow)</td></tr>
+    <tr><td><code translate="no">nmap -Pn 192.0.2.10</code></td><td>Host blocks ping</td></tr>
+    <tr><td><code translate="no">sudo nmap -A 192.0.2.10</code> <span class="flag flag-caution">caution</span></td><td>OS, versions and scripts</td></tr>
+    <tr><td><code translate="no">nmap -sV -oA scan1 192.0.2.10</code></td><td>Save output in 3 formats</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="options">Options by job</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Job</th><th scope="col">Options</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Discover</th><td><code translate="no">-sn</code> ping only, <code translate="no">-Pn</code> skip ping, <code translate="no">-n</code> no DNS</td></tr>
+    <tr><th scope="row">Technique</th><td><code translate="no">-sS</code> SYN, <code translate="no">-sT</code> connect, <code translate="no">-sU</code> UDP, <code translate="no">-sA</code> ACK</td></tr>
+    <tr><th scope="row">Ports</th><td><code translate="no">-p 1-100</code>, <code translate="no">-p-</code> all, <code translate="no">-F</code> top 100, <code translate="no">--top-ports N</code></td></tr>
+    <tr><th scope="row">Detect</th><td><code translate="no">-sV</code> versions, <code translate="no">-O</code> OS, <code translate="no">-sC</code> default scripts, <code translate="no">-A</code> all</td></tr>
+    <tr><th scope="row">Output</th><td><code translate="no">-oN</code>, <code translate="no">-oX</code>, <code translate="no">-oG</code>, <code translate="no">-oA</code> all formats, <code translate="no">-v</code> verbose</td></tr>
+    <tr><th scope="row">IPv6</th><td><code translate="no">-6 2001:db8::10</code></td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="nse">NSE scripts: know the risk</h3>
+<p>Script categories: safe, default, discovery, intrusive, vuln, brute, dos, exploit.</p>
+<p class="note note-caution"><b>Danger.</b> The <code translate="no">vuln</code>, <code translate="no">brute</code>, <code translate="no">dos</code>, <code translate="no">exploit</code> and <code translate="no">all</code> categories can crash services and lock accounts. Use them in scope only.</p>
+<p class="note note-caution"><b>Caution.</b> Scripts are not sandboxed. Never run unreviewed <code translate="no">.nse</code> files.</p>
+
+<h3 id="timing">Timing templates</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Template</th><th scope="col">Name</th></tr></thead>
+  <tbody>
+    <tr><td>-T0</td><td>paranoid</td></tr>
+    <tr><td>-T1</td><td>sneaky</td></tr>
+    <tr><td>-T2</td><td>polite</td></tr>
+    <tr><td>-T3</td><td>normal (default)</td></tr>
+    <tr><td>-T4</td><td>aggressive</td></tr>
+    <tr><td>-T5</td><td>insane</td></tr>
+  </tbody>
+</table></div>
+<p>T3 is the default. The Nmap book recommends T4 on fast, reliable networks. T5 trades accuracy for speed and can overload fragile devices such as printers, PLCs and old switches.</p>
+
+<h3 id="before">Before you scan</h3>
+<ul>
+  <li>Written scope: IPs, dates and hours</li>
+  <li>Emergency contact and excluded hosts</li>
+  <li>Start at T3 with a small port range</li>
+  <li>Save output with <code translate="no">-oA</code></li>
+</ul>
+
+<h3 id="remember">Remember</h3>
+<ul>
+  <li>Root or admin runs <code translate="no">-sS</code> by default; a normal user gets <code translate="no">-sT</code></li>
+  <li>No <code translate="no">-p</code> means the 1,000 most common TCP ports</li>
+  <li>filtered means something dropped the probe</li>
+  <li><code translate="no">-sV</code> checks the real service, not just the port</li>
+  <li>UDP is slow; expect open|filtered</li>
+  <li>Save every scan with <code translate="no">-oA</code> for your report</li>
+</ul>
+      <h3>Sources</h3>
+      <ul><li><a href="https://nmap.org/book/man.html" rel="noopener" target="_blank">Nmap Reference Guide</a></li><li><a href="https://nmap.org/book/toc.html" rel="noopener" target="_blank">Nmap Network Scanning (nmap.org/book)</a></li></ul>
+      <h3>Go deeper on the blog</h3><ul><li><a href="/blog/soc-homelab-first-alerts-attack-simulation">First Alerts: What My SOC Home Lab Caught, What It Missed, and How I Triaged It</a></li></ul>
+    </div>
+    <nav class="nexthop" aria-label="More cheat sheets"><a class="prev" href="/cheat-sheets/net-03"><span class="k">&larr; previous sheet</span>NET-03 IPv4 subnetting &amp; VLSM</a><a class="next" href="/cheat-sheets/sec-03"><span class="k">next sheet &rarr;</span>SEC-03 Wireshark display filters</a></nav>
+  </section>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 29, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

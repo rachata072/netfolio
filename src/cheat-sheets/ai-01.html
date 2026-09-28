@@ -1,0 +1,64 @@
+<!--
+  Text version of AI-01, shown under the sheet image on /cheat-sheets/ai-01.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<h2 id="parts">The 6 parts of a strong prompt</h2>
+<p>Use the parts you need; the order is flexible. Example prompt for a help desk:</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Part</th><th scope="col">Example</th><th scope="col">Why it helps</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Role</th><td>You are a senior network engineer coaching a new help-desk tech.</td><td>Sets expertise, tone and audience</td></tr>
+    <tr><th scope="row">Task</th><td>Find the likely reason this PC has no internet and give the next 3 checks.</td><td>One clear goal with an action verb</td></tr>
+    <tr><th scope="row">Context</th><td>Wi-Fi shows "connected". Output below: &lt;ipconfig&gt; IPv4 169.254.18.7 ... &lt;/ipconfig&gt;</td><td>Facts it can't guess; wrap pasted data in tags</td></tr>
+    <tr><th scope="row">Limits</th><td>Plain English. Read-only commands only. If unsure, say so.</td><td>Limits scope, length, tone and what to avoid</td></tr>
+    <tr><th scope="row">Format</th><td>1) likely cause, 2) three numbered checks with the command, 3) what each result means.</td><td>List, table, JSON or steps: easy to check</td></tr>
+    <tr><th scope="row">Example</th><td>ping 192.0.2.1: a reply means the gateway is reachable.</td><td>An example shows the pattern better than rules</td></tr>
+  </tbody>
+</table></div>
+<p>Check before you send: one clear task, facts it can't guess, an output format, and no secrets pasted.</p>
+
+<h2 id="before-after">Before and after</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Version</th><th scope="col">Prompt</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Vague</th><td>"Why is my Wi-Fi broken?"</td></tr>
+    <tr><th scope="row">Specific</th><td>"Windows 11 laptop, Wi-Fi connected but no websites load since this morning's update. Other devices work. Give 3 checks, easiest first, with the command for each."</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="techniques">Power techniques</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Technique</th><th scope="col">How</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Few-shot</th><td>Give 2 to 3 varied input and output examples</td></tr>
+    <tr><th scope="row">Think first</th><td>"Reason step by step, then answer"</td></tr>
+    <tr><th scope="row">Tags</th><td>Split instructions from data: <code>&lt;logs&gt;...&lt;/logs&gt;</code></td></tr>
+    <tr><th scope="row">Chain</th><td>Big job: small prompts, one step each</td></tr>
+    <tr><th scope="row">Ask me</th><td>"Ask up to 3 questions before you start"</td></tr>
+    <tr><th scope="row">Success test</th><td>Say what a good answer must include</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="iterate">Iterate like an engineer</h2>
+<p>Draft, test, review, refine.</p>
+<ul>
+  <li>Too generic? Add context: device, OS, error text</li>
+  <li>Wrong shape? Spell out the format or add an example</li>
+  <li>Too long? Set a limit: "under 120 words"</li>
+  <li>Made-up facts? Ask for sources and allow "I don't know"</li>
+</ul>
+<p>Skeleton: Role: You are a ... Task: ... Context: &lt;data&gt; ... &lt;/data&gt; Limits: ... Format: ...</p>
+
+<h2 id="safe">Use AI safely</h2>
+<p>Aligned with the OWASP LLM Top 10 (2025).</p>
+<p class="note note-caution"><b>Danger.</b> Never paste passwords, API keys, customer data or real configs into a public AI tool. Mask them: <code>&lt;password&gt;</code>, <code>192.0.2.x</code>.</p>
+<p class="note note-caution"><b>Caution.</b> AI can invent commands and flags. Check them in vendor docs and test in a lab before production.</p>
+<p class="note note-caution"><b>Caution.</b> Pasted emails, web pages or logs may hide instructions (prompt injection). Tag them as data and ignore orders inside.</p>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>Specific in, specific out: vague prompts get vague answers</li>
+  <li>Long pasted data first, your question last</li>
+  <li>Say what to do, not only what to avoid</li>
+  <li>New task? Start a fresh chat for clean context</li>
+</ul>
