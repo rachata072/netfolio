@@ -10,7 +10,7 @@
 <meta name="color-scheme" content="dark">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/style.css?v=8f8c37b981">
+<link rel="stylesheet" href="/css/style.css?v=15c414d558">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
 <meta property="og:type" content="website">
@@ -27,20 +27,21 @@
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Trey","url":"https://breakfixlearn.com/","jobTitle":"CCNA-Certified Network Engineer","email":"mailto:treyrct858@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Vancouver","addressRegion":"BC","addressCountry":"CA"},"sameAs":["https://github.com/rachata072","https://www.linkedin.com/in/treywcp/"],"knowsAbout":["Networking","Cybersecurity","Python","Cisco IOS","Network Automation","SOC","Active Directory"]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"breakfixlearn","url":"https://breakfixlearn.com/"}</script>
-<script src="/js/main.js?v=b6a070fa7c" defer></script>
-<script src="/js/globe.js?v=269ddac202" defer></script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+<script src="/js/globe.js?v=160e3e845d" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="hdr">
   <div class="wrap">
-    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
     <nav aria-label="Main">
       <ul class="ports">
         <li><a class="port" href="/" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
         <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
         <li><a class="port" href="/blog"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
-        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span>about</a></li>
+        <li><a class="port" href="/cheat-sheets"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
       </ul>
     </nav>
   </div>
@@ -67,9 +68,16 @@
         </div>
 
         <figure class="console mt-0" aria-labelledby="topo-cap">
-          <div class="console-bar" aria-hidden="true">
-            <span><b>lab-core</b> / topology.pkt</span>
-            <span class="live"><span class="led"></span>live</span>
+          <div class="console-bar">
+            <span aria-hidden="true"><b>lab-core</b> / topology.pkt</span>
+            <span class="bar-r">
+              <span class="live" aria-hidden="true"><span class="led"></span><span data-live>live</span></span>
+              <button type="button" class="motion-btn" data-motion hidden>
+                <svg class="ico i-pause" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><rect x="1" y="1" width="3" height="8"/><rect x="6" y="1" width="3" height="8"/></svg>
+                <svg class="ico i-play" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2 1l7 4-7 4z"/></svg>
+                <span data-motion-label>pause motion</span>
+              </button>
+            </span>
           </div>
           <svg class="topo topo-lg" viewBox="0 0 560 410" role="group" aria-labelledby="topo-title">
             <title id="topo-title">Lab topology: internet, firewall, core switch, and four lab segments</title>
@@ -302,8 +310,26 @@
     </div>
   </section>
 
+  <!-- ================= CHEAT SHEETS ================= -->
+  <section class="sec sec-band" aria-labelledby="sheets-h">
+    <div class="wrap rv">
+      <div class="sec-head">
+        <div>
+          <span class="cli"><span class="h">edge#</span> <span class="v">show</span> <span class="a">cheat-sheets | new</span></span>
+          <h2 class="sec-title" id="sheets-h">Cheat sheets</h2>
+          <p class="sec-lede">One-page desk references for CCNA, security and help desk work. Free PDF and print.</p>
+        </div>
+        <a class="more" href="/cheat-sheets">show cheat-sheets | all &rarr;</a>
+      </div>
+      <div class="sgrid">
+        <article class="scard" data-cat="networking" data-search="net-01 osi &amp; tcp/ip models networking all seven osi layers mapped to tcp/ip, with pdus, protocols, encapsulation, tcp vs udp, bottom-up troubleshooting commands and attacks by layer. osi tcp/ip encapsulation tcp udp troubleshooting"><a class="scard-img" href="/cheat-sheets/net-01" tabindex="-1" aria-hidden="true"><img src="/cheat-sheets/files/bfl-net-01-osi-model_v1.0_thumb.webp" width="600" height="776" alt="" loading="lazy" decoding="async"></a><div class="scard-body"><p class="scard-meta"><span class="sid k-networking">NET-01</span><span>Networking</span></p><h3><a href="/cheat-sheets/net-01">OSI &amp; TCP/IP models</a></h3><p>All seven OSI layers mapped to TCP/IP, with PDUs, protocols, encapsulation, TCP vs UDP, bottom-up troubleshooting commands and attacks by layer.</p><p class="scard-foot"><span>CCNA 200-301 v1.1 &amp; v2.0</span><span>v1.0 &middot; Sep 28, 2026</span></p><p class="scard-links"><a href="/cheat-sheets/net-01">open sheet &rarr;</a><a href="/cheat-sheets/files/bfl-net-01-osi-model_v1.0_print-letter.pdf" download>PDF Letter</a><a href="/cheat-sheets/files/bfl-net-01-osi-model_v1.0_print-a4.pdf" download>PDF A4</a></p></div></article>
+        <div class="rack k-networking next-up"><h3><span class="sid">next</span>On the bench<span class="ct">39 to go</span></h3><ol class="rack-list"><li class="k-networking"><span class="rid">NET-02</span><span class="rt">Common ports &amp; protocols</span><span class="rw">w1</span></li><li class="k-networking"><span class="rid">NET-03</span><span class="rt">IPv4 subnetting &amp; VLSM</span><span class="rw">w1</span></li><li class="k-cybersecurity"><span class="rid">SEC-02</span><span class="rt">Nmap scanning</span><span class="rw">w1</span></li><li class="k-cybersecurity"><span class="rid">SEC-03</span><span class="rt">Wireshark display filters</span><span class="rw">w1</span></li><li class="k-it-support"><span class="rid">IT-01</span><span class="rt">Troubleshooting methodology (CompTIA 7 steps)</span><span class="rw">w1</span></li><li class="k-it-support"><span class="rid">IT-02</span><span class="rt">Windows CMD &amp; Run commands</span><span class="rw">w1</span></li></ol></div>
+      </div>
+    </div>
+  </section>
+
   <!-- ================= LATEST POSTS ================= -->
-  <section class="sec sec-band" aria-labelledby="log-h">
+  <section class="sec" aria-labelledby="log-h">
     <div class="wrap rv">
       <div class="sec-head">
         <div>
@@ -318,7 +344,7 @@
   </section>
 
   <!-- ================= ABOUT ================= -->
-  <section class="sec" id="about" aria-labelledby="about-h">
+  <section class="sec sec-band" id="about" aria-labelledby="about-h">
     <div class="wrap about rv">
       <div class="about-copy">
         <span class="cli"><span class="h">edge#</span> <span class="v">show</span> <span class="a">running-config | section me</span></span>
@@ -359,7 +385,7 @@
 <footer class="ftr">
   <div class="wrap ftr-grid">
     <div>
-      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
       <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
     </div>
     <nav aria-label="Site">
@@ -367,6 +393,7 @@
       <ul>
         <li><a href="/projects">projects</a></li>
         <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
         <li><a href="/#about">about</a></li>
         <li><a href="/privacy">privacy</a></li>
         <li><a href="/feed.xml">rss feed</a></li>

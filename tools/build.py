@@ -105,20 +105,22 @@ BRAND_SVG = ('<svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" foc
              '<rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/>'
              '<path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg>')
 
-NAV = [("home", "/", "01"), ("projects", "/projects", "02"), ("blog", "/blog", "03"), ("about", "/#about", "04")]
+# (key, href, port number, label). "cheat " is hidden on narrow phones so five ports fit.
+NAV = [("home", "/", "01", "home"), ("projects", "/projects", "02", "projects"), ("blog", "/blog", "03", "blog"),
+       ("sheets", "/cheat-sheets", "04", '<span class="lg">cheat </span>sheets'), ("about", "/#about", "05", "about")]
 
 
 def header(active):
     ports = []
-    for name, href, num in NAV:
+    for name, href, num, label in NAV:
         cur = ' aria-current="page"' if name == active else ""
         ports.append(f'<li><a class="port" href="{href}"{cur}><span class="led" aria-hidden="true"></span>'
-                     f'<span class="pn" aria-hidden="true">{num}</span>{name}</a></li>')
+                     f'<span class="pn" aria-hidden="true">{num}</span>{label}</a></li>')
     return (
         '<a class="skip" href="#main">Skip to content</a>\n'
         '<header class="hdr">\n  <div class="wrap">\n'
         f'    <a class="brand" href="/" aria-label="breakfixlearn home">{BRAND_SVG}'
-        '<span><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>\n'
+        '<span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>\n'
         '    <nav aria-label="Main">\n      <ul class="ports">\n        '
         + "\n        ".join(ports) +
         '\n      </ul>\n    </nav>\n  </div>\n</header>\n'
@@ -130,7 +132,7 @@ def footer(site, last_change):
     return f'''<footer class="ftr">
   <div class="wrap ftr-grid">
     <div>
-      <a class="brand" href="/" aria-label="breakfixlearn home">{BRAND_SVG}<span><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <a class="brand" href="/" aria-label="breakfixlearn home">{BRAND_SVG}<span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
       <p>Build it, break it, fix it, learn it. Network and security lab notes by {esc(site["author"])}, written by hand in {esc(site["location"])}.</p>
     </div>
     <nav aria-label="Site">
@@ -138,6 +140,7 @@ def footer(site, last_change):
       <ul>
         <li><a href="/projects">projects</a></li>
         <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
         <li><a href="/#about">about</a></li>
         <li><a href="/privacy">privacy</a></li>
         <li><a href="/feed.xml">rss feed</a></li>
@@ -266,8 +269,13 @@ def sev_badge(site, cat, full=False):
     return f'<span class="sev c-{cat}">{label}</span>'
 
 
+def no_translate(body):
+    return re.sub(r"<(pre|code)(?=[\s>])(?![^>]*translate=)", r'<\1 translate="no"', body)
+
+
 def render_post(site, hashes, last_change, post, posts):
     body, toc = add_heading_ids(post["body"])
+    body = no_translate(body)
     cat = post["category"]
     c = site["categories"][cat]
 
@@ -493,6 +501,277 @@ def block_project_cards(site, projects, posts_by_slug):
     return "\n      ".join(cards)
 
 
+# ------------------------------------------------------------------ cheat sheets
+SHEET_FILES = "/cheat-sheets/files"
+SHEET_STATUS = {"live": ("st-up", "published"), "audit": ("st-prog", "in review"), "planned": ("st-plan", "planned")}
+DOWNLOADS = [  # variant, format label, name, note
+    ("print-letter", "PDF", "US Letter", "print"),
+    ("print-a4", "PDF", "A4", "print"),
+    ("web", "PDF", "Screen", "links work"),
+    ("full", "WebP", "Hi-res image", "2550 &times; 3300"),
+]
+
+
+def webp_size(path):
+    """Width/height of a WebP file from its header (VP8, VP8L or VP8X), stdlib only."""
+    b = path.read_bytes()[:40]
+    if b[:4] != b"RIFF" or b[8:12] != b"WEBP":
+        sys.exit(f"{path} is not a WebP file")
+    kind = b[12:16]
+    if kind == b"VP8X":
+        return 1 + int.from_bytes(b[24:27], "little"), 1 + int.from_bytes(b[27:30], "little")
+    if kind == b"VP8L":
+        bits = int.from_bytes(b[21:25], "little")
+        return (bits & 0x3FFF) + 1, ((bits >> 14) & 0x3FFF) + 1
+    if kind == b"VP8 ":
+        return int.from_bytes(b[26:28], "little") & 0x3FFF, int.from_bytes(b[28:30], "little") & 0x3FFF
+    sys.exit(f"{path}: unknown WebP chunk {kind!r}")
+
+
+def human_size(n):
+    return f"{n / 1024 / 1024:.1f} MB" if n >= 1024 * 1024 else f"{round(n / 1024)} KB"
+
+
+def load_sheets():
+    data = json.loads((SRC / "cheatsheets.json").read_text(encoding="utf-8"))
+    cats = data["categories"]
+    seen = set()
+    for sh in data["sheets"]:
+        sid = sh["id"]
+        if sid in seen or not re.fullmatch(r"[A-Z]+-\d{2}", sid):
+            sys.exit(f"cheatsheets.json: bad or duplicate id {sid!r}")
+        seen.add(sid)
+        if sh["cat"] not in cats:
+            sys.exit(f"cheatsheets.json: {sid} has unknown category {sh['cat']!r}")
+        if sh["status"] not in SHEET_STATUS:
+            sys.exit(f"cheatsheets.json: {sid} has unknown status {sh['status']!r}")
+        sh["key"] = sid.lower()
+        sh["path"] = f"/cheat-sheets/{sh['key']}"
+        if sh["status"] != "live":
+            continue
+        base = f"bfl-{sh['key']}-{sh['slug']}_v{sh['version']}"
+        sh["files"] = {}
+        for variant, ext in [("web", "pdf"), ("print-letter", "pdf"), ("print-a4", "pdf"),
+                             ("full", "webp"), ("web", "webp"), ("social", "webp"), ("thumb", "webp")]:
+            name = f"{base}_{variant}.{ext}"
+            f = PUB / "cheat-sheets" / "files" / name
+            if not f.is_file():
+                sys.exit(f"{sid}: missing {f.relative_to(ROOT)} (run tools/sheetprep.py on the exports)")
+            raw = f.read_bytes()
+            info = {"name": name, "url": f"{SHEET_FILES}/{name}", "bytes": len(raw),
+                    "sha256": hashlib.sha256(raw).hexdigest()}
+            if ext == "webp":
+                info["w"], info["h"] = webp_size(f)
+            sh["files"][f"{variant}.{ext}"] = info
+        body_f = SRC / "cheat-sheets" / f"{sh['key']}.html"
+        if not body_f.is_file():
+            sys.exit(f"{sid}: missing text version {body_f.relative_to(ROOT)}")
+        sh["body"] = re.sub(r"<!--.*?-->", "", body_f.read_text(encoding="utf-8"), flags=re.S).strip()
+    return data
+
+
+def sheet_badge(sh):
+    return f'<span class="sid k-{sh["cat"]}">{esc(sh["id"])}</span>'
+
+
+def sheet_search(data, sh):
+    c = data["categories"][sh["cat"]]
+    return esc(" ".join([sh["id"], sh["title"], c["name"], sh.get("summary", ""), " ".join(sh.get("tags", []))]).lower())
+
+
+def block_sheet_cards(data, sheets, heading="h3"):
+    cards = []
+    for sh in sheets:
+        c = data["categories"][sh["cat"]]
+        th = sh["files"]["thumb.webp"]
+        cards.append(
+            f'<article class="scard" data-cat="{sh["cat"]}" data-search="{sheet_search(data, sh)}">'
+            f'<a class="scard-img" href="{sh["path"]}" tabindex="-1" aria-hidden="true">'
+            f'<img src="{th["url"]}" width="{th["w"]}" height="{th["h"]}" alt="" loading="lazy" decoding="async"></a>'
+            f'<div class="scard-body"><p class="scard-meta">{sheet_badge(sh)}<span>{esc(c["name"])}</span></p>'
+            f'<{heading}><a href="{sh["path"]}">{esc(sh["title"])}</a></{heading}>'
+            f'<p>{esc(sh["summary"])}</p>'
+            f'<p class="scard-foot"><span>{esc(sh["exam"])}</span><span>v{esc(sh["version"])} &middot; {fmt_date(sh["date"])}</span></p>'
+            f'<p class="scard-links"><a href="{sh["path"]}">open sheet &rarr;</a>'
+            f'<a href="{sh["files"]["print-letter.pdf"]["url"]}" download>PDF Letter</a>'
+            f'<a href="{sh["files"]["print-a4.pdf"]["url"]}" download>PDF A4</a></p>'
+            f'</div></article>')
+    return "\n      ".join(cards)
+
+
+def block_sheet_roadmap(data):
+    racks = []
+    for key, c in data["categories"].items():
+        items = [sh for sh in data["sheets"] if sh["cat"] == key]
+        live = sum(1 for sh in items if sh["status"] == "live")
+        rows = []
+        for sh in sorted(items, key=lambda x: x["id"]):
+            cls, label = SHEET_STATUS[sh["status"]]
+            title = (f'<a href="{sh["path"]}">{esc(sh["title"])}</a>' if sh["status"] == "live" else esc(sh["title"]))
+            rows.append(f'<li data-cat="{key}" data-search="{sheet_search(data, sh)}">'
+                        f'<span class="rid">{esc(sh["id"])}</span><span class="rt">{title}</span>'
+                        f'<span class="rw" title="Release wave {sh["wave"]}">w{sh["wave"]}</span>'
+                        f'<span class="st {cls}">{label}</span></li>')
+        racks.append(
+            f'<section class="rack k-{key}" data-month="rm-{key}" aria-labelledby="rm-{key}-h">'
+            f'<h3 id="rm-{key}-h"><span class="sid k-{key}">{esc(c["code"])}</span>{esc(c["name"])}'
+            f'<span class="ct">{len(items)} sheets &middot; {live} live</span></h3>'
+            f'<ol class="rack-list" id="rm-{key}">{"".join(rows)}</ol></section>')
+    return "\n      ".join(racks)
+
+
+def block_sheet_teaser(data, live):
+    """Home page: newest live sheet next to what ships next (keeps the row full while the library is young)."""
+    order = list(data["categories"])
+    upcoming = sorted([sh for sh in data["sheets"] if sh["status"] != "live"],
+                      key=lambda x: (x["wave"], order.index(x["cat"]), x["id"]))[:6]
+    rows = "".join(f'<li class="k-{sh["cat"]}"><span class="rid">{esc(sh["id"])}</span><span class="rt">{esc(sh["title"])}</span>'
+                   f'<span class="rw">w{sh["wave"]}</span></li>' for sh in upcoming)
+    nxt = (f'<div class="rack k-networking next-up"><h3><span class="sid">next</span>On the bench'
+           f'<span class="ct">{len([s for s in data["sheets"] if s["status"] != "live"])} to go</span></h3>'
+           f'<ol class="rack-list">{rows}</ol></div>')
+    return block_sheet_cards(data, live[-1:]) + "\n        " + nxt
+
+
+def block_sheet_filters(data):
+    counts = {}
+    for sh in data["sheets"]:
+        counts[sh["cat"]] = counts.get(sh["cat"], 0) + 1
+    return block_filters([(k, esc(c.get("short", c["name"]).lower()), counts.get(k, 0), f"k-{k}")
+                          for k, c in data["categories"].items()], len(data["sheets"]))
+
+
+def render_sheet(site, hashes, last_change, data, sh, posts_by_slug):
+    c = data["categories"][sh["cat"]]
+    lic = data["license"]
+    fl = sh["files"]
+    web, full, social = fl["web.webp"], fl["full.webp"], fl["social.webp"]
+    body = re.sub(r"<(/?)h2\b", r"<\1h3", sh["body"])  # page h2 is "Text version"
+    body = no_translate(body)
+
+    tiles = []
+    for i, (variant, fmt, name, note) in enumerate(DOWNLOADS):
+        f = fl[f"{variant}.{'webp' if fmt == 'WebP' else 'pdf'}"]
+        tiles.append(
+            f'<li><a class="dl{" dl-pri" if i == 0 else ""}" href="{f["url"]}" download>'
+            f'<span class="dl-k">{fmt}</span><span class="dl-t"><b>{name}</b>'
+            f'<span class="dl-m">{note} &middot; {human_size(f["bytes"])}</span></span>'
+            f'<svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg>'
+            f'<span class="sr-only">, download</span></a></li>')
+    sums = "".join(f'<tr><td translate="no">{esc(f["name"])}</td><td translate="no">{f["sha256"]}</td></tr>'
+                   for k, f in fl.items() if not k.startswith(("thumb", "social", "web.webp")))
+    sources = "".join(f'<li><a href="{esc(u)}" rel="noopener" target="_blank">{esc(t)}</a></li>' for t, u in sh.get("sources", []))
+    related = ""
+    for slug in sh.get("related", []):
+        p = posts_by_slug.get(slug)
+        if not p:
+            sys.exit(f'{sh["id"]}: related post {slug!r} not found')
+        related += f'<li><a href="{p["path"]}">{esc(p.get("list_title", p["title"]))}</a></li>'
+    related_html = f'<h3>Go deeper on the blog</h3><ul>{related}</ul>' if related else ""
+
+    # previous / next live sheet
+    live = [x for x in data["sheets"] if x["status"] == "live"]
+    i = live.index(sh)
+    hop = []
+    if i > 0:
+        hop.append(f'<a class="prev" href="{live[i-1]["path"]}"><span class="k">&larr; previous sheet</span>{esc(live[i-1]["id"])} {esc(live[i-1]["title"])}</a>')
+    if i + 1 < len(live):
+        hop.append(f'<a class="next" href="{live[i+1]["path"]}"><span class="k">next sheet &rarr;</span>{esc(live[i+1]["id"])} {esc(live[i+1]["title"])}</a>')
+    nexthop = f'<nav class="nexthop" aria-label="More cheat sheets">{"".join(hop)}</nav>' if hop else ""
+
+    main = f'''<main id="main">
+<article class="sheet">
+  <header class="post-head sheet-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/cheat-sheets">cheat-sheets</a><span aria-hidden="true">/</span><a href="/cheat-sheets#{sh["cat"]}">{esc(c["code"].lower())}</a></nav>
+      <p class="scard-meta">{sheet_badge(sh)}<span>{esc(c["name"])}</span></p>
+      <h1>{esc(sh["title"])}</h1>
+      <p class="post-dek"><b>Use this when:</b> {esc(sh["use_when"][0].lower() + sh["use_when"][1:])}</p>
+      <div class="post-meta"><span>{esc(sh["exam"])}</span><span class="sep">/</span><span>v{esc(sh["version"])}</span><span class="sep">/</span><time datetime="{sh["date"]}">{fmt_date(sh["date"])}</time><span class="sep">/</span><span>1 page</span><span class="sep">/</span><a href="{esc(lic["url"])}" rel="license noopener" target="_blank">{esc(lic["name"])}</a></div>
+    </div>
+  </header>
+  <div class="wrap sheet-grid">
+    <figure class="sheet-paper">
+      <a href="{full["url"]}" aria-label="Open the full-size {esc(sh["id"])} image ({full["w"]} by {full["h"]} pixels)">
+        <img src="{web["url"]}" srcset="{web["url"]} {web["w"]}w, {full["url"]} {full["w"]}w" sizes="(max-width: 60rem) calc(100vw - 2rem), 46rem"
+             width="{web["w"]}" height="{web["h"]}" fetchpriority="high" decoding="async"
+             alt="{esc(sh["id"])} {esc(sh["title"])} cheat sheet. Every table on it is repeated as text below.">
+      </a>
+      <figcaption>Tap the sheet for the full-size image. The <a href="#text-version">text version</a> below is screen-reader friendly.</figcaption>
+    </figure>
+    <aside class="sheet-side" aria-labelledby="dl-h">
+      <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">copy</span> <span class="a">{esc(sh["key"])} flash:</span></span>
+      <h2 id="dl-h" class="side-h">Download</h2>
+      <ul class="dl-list">{"".join(tiles)}</ul>
+      <p class="dl-open"><a href="{fl["web.pdf"]["url"]}">Open the PDF in your browser</a> instead of downloading it.</p>
+      <details class="sums">
+        <summary>Verify your download (SHA-256)</summary>
+        <div class="tbl"><table class="sheet-files"><thead><tr><th scope="col">File</th><th scope="col">SHA-256</th></tr></thead><tbody>{sums}</tbody></table></div>
+        <p>Compare the hash with the one printed by
+          <code translate="no">Get-FileHash .\\file.pdf -Algorithm SHA256</code> (PowerShell) or
+          <code translate="no">sha256sum file.pdf</code> (Linux, macOS: <code translate="no">shasum -a 256</code>). Different hash, different file: delete it.</p>
+      </details>
+      <p class="side-note">Free for personal and classroom use under {esc(lic["name"])}. Keep the credit line; don't sell it. Spotted a mistake? <a href="mailto:{esc(site["email"])}?subject={esc(sh["id"])}%20v{esc(sh["version"])}%20correction">Email a correction</a>.</p>
+    </aside>
+  </div>
+  <section class="wrap sheet-text" aria-labelledby="text-version">
+    <div class="prose">
+      <h2 id="text-version">Text version</h2>
+      <p>Everything on the sheet, as plain HTML: handy for screen readers, copy-paste and search.</p>
+{body}
+      <h3>Sources</h3>
+      <ul>{sources}</ul>
+      {related_html}
+    </div>
+    {nexthop}
+  </section>
+</article>
+</main>
+'''
+    url = site["url"] + sh["path"]
+    media = []
+    for variant, fmt, name, note in DOWNLOADS:
+        f = fl[f"{variant}.{'webp' if fmt == 'WebP' else 'pdf'}"]
+        media.append({"@type": "MediaObject", "name": f'{sh["id"]} {sh["title"]} ({name})',
+                      "contentUrl": site["url"] + f["url"],
+                      "encodingFormat": "image/webp" if fmt == "WebP" else "application/pdf",
+                      "contentSize": human_size(f["bytes"]), "sha256": f["sha256"]})
+    jsonld = [{
+        "@context": "https://schema.org",
+        "@type": "LearningResource",
+        "name": f'{sh["id"]} {sh["title"]} cheat sheet',
+        "description": sh["description"],
+        "url": url,
+        "learningResourceType": "Cheat sheet",
+        "educationalLevel": "Beginner",
+        "teaches": sh["title"],
+        "keywords": ", ".join(sh.get("tags", [])),
+        "inLanguage": "en",
+        "isAccessibleForFree": True,
+        "license": lic["url"],
+        "version": sh["version"],
+        "datePublished": sh["date"],
+        "dateModified": sh.get("updated", sh["date"]),
+        "image": site["url"] + social["url"],
+        "author": {"@type": "Person", "name": site["author"], "url": site["url"] + "/"},
+        "encoding": media,
+    }, {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": site["url"] + "/"},
+            {"@type": "ListItem", "position": 2, "name": "Cheat sheets", "item": site["url"] + "/cheat-sheets"},
+            {"@type": "ListItem", "position": 3, "name": f'{sh["id"]} {sh["title"]}'},
+        ],
+    }]
+    return page(site, hashes, last_change, nav="sheets", body=main,
+                title=f'{sh["id"]} {sh["title"]} Cheat Sheet (PDF) | breakfixlearn',
+                description=sh["description"], path=sh["path"],
+                og_title=f'{sh["title"]} cheat sheet ({sh["id"]})', og_description=sh["summary"],
+                og_image=social["url"], og_image_alt=f'{sh["id"]} {sh["title"]} cheat sheet preview',
+                jsonld=jsonld)
+
+
 # ------------------------------------------------------------------ feed / map
 def feed(site, posts):
     items = []
@@ -561,6 +840,12 @@ def main():
         len(projects))
     shipped = sum(1 for p in projects if p["status"] == "up")
 
+    sheets = load_sheets()
+    live_sheets = [sh for sh in sheets["sheets"] if sh["status"] == "live"]
+    for sh in live_sheets:
+        write(f'cheat-sheets/{sh["key"]}.html', render_sheet(site, hashes, last_change, sheets, sh, by_slug))
+    n_sheets = len(sheets["sheets"])
+
     tokens = {
         "POST_COUNT": str(len(posts)),
         "LAST_CHANGE": fmt_date(last_change),
@@ -573,6 +858,12 @@ def main():
         "PROJECT_FILTERS": proj_filters,
         "PROJECT_CARDS": block_project_cards(site, projects, by_slug),
         "PROJECT_SUMMARY": f"{len(projects)} interfaces, {shipped} up/up.",
+        "SHEET_FILTERS": block_sheet_filters(sheets),
+        "SHEET_CARDS": block_sheet_cards(sheets, live_sheets),
+        "SHEET_ROADMAP": block_sheet_roadmap(sheets),
+        "SHEET_COUNT": str(n_sheets),
+        "SHEET_LIVE": str(len(live_sheets)),
+        "SHEETS_TEASER": block_sheet_teaser(sheets, live_sheets),
     }
 
     for f in sorted((SRC / "pages").glob("*.html")):
@@ -606,8 +897,11 @@ def main():
             scripts=meta.get("scripts", [])))
 
     write("feed.xml", feed(site, posts))
+    sheets_mod = max([sh.get("updated", sh["date"]) for sh in live_sheets] or [last_change])
     write("sitemap.xml", sitemap(site, posts, [("/", last_change), ("/projects", last_change),
-                                                ("/blog", last_change), ("/privacy", "2026-09-25")]))
+                                                ("/blog", last_change), ("/cheat-sheets", sheets_mod),
+                                                ("/privacy", "2026-09-28")]
+                                 + [(sh["path"], sh.get("updated", sh["date"])) for sh in live_sheets]))
     print("done")
 
 

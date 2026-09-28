@@ -26,3 +26,12 @@
 /assets/og/*
   Cache-Control: public, max-age=86400
 
+# Cheat sheet downloads: PDFs, hi-res WebP, thumbnails.
+# Chrome's built-in PDF viewer injects its own styles, so the site-wide CSP
+# (style-src 'self') would show a blank page. Detach it and send a PDF-only
+# policy: still no scripts, no forms, no framing. qa.py (tools/pdfcheck.py)
+# guarantees the files contain no JavaScript, actions, forms or attachments.
+/cheat-sheets/files/*
+  ! Content-Security-Policy
+  Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data: blob:; object-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'
+  Cache-Control: public, max-age=86400

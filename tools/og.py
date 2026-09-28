@@ -128,4 +128,5 @@ def make_all(site, posts, outdir):
     page_image(site, outdir / "index.webp", "edge# show version", "BUILD. BREAK.\nFIX. LEARN.", sub)
     page_image(site, outdir / "blog.webp", "edge# show logging", f"{len(posts)} LAB LOGS\n& WRITE-UPS", sub)
     page_image(site, outdir / "projects.webp", "edge# show interfaces status", "PROJECTS:\nNET + SEC LABS", sub)
-    print(f"  og images: {len(posts) + 4} written to {outdir}")
+    page_image(site, outdir / "cheat-sheets.webp", "edge# show cheat-sheets", "CHEAT SHEETS:\nPRINT-READY", sub)
+    print(f"  og images: {len(posts) + 5} written to {outdir}")

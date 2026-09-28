@@ -9,6 +9,9 @@ Checks
               no inline event handlers (onclick=...), target=_blank always has rel=noopener,
               no innerHTML / outerHTML / insertAdjacentHTML / document.write / eval in JS,
               no http:// resources (mixed content)
+  files     : every PDF passes tools/pdfcheck.py (no JavaScript, actions, forms,
+              attachments or encryption; only https links to breakfixlearn.com; 1 page),
+              no file in public/ over 5 MB, hi-res sheet images under 1.5 MB
   content   : no em dashes (house style), images have alt + width + height,
               every raster image (posts, OG/share images, files in public/) is WebP
   seo       : canonical is extension-less and absolute, description 50-170 chars
@@ -144,6 +147,19 @@ RASTER = {".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tif", ".tiff", ".avif", ".h
 for f in sorted(ROOT.rglob("*")):
     if f.is_file() and f.suffix.lower() in RASTER:
         bad(f, "non-WebP image in public/ (convert with tools/imgprep.py)")
+
+# --- downloadable files (OWASP A08:2025 integrity, A05:2025 injection via documents) ---
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from pdfcheck import check as pdf_check  # noqa: E402
+
+for f in sorted(ROOT.rglob("*.pdf")):
+    for issue in pdf_check(f):
+        bad(f, f"unsafe PDF: {issue}")
+for f in sorted(ROOT.rglob("*")):
+    if f.is_file() and f.stat().st_size > 5 * 1024 * 1024:
+        bad(f, f"{f.stat().st_size // 1024} KB is over the 5 MB per-file budget")
+    if f.is_file() and f.name.endswith("_full.webp") and f.stat().st_size > 1536 * 1024:
+        bad(f, "hi-res sheet image over 1.5 MB")
 
 danger = re.compile(r"\b(innerHTML|outerHTML|insertAdjacentHTML|document\.write|eval\s*\(|new Function)")
 for f in sorted(ROOT.rglob("*.js")):

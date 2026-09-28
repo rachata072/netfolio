@@ -35,6 +35,9 @@ def load_headers():
         if not raw[0].isspace():
             cur = (raw.strip(), [])
             rules.append(cur)
+        elif cur and raw.strip().startswith("!"):
+            # "! Header-Name" detaches a header set by an earlier rule (Cloudflare syntax)
+            cur[1].append(("!", raw.strip()[1:].strip()))
         elif cur and ":" in raw:
             k, v = raw.strip().split(":", 1)
             cur[1].append((k.strip(), v.strip()))
@@ -50,15 +53,21 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def end_headers(self):
         path = urllib.parse.urlsplit(self.path).path
+        out = []
         for pattern, headers in RULES:
             if fnmatch.fnmatch(path, pattern):
                 for k, v in headers:
+                    if k == "!":
+                        out = [(ok, ov) for ok, ov in out if ok.lower() != v.lower()]
+                        continue
                     # upgrade-insecure-requests breaks plain-http localhost
                     if k.lower() == "content-security-policy":
                         v = v.replace("; upgrade-insecure-requests", "")
                     if k.lower() == "strict-transport-security":
                         continue
-                    self.send_header(k, v)
+                    out.append((k, v))
+        for k, v in out:
+            self.send_header(k, v)
         super().end_headers()
 
     def do_HEAD(self):

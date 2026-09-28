@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#050D18">
 <meta name="color-scheme" content="dark">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/style.css?v=8f8c37b981">
+<link rel="stylesheet" href="/css/style.css?v=15c414d558">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
 <meta property="og:type" content="article">
@@ -34,20 +34,21 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab","description":"A 24-hour Wazuh threat hunt read cold: eight level-15 Shellshock alerts dissected, a Zeek detection I'd called broken found working, and zero auth failures.","datePublished":"2026-09-25","dateModified":"2026-09-25","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"publisher":{"@type":"Person","name":"Trey"},"mainEntityOfPage":"https://breakfixlearn.com/blog/soc-homelab-threat-hunt-report","image":"https://breakfixlearn.com/assets/og/soc-homelab-threat-hunt-report.webp","keywords":"SOC, Threat Hunting, Wazuh, Zeek, MITRE ATT&CK, Blue Team, Homelab","articleSection":"Security","timeRequired":"PT17M"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://breakfixlearn.com/blog"},{"@type":"ListItem","position":3,"name":"Reading My Own SIEM: A 24-Hour Threat Hunt Through the Home Lab"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Why does a level 15 Shellshock alert not automatically mean the server was compromised?","acceptedAnswer":{"@type":"Answer","text":"Wazuh's rule matched a string pattern in the incoming HTTP request, specifically the classic Shellshock function-definition syntax inside the Referer and User-Agent headers. That confirms the probe was sent. It does not confirm the probe was executed, because the access log the rule reads from only records what came in, never what the server did with it afterward. In this lab, the response was an ordinary 302 redirect with no reflected output, and the target's Apache and PHP stack was never invoking those headers through CGI in the first place, so the correct read is a delivered but inert probe, not a successful attack."}},{"@type":"Question","name":"Why is a MITRE ATT&CK technique tag on an alert a hypothesis rather than a confirmed fact?","acceptedAnswer":{"@type":"Answer","text":"The technique label comes from metadata written into the rule by whoever authored it, not from Wazuh confirming the technique's behavior actually occurred. A rule named after Process Injection can fire on a much more mundane string match, like a cmd= parameter in a URL, that only resembles the technique's description. The tag tells you where to look, and the raw alert record underneath it is what actually proves or disproves the hypothesis."}},{"@type":"Question","name":"What should you check before writing up zero detected authentication failures as a security gap?","acceptedAnswer":{"@type":"Answer","text":"Two things, in order: whether the brute-force attempt actually happened inside the time window you are reviewing, and whether password authentication was already disabled at the SSH daemon level before the attempt reached the authentication log at all. If PasswordAuthentication is set to no, failed password attempts get rejected before PAM ever logs them, which means zero logged failures is the hardening control working correctly, not a detection gap. Writing up an unverified negative as a finding is the same mistake as writing up an unverified positive."}}]}</script>
-<script src="/js/main.js?v=b6a070fa7c" defer></script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
 </head>
 <body>
 <div class="progress" aria-hidden="true"></div>
 <a class="skip" href="#main">Skip to content</a>
 <header class="hdr">
   <div class="wrap">
-    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
     <nav aria-label="Main">
       <ul class="ports">
         <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
         <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
         <li><a class="port" href="/blog" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
-        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span>about</a></li>
+        <li><a class="port" href="/cheat-sheets"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
       </ul>
     </nav>
   </div>
@@ -104,18 +105,18 @@
       a few good habits at once: you pick a fixed time window instead of an open-ended "whatever is
       on screen right now," you get a portable PDF you can commit to the repository as evidence,
       and you get a second artifact that was generated independently of my own
-      <code>soc_digest.py</code> script from the previous post. If the two disagree about
+      <code translate="no">soc_digest.py</code> script from the previous post. If the two disagree about
       something, that disagreement is itself worth looking at.
     </p>
     <p>The steps, for anyone building the same habit into their own lab:</p>
     <p>
       Open the Wazuh dashboard and go to Threat Hunting in the left menu. Set the time range to
-      the window you actually want to review, mine covered <code>2026-09-23T19:24:45</code> to
-      <code>2026-09-24T19:24:45</code>, a full day that turned out to capture two separate
-      <code>kali-attack-sim.sh</code> runs, which I did not know going in. Filter to
-      <code>manager.name: Ubuntu</code>, the single node this lab runs. Click Generate Report in
+      the window you actually want to review, mine covered <code translate="no">2026-09-23T19:24:45</code> to
+      <code translate="no">2026-09-24T19:24:45</code>, a full day that turned out to capture two separate
+      <code translate="no">kali-attack-sim.sh</code> runs, which I did not know going in. Filter to
+      <code translate="no">manager.name: Ubuntu</code>, the single node this lab runs. Click Generate Report in
       the top right, or the export icon on the module itself, and choose PDF. Commit the PDF into
-      <code>docs/evidence/</code> under a name that includes the date range, so it stays attached
+      <code translate="no">docs/evidence/</code> under a name that includes the date range, so it stays attached
       to the write-up in git history rather than living only as a chat attachment or a screenshot
       that eventually gets lost.
     </p>
@@ -152,7 +153,7 @@
       two distinct spikes, similar in shape, both landing in the afternoon and evening. That meant
       this window held two attack-sim passes, not one, which changes how you read every count that
       follows. Averaging two runs together into one number blurs the story. The fix was simple:
-      pull <code>timeline.csv</code> from both Kali runs and line each one up against its own
+      pull <code translate="no">timeline.csv</code> from both Kali runs and line each one up against its own
       spike before writing anything else up.
     </p>
 
@@ -207,12 +208,12 @@
       and remote file inclusion signatures from the ET Open ruleset, accounted for close to six
       thousand alerts, a lot for what amounts to two scan passes. Two runs plus Nikto's large
       built-in check list explains most of that volume, but it is exactly the kind of number I
-      wanted to confirm against <code>timeline.csv</code> rather than assume.
+      wanted to confirm against <code translate="no">timeline.csv</code> rather than assume.
     </p>
     <p>
       My own custom Suricata test signatures behaved exactly as designed: the SYN burst rule, the
       SQLi UNION SELECT rule, and the path traversal rule all fired at counts consistent with two
-      runs through <code>kali-attack-sim.sh</code>. That consistency matters more than it sounds,
+      runs through <code translate="no">kali-attack-sim.sh</code>. That consistency matters more than it sounds,
       because it means the rules are doing their job predictably, not just occasionally.
     </p>
     <p>
@@ -231,7 +232,7 @@
     </p>
     <p>
       My own admin activity on the VM, PAM sessions opening and closing and successful
-      <code>sudo</code> escalations, accounted for over a hundred alerts on its own, worth knowing
+      <code translate="no">sudo</code> escalations, accounted for over a hundred alerts on its own, worth knowing
       specifically so a future reader of the alert stream does not mistake ordinary administrative
       work for something adversarial. Knowing what your own noise looks like is half of knowing
       what an attacker's noise looks like.
@@ -251,7 +252,7 @@
       nothing about whether to be worried. Pulling the raw record is what actually settles it.
     </p>
     <p>Wazuh's Document Details view for one of the eight alerts:</p>
-    <pre><code>data.srcip          192.168.56.20
+    <pre translate="no"><code translate="no">data.srcip          192.168.56.20
 data.url            /index.php
 decoder.name        web-accesslog
 location            /var/log/dvwa/access.log
@@ -274,17 +275,17 @@ full_log            192.168.56.20 - - [25/Sep/2026:13:13:02 +0000] "GET /index.p
     </figure>
     <p>
       Reading the raw Apache combined log line closely: the third quoted field is the
-      <code>Referer</code> header, and it carries Nikto's CVE-2014-6278 check. The fourth quoted
-      field is the <code>User-Agent</code> header, carrying its CVE-2014-6271 check. Both are
+      <code translate="no">Referer</code> header, and it carries Nikto's CVE-2014-6278 check. The fourth quoted
+      field is the <code translate="no">User-Agent</code> header, carrying its CVE-2014-6271 check. Both are
       classic Shellshock probes, both sent in the same request. The server's response was
-      <code>302 336</code>, an ordinary redirect of 336 bytes, exactly what DVWA does for every
+      <code translate="no">302 336</code>, an ordinary redirect of 336 bytes, exactly what DVWA does for every
       unauthenticated request regardless of what headers it received. There is no reflected
-      <code>93e4r0-cve-2014-6271: true</code> string anywhere in the response, no unusually large
+      <code translate="no">93e4r0-cve-2014-6271: true</code> string anywhere in the response, no unusually large
       or slow reply, nothing that looks like the header content was ever evaluated as a shell
       command rather than just read as a string.
     </p>
     <p>
-      The decoder itself matters here too. <code>decoder.name: web-accesslog</code> confirms this
+      The decoder itself matters here too. <code translate="no">decoder.name: web-accesslog</code> confirms this
       record came from Apache's own access log, not from a process trace or a command execution
       log. Wazuh detected a string pattern in the incoming request, which is precisely what it is
       supposed to do, and it never claimed to detect execution in the first place. Confusing "the
@@ -301,7 +302,7 @@ full_log            192.168.56.20 - - [25/Sep/2026:13:13:02 +0000] "GET /index.p
       was sent, not what the server did with it afterward. That is a real limitation of this
       specific evidence source, not a gap in this particular check, and I flagged it as a
       follow-up rather than quietly ignoring it. A one-time confirmation that DVWA's container has
-      no CGI module loaded (<code>docker exec dvwa apachectl -M | grep -i cgi</code>) would close
+      no CGI module loaded (<code translate="no">docker exec dvwa apachectl -M | grep -i cgi</code>) would close
       that last assumption for good, cheaply.
     </p>
     <p>
@@ -319,18 +320,18 @@ full_log            192.168.56.20 - - [25/Sep/2026:13:13:02 +0000] "GET /index.p
     </p>
     <p>
       Back in the runbook's troubleshooting section, I documented that Zeek's
-      <code>protocols/http/detect-sqli</code> script was not available on this lab's
-      <code>zeek-8.0</code> package, based on <code>zeekctl check</code> failing to find it at the
+      <code translate="no">protocols/http/detect-sqli</code> script was not available on this lab's
+      <code translate="no">zeek-8.0</code> package, based on <code translate="no">zeekctl check</code> failing to find it at the
       expected path. I wrote that step 04 of the attack simulation was "two vantage points, not
       three" as a direct result, Suricata and Wazuh catching the SQL injection traffic, Zeek
       staying silent on it. That was a documented, specific, checked conclusion at the time. This
       report showed Wazuh rule 100203, which corresponds to Zeek's
-      <code>HTTP::SQL_Injection_Attacker</code> and <code>HTTP::SQL_Injection_Victim</code>
+      <code translate="no">HTTP::SQL_Injection_Attacker</code> and <code translate="no">HTTP::SQL_Injection_Victim</code>
       notices, firing once each in the window. That should not have been possible if the script
       really was missing.
     </p>
     <p>Wazuh's Discover view for the record:</p>
-    <pre><code>@timestamp        Sep 24, 2026 @ 18:16:42.441
+    <pre translate="no"><code translate="no">@timestamp        Sep 24, 2026 @ 18:16:42.441
 agent.name        Ubuntu
 data.note         HTTP::SQL_Injection_Victim
 data.msg          An SQL injection victim was discovered!
@@ -353,14 +354,14 @@ full_log          {"ts":1790298942.473597,"uid":"CuXNdG9rlxQQ85l","note":"HTTP::
       <figcaption>data.source: zeek-notice, straight out of notice.log: proof the SQLi detection script was never actually missing, just misread months earlier.</figcaption>
     </figure>
     <p>
-      <code>data.source: zeek-notice</code> and <code>location: /opt/zeek/logs/current/notice.log</code>
+      <code translate="no">data.source: zeek-notice</code> and <code translate="no">location: /opt/zeek/logs/current/notice.log</code>
       rule out a decoder coincidence or a mislabeled Suricata event borrowing the rule number.
-      This is a genuine Zeek <code>HTTP::SQL_Injection_Victim</code> notice, read directly out of
-      <code>notice.log</code> on the sensor. Whatever caused the script to appear missing when I
+      This is a genuine Zeek <code translate="no">HTTP::SQL_Injection_Victim</code> notice, read directly out of
+      <code translate="no">notice.log</code> on the sensor. Whatever caused the script to appear missing when I
       wrote the original troubleshooting entry, a package update, a version difference between
-      when I checked and when this ran, or a mistake in how I read <code>zeekctl check</code>'s
+      when I checked and when this ran, or a mistake in how I read <code translate="no">zeekctl check</code>'s
       output at the time, is not the current state of this install.
-      <code>protocols/http/detect-sqli</code> is loaded and firing right now.
+      <code translate="no">protocols/http/detect-sqli</code> is loaded and firing right now.
     </p>
     <p>
       I closed this as confirmed and updated the documentation across the repository rather than
@@ -394,7 +395,7 @@ full_log          {"ts":1790298942.473597,"uid":"CuXNdG9rlxQQ85l","note":"HTTP::
     <p>
       The two attack windows in one day, mentioned above, are a reminder that a single day's
       report can quietly contain more than one event. Before writing anything up publicly, I
-      checked <code>timeline.csv</code> on the Kali side to confirm this was two intentional
+      checked <code translate="no">timeline.csv</code> on the Kali side to confirm this was two intentional
       passes rather than one run plus an accidental repeat. Either answer is a fine one to write
       down. Guessing which happened is not.
     </p>
@@ -402,8 +403,8 @@ full_log          {"ts":1790298942.473597,"uid":"CuXNdG9rlxQQ85l","note":"HTTP::
       Zero authentication failures against a full day that was supposed to include an SSH brute
       force step needed a real explanation rather than either alarm or a shrug. I checked two
       things in order: whether the brute force step actually ran inside this particular twenty
-      four hour window at all, and if it did, whether <code>PasswordAuthentication</code> in
-      <code>sshd_config</code> was already set to <code>no</code> from an earlier hardening pass.
+      four hour window at all, and if it did, whether <code translate="no">PasswordAuthentication</code> in
+      <code translate="no">sshd_config</code> was already set to <code translate="no">no</code> from an earlier hardening pass.
       If password authentication is disabled at the SSH daemon level, Hydra's password attempts
       get rejected before they ever reach PAM, which is exactly why they would not show up as PAM
       authentication failures. That would not be a detection gap at all, it would be the control
@@ -418,7 +419,7 @@ full_log          {"ts":1790298942.473597,"uid":"CuXNdG9rlxQQ85l","note":"HTTP::
     <p>
       Wazuh's Security Configuration Assessment module surfaced two real hardening gaps that had
       nothing to do with the attack traffic at all: a CIS Ubuntu 24.04 benchmark score under fifty
-      percent, and <code>systemd-timesyncd</code> flipping from passed to failed at some point
+      percent, and <code translate="no">systemd-timesyncd</code> flipping from passed to failed at some point
       during the window, meaning time synchronization on the sensor stopped being enforced. That
       second one matters specifically for a lab built around correlating timestamps across four
       different tools, the same correlation habit that made the beacon-hunting math and
@@ -449,7 +450,7 @@ full_log          {"ts":1790298942.473597,"uid":"CuXNdG9rlxQQ85l","note":"HTTP::
       Shellshock finding above, since it had the clearest evidence trail of the two major
       findings.
     </p>
-    <pre><code>Title:        [High -&gt; Closed] Wazuh rule 31168 - Shellshock attack detected x8, benign
+    <pre translate="no"><code translate="no">Title:        [High -&gt; Closed] Wazuh rule 31168 - Shellshock attack detected x8, benign
 Detected:     2026-09-25T13:13:02Z (this hit), Wazuh, rule 31168, level 15, firedtimes 2
 Source:       192.168.56.20 (soc-kali)
 Destination:  192.168.56.10 (soc-sensor, DVWA / Apache), GET /index.php
@@ -500,7 +501,7 @@ Follow-up:    Confirm mod_cgi is genuinely absent from the DVWA container rather
       attack simulation guide, the triage playbook, and this report, and renumbering every image
       so the numbers run in the same order a reader actually encounters them, start to finish. A
       few images turned out to have no reference anywhere, so they moved into an
-      <code>extras/</code> folder instead of being deleted outright, since a draft capture can
+      <code translate="no">extras/</code> folder instead of being deleted outright, since a draft capture can
       still be useful evidence even when it is not part of the required set. And two images built
       for this write-up, an architecture diagram and a side-by-side comparison of one attack seen
       through three different tools, had been generated and committed but never actually embedded
@@ -541,7 +542,7 @@ Follow-up:    Confirm mod_cgi is genuinely absent from the DVWA container rather
     <p>
       The second image is the one I keep coming back to as the clearest single illustration of
       what this whole project is actually for. One attack, the SQL injection step from
-      <code>kali-attack-sim.sh</code>, shown through three completely different lenses at once:
+      <code translate="no">kali-attack-sim.sh</code>, shown through three completely different lenses at once:
       Suricata's signature match, Zeek's behavioral notice, and Wazuh's correlated alert, built
       from real captures of each tool's own view of the identical traffic. That is the entire
       argument of this series in one picture. No single tool tells the whole story. Comparing what
@@ -638,7 +639,7 @@ Follow-up:    Confirm mod_cgi is genuinely absent from the DVWA container rather
     <p>
       The technique label comes from metadata written into the rule by whoever authored it, not
       from Wazuh confirming the technique's behavior actually occurred. A rule named after Process
-      Injection can fire on a much more mundane string match, like a <code>cmd=</code> parameter in
+      Injection can fire on a much more mundane string match, like a <code translate="no">cmd=</code> parameter in
       a URL, that only resembles the technique's description. The tag tells you where to look, and
       the raw alert record underneath it is what actually proves or disproves the hypothesis.
     </p>
@@ -647,7 +648,7 @@ Follow-up:    Confirm mod_cgi is genuinely absent from the DVWA container rather
       Two things, in order: whether the brute-force attempt actually happened inside the time
       window you are reviewing, and whether password authentication was already disabled at the
       SSH daemon level before the attempt reached the authentication log at all. If
-      <code>PasswordAuthentication</code> is set to <code>no</code>, failed password attempts get
+      <code translate="no">PasswordAuthentication</code> is set to <code translate="no">no</code>, failed password attempts get
       rejected before PAM ever logs them, which means zero logged failures is the hardening
       control working correctly, not a detection gap. Writing up an unverified negative as a
       finding is the same mistake as writing up an unverified positive.
@@ -683,7 +684,7 @@ Follow-up:    Confirm mod_cgi is genuinely absent from the DVWA container rather
 <footer class="ftr">
   <div class="wrap ftr-grid">
     <div>
-      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
       <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
     </div>
     <nav aria-label="Site">
@@ -691,6 +692,7 @@ Follow-up:    Confirm mod_cgi is genuinely absent from the DVWA container rather
       <ul>
         <li><a href="/projects">projects</a></li>
         <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
         <li><a href="/#about">about</a></li>
         <li><a href="/privacy">privacy</a></li>
         <li><a href="/feed.xml">rss feed</a></li>

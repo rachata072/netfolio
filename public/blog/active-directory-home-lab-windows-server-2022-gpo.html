@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#050D18">
 <meta name="color-scheme" content="dark">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/style.css?v=8f8c37b981">
+<link rel="stylesheet" href="/css/style.css?v=15c414d558">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
 <meta property="og:type" content="article">
@@ -34,20 +34,21 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"I Built an Active Directory Home Lab That's More Than Three OUs and a Password Policy","description":"An Active Directory lab on Windows Server 2022: OU design, fine-grained password policies, Windows LAPS, delegated help desk rights, WSUS, and a tested backup.","datePublished":"2026-09-10","dateModified":"2026-09-10","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"publisher":{"@type":"Person","name":"Trey"},"mainEntityOfPage":"https://breakfixlearn.com/blog/active-directory-home-lab-windows-server-2022-gpo","image":"https://breakfixlearn.com/assets/og/active-directory-home-lab-windows-server-2022-gpo.webp","keywords":"Active Directory, Windows Server 2022, Group Policy, LAPS, WSUS, PowerShell","articleSection":"IT support","timeRequired":"PT24M"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://breakfixlearn.com/blog"},{"@type":"ListItem","position":3,"name":"I Built an Active Directory Home Lab That's More Than Three OUs and a Password Policy"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Why does this lab use a VirtualBox NAT Network instead of plain NAT or Bridged networking?","acceptedAnswer":{"@type":"Answer","text":"Plain NAT puts each VM behind its own isolated NAT instance, so the domain controller and the client can each reach the internet but cannot see each other, domain join fails before it even reaches a credentials prompt. Bridged networking exposes both VMs directly on the home LAN, where a home router already running DHCP collides with the domain controller's own DHCP scope. A VirtualBox NAT Network is a single shared virtual switch that gives every attached VM both a route to the internet and a route to each other, with its own built-in DHCP turned off so it doesn't race the domain controller's DHCP server for client leases."}},{"@type":"Question","name":"Why put a stricter password policy on IT admin accounts instead of raising it for the whole domain?","acceptedAnswer":{"@type":"Answer","text":"Windows only honors one password and lockout policy per domain through the Default Domain Policy, so a second GPO with different password settings on a different OU would simply be ignored for that purpose. A Fine-Grained Password Policy (a Password Settings Object) is the mechanism built for exactly this: it targets a specific security group, so IT-Admins accounts get a 16-character minimum and a 3-attempt lockout threshold while everyone else keeps the domain default, raising the bar only for the accounts whose compromise actually matters most, rather than adding friction for every account in the organization."}},{"@type":"Question","name":"What does Windows LAPS actually protect against?","acceptedAnswer":{"@type":"Answer","text":"Without it, most environments build every workstation from the same image, so every machine ends up with the identical local Administrator password. Once that one password is known, an attacker who compromises a single workstation can move laterally to every other machine using the same credential, a technique commonly called pass-the-hash. Windows LAPS randomizes and rotates the local Administrator password independently on every domain-joined machine and stores the current value as a protected, permission-gated attribute in Active Directory, so compromising one machine's local admin password gives an attacker nothing usable anywhere else."}},{"@type":"Question","name":"Why delegate password-reset rights to a help desk group instead of just making them Domain Admins?","acceptedAnswer":{"@type":"Answer","text":"Making every help desk technician a Domain Admin is the fastest way to unblock a password-reset ticket, and also the fastest way to turn one compromised help desk account into a domain-wide incident, since a Domain Admin account can do anything, including adding new Domain Admins or modifying Group Policy, none of which a reset ticket ever needed. Delegating exactly two rights, Reset Password and the ability to write the lockoutTime attribute, scoped only to the OUs the help desk actually supports, gives that group real capability with none of the excess access, so a compromised help desk credential still can't touch anything outside its assigned scope."}},{"@type":"Question","name":"Why back up a domain controller if you've never actually restored from the backup?","acceptedAnswer":{"@type":"Answer","text":"A domain controller backup that's never been restored from is a domain controller with an assumption, not a tested recovery procedure. A System State backup captures the AD database, SYSVOL, and the registry, but the only way to actually know it works is to walk through a real restore in a controlled setting, on a VM snapshot you can roll back regardless of outcome, before you're depending on it during a genuine incident. The AD Recycle Bin serves a related but different purpose, restoring a single accidentally deleted object in seconds instead of requiring a multi-hour, whole-server Directory Services Restore Mode recovery for a five-second mistake."}}]}</script>
-<script src="/js/main.js?v=b6a070fa7c" defer></script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
 </head>
 <body>
 <div class="progress" aria-hidden="true"></div>
 <a class="skip" href="#main">Skip to content</a>
 <header class="hdr">
   <div class="wrap">
-    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
     <nav aria-label="Main">
       <ul class="ports">
         <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
         <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
         <li><a class="port" href="/blog" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
-        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span>about</a></li>
+        <li><a class="port" href="/cheat-sheets"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
       </ul>
     </nav>
   </div>
@@ -112,7 +113,7 @@
       Network</span>, a single shared virtual switch that gives every attached VM both
       a route to the internet and a route to each other:
     </p>
-    <pre><code>VBoxManage natnetwork add --netname ADLab-Net --network "10.10.0.0/24" --enable --dhcp off</code></pre>
+    <pre translate="no"><code translate="no">VBoxManage natnetwork add --netname ADLab-Net --network "10.10.0.0/24" --enable --dhcp off</code></pre>
     <p>
       <span class="mono">--dhcp off</span> matters specifically here: a NAT Network has
       its own built-in DHCP server, and if it's left on, it races the domain
@@ -181,7 +182,7 @@
       name, requiring a manual DNS cleanup and re-registration that renaming first
       avoids completely.
     </p>
-    <pre><code>Rename-Computer -NewName "dc01" -Restart
+    <pre translate="no"><code translate="no">Rename-Computer -NewName "dc01" -Restart
 Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
 Install-ADDSForest -DomainName "contoso.local" -DomainNetbiosName "CONTOSO" `
   -InstallDns:$true -SafeModeAdministratorPassword (Read-Host -AsSecureString "Enter DSRM password")</code></pre>
@@ -217,7 +218,7 @@ Install-ADDSForest -DomainName "contoso.local" -DomainNetbiosName "CONTOSO" `
       without a forwarder pointed upstream, which also happens to be a prerequisite for
       WSUS's own sync later:
     </p>
-    <pre><code>Add-DnsServerForwarder -IPAddress 8.8.8.8, 1.1.1.1</code></pre>
+    <pre translate="no"><code translate="no">Add-DnsServerForwarder -IPAddress 8.8.8.8, 1.1.1.1</code></pre>
 
     <figure class="post-figure">
       <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/dns-forwarders-configured-480.webp"
@@ -239,7 +240,7 @@ Install-ADDSForest -DomainName "contoso.local" -DomainNetbiosName "CONTOSO" `
       server (a misconfigured VM, a consumer router plugged in somewhere it shouldn't
       be) handing out bad configuration.
     </p>
-    <pre><code>Add-DhcpServerv4Scope -Name "Main-Scope" -StartRange 10.10.0.100 -EndRange 10.10.0.200 -SubnetMask 255.255.255.0
+    <pre translate="no"><code translate="no">Add-DhcpServerv4Scope -Name "Main-Scope" -StartRange 10.10.0.100 -EndRange 10.10.0.200 -SubnetMask 255.255.255.0
 Add-DhcpServerInDC -DnsName "dc01.contoso.local" -IPAddress 10.10.0.10</code></pre>
 
     <figure class="post-figure">
@@ -265,7 +266,7 @@ Add-DhcpServerInDC -DnsName "dc01.contoso.local" -IPAddress 10.10.0.10</code></p
       needs to sync from a real external source rather than the hypervisor's own
       clock:
     </p>
-    <pre><code>w32tm /config /manualpeerlist:"time.windows.com,0x1 time.google.com,0x1" /syncfromflags:manual /reliable:yes /update
+    <pre translate="no"><code translate="no">w32tm /config /manualpeerlist:"time.windows.com,0x1 time.google.com,0x1" /syncfromflags:manual /reliable:yes /update
 Enable-ADOptionalFeature -Identity "Recycle Bin Feature" -Scope ForestOrConfigurationSet -Target contoso.local -Confirm:$false</code></pre>
     <p>
       The AD Recycle Bin is off by default and there's no undo for turning it off once
@@ -318,7 +319,7 @@ Enable-ADOptionalFeature -Identity "Recycle Bin Feature" -Scope ForestOrConfigur
       domain-wide policy always wins for password and lockout settings regardless of
       which OU a second GPO targets.
     </p>
-    <pre><code>Set-ADDefaultDomainPasswordPolicy -Identity contoso.local -MinPasswordLength 12 `
+    <pre translate="no"><code translate="no">Set-ADDefaultDomainPasswordPolicy -Identity contoso.local -MinPasswordLength 12 `
   -PasswordHistoryCount 10 -MaxPasswordAge (New-TimeSpan -Days 90) `
   -LockoutThreshold 5 -LockoutDuration (New-TimeSpan -Minutes 30) -ComplexityEnabled $true</code></pre>
 
@@ -391,7 +392,7 @@ Enable-ADOptionalFeature -Identity "Recycle Bin Feature" -Scope ForestOrConfigur
       USB mass-storage driver's start type closes a straightforward data-exfiltration
       and malware-vector path.
     </p>
-    <pre><code>Set-GPRegistryValue -Name "Domain-Security-Baseline" -Key "HKLM\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" -ValueName "SMB1" -Type DWord -Value 0</code></pre>
+    <pre translate="no"><code translate="no">Set-GPRegistryValue -Name "Domain-Security-Baseline" -Key "HKLM\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" -ValueName "SMB1" -Type DWord -Value 0</code></pre>
 
     <figure class="post-figure">
       <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/security-baseline-smb1-disabled-480.webp"
@@ -541,7 +542,7 @@ Enable-ADOptionalFeature -Identity "Recycle Bin Feature" -Scope ForestOrConfigur
       <span class="mono">dsacls</span> since the AD PowerShell module doesn't expose a
       clean cmdlet for this specific delegation:
     </p>
-    <pre><code>dsacls "OU=IT,OU=Departments,DC=contoso,DC=local" /I:S /G "CONTOSO\SG-HelpDesk:CA;Reset Password;user"
+    <pre translate="no"><code translate="no">dsacls "OU=IT,OU=Departments,DC=contoso,DC=local" /I:S /G "CONTOSO\SG-HelpDesk:CA;Reset Password;user"
 dsacls "OU=IT,OU=Departments,DC=contoso,DC=local" /I:S /G "CONTOSO\SG-HelpDesk:WP;lockoutTime;user"</code></pre>
     <p>
       Repeated against the HR and Finance OUs so the same group supports all three
@@ -631,7 +632,7 @@ dsacls "OU=IT,OU=Departments,DC=contoso,DC=local" /I:S /G "CONTOSO\SG-HelpDesk:W
       Pointing clients at the internal WSUS server instead of Microsoft directly is a
       GPO, not a per-machine setting:
     </p>
-    <pre><code>Set-GPRegistryValue -Name "WSUS-Client-Config" -Key "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -ValueName "WUServer" -Type String -Value "http://dc01.contoso.local:8530"</code></pre>
+    <pre translate="no"><code translate="no">Set-GPRegistryValue -Name "WSUS-Client-Config" -Key "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -ValueName "WUServer" -Type String -Value "http://dc01.contoso.local:8530"</code></pre>
 
     <figure class="post-figure">
       <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/wsus-client-checkin-800.webp"
@@ -703,7 +704,7 @@ dsacls "OU=IT,OU=Departments,DC=contoso,DC=local" /I:S /G "CONTOSO\SG-HelpDesk:W
       for authentication going forward, and every GPO scoped to reach it starts
       applying from that point on.
     </p>
-    <pre><code>Add-Computer -DomainName "contoso.local" -Credential (Get-Credential) -Restart</code></pre>
+    <pre translate="no"><code translate="no">Add-Computer -DomainName "contoso.local" -Credential (Get-Credential) -Restart</code></pre>
 
     <figure class="post-figure">
       <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/domain-join-success-signin-screen-800.webp"
@@ -724,7 +725,7 @@ dsacls "OU=IT,OU=Departments,DC=contoso,DC=local" /I:S /G "CONTOSO\SG-HelpDesk:W
       manually. This is one of the most common "why isn't my GPO applying" causes in
       real environments, not just a lab quirk.
     </p>
-    <pre><code>Move-ADObject -Identity (Get-ADComputer "WINDOWS11").DistinguishedName -TargetPath "OU=Computers,OU=IT,OU=Departments,DC=contoso,DC=local"</code></pre>
+    <pre translate="no"><code translate="no">Move-ADObject -Identity (Get-ADComputer "WINDOWS11").DistinguishedName -TargetPath "OU=Computers,OU=IT,OU=Departments,DC=contoso,DC=local"</code></pre>
 
     <figure class="post-figure">
       <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/computer-object-moved-to-department-ou-800.webp"
@@ -744,7 +745,7 @@ dsacls "OU=IT,OU=Departments,DC=contoso,DC=local" /I:S /G "CONTOSO\SG-HelpDesk:W
       to an OU is not the same thing as it actually applying, security filtering, WMI
       filtering, or the object sitting in the wrong OU can all silently prevent it.
     </p>
-    <pre><code>gpresult /h C:\Temp\gpresult-report.html /f</code></pre>
+    <pre translate="no"><code translate="no">gpresult /h C:\Temp\gpresult-report.html /f</code></pre>
 
     <figure class="post-figure">
       <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/gpresult-html-report-applied-gpos-480.webp"
@@ -809,7 +810,7 @@ dsacls "OU=IT,OU=Departments,DC=contoso,DC=local" /I:S /G "CONTOSO\SG-HelpDesk:W
       to restore from it at least once in a controlled setting before depending on it
       during a real incident.
     </p>
-    <pre><code>wbadmin start systemstatebackup -backuptarget:C:\Backups -quiet
+    <pre translate="no"><code translate="no">wbadmin start systemstatebackup -backuptarget:C:\Backups -quiet
 wbadmin get versions</code></pre>
 
     <figure class="post-figure">
@@ -841,7 +842,7 @@ wbadmin get versions</code></pre>
       that shouldn't require a multi-hour DSRM recovery to fix. This one I did run live
       end to end, on a disposable test object, created, deleted, and restored:
     </p>
-    <pre><code>Get-ADObject -Filter {DisplayName -eq "RecycleBin-Drill"} -IncludeDeletedObjects | Restore-ADObject</code></pre>
+    <pre translate="no"><code translate="no">Get-ADObject -Filter {DisplayName -eq "RecycleBin-Drill"} -IncludeDeletedObjects | Restore-ADObject</code></pre>
 
     <figure class="post-figure">
       <img src="/assets/img/active-directory-home-lab-windows-server-2022-gpo/ad-recycle-bin-object-restore-verified-800.webp"
@@ -989,7 +990,7 @@ wbadmin get versions</code></pre>
 <footer class="ftr">
   <div class="wrap ftr-grid">
     <div>
-      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
       <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
     </div>
     <nav aria-label="Site">
@@ -997,6 +998,7 @@ wbadmin get versions</code></pre>
       <ul>
         <li><a href="/projects">projects</a></li>
         <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
         <li><a href="/#about">about</a></li>
         <li><a href="/privacy">privacy</a></li>
         <li><a href="/feed.xml">rss feed</a></li>

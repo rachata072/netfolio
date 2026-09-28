@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NET-01 OSI &amp; TCP/IP models Cheat Sheet (PDF) | breakfixlearn</title>
+<meta name="description" content="Free one-page OSI and TCP/IP cheat sheet: layers, PDUs, protocols, encapsulation, TCP vs UDP and bottom-up troubleshooting. PDF (Letter, A4) and image.">
+<link rel="canonical" href="https://breakfixlearn.com/cheat-sheets/net-01">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=15c414d558">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="OSI &amp; TCP/IP models cheat sheet (NET-01)">
+<meta property="og:description" content="All seven OSI layers mapped to TCP/IP, with PDUs, protocols, encapsulation, TCP vs UDP, bottom-up troubleshooting commands and attacks by layer.">
+<meta property="og:url" content="https://breakfixlearn.com/cheat-sheets/net-01">
+<meta property="og:image" content="https://breakfixlearn.com/cheat-sheets/files/bfl-net-01-osi-model_v1.0_social.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="NET-01 OSI &amp; TCP/IP models cheat sheet preview">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"NET-01 OSI & TCP/IP models cheat sheet","description":"Free one-page OSI and TCP/IP cheat sheet: layers, PDUs, protocols, encapsulation, TCP vs UDP and bottom-up troubleshooting. PDF (Letter, A4) and image.","url":"https://breakfixlearn.com/cheat-sheets/net-01","learningResourceType":"Cheat sheet","educationalLevel":"Beginner","teaches":"OSI & TCP/IP models","keywords":"OSI, TCP/IP, Encapsulation, TCP, UDP, Troubleshooting","inLanguage":"en","isAccessibleForFree":true,"license":"https://creativecommons.org/licenses/by-nc/4.0/","version":"1.0","datePublished":"2026-09-28","dateModified":"2026-09-28","image":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-01-osi-model_v1.0_social.webp","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"encoding":[{"@type":"MediaObject","name":"NET-01 OSI & TCP/IP models (US Letter)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-01-osi-model_v1.0_print-letter.pdf","encodingFormat":"application/pdf","contentSize":"180 KB","sha256":"b586712b7c1139924d345b932b85242510c9981289cb28d72cfd54117b476d30"},{"@type":"MediaObject","name":"NET-01 OSI & TCP/IP models (A4)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-01-osi-model_v1.0_print-a4.pdf","encodingFormat":"application/pdf","contentSize":"181 KB","sha256":"41e53330cfb8b3160e41ae80832712f5ebdc40242b39780b20656dd1f5f8d829"},{"@type":"MediaObject","name":"NET-01 OSI & TCP/IP models (Screen)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-01-osi-model_v1.0_web.pdf","encodingFormat":"application/pdf","contentSize":"164 KB","sha256":"ac04aa31d3320ba756ee409386d466bf865404addb0f5d4accbb15c3c37fbca1"},{"@type":"MediaObject","name":"NET-01 OSI & TCP/IP models (Hi-res image)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-01-osi-model_v1.0_full.webp","encodingFormat":"image/webp","contentSize":"552 KB","sha256":"b17b587283bd18f06785b4013966361bb521811b9b1b1ed6ee690f96ea22cef5"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Cheat sheets","item":"https://breakfixlearn.com/cheat-sheets"},{"@type":"ListItem","position":3,"name":"NET-01 OSI & TCP/IP models"}]}</script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article class="sheet">
+  <header class="post-head sheet-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/cheat-sheets">cheat-sheets</a><span aria-hidden="true">/</span><a href="/cheat-sheets#networking">net</a></nav>
+      <p class="scard-meta"><span class="sid k-networking">NET-01</span><span>Networking</span></p>
+      <h1>OSI &amp; TCP/IP models</h1>
+      <p class="post-dek"><b>Use this when:</b> you troubleshoot layer by layer, or need to place a protocol, device or attack at its layer.</p>
+      <div class="post-meta"><span>CCNA 200-301 v1.1 &amp; v2.0</span><span class="sep">/</span><span>v1.0</span><span class="sep">/</span><time datetime="2026-09-28">Sep 28, 2026</time><span class="sep">/</span><span>1 page</span><span class="sep">/</span><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license noopener" target="_blank">CC BY-NC 4.0</a></div>
+    </div>
+  </header>
+  <div class="wrap sheet-grid">
+    <figure class="sheet-paper">
+      <a href="/cheat-sheets/files/bfl-net-01-osi-model_v1.0_full.webp" aria-label="Open the full-size NET-01 image (2550 by 3300 pixels)">
+        <img src="/cheat-sheets/files/bfl-net-01-osi-model_v1.0_web.webp" srcset="/cheat-sheets/files/bfl-net-01-osi-model_v1.0_web.webp 1200w, /cheat-sheets/files/bfl-net-01-osi-model_v1.0_full.webp 2550w" sizes="(max-width: 60rem) calc(100vw - 2rem), 46rem"
+             width="1200" height="1553" fetchpriority="high" decoding="async"
+             alt="NET-01 OSI &amp; TCP/IP models cheat sheet. Every table on it is repeated as text below.">
+      </a>
+      <figcaption>Tap the sheet for the full-size image. The <a href="#text-version">text version</a> below is screen-reader friendly.</figcaption>
+    </figure>
+    <aside class="sheet-side" aria-labelledby="dl-h">
+      <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">copy</span> <span class="a">net-01 flash:</span></span>
+      <h2 id="dl-h" class="side-h">Download</h2>
+      <ul class="dl-list"><li><a class="dl dl-pri" href="/cheat-sheets/files/bfl-net-01-osi-model_v1.0_print-letter.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>US Letter</b><span class="dl-m">print &middot; 180 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-net-01-osi-model_v1.0_print-a4.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>A4</b><span class="dl-m">print &middot; 181 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-net-01-osi-model_v1.0_web.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>Screen</b><span class="dl-m">links work &middot; 164 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-net-01-osi-model_v1.0_full.webp" download><span class="dl-k">WebP</span><span class="dl-t"><b>Hi-res image</b><span class="dl-m">2550 &times; 3300 &middot; 552 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li></ul>
+      <p class="dl-open"><a href="/cheat-sheets/files/bfl-net-01-osi-model_v1.0_web.pdf">Open the PDF in your browser</a> instead of downloading it.</p>
+      <details class="sums">
+        <summary>Verify your download (SHA-256)</summary>
+        <div class="tbl"><table class="sheet-files"><thead><tr><th scope="col">File</th><th scope="col">SHA-256</th></tr></thead><tbody><tr><td translate="no">bfl-net-01-osi-model_v1.0_web.pdf</td><td translate="no">ac04aa31d3320ba756ee409386d466bf865404addb0f5d4accbb15c3c37fbca1</td></tr><tr><td translate="no">bfl-net-01-osi-model_v1.0_print-letter.pdf</td><td translate="no">b586712b7c1139924d345b932b85242510c9981289cb28d72cfd54117b476d30</td></tr><tr><td translate="no">bfl-net-01-osi-model_v1.0_print-a4.pdf</td><td translate="no">41e53330cfb8b3160e41ae80832712f5ebdc40242b39780b20656dd1f5f8d829</td></tr><tr><td translate="no">bfl-net-01-osi-model_v1.0_full.webp</td><td translate="no">b17b587283bd18f06785b4013966361bb521811b9b1b1ed6ee690f96ea22cef5</td></tr></tbody></table></div>
+        <p>Compare the hash with the one printed by
+          <code translate="no">Get-FileHash .\file.pdf -Algorithm SHA256</code> (PowerShell) or
+          <code translate="no">sha256sum file.pdf</code> (Linux, macOS: <code translate="no">shasum -a 256</code>). Different hash, different file: delete it.</p>
+      </details>
+      <p class="side-note">Free for personal and classroom use under CC BY-NC 4.0. Keep the credit line; don't sell it. Spotted a mistake? <a href="mailto:treyrct858@gmail.com?subject=NET-01%20v1.0%20correction">Email a correction</a>.</p>
+    </aside>
+  </div>
+  <section class="wrap sheet-text" aria-labelledby="text-version">
+    <div class="prose">
+      <h2 id="text-version">Text version</h2>
+      <p>Everything on the sheet, as plain HTML: handy for screen readers, copy-paste and search.</p>
+<h3 id="layers">7 OSI layers and 4 TCP/IP layers</h3>
+<p>The sender works down from layer 7 to layer 1; the receiver works back up from 1 to 7.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">TCP/IP</th><th scope="col">#</th><th scope="col">OSI layer</th><th scope="col">What it does</th><th scope="col">PDU</th><th scope="col">Key protocols</th><th scope="col">Device and address</th></tr></thead>
+  <tbody>
+    <tr><td rowspan="3">Application (L5 to L7)</td><td>7</td><th scope="row">Application</th><td>Network services for apps</td><td>Data</td><td>HTTP(S), DNS, DHCP, SSH</td><td>Host, server, NGFW</td></tr>
+    <tr><td>6</td><th scope="row">Presentation</th><td>Format, encrypt, compress</td><td>Data</td><td>TLS*, UTF-8, JPEG</td><td>Endpoint</td></tr>
+    <tr><td>5</td><th scope="row">Session</th><td>Open and close sessions</td><td>Data</td><td>RPC, NetBIOS</td><td>Endpoint</td></tr>
+    <tr><td>Transport</td><td>4</td><th scope="row">Transport</th><td>End-to-end delivery, ports</td><td>Segment</td><td>TCP, UDP</td><td>Firewall, port</td></tr>
+    <tr><td>Internet</td><td>3</td><th scope="row">Network</th><td>Routing between networks</td><td>Packet</td><td>IPv4, IPv6, ICMP, OSPF</td><td>Router, IP address</td></tr>
+    <tr><td rowspan="2">Link (L1 to L2)</td><td>2</td><th scope="row">Data Link</th><td>Frames, MAC, error check</td><td>Frame</td><td>Ethernet, Wi-Fi, ARP*</td><td>Switch, AP, MAC address</td></tr>
+    <tr><td>1</td><th scope="row">Physical</th><td>Signals: voltage, light, radio</td><td>Bits</td><td>1000BASE-T, fiber, PoE</td><td>Cable, hub, NIC</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="encapsulation">Encapsulation</h3>
+<p>On the way down, each layer wraps the one above it. On the way up, the receiver strips each header in reverse.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">PDU</th><th scope="col">Layer</th><th scope="col">What it carries</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Data</th><td>L7 to L5</td><td>Application data</td></tr>
+    <tr><th scope="row">Segment</th><td>L4</td><td>Ports + data</td></tr>
+    <tr><th scope="row">Packet</th><td>L3</td><td>IP addresses + L4 header + data</td></tr>
+    <tr><th scope="row">Frame</th><td>L2</td><td>MAC addresses + L3 + L4 + data + FCS trailer</td></tr>
+    <tr><th scope="row">Bits</th><td>L1</td><td>The frame as a signal, for example <code translate="no">1011 0010 0110 1101</code></td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="tcp-udp">TCP vs UDP (layer 4)</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col"></th><th scope="col">TCP</th><th scope="col">UDP</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Setup</th><td>SYN, SYN-ACK, ACK</td><td>None</td></tr>
+    <tr><th scope="row">Delivery</th><td>ACKs, retransmit, windowing</td><td>Best effort</td></tr>
+    <tr><th scope="row">Header</th><td>20 bytes minimum</td><td>8 bytes</td></tr>
+    <tr><th scope="row">Used by</th><td>HTTPS 443, SSH 22</td><td>DNS 53*, DHCP 67/68</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="troubleshoot">Troubleshoot bottom-up</h3>
+<p>Cisco IOS and Windows commands, in the order you would run them.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Layer</th><th scope="col">Command</th><th scope="col">What it answers</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><code translate="no">show interfaces status</code></td><td>Errors, duplex</td></tr>
+    <tr><td>1</td><td><code translate="no">shutdown</code> then <code translate="no">no shutdown</code> <span class="flag flag-caution">caution</span></td><td>Bounce the port</td></tr>
+    <tr><td>2</td><td><code translate="no">show mac address-table</code></td><td>Which port and VLAN?</td></tr>
+    <tr><td>3</td><td><code translate="no">show ip interface brief</code></td><td>Up/up? Right IP?</td></tr>
+    <tr><td>3</td><td><code translate="no">ping</code>, <code translate="no">traceroute</code>, <code translate="no">tracert</code></td><td>Where does the path break?</td></tr>
+    <tr><td>4</td><td><code translate="no">Test-NetConnection 192.0.2.10 -Port 443</code></td><td>Is the port open?</td></tr>
+    <tr><td>7</td><td><code translate="no">nslookup example.com</code></td><td>Does the name resolve?</td></tr>
+  </tbody>
+</table></div>
+<p class="note note-caution"><b>Caution.</b> <code translate="no">shutdown</code> drops every session on that port. Never bounce the link you are managing the device from.</p>
+
+<h3 id="attacks">Attacks and defenses by layer</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Layer</th><th scope="col">Attack</th><th scope="col">Defense</th></tr></thead>
+  <tbody>
+    <tr><td>7</td><td>Phishing, SQL injection</td><td>Email filter, WAF</td></tr>
+    <tr><td>4</td><td>SYN flood, port scans</td><td>SYN cookies, firewall</td></tr>
+    <tr><td>3</td><td>IP spoofing</td><td>ACLs, uRPF</td></tr>
+    <tr><td>2</td><td>ARP spoofing</td><td>Dynamic ARP Inspection</td></tr>
+    <tr><td>2</td><td>MAC flooding, rogue DHCP</td><td>Port security, DHCP snooping</td></tr>
+    <tr><td>1</td><td>Rogue device on a wall jack</td><td>802.1X, shut unused ports</td></tr>
+  </tbody>
+</table></div>
+<p class="note note-auth"><b>Authorized use only.</b> Test attacks only in your own lab or with written permission.</p>
+
+<h3 id="remember">Remember</h3>
+<ul>
+  <li>L1 to L7: <i>Please Do Not Throw Sausage Pizza Away</i></li>
+  <li>L7 to L1: <i>All People Seem To Need Data Processing</i></li>
+  <li>PDUs: Data, Segment, Packet, Frame, Bits</li>
+  <li>Switch = L2 (MAC). Router = L3 (IP).</li>
+  <li>UDP's layer 4 PDU is a datagram. DNS also uses TCP 53 (zone transfers and large answers).</li>
+  <li>* ARP sits between L2 and L3; TLS is often placed at L6.</li>
+</ul>
+      <h3>Sources</h3>
+      <ul><li><a href="https://www.iso.org/standard/20269.html" rel="noopener" target="_blank">ISO/IEC 7498-1:1994, OSI basic reference model</a></li><li><a href="https://www.rfc-editor.org/rfc/rfc1122" rel="noopener" target="_blank">RFC 1122, requirements for Internet hosts</a></li><li><a href="https://www.rfc-editor.org/rfc/rfc9293" rel="noopener" target="_blank">RFC 9293, Transmission Control Protocol</a></li><li><a href="https://www.rfc-editor.org/rfc/rfc768" rel="noopener" target="_blank">RFC 768, User Datagram Protocol</a></li><li><a href="https://learningnetwork.cisco.com/s/ccna-exam-topics" rel="noopener" target="_blank">Cisco CCNA 200-301 exam topics</a></li></ul>
+      <h3>Go deeper on the blog</h3><ul><li><a href="/blog/wireshark-network-analysis-nine-packet-captures">What Nine Packet Captures Taught Me About Networks I Thought I Already Understood</a></li></ul>
+    </div>
+    
+  </section>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 27, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

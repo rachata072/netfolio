@@ -1,0 +1,69 @@
+{
+  "license": {
+    "name": "CC BY-NC 4.0",
+    "url": "https://creativecommons.org/licenses/by-nc/4.0/"
+  },
+  "categories": {
+    "networking": { "code": "NET", "name": "Networking" },
+    "cybersecurity": { "code": "SEC", "name": "Cybersecurity" },
+    "it-support": { "code": "IT", "name": "IT Support" },
+    "ai": { "code": "AI", "name": "AI & Prompt Engineering", "short": "AI & prompts" }
+  },
+  "sheets": [
+    {
+      "id": "NET-01", "slug": "osi-model", "title": "OSI & TCP/IP models", "cat": "networking", "wave": 1, "status": "live",
+      "version": "1.0", "date": "2026-09-28", "exam": "CCNA 200-301 v1.1 & v2.0",
+      "use_when": "You troubleshoot layer by layer, or need to place a protocol, device or attack at its layer.",
+      "summary": "All seven OSI layers mapped to TCP/IP, with PDUs, protocols, encapsulation, TCP vs UDP, bottom-up troubleshooting commands and attacks by layer.",
+      "description": "Free one-page OSI and TCP/IP cheat sheet: layers, PDUs, protocols, encapsulation, TCP vs UDP and bottom-up troubleshooting. PDF (Letter, A4) and image.",
+      "tags": ["OSI", "TCP/IP", "Encapsulation", "TCP", "UDP", "Troubleshooting"],
+      "sources": [
+        ["ISO/IEC 7498-1:1994, OSI basic reference model", "https://www.iso.org/standard/20269.html"],
+        ["RFC 1122, requirements for Internet hosts", "https://www.rfc-editor.org/rfc/rfc1122"],
+        ["RFC 9293, Transmission Control Protocol", "https://www.rfc-editor.org/rfc/rfc9293"],
+        ["RFC 768, User Datagram Protocol", "https://www.rfc-editor.org/rfc/rfc768"],
+        ["Cisco CCNA 200-301 exam topics", "https://learningnetwork.cisco.com/s/ccna-exam-topics"]
+      ],
+      "related": ["wireshark-network-analysis-nine-packet-captures"]
+    },
+    { "id": "NET-02", "title": "Common ports & protocols", "cat": "networking", "wave": 1, "status": "planned" },
+    { "id": "NET-03", "title": "IPv4 subnetting & VLSM", "cat": "networking", "wave": 1, "status": "planned" },
+    { "id": "NET-04", "title": "IPv6 essentials", "cat": "networking", "wave": 2, "status": "planned" },
+    { "id": "NET-05", "title": "Cisco IOS CLI essentials", "cat": "networking", "wave": 2, "status": "planned" },
+    { "id": "NET-06", "title": "VLANs & 802.1Q trunking", "cat": "networking", "wave": 2, "status": "planned" },
+    { "id": "NET-07", "title": "STP/RSTP & EtherChannel", "cat": "networking", "wave": 2, "status": "planned" },
+    { "id": "NET-08", "title": "Static routing & OSPFv2", "cat": "networking", "wave": 3, "status": "planned" },
+    { "id": "NET-09", "title": "ACLs & wildcard masks", "cat": "networking", "wave": 2, "status": "planned" },
+    { "id": "NET-10", "title": "NAT/PAT, DHCP & DNS services", "cat": "networking", "wave": 3, "status": "planned" },
+    { "id": "NET-11", "title": "Wireless 802.11 & WLAN security", "cat": "networking", "wave": 3, "status": "planned" },
+    { "id": "NET-12", "title": "Python network automation (Netmiko, REST, JSON)", "cat": "networking", "wave": 3, "status": "planned" },
+    { "id": "SEC-01", "title": "Security fundamentals & key terms", "cat": "cybersecurity", "wave": 2, "status": "planned" },
+    { "id": "SEC-02", "title": "Nmap scanning", "cat": "cybersecurity", "wave": 1, "status": "planned" },
+    { "id": "SEC-03", "title": "Wireshark display filters", "cat": "cybersecurity", "wave": 1, "status": "planned" },
+    { "id": "SEC-04", "title": "Linux security commands", "cat": "cybersecurity", "wave": 2, "status": "planned" },
+    { "id": "SEC-05", "title": "Windows & PowerShell for defenders", "cat": "cybersecurity", "wave": 2, "status": "planned" },
+    { "id": "SEC-06", "title": "Common attacks & mitigations (MITRE ATT&CK)", "cat": "cybersecurity", "wave": 2, "status": "planned" },
+    { "id": "SEC-07", "title": "OWASP Top 10 web risks", "cat": "cybersecurity", "wave": 2, "status": "planned" },
+    { "id": "SEC-08", "title": "Incident response lifecycle", "cat": "cybersecurity", "wave": 3, "status": "planned" },
+    { "id": "SEC-09", "title": "Cryptography & hashing", "cat": "cybersecurity", "wave": 3, "status": "planned" },
+    { "id": "SEC-10", "title": "Host firewalls (ufw, nftables, Windows Firewall)", "cat": "cybersecurity", "wave": 3, "status": "planned" },
+    { "id": "SEC-11", "title": "Log analysis & SIEM queries", "cat": "cybersecurity", "wave": 3, "status": "planned" },
+    { "id": "SEC-12", "title": "Risk & compliance frameworks (NIST CSF, CIS, ISO 27001)", "cat": "cybersecurity", "wave": 3, "status": "planned" },
+    { "id": "IT-01", "title": "Troubleshooting methodology (CompTIA 7 steps)", "cat": "it-support", "wave": 1, "status": "planned" },
+    { "id": "IT-02", "title": "Windows CMD & Run commands", "cat": "it-support", "wave": 1, "status": "planned" },
+    { "id": "IT-03", "title": "PowerShell for help desk", "cat": "it-support", "wave": 2, "status": "planned" },
+    { "id": "IT-04", "title": "Network troubleshooting for help desk", "cat": "it-support", "wave": 2, "status": "planned" },
+    { "id": "IT-05", "title": "Active Directory & Microsoft 365 account tasks", "cat": "it-support", "wave": 2, "status": "planned" },
+    { "id": "IT-06", "title": "PC hardware & boot troubleshooting", "cat": "it-support", "wave": 3, "status": "planned" },
+    { "id": "IT-07", "title": "Linux basics for support", "cat": "it-support", "wave": 3, "status": "planned" },
+    { "id": "IT-08", "title": "ITIL, tickets & user communication", "cat": "it-support", "wave": 3, "status": "planned" },
+    { "id": "AI-01", "title": "Prompt anatomy (role, task, context, format)", "cat": "ai", "wave": 1, "status": "planned" },
+    { "id": "AI-02", "title": "Prompt patterns (few-shot, step-by-step, structured output)", "cat": "ai", "wave": 2, "status": "planned" },
+    { "id": "AI-03", "title": "Prompts for IT & networking tasks", "cat": "ai", "wave": 2, "status": "planned" },
+    { "id": "AI-04", "title": "AI security risks (OWASP LLM Top 10)", "cat": "ai", "wave": 2, "status": "planned" },
+    { "id": "AI-05", "title": "Checking AI output & hallucinations", "cat": "ai", "wave": 3, "status": "planned" },
+    { "id": "AI-06", "title": "AI glossary (tokens, context, RAG, agents)", "cat": "ai", "wave": 3, "status": "planned" },
+    { "id": "AI-07", "title": "Calling AI APIs with Python", "cat": "ai", "wave": 3, "status": "planned" },
+    { "id": "AI-08", "title": "Data privacy & responsible AI use", "cat": "ai", "wave": 3, "status": "planned" }
+  ]
+}

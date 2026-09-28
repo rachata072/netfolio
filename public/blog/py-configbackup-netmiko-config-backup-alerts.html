@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#050D18">
 <meta name="color-scheme" content="dark">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/style.css?v=8f8c37b981">
+<link rel="stylesheet" href="/css/style.css?v=15c414d558">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
 <meta property="og:type" content="article">
@@ -34,20 +34,21 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"I Built a Netmiko Config Backup Tool So I'd Stop Losing Arguments With My Own Router","description":"A Python CLI that backs up running configs over SSH with Netmiko, diffs them, and emails on change, tested against a real two-router VyOS lab.","datePublished":"2026-09-20","dateModified":"2026-09-20","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"publisher":{"@type":"Person","name":"Trey"},"mainEntityOfPage":"https://breakfixlearn.com/blog/py-configbackup-netmiko-config-backup-alerts","image":"https://breakfixlearn.com/assets/og/py-configbackup-netmiko-config-backup-alerts.webp","keywords":"Netmiko, Python, Network Automation, SSH, VyOS, Config Management","articleSection":"Automation","timeRequired":"PT17M"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://breakfixlearn.com/blog"},{"@type":"ListItem","position":3,"name":"I Built a Netmiko Config Backup Tool So I'd Stop Losing Arguments With My Own Router"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Why use SSH and Netmiko instead of a REST API?","acceptedAnswer":{"@type":"Answer","text":"A REST API is often the better long-term choice for production automation where it's available and licensed, but SSH works identically across old and new gear, doesn't require any API to be enabled separately, and remains the most universal way to reach a network device that's been in service for twenty years. Netmiko exists specifically to smooth over the differences in login prompts, paging, and command syntax between platforms, so the tool's own code just calls one command and gets clean text back, regardless of which vendor's box is on the other end."}},{"@type":"Question","name":"Why doesn't the inventory CSV ever contain a real password?","acceptedAnswer":{"@type":"Answer","text":"The first sketch of the inventory format had a plain password column, which is exactly the kind of thing that ends up committed to a public GitHub repository by accident, because a CSV doesn't look dangerous the way a .env file does. The shipped design uses a password_env column that holds only the name of an environment variable; the real credential is resolved from the environment at runtime and lives in a git-ignored .env file. That maps directly to CWE-798, Use of Hard-coded Credentials, and a plaintext fallback column still exists purely for a disposable lab, but the loader prints a visible warning every time that path gets used so it's never a silent, accidental choice."}},{"@type":"Question","name":"Can this tool ever push a configuration change to a device?","acceptedAnswer":{"@type":"Answer","text":"No, structurally, not just by policy. Every command the tool sends to a device is a read-only show-style command; it never enters configuration mode and never writes anything to a device. The worst failure mode is a missed backup or a missed alert email, never a pushed change, because the ability to change a device's configuration was never built into the tool in the first place."}},{"@type":"Question","name":"Why did a stray sudo message end up inside a saved backup file?","acceptedAnswer":{"@type":"Answer","text":"It's a real artifact of a real SSH session, not a bug in VyOS. Right after a hostname change, sudo prints an internal warning when /etc/hosts doesn't yet match the new hostname, and a bracketed-paste-mode terminal control sequence from the shell showed up as a visible line instead of being swallowed as invisible signaling. Both leaked into the saved config text and would have been read as a false configuration change. The fix is a small, explicit regex filter in backup.py that strips exactly those two observed patterns before anything is saved or diffed, with a dedicated test reproducing the real output that caught it."}}]}</script>
-<script src="/js/main.js?v=b6a070fa7c" defer></script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
 </head>
 <body>
 <div class="progress" aria-hidden="true"></div>
 <a class="skip" href="#main">Skip to content</a>
 <header class="hdr">
   <div class="wrap">
-    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
     <nav aria-label="Main">
       <ul class="ports">
         <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
         <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
         <li><a class="port" href="/blog" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
-        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span>about</a></li>
+        <li><a class="port" href="/cheat-sheets"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
       </ul>
     </nav>
   </div>
@@ -106,7 +107,7 @@
 
     <h2 id="what-i-actually-built">What I actually built</h2>
     <p>
-      <code>configbackup</code> is a command-line tool. You give it a CSV inventory of devices. For
+      <code translate="no">configbackup</code> is a command-line tool. You give it a CSV inventory of devices. For
       each one, it does four things: connects over SSH using
       <a href="https://netmiko.org/" rel="noopener" target="_blank">Netmiko</a> and pulls
       the running configuration, saves that configuration to disk as a timestamped file in
@@ -137,10 +138,10 @@
     </p>
     <p>
       VyOS doesn't publish a ready-made Docker image, so the first real step was building
-      one myself from VyOS's own ISO: extracting the root filesystem with <code>bsdtar</code> and
-      <code>sqfs2tar</code>, then a short <code>Dockerfile</code> that masks a couple of services that don't
-      belong in a container and boots <code>/sbin/init</code>. That's a one-time cost; once the image
-      is built, <code>containerlab deploy</code> against a two-node topology file brings both routers
+      one myself from VyOS's own ISO: extracting the root filesystem with <code translate="no">bsdtar</code> and
+      <code translate="no">sqfs2tar</code>, then a short <code translate="no">Dockerfile</code> that masks a couple of services that don't
+      belong in a container and boots <code translate="no">/sbin/init</code>. That's a one-time cost; once the image
+      is built, <code translate="no">containerlab deploy</code> against a two-node topology file brings both routers
       up, wired to each other, in under a minute, and prints each node's management IP,
       which is exactly what the inventory CSV in Part 6 of the runbook needed.
     </p>
@@ -159,7 +160,7 @@
       From there it was ordinary router setup: SSH into each node with the VyOS
       containerlab image's default credentials, set a real password instead of leaving the
       default in place, and, critically, remember that VyOS keeps a running config and a
-      separately-saved boot config, so a <code>commit</code> without a following <code>save</code> evaporates
+      separately-saved boot config, so a <code translate="no">commit</code> without a following <code translate="no">save</code> evaporates
       the moment the container restarts. That's a small platform quirk, but it's exactly
       the kind of thing that looks like a mysterious "my config disappeared" bug the first
       time you hit it and is actually just a missed command.
@@ -170,9 +171,9 @@
       Netmiko is a library built specifically to smooth over the differences between how
       various network operating systems handle an SSH session. Cisco IOS, Arista EOS,
       Juniper Junos, VyOS, and dozens of other platforms all have slightly different login
-      prompts, paging behavior, and command syntax. Netmiko's <code>ConnectHandler</code> takes a
-      <code>device_type</code> string and handles all of that platform-specific plumbing internally,
-      so my code gets to just call <code>send_command("show running-config")</code> and get clean text
+      prompts, paging behavior, and command syntax. Netmiko's <code translate="no">ConnectHandler</code> takes a
+      <code translate="no">device_type</code> string and handles all of that platform-specific plumbing internally,
+      so my code gets to just call <code translate="no">send_command("show running-config")</code> and get clean text
       back, instead of me hand-rolling a screen-scraper for every vendor.
     </p>
     <p>
@@ -188,28 +189,28 @@
 
     <h2 id="designing-the-inventory-format-around-a-security-mistake-i-d">Designing the inventory format around a security mistake I didn't want to make</h2>
     <p>
-      The first version of the inventory CSV I sketched out on paper had a <code>password</code>
+      The first version of the inventory CSV I sketched out on paper had a <code translate="no">password</code>
       column. It's the obvious design. It's also exactly the kind of thing that ends up
       committed to a public GitHub repo by accident, because a CSV doesn't look dangerous
-      the way a <code>.env</code> file does, it looks like a spreadsheet, and it's the textbook shape
+      the way a <code translate="no">.env</code> file does, it looks like a spreadsheet, and it's the textbook shape
       of <a href="https://cwe.mitre.org/data/definitions/798.html" rel="noopener" target="_blank">CWE-798, Use of Hard-coded Credentials</a>.
     </p>
     <p>
       I changed the design before writing any connection code. The real inventory format
-      has a <code>password_env</code> column instead, which holds the <em>name</em> of an environment
+      has a <code translate="no">password_env</code> column instead, which holds the <em>name</em> of an environment
       variable, not a password. The tool resolves the actual credential from the
       environment at runtime:
     </p>
-    <pre><code># my-lab-inventory.csv
+    <pre translate="no"><code translate="no"># my-lab-inventory.csv
 hostname,ip,device_type,port,username,password_env,secret_env
 lab-r1,172.20.20.3,vyos,22,admin,CONFIGBACKUP_LAB_R1_PASSWORD,
 lab-r2,172.20.20.2,vyos,22,admin,CONFIGBACKUP_LAB_R2_PASSWORD,</code></pre>
     <p>
       That CSV file is completely safe to commit to git as-is. The real password lives in
-      a <code>.env</code> file that's explicitly listed in <code>.gitignore</code>, loaded into the shell with
-      <code>set -a; source .env; set +a</code> rather than the older <code>export $(... | xargs)</code> pattern,
-      which breaks silently on any value containing a space, <code>#</code>, or <code>$</code>. I kept a literal
-      <code>password</code> column as a fallback purely so someone could point this at a disposable
+      a <code translate="no">.env</code> file that's explicitly listed in <code translate="no">.gitignore</code>, loaded into the shell with
+      <code translate="no">set -a; source .env; set +a</code> rather than the older <code translate="no">export $(... | xargs)</code> pattern,
+      which breaks silently on any value containing a space, <code translate="no">#</code>, or <code translate="no">$</code>. I kept a literal
+      <code translate="no">password</code> column as a fallback purely so someone could point this at a disposable
       lab without setting up environment variables first, but the loader prints a visible
       warning to the console every time that path gets used, specifically so it's never a
       silent, accidental choice.
@@ -241,9 +242,9 @@ lab-r2,172.20.20.2,vyos,22,admin,CONFIGBACKUP_LAB_R2_PASSWORD,</code></pre>
       My first instinct was that the test itself was wrong. It wasn't. I added print
       statements to trace exactly which files were being written and read, and found the
       actual problem: my original timestamp format only had one-second resolution
-      (<code>%Y%m%d-%H%M%S</code>). Both calls to <code>main()</code> happened inside the same wall-clock
+      (<code translate="no">%Y%m%d-%H%M%S</code>). Both calls to <code translate="no">main()</code> happened inside the same wall-clock
       second, since a test suite runs fast, so both backup files got the exact same
-      filename. The second call's <code>save_backup()</code> silently overwrote the first backup on
+      filename. The second call's <code translate="no">save_backup()</code> silently overwrote the first backup on
       disk. Then, because of the order I'd written the code in, the "read the previous
       backup" step happened <em>after</em> the new file had already been written, so it read the
       new content and diffed it against itself. Zero diff, reported as "no change," even
@@ -259,7 +260,7 @@ lab-r2,172.20.20.2,vyos,22,admin,CONFIGBACKUP_LAB_R2_PASSWORD,</code></pre>
     </p>
     <p>
       I fixed it two ways, deliberately not just one. First, I switched the timestamp
-      format to include microseconds (<code>%Y%m%d-%H%M%S-%f</code>), which makes a same-second
+      format to include microseconds (<code translate="no">%Y%m%d-%H%M%S-%f</code>), which makes a same-second
       filename collision essentially impossible even if the tool gets run multiple times
       in rapid succession. Second, and I think this is the more important fix, I reordered
       the code so the previous backup's content gets read into memory <em>before</em> the new
@@ -274,19 +275,19 @@ lab-r2,172.20.20.2,vyos,22,admin,CONFIGBACKUP_LAB_R2_PASSWORD,</code></pre>
     <h2 id="handling-a-platform-that-doesn-t-have-a-running-config">Handling a platform that doesn't have a "running-config"</h2>
     <p>
       The wrinkle with VyOS is that it doesn't structure its configuration the way Cisco
-      IOS does. IOS has one obvious, universally-known command, <code>show running-config</code>,
+      IOS does. IOS has one obvious, universally-known command, <code translate="no">show running-config</code>,
       which dumps a flat, human-readable config file. VyOS's configuration is stored as a
-      tree, not a flat file, and the closest equivalent for backup purposes is <code>show
-      configuration commands</code>, which prints the config as an ordered list of <code>set</code>
+      tree, not a flat file, and the closest equivalent for backup purposes is <code translate="no">show
+      configuration commands</code>, which prints the config as an ordered list of <code translate="no">set</code>
       statements. It's a different mental model, and I only found the right command by
       actually researching how other people automate VyOS backups, not by guessing based
       on my Cisco-flavored assumptions from CCNA study.
     </p>
     <p>
       Rather than hardcode one command for one platform, I built a small lookup table in
-      <code>backup.py</code>:
+      <code translate="no">backup.py</code>:
     </p>
-    <pre><code># backup.py
+    <pre translate="no"><code translate="no"># backup.py
 RUNNING_CONFIG_COMMANDS = {
     "cisco_ios": "show running-config",
     "cisco_xe": "show running-config",
@@ -339,7 +340,7 @@ RUNNING_CONFIG_COMMANDS = {
       This was a non-negotiable design constraint from the very start, and it's worth
       stating explicitly rather than leaving it implicit: this tool never enters
       configuration mode on a device, and never writes anything to a device. Every single
-      command it sends is a read-only <code>show</code>-style command. The worst thing that can go
+      command it sends is a read-only <code translate="no">show</code>-style command. The worst thing that can go
       wrong if this tool has a bug is that a backup doesn't get saved, or an alert email
       doesn't go out. It cannot be the reason a device goes down, because it never has the
       ability to change one.
@@ -364,11 +365,11 @@ RUNNING_CONFIG_COMMANDS = {
       building the exact lab described in the runbook.
     </p>
     <p>
-      The fix was mocking at the right boundary. <code>netmiko.ConnectHandler</code> gets patched in
-      the backup module's tests, so <code>fetch_running_config()</code> is tested against a fake
+      The fix was mocking at the right boundary. <code translate="no">netmiko.ConnectHandler</code> gets patched in
+      the backup module's tests, so <code translate="no">fetch_running_config()</code> is tested against a fake
       connection object that returns scripted text, or raises a timeout or authentication
-      exception on command, without a socket ever opening. <code>smtplib.SMTP</code> gets the same
-      treatment in the alert module's tests. The CLI's own tests mock <code>fetch_running_config</code>
+      exception on command, without a socket ever opening. <code translate="no">smtplib.SMTP</code> gets the same
+      treatment in the alert module's tests. The CLI's own tests mock <code translate="no">fetch_running_config</code>
       one level higher, which let me write a test where one device in a two-device
       inventory times out and the other succeeds, and confirm the tool still backs up the
       healthy device and reports the correct overall exit code, all without any of it
@@ -403,7 +404,7 @@ RUNNING_CONFIG_COMMANDS = {
       Once the lab was up and the credentials were configured, the actual usage is about
       as simple as I could make it. First run against a fresh inventory:
     </p>
-    <pre><code>$ configbackup --inventory my-lab-inventory.csv --backup-dir backups
+    <pre translate="no"><code translate="no">$ configbackup --inventory my-lab-inventory.csv --backup-dir backups
 [lab-r1] first backup saved: lab-r1_20260919-075834-904492.cfg
 [lab-r2] first backup saved: lab-r2_20260919-075843-195007.cfg
 done: 2 device(s) in inventory, 0 changed, 0 failed.</code></pre>
@@ -416,10 +417,10 @@ done: 2 device(s) in inventory, 0 changed, 0 failed.</code></pre>
     </figure>
 
     <p>
-      Then I SSHed into <code>lab-r1</code> directly and changed its hostname, a small, deliberate,
+      Then I SSHed into <code translate="no">lab-r1</code> directly and changed its hostname, a small, deliberate,
       obviously-detectable change, and ran the tool again:
     </p>
-    <pre><code>$ configbackup --inventory my-lab-inventory.csv --backup-dir backups
+    <pre translate="no"><code translate="no">$ configbackup --inventory my-lab-inventory.csv --backup-dir backups
 [lab-r1] CHANGED - saved lab-r1_20260919-080538-799084.cfg
 [lab-r2] no change - saved lab-r2_20260919-080547-117601.cfg
 alert email sent for 1 device(s).
@@ -454,12 +455,12 @@ done: 2 device(s) in inventory, 1 changed, 0 failed.</code></pre>
     <h2 id="a-second-bug-found-only-by-testing-against-a-real-device">A second bug, found only by testing against a real device</h2>
     <p>
       That alert email above is also how I caught something the mocked test suite had no
-      way of catching: a stray line, <code>sudo: unable to resolve host lab-r1: System error</code>,
-      sitting inside an actual saved backup file, and a second one, <code>[?2004l</code>, present in
+      way of catching: a stray line, <code translate="no">sudo: unable to resolve host lab-r1: System error</code>,
+      sitting inside an actual saved backup file, and a second one, <code translate="no">[?2004l</code>, present in
       every single backup from the very first run. I confirmed both by going straight to
       the files on disk and diffing them directly:
     </p>
-    <pre><code>$ find backups -type f
+    <pre translate="no"><code translate="no">$ find backups -type f
 backups/lab-r1/lab-r1_20260919-075834-904492.cfg
 backups/lab-r1/lab-r1_20260919-080538-799084.cfg
 backups/lab-r2/lab-r2_20260919-075843-195007.cfg
@@ -484,13 +485,13 @@ $ diff backups/lab-r1/lab-r1_*.cfg
 
     <p>
       Neither of those extra lines is part of VyOS's configuration. The first is a
-      diagnostic message <code>sudo</code> prints internally when <code>/etc/hosts</code> doesn't yet match the
-      device's current hostname, which happened right after I renamed <code>lab-r1</code>. The second
+      diagnostic message <code translate="no">sudo</code> prints internally when <code translate="no">/etc/hosts</code> doesn't yet match the
+      device's current hostname, which happened right after I renamed <code translate="no">lab-r1</code>. The second
       is a bracketed-paste-mode terminal control sequence some shells emit, that ended up
       as a bare, visible line instead of being swallowed as invisible terminal signaling.
       Both are artifacts of talking to a real, live SSH session on a real (if
       containerized) operating system, exactly the category of thing a mocked
-      <code>ConnectHandler</code> in a test can never produce, because I control every byte it returns.
+      <code translate="no">ConnectHandler</code> in a test can never produce, because I control every byte it returns.
     </p>
     <p>
       Left alone, this is a real correctness bug, not just a cosmetic one. If a stray line
@@ -501,10 +502,10 @@ $ diff backups/lab-r1/lab-r1_*.cfg
       the alerts.
     </p>
     <p>
-      The fix is a small, explicit filter in <code>backup.py</code>, applied to every command's
+      The fix is a small, explicit filter in <code translate="no">backup.py</code>, applied to every command's
       output before it's ever saved or diffed:
     </p>
-    <pre><code># backup.py
+    <pre translate="no"><code translate="no"># backup.py
 _NOISE_LINE_PATTERNS = (
     re.compile(r"^\s*sudo:\s.*$"),
     re.compile(r"^\s*\x1b?\[\?2004[hl]\s*$"),
@@ -535,7 +536,7 @@ _NOISE_LINE_PATTERNS = (
       anticipate real objections instead of only the ones I'd already thought of. The
       security lead character asks about credential storage before anything else, which is
       exactly the order I'd expect a real reviewer to ask questions in, and it's the reason
-      the <code>password_env</code> design exists at all rather than a simpler plaintext column. The
+      the <code translate="no">password_env</code> design exists at all rather than a simpler plaintext column. The
       Ops Manager character asks specifically whether the tool can ever push a config
       change, and getting to answer "no, structurally, not just by policy" is the
       strongest sentence in the whole pitch. If I couldn't answer that question with total
@@ -545,7 +546,7 @@ _NOISE_LINE_PATTERNS = (
     <h2 id="what-i-d-build-next">What I'd build next</h2>
     <p>
       A few things I'd genuinely add if this went from a portfolio project to something
-      running against a real fleet. A <code>--dry-run</code> flag that connects and diffs but never
+      running against a real fleet. A <code translate="no">--dry-run</code> flag that connects and diffs but never
       writes a new backup file, useful for testing an inventory change safely before
       trusting it. Right now every run writes a permanent file, which is the right default
       but not always what you want while debugging the inventory itself.
@@ -599,10 +600,10 @@ _NOISE_LINE_PATTERNS = (
     <p>
       The first sketch of the inventory format had a plain password column, which is
       exactly the kind of thing that ends up committed to a public GitHub repository by
-      accident, because a CSV doesn't look dangerous the way a <code>.env</code> file does. The
-      shipped design uses a <code>password_env</code> column that holds only the name of an
+      accident, because a CSV doesn't look dangerous the way a <code translate="no">.env</code> file does. The
+      shipped design uses a <code translate="no">password_env</code> column that holds only the name of an
       environment variable; the real credential is resolved from the environment at
-      runtime and lives in a git-ignored <code>.env</code> file. That maps directly to CWE-798, Use
+      runtime and lives in a git-ignored <code translate="no">.env</code> file. That maps directly to CWE-798, Use
       of Hard-coded Credentials, and a plaintext fallback column still exists purely for a
       disposable lab, but the loader prints a visible warning every time that path gets
       used so it's never a silent, accidental choice.
@@ -620,11 +621,11 @@ _NOISE_LINE_PATTERNS = (
     <h3>Why did a stray sudo message end up inside a saved backup file?</h3>
     <p>
       It's a real artifact of a real SSH session, not a bug in VyOS. Right after a
-      hostname change, <code>sudo</code> prints an internal warning when <code>/etc/hosts</code> doesn't yet
+      hostname change, <code translate="no">sudo</code> prints an internal warning when <code translate="no">/etc/hosts</code> doesn't yet
       match the new hostname, and a bracketed-paste-mode terminal control sequence from the
       shell showed up as a visible line instead of being swallowed as invisible signaling.
       Both leaked into the saved config text and would have been read as a false
-      configuration change. The fix is a small, explicit regex filter in <code>backup.py</code> that
+      configuration change. The fix is a small, explicit regex filter in <code translate="no">backup.py</code> that
       strips exactly those two observed patterns before anything is saved or diffed, with a
       dedicated test reproducing the real output that caught it.
     </p>
@@ -660,7 +661,7 @@ _NOISE_LINE_PATTERNS = (
 <footer class="ftr">
   <div class="wrap ftr-grid">
     <div>
-      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
       <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
     </div>
     <nav aria-label="Site">
@@ -668,6 +669,7 @@ _NOISE_LINE_PATTERNS = (
       <ul>
         <li><a href="/projects">projects</a></li>
         <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
         <li><a href="/#about">about</a></li>
         <li><a href="/privacy">privacy</a></li>
         <li><a href="/feed.xml">rss feed</a></li>

@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#050D18">
 <meta name="color-scheme" content="dark">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/style.css?v=8f8c37b981">
+<link rel="stylesheet" href="/css/style.css?v=15c414d558">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
 <meta property="og:type" content="article">
@@ -34,20 +34,21 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work","description":"Why I cut a multi-firewall SOC design down to two VirtualBox VMs, the network and memory budget behind it, and the threat model that shaped the lab.","datePublished":"2026-09-21","dateModified":"2026-09-21","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"publisher":{"@type":"Person","name":"Trey"},"mainEntityOfPage":"https://breakfixlearn.com/blog/soc-homelab-designing-two-vm-lab","image":"https://breakfixlearn.com/assets/og/soc-homelab-designing-two-vm-lab.webp","keywords":"SOC, Suricata, Zeek, Wazuh, VirtualBox, Blue Team, Homelab","articleSection":"Security","timeRequired":"PT14M"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://breakfixlearn.com/blog"},{"@type":"ListItem","position":3,"name":"Designing a Two-VM SOC Home Lab: Small Scope, Real Detection Work"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Why build a two-VM SOC lab instead of a segmented network with a firewall appliance?","acceptedAnswer":{"@type":"Answer","text":"A firewall build with multiple network segments is a multi-day project on its own, and most of that extra time goes toward VLAN-style isolation and rule ordering rather than the actual SOC skill of reading an alert and deciding what it means. Two VMs on one flat network is the smallest lab that still produces a complete detection story: an attack, independent detections across three tools, and one place to triage. The segmented design is not abandoned, it is a good second project once this smaller one is solid."}},{"@type":"Question","name":"Why does Suricata's HOME_NET only include the sensor's own address instead of the whole subnet?","acceptedAnswer":{"@type":"Answer","text":"The attacker VM and the sensor VM sit on the same 192.168.56.0/24 host-only network. If HOME_NET were set to the whole subnet, the attacker would count as internal too, and the rules written to fire on inbound attacks from an external source would never evaluate as true. Setting HOME_NET to only the sensor's single address makes the attacker count as EXTERNAL_NET automatically, so every rule written the normal way still works even though both machines share a subnet in real life."}},{"@type":"Question","name":"Why does Wazuh run without a separate agent in this lab?","acceptedAnswer":{"@type":"Answer","text":"Wazuh's all-in-one install includes its own local agent by default, and because the manager, the target application, and the SSH service all live on the same VM, that local agent can already read every file it needs directly off the filesystem: Suricata's EVE JSON, Zeek's notice log, the target's own access log, and the host firewall log. Adding a second, remote agent would only be necessary once a real second host exists to monitor, and it would introduce agent enrollment and agent-to-manager TLS as new things that can quietly break."}},{"@type":"Question","name":"Is it a problem that the sensors and the target application run on the same virtual machine?","acceptedAnswer":{"@type":"Answer","text":"Yes, and it is worth stating plainly rather than glossing over. A real network puts sensors on a span port or a tap, physically separate from anything an attacker could reach, so a compromise of the target cannot also compromise the thing watching it. Here, a genuine compromise of the sensor VM could in principle let an attacker tamper with the very sensors meant to catch them. That is a real limit of this version of the lab, and a dedicated, separate sensor host is the natural next iteration once this smaller design is solid."}}]}</script>
-<script src="/js/main.js?v=b6a070fa7c" defer></script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
 </head>
 <body>
 <div class="progress" aria-hidden="true"></div>
 <a class="skip" href="#main">Skip to content</a>
 <header class="hdr">
   <div class="wrap">
-    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
     <nav aria-label="Main">
       <ul class="ports">
         <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
         <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
         <li><a class="port" href="/blog" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
-        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span>about</a></li>
+        <li><a class="port" href="/cheat-sheets"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
       </ul>
     </nav>
   </div>
@@ -162,10 +163,10 @@
     <p>
       <strong>Host-only Network</strong> connects the virtual machines to each other and to the
       host, with no route out to the internet. This is the lab network. I created one host-only
-      adapter in VirtualBox (<code>File &gt; Tools &gt; Network Manager &gt; Host-only
-      Networks</code>), gave it the address <code>192.168.56.1</code> with a <code>/24</code>
+      adapter in VirtualBox (<code translate="no">File &gt; Tools &gt; Network Manager &gt; Host-only
+      Networks</code>), gave it the address <code translate="no">192.168.56.1</code> with a <code translate="no">/24</code>
       mask, and turned its DHCP server off. Both VMs get a static address on this network:
-      <code>192.168.56.10</code> for soc-sensor and <code>192.168.56.20</code> for soc-kali.
+      <code translate="no">192.168.56.10</code> for soc-sensor and <code translate="no">192.168.56.20</code> for soc-kali.
       Because it is host-only, attack traffic between Kali and the sensor VM never touches my
       real network or the internet. That matters for a lab whose whole purpose is running port
       scans, SQL injection attempts and password brute forcing against a target: I want that
@@ -173,7 +174,7 @@
     </p>
     <p>
       <strong>NAT</strong> is the second adapter on each VM, and it does one job only: it lets
-      <code>apt</code> install packages, lets Suricata pull the ET Open ruleset, and lets Wazuh's
+      <code translate="no">apt</code> install packages, lets Suricata pull the ET Open ruleset, and lets Wazuh's
       installer download what it needs, all through the host's own internet connection. Every VM
       sits alone behind its own NAT, which is fine here because the two VMs never need to reach
       each other over this adapter, only the lab network is for that. I disabled the DHCP server
@@ -183,8 +184,8 @@
     <p>
       The result is that each VM has two network cards, and their order matters. On both
       soc-sensor and soc-kali, the first adapter is NAT and the second is host-only. On the
-      Ubuntu VM those come up as <code>enp0s3</code> (NAT) and <code>enp0s8</code> (host-only).
-      On Kali they come up as <code>eth0</code> (NAT) and <code>eth1</code> (host-only). Every
+      Ubuntu VM those come up as <code translate="no">enp0s3</code> (NAT) and <code translate="no">enp0s8</code> (host-only).
+      On Kali they come up as <code translate="no">eth0</code> (NAT) and <code translate="no">eth1</code> (host-only). Every
       sensor, every firewall rule and every script in the repository assumes that mapping, so I
       verify the adapter order in the VirtualBox GUI once for each VM right after creating it,
       since a swapped card is the single most common reason a fresh build looks broken.
@@ -216,9 +217,9 @@
     </div>
     <p>
       Once the network was addressed, my own browser is the third participant, even though it is
-      not a VM. From the host, I reach the Wazuh dashboard at <code>https://192.168.56.10</code>
-      and Grafana at <code>http://192.168.56.10:3000</code> over the same host-only network,
-      since the host itself sits at <code>192.168.56.1</code> on that adapter. No port
+      not a VM. From the host, I reach the Wazuh dashboard at <code translate="no">https://192.168.56.10</code>
+      and Grafana at <code translate="no">http://192.168.56.10:3000</code> over the same host-only network,
+      since the host itself sits at <code translate="no">192.168.56.1</code> on that adapter. No port
       forwarding, no extra hop, the same address I use for everything else on the lab network.
     </p>
 
@@ -230,12 +231,12 @@
     </p>
     <p>
       <strong>Suricata</strong>, installed from the official OISF PPA, sniffing
-      <code>enp0s8</code> in IDS mode with the ET Open ruleset plus three custom test rules
+      <code translate="no">enp0s8</code> in IDS mode with the ET Open ruleset plus three custom test rules
       (SIDs 9000001 through 9000003) that I wrote specifically so I always have a signature I
       know should fire, independent of whatever the community ruleset happens to catch that day.
     </p>
     <p>
-      <strong>Zeek 8.0</strong>, running as a standalone node, also on <code>enp0s8</code>,
+      <strong>Zeek 8.0</strong>, running as a standalone node, also on <code translate="no">enp0s8</code>,
       writing JSON logs and running scan, SSH brute force and SQL injection notice scripts so it
       raises behavioral alerts, not just connection records.
     </p>
@@ -243,8 +244,8 @@
       <strong>Wazuh 4.14</strong>, deployed as an all-in-one install (manager, indexer and
       dashboard on the same VM). It does not use an agent and does not receive anything over
       syslog. Its manager includes a local agent by default, so it reads Suricata's
-      <code>eve.json</code>, Zeek's <code>notice.log</code>, the DVWA Apache access log, and the
-      <code>ufw</code> log directly off the local filesystem. That single decision removed an
+      <code translate="no">eve.json</code>, Zeek's <code translate="no">notice.log</code>, the DVWA Apache access log, and the
+      <code translate="no">ufw</code> log directly off the local filesystem. That single decision removed an
       entire category of problems I would otherwise have had to debug: agent enrollment,
       agent-to-manager TLS, and a transport layer that exists only to move log lines a few
       centimeters across the same disk.
@@ -253,15 +254,15 @@
       <strong>Loki, Grafana Alloy and Grafana</strong>, for dashboards and ad-hoc log search. I
       used Alloy rather than Promtail, because Promtail reaches end of life in March 2026 and
       Alloy is the log shipper Grafana Labs now supports going forward. Alloy ships Suricata,
-      Zeek, <code>ufw</code> and Wazuh alert files to Loki with a small, deliberately
-      low-cardinality label set (<code>job</code>, <code>zeek_log</code>, <code>event_type</code>);
+      Zeek, <code translate="no">ufw</code> and Wazuh alert files to Loki with a small, deliberately
+      low-cardinality label set (<code translate="no">job</code>, <code translate="no">zeek_log</code>, <code translate="no">event_type</code>);
       source IPs and signature names stay inside the JSON payload and get parsed at query time
       instead of becoming labels, because high-cardinality labels are the most common way to
       make Loki slow and expensive.
     </p>
     <p>
       <strong>DVWA</strong>, running in Docker, bound specifically to
-      <code>192.168.56.10:80</code> rather than published on every interface. Docker publishes
+      <code translate="no">192.168.56.10:80</code> rather than published on every interface. Docker publishes
       container ports around the host firewall by default, so binding to one address is what
       keeps a deliberately vulnerable web app off any network but the lab one.
     </p>
@@ -271,7 +272,7 @@
     </p>
     <p>
       <strong>ufw</strong>, set to default deny with every block logged, allowing only the lab
-      network (<code>192.168.56.0/24</code>) in to ports 22, 80, 443 and 3000.
+      network (<code translate="no">192.168.56.0/24</code>) in to ports 22, 80, 443 and 3000.
     </p>
     <p>
       <strong>soc-kali</strong> is much simpler by design: nmap, nikto, hydra, curl and sqlmap,
@@ -297,27 +298,27 @@
       truth.
     </p>
     <p>
-      The first is <code>HOME_NET</code>. Suricata's whole rule logic depends on knowing which
+      The first is <code translate="no">HOME_NET</code>. Suricata's whole rule logic depends on knowing which
       side of a connection is "home" and which is the outside. Because Kali sits in the same
-      <code>/24</code> as the sensor VM, if I had set <code>HOME_NET</code> to the whole
-      <code>192.168.56.0/24</code> subnet, Kali would count as internal too, and most of the
+      <code translate="no">/24</code> as the sensor VM, if I had set <code translate="no">HOME_NET</code> to the whole
+      <code translate="no">192.168.56.0/24</code> subnet, Kali would count as internal too, and most of the
       rules that are written to fire on inbound attacks from an external source would simply
-      never trigger. So <code>HOME_NET</code> is set to the SOC VM's single address,
-      <code>192.168.56.10</code>, and nothing else. That one line is what makes Kali count as an
+      never trigger. So <code translate="no">HOME_NET</code> is set to the SOC VM's single address,
+      <code translate="no">192.168.56.10</code>, and nothing else. That one line is what makes Kali count as an
       attacker instead of a neighbor.
     </p>
     <p>
-      The second is where the sensors sit relative to <code>ufw</code>. Suricata and Zeek both
-      read <code>enp0s8</code> directly through AF_PACKET, which means they see every frame as
+      The second is where the sensors sit relative to <code translate="no">ufw</code>. Suricata and Zeek both
+      read <code translate="no">enp0s8</code> directly through AF_PACKET, which means they see every frame as
       it arrives on the wire, before the kernel firewall has decided whether to drop it. A scan
-      that <code>ufw</code> blocks and logs is still a scan that Suricata and Zeek saw in full.
+      that <code translate="no">ufw</code> blocks and logs is still a scan that Suricata and Zeek saw in full.
       That ordering is what makes it possible to compare "what the firewall blocked" against
       "what the sensors detected" as two separate, honest signals, instead of only seeing
       whatever got past the firewall.
     </p>
     <p>
       I also extended Wazuh's ruleset rather than replacing it. The lab's custom rules (numbered
-      100100 through 100204) use <code>if_sid</code> to attach to Wazuh's own built-in Suricata
+      100100 through 100204) use <code translate="no">if_sid</code> to attach to Wazuh's own built-in Suricata
       decoder rule, 86601, instead of re-parsing the Suricata JSON from scratch. If a future
       Wazuh ruleset update changes how the built-in decoder works, my rules still inherit that
       fix, rather than silently breaking because I duplicated logic Wazuh already had.
@@ -360,9 +361,9 @@
       the machine in practice for the piece I was most worried about. What actually strained the
       VM was not memory at all: during the heaviest attack run, with Suricata, Zeek and the
       Wazuh indexer all working at once, the scheduler fell behind badly enough that Zeek itself
-      crashed mid-run, not at boot, while <code>free -h</code> still reported healthy headroom.
-      The tell was in <code>dmesg</code>, not <code>free</code>: an RCU-preempt CPU-starvation
-      warning paired with <code>systemd-oomd</code> missing its own watchdog heartbeat, the
+      crashed mid-run, not at boot, while <code translate="no">free -h</code> still reported healthy headroom.
+      The tell was in <code translate="no">dmesg</code>, not <code translate="no">free</code>: an RCU-preempt CPU-starvation
+      warning paired with <code translate="no">systemd-oomd</code> missing its own watchdog heartbeat, the
       service whose entire job is to intervene before things get that bad. That is a real limit
       worth stating plainly: this VM is sized correctly for its memory budget and slightly
       undersized for its CPU budget under sustained multi-service load, and the fix is
@@ -372,12 +373,12 @@
     <p>
       The budget also drove a design rule I think is worth keeping even outside this lab: the
       SIEM holds alerts, and the log platform holds telemetry. Zeek's connection log,
-      <code>conn.log</code>, can run to millions of lines a day even on a quiet network. Pushing
+      <code translate="no">conn.log</code>, can run to millions of lines a day even on a quiet network. Pushing
       all of that into Wazuh's indexer would make the biggest memory consumer in the whole lab
       bigger for very little benefit, since most of those lines are never going to become an
-      alert. Instead, only Zeek's <code>notice.log</code> goes into Wazuh, where it becomes a
-      ranked, correlated alert. The bulk logs, <code>conn.log</code>, <code>dns.log</code>,
-      <code>http.log</code> and <code>ssl.log</code>, go to Loki, where they are cheap to store
+      alert. Instead, only Zeek's <code translate="no">notice.log</code> goes into Wazuh, where it becomes a
+      ranked, correlated alert. The bulk logs, <code translate="no">conn.log</code>, <code translate="no">dns.log</code>,
+      <code translate="no">http.log</code> and <code translate="no">ssl.log</code>, go to Loki, where they are cheap to store
       and fast to search with LogQL when I want to hunt rather than triage. The next post in
       this series covers that pipeline in detail.
     </p>
@@ -408,7 +409,7 @@
       rule in blocking mode causes an outage, not just a noisy log line.
     </p>
     <p>
-      The beaconing behavior I simulate is exactly that, simulated. <code>kali-beacon-sim.sh</code>
+      The beaconing behavior I simulate is exactly that, simulated. <code translate="no">kali-beacon-sim.sh</code>
       sends twenty requests to DVWA, thirty seconds apart, to produce a regular interval pattern
       for the beacon-hunting tool to find. It is a stand-in for command-and-control traffic, not
       the real thing, and the results in this series say so.
@@ -433,9 +434,9 @@
       home on a schedule? Each question maps to a specific sensor. The first is answered by
       Suricata's port scan and SYN burst signatures alongside Zeek's own scan detection. The
       second by Suricata's web application attack category, Zeek's HTTP log, and DVWA's own
-      Apache access log. The third by Zeek's SSH analysis and the <code>sshd</code> and
-      <code>ufw</code> logs Wazuh reads directly. The fourth by the interval analysis in
-      <code>tools/beacon_hunt.py</code> against Zeek's <code>conn.log</code>.
+      Apache access log. The third by Zeek's SSH analysis and the <code translate="no">sshd</code> and
+      <code translate="no">ufw</code> logs Wazuh reads directly. The fourth by the interval analysis in
+      <code translate="no">tools/beacon_hunt.py</code> against Zeek's <code translate="no">conn.log</code>.
     </p>
     <p>
       This is also how I decided what belonged in the lab. A feature earns its place only if it
@@ -448,7 +449,7 @@
       I set success criteria before building, so I could not quietly redefine success after the
       fact. The lab works if a scripted attack against soc-sensor produces at least one alert in
       each detection layer (Suricata, Zeek and Wazuh), if at least one finding is confirmed by
-      two independent tools for the same source address, if the <code>soc_digest.py</code> tool
+      two independent tools for the same source address, if the <code translate="no">soc_digest.py</code> tool
       correctly correlates those sources across all three log sources, and if I can go from a raw
       alert to a written ticket in under fifteen minutes using my own triage playbook. The
       criterion I care about most is the simplest to state and the hardest to fake: that I can
@@ -459,7 +460,7 @@
       each of the three detection layers: Suricata's own test signatures, Wazuh's correlation
       rules, and, as the run confirmed, a genuine Zeek notice too. The SQL injection step in
       particular ended up confirmed by three independent tools watching the same source address,
-      not just two, which is a stronger result than I expected going in. <code>soc_digest.py</code>
+      not just two, which is a stronger result than I expected going in. <code translate="no">soc_digest.py</code>
       correctly listed both the attacker and the target under sources seen by more than one
       tool, and the completed ticket for the lab's highest-severity finding, a Shellshock probe
       that turned out to be sent but never executed, went from raw alert to a written, evidenced
@@ -499,14 +500,14 @@
       A build I can only do by clicking through installers is a build I can only do once. So the
       repository has a numbered script for every stage: one that creates the two VirtualBox VMs
       with the correct NIC order, one that prepares the base Ubuntu install and enables
-      <code>ufw</code>, and one each for Suricata, Zeek, DVWA, Wazuh and the Grafana stack. There
+      <code translate="no">ufw</code>, and one each for Suricata, Zeek, DVWA, Wazuh and the Grafana stack. There
       is also a health check script that prints a pass or fail for every hop in the pipeline,
       which turned out to be the most useful script of all, because it tells me which link is
       broken in seconds instead of forcing me to check each service by hand.
     </p>
     <p>
       Repeatability matters for another reason too. I take a snapshot of both VMs before each
-      attack run, named <code>clean-baseline</code>, so I can restore the whole lab and run the
+      attack run, named <code translate="no">clean-baseline</code>, so I can restore the whole lab and run the
       same test again under the same starting conditions. A lab you can reset on demand is a lab
       you can actually run experiments on, instead of a lab you are afraid to touch. This is the
       same instinct behind
@@ -528,14 +529,14 @@
     </p>
     <p>
       Sensor placement decides what a sensor can know. Because Suricata and Zeek read the
-      interface before <code>ufw</code> makes its decision, they see everything, including what
+      interface before <code translate="no">ufw</code> makes its decision, they see everything, including what
       gets blocked. If they sat behind the firewall instead, blocked traffic would be invisible
       to them, and I would be blind to exactly the attempts a defense-in-depth story depends on
       catching.
     </p>
     <p>
       Every default encodes an assumption, and a lab will violate some of them.
-      <code>HOME_NET</code> covering the whole subnet is a reasonable default for a network where
+      <code translate="no">HOME_NET</code> covering the whole subnet is a reasonable default for a network where
       every device is actually internal, and it is the wrong default the moment an attacker
       shares that subnet on purpose. I now read every sensor and firewall default with the
       question "what is this assuming about my network, and is that assumption true here?"
@@ -586,7 +587,7 @@
       The full runbook, the architecture document, every script, and the screenshot checklist
       are on GitHub:
       <a href="https://github.com/rachata072/soc-homelab" rel="noopener" target="_blank">github.com/rachata072/soc-homelab</a>.
-      Part 2 of this series puts Suricata and Zeek to work on <code>enp0s8</code>:
+      Part 2 of this series puts Suricata and Zeek to work on <code translate="no">enp0s8</code>:
       <a href="/blog/soc-homelab-suricata-ids-installation">Suricata on the SOC VM</a>.
     </p>
     <p>
@@ -609,7 +610,7 @@
 <footer class="ftr">
   <div class="wrap ftr-grid">
     <div>
-      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
       <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
     </div>
     <nav aria-label="Site">
@@ -617,6 +618,7 @@
       <ul>
         <li><a href="/projects">projects</a></li>
         <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
         <li><a href="/#about">about</a></li>
         <li><a href="/privacy">privacy</a></li>
         <li><a href="/feed.xml">rss feed</a></li>

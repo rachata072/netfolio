@@ -11,6 +11,32 @@
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   doc.classList.add("js");
 
+  /* ---------- motion switch (WCAG 2.2.2): pauses the globe, SVG packets and CSS loops ----------
+     The choice is remembered per browser. Storage can be blocked (private mode, strict
+     settings), so every access is wrapped: the page must work without it. */
+  var MOTION_KEY = "bfl-motion";
+  var motionOff = false;
+  try { motionOff = window.localStorage.getItem(MOTION_KEY) === "off"; } catch (e) { motionOff = false; }
+  var setMotion = function (off, save) {
+    motionOff = off;
+    doc.classList.toggle("motion-off", off);
+    document.querySelectorAll("svg.topo").forEach(function (svg) {
+      if (typeof svg.pauseAnimations === "function") { if (off) svg.pauseAnimations(); else svg.unpauseAnimations(); }
+    });
+    document.querySelectorAll("[data-motion-label]").forEach(function (el) { el.textContent = off ? "resume motion" : "pause motion"; });
+    document.querySelectorAll("[data-live]").forEach(function (el) { el.textContent = off ? "paused" : "live"; });
+    document.dispatchEvent(new CustomEvent("bfl:motion", { detail: { off: off } }));
+    if (save) { try { window.localStorage.setItem(MOTION_KEY, off ? "off" : "on"); } catch (e) { /* storage blocked: session only */ } }
+  };
+  var motionBtns = document.querySelectorAll("[data-motion]");
+  if (motionBtns.length && !reduced) {
+    motionBtns.forEach(function (b) {
+      b.hidden = false;
+      b.addEventListener("click", function () { setMotion(!motionOff, true); });
+    });
+  }
+  if (motionOff) setMotion(true, false);
+
   /* ---------- blog facility legend: start collapsed on phones ---------- */
   var fac = document.querySelector("details.facilities");
   if (fac && window.matchMedia("(max-width: 48rem)").matches) fac.removeAttribute("open");

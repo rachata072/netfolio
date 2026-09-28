@@ -1,0 +1,67 @@
+<!--meta
+{
+  "out": "cheat-sheets.html",
+  "path": "/cheat-sheets",
+  "nav": "sheets",
+  "title": "Free Networking & Security Cheat Sheets (PDF) | breakfixlearn",
+  "description": "Free one-page cheat sheets for CCNA, Security+ and help desk work: OSI, subnetting, Nmap, Wireshark and more. Open on the web or download a print-ready PDF.",
+  "og_title": "Cheat sheets: one page, one topic, print-ready",
+  "og_description": "One-page networking, cybersecurity, IT support and AI cheat sheets. Read on the web or download PDF (Letter, A4) and hi-res WebP.",
+  "preload_display": true,
+  "scripts": ["filter"]
+}
+-->
+<main id="main">
+  <header class="page-head">
+    <div class="wrap">
+      <span class="cli"><span class="h">edge#</span> <span class="v">show</span> <span class="a">cheat-sheets</span></span>
+      <h1>Cheat sheets</h1>
+      <p class="sec-lede">
+        One page, one topic, readable in under two minutes. Open a sheet on the web or download
+        a print-ready PDF for your desk. Built for CCNA, Security+ and A+ study and for the
+        first years on a help desk or NOC.
+      </p>
+    </div>
+  </header>
+
+  <section class="wrap" data-filter-group aria-label="Cheat sheets">
+    <div class="toolbar" hidden>
+      <label class="search">
+        <span class="pipe" aria-hidden="true">|</span><span aria-hidden="true">include</span>
+        <span class="sr-only">Search cheat sheets</span>
+        <input type="search" name="q" placeholder="osi, nmap, subnetting…" autocomplete="off" spellcheck="false" maxlength="80">
+      </label>
+      <div class="filters" role="group" aria-label="Filter cheat sheets by category">
+        {{SHEET_FILTERS}}
+      </div>
+    </div>
+    <p class="sr-only" data-status aria-live="polite"></p>
+
+    <!-- data-month: filter.js hides this block when a filter leaves it empty -->
+    <div data-month="avail">
+      <h2 class="sub-h">Available now</h2>
+      <div class="sgrid" id="avail">
+        {{SHEET_CARDS}}
+      </div>
+    </div>
+
+    <div class="rm-head">
+      <h2 class="sub-h" id="roadmap">Roadmap</h2>
+      <p>{{SHEET_COUNT}} sheets in three release waves, {{SHEET_LIVE}} live so far. Published sheets link to their page; the rest are on the bench.</p>
+    </div>
+    <div class="racks">
+      {{SHEET_ROADMAP}}
+    </div>
+    <p class="empty mt-2" hidden>% No cheat sheets match. Try another word or pick <b>all</b>.</p>
+
+    <aside class="sheet-trust" aria-labelledby="trust-h">
+      <h2 id="trust-h" class="sub-h">How every sheet is made</h2>
+      <ul>
+        <li><b>Checked twice.</b> Every fact is confirmed in two sources, one of them official: RFCs, vendor docs, NIST, OWASP or exam objectives.</li>
+        <li><b>Safe examples.</b> Documentation-only addresses (192.0.2.0/24, 2001:db8::/32, example.com), placeholder secrets, and a caution or danger flag on anything that changes or breaks a device.</li>
+        <li><b>Clean files.</b> PDFs are scanned before publishing: no scripts, forms, attachments or outside links. Each download lists its SHA-256 hash so you can verify it.</li>
+        <li><b>Free to share.</b> CC BY-NC 4.0: print it, share it with your class, keep the credit line.</li>
+      </ul>
+    </aside>
+  </section>
+</main>

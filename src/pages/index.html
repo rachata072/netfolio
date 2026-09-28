@@ -32,9 +32,16 @@
         </div>
 
         <figure class="console mt-0" aria-labelledby="topo-cap">
-          <div class="console-bar" aria-hidden="true">
-            <span><b>lab-core</b> / topology.pkt</span>
-            <span class="live"><span class="led"></span>live</span>
+          <div class="console-bar">
+            <span aria-hidden="true"><b>lab-core</b> / topology.pkt</span>
+            <span class="bar-r">
+              <span class="live" aria-hidden="true"><span class="led"></span><span data-live>live</span></span>
+              <button type="button" class="motion-btn" data-motion hidden>
+                <svg class="ico i-pause" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><rect x="1" y="1" width="3" height="8"/><rect x="6" y="1" width="3" height="8"/></svg>
+                <svg class="ico i-play" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2 1l7 4-7 4z"/></svg>
+                <span data-motion-label>pause motion</span>
+              </button>
+            </span>
           </div>
           <svg class="topo topo-lg" viewBox="0 0 560 410" role="group" aria-labelledby="topo-title">
             <title id="topo-title">Lab topology: internet, firewall, core switch, and four lab segments</title>
@@ -267,8 +274,25 @@
     </div>
   </section>
 
+  <!-- ================= CHEAT SHEETS ================= -->
+  <section class="sec sec-band" aria-labelledby="sheets-h">
+    <div class="wrap rv">
+      <div class="sec-head">
+        <div>
+          <span class="cli"><span class="h">edge#</span> <span class="v">show</span> <span class="a">cheat-sheets | new</span></span>
+          <h2 class="sec-title" id="sheets-h">Cheat sheets</h2>
+          <p class="sec-lede">One-page desk references for CCNA, security and help desk work. Free PDF and print.</p>
+        </div>
+        <a class="more" href="/cheat-sheets">show cheat-sheets | all &rarr;</a>
+      </div>
+      <div class="sgrid">
+        {{SHEETS_TEASER}}
+      </div>
+    </div>
+  </section>
+
   <!-- ================= LATEST POSTS ================= -->
-  <section class="sec sec-band" aria-labelledby="log-h">
+  <section class="sec" aria-labelledby="log-h">
     <div class="wrap rv">
       <div class="sec-head">
         <div>
@@ -283,7 +307,7 @@
   </section>
 
   <!-- ================= ABOUT ================= -->
-  <section class="sec" id="about" aria-labelledby="about-h">
+  <section class="sec sec-band" id="about" aria-labelledby="about-h">
     <div class="wrap about rv">
       <div class="about-copy">
         <span class="cli"><span class="h">edge#</span> <span class="v">show</span> <span class="a">running-config | section me</span></span>

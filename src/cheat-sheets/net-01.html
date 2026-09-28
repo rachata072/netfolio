@@ -1,0 +1,83 @@
+<!--
+  Text version of NET-01, shown under the sheet image on /cheat-sheets/net-01.
+  It is the accessible alternative to the image (WCAG 1.1.1 / 1.4.5) and what
+  search engines read. Keep it in sync with the sheet when the version changes.
+-->
+<h2 id="layers">7 OSI layers and 4 TCP/IP layers</h2>
+<p>The sender works down from layer 7 to layer 1; the receiver works back up from 1 to 7.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">TCP/IP</th><th scope="col">#</th><th scope="col">OSI layer</th><th scope="col">What it does</th><th scope="col">PDU</th><th scope="col">Key protocols</th><th scope="col">Device and address</th></tr></thead>
+  <tbody>
+    <tr><td rowspan="3">Application (L5 to L7)</td><td>7</td><th scope="row">Application</th><td>Network services for apps</td><td>Data</td><td>HTTP(S), DNS, DHCP, SSH</td><td>Host, server, NGFW</td></tr>
+    <tr><td>6</td><th scope="row">Presentation</th><td>Format, encrypt, compress</td><td>Data</td><td>TLS*, UTF-8, JPEG</td><td>Endpoint</td></tr>
+    <tr><td>5</td><th scope="row">Session</th><td>Open and close sessions</td><td>Data</td><td>RPC, NetBIOS</td><td>Endpoint</td></tr>
+    <tr><td>Transport</td><td>4</td><th scope="row">Transport</th><td>End-to-end delivery, ports</td><td>Segment</td><td>TCP, UDP</td><td>Firewall, port</td></tr>
+    <tr><td>Internet</td><td>3</td><th scope="row">Network</th><td>Routing between networks</td><td>Packet</td><td>IPv4, IPv6, ICMP, OSPF</td><td>Router, IP address</td></tr>
+    <tr><td rowspan="2">Link (L1 to L2)</td><td>2</td><th scope="row">Data Link</th><td>Frames, MAC, error check</td><td>Frame</td><td>Ethernet, Wi-Fi, ARP*</td><td>Switch, AP, MAC address</td></tr>
+    <tr><td>1</td><th scope="row">Physical</th><td>Signals: voltage, light, radio</td><td>Bits</td><td>1000BASE-T, fiber, PoE</td><td>Cable, hub, NIC</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="encapsulation">Encapsulation</h2>
+<p>On the way down, each layer wraps the one above it. On the way up, the receiver strips each header in reverse.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">PDU</th><th scope="col">Layer</th><th scope="col">What it carries</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Data</th><td>L7 to L5</td><td>Application data</td></tr>
+    <tr><th scope="row">Segment</th><td>L4</td><td>Ports + data</td></tr>
+    <tr><th scope="row">Packet</th><td>L3</td><td>IP addresses + L4 header + data</td></tr>
+    <tr><th scope="row">Frame</th><td>L2</td><td>MAC addresses + L3 + L4 + data + FCS trailer</td></tr>
+    <tr><th scope="row">Bits</th><td>L1</td><td>The frame as a signal, for example <code>1011 0010 0110 1101</code></td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="tcp-udp">TCP vs UDP (layer 4)</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col"></th><th scope="col">TCP</th><th scope="col">UDP</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Setup</th><td>SYN, SYN-ACK, ACK</td><td>None</td></tr>
+    <tr><th scope="row">Delivery</th><td>ACKs, retransmit, windowing</td><td>Best effort</td></tr>
+    <tr><th scope="row">Header</th><td>20 bytes minimum</td><td>8 bytes</td></tr>
+    <tr><th scope="row">Used by</th><td>HTTPS 443, SSH 22</td><td>DNS 53*, DHCP 67/68</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="troubleshoot">Troubleshoot bottom-up</h2>
+<p>Cisco IOS and Windows commands, in the order you would run them.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Layer</th><th scope="col">Command</th><th scope="col">What it answers</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><code>show interfaces status</code></td><td>Errors, duplex</td></tr>
+    <tr><td>1</td><td><code>shutdown</code> then <code>no shutdown</code> <span class="flag flag-caution">caution</span></td><td>Bounce the port</td></tr>
+    <tr><td>2</td><td><code>show mac address-table</code></td><td>Which port and VLAN?</td></tr>
+    <tr><td>3</td><td><code>show ip interface brief</code></td><td>Up/up? Right IP?</td></tr>
+    <tr><td>3</td><td><code>ping</code>, <code>traceroute</code>, <code>tracert</code></td><td>Where does the path break?</td></tr>
+    <tr><td>4</td><td><code>Test-NetConnection 192.0.2.10 -Port 443</code></td><td>Is the port open?</td></tr>
+    <tr><td>7</td><td><code>nslookup example.com</code></td><td>Does the name resolve?</td></tr>
+  </tbody>
+</table></div>
+<p class="note note-caution"><b>Caution.</b> <code>shutdown</code> drops every session on that port. Never bounce the link you are managing the device from.</p>
+
+<h2 id="attacks">Attacks and defenses by layer</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Layer</th><th scope="col">Attack</th><th scope="col">Defense</th></tr></thead>
+  <tbody>
+    <tr><td>7</td><td>Phishing, SQL injection</td><td>Email filter, WAF</td></tr>
+    <tr><td>4</td><td>SYN flood, port scans</td><td>SYN cookies, firewall</td></tr>
+    <tr><td>3</td><td>IP spoofing</td><td>ACLs, uRPF</td></tr>
+    <tr><td>2</td><td>ARP spoofing</td><td>Dynamic ARP Inspection</td></tr>
+    <tr><td>2</td><td>MAC flooding, rogue DHCP</td><td>Port security, DHCP snooping</td></tr>
+    <tr><td>1</td><td>Rogue device on a wall jack</td><td>802.1X, shut unused ports</td></tr>
+  </tbody>
+</table></div>
+<p class="note note-auth"><b>Authorized use only.</b> Test attacks only in your own lab or with written permission.</p>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>L1 to L7: <i>Please Do Not Throw Sausage Pizza Away</i></li>
+  <li>L7 to L1: <i>All People Seem To Need Data Processing</i></li>
+  <li>PDUs: Data, Segment, Packet, Frame, Bits</li>
+  <li>Switch = L2 (MAC). Router = L3 (IP).</li>
+  <li>UDP's layer 4 PDU is a datagram. DNS also uses TCP 53 (zone transfers and large answers).</li>
+  <li>* ARP sits between L2 and L3; TLS is often placed at L6.</li>
+</ul>

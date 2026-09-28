@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#050D18">
 <meta name="color-scheme" content="dark">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/style.css?v=8f8c37b981">
+<link rel="stylesheet" href="/css/style.css?v=15c414d558">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
 <meta property="og:type" content="article">
@@ -32,20 +32,21 @@
 <meta property="article:tag" content="rkhunter">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"I Ran a Real Security Audit Against My Own Linux Machine, Here Is What Actually Broke","description":"I ran Lynis and rkhunter against my own Ubuntu workstation, triaged every finding, and caught a security service that had silently crashed hours earlier.","datePublished":"2026-09-03","dateModified":"2026-09-03","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"publisher":{"@type":"Person","name":"Trey"},"mainEntityOfPage":"https://breakfixlearn.com/blog/linux-hardening-audit-lynis-rkhunter","image":"https://breakfixlearn.com/assets/og/linux-hardening-audit-lynis-rkhunter.webp","keywords":"Linux, Cybersecurity, Security Auditing, Lynis, rkhunter","articleSection":"Security","timeRequired":"PT16M"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://breakfixlearn.com/blog"},{"@type":"ListItem","position":3,"name":"I Ran a Real Security Audit Against My Own Linux Machine, Here Is What Actually Broke"}]}</script>
-<script src="/js/main.js?v=b6a070fa7c" defer></script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
 </head>
 <body>
 <div class="progress" aria-hidden="true"></div>
 <a class="skip" href="#main">Skip to content</a>
 <header class="hdr">
   <div class="wrap">
-    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
     <nav aria-label="Main">
       <ul class="ports">
         <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
         <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
         <li><a class="port" href="/blog" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
-        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span>about</a></li>
+        <li><a class="port" href="/cheat-sheets"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
       </ul>
     </nav>
   </div>
@@ -132,7 +133,7 @@
       repositories. No paid lab environment, no cloud subscription, nothing beyond a Linux
       machine you already have.
     </p>
-    <pre><code>sudo apt install lynis -y
+    <pre translate="no"><code translate="no">sudo apt install lynis -y
 sudo apt install rkhunter -y</code></pre>
 
     <h2 id="setting-the-scope-honestly-before-touching-a-single-command">Setting the scope honestly, before touching a single command</h2>
@@ -154,7 +155,7 @@ sudo apt install rkhunter -y</code></pre>
     </p>
 
     <h2 id="running-the-baseline-scan">Running the baseline scan</h2>
-    <pre><code>sudo lynis audit system</code></pre>
+    <pre translate="no"><code translate="no">sudo lynis audit system</code></pre>
     <p>
       The scan takes several minutes and walks through dozens of categories in sequence,
       boot and services, kernel, memory and processes, users and authentication, shells,
@@ -199,32 +200,32 @@ sudo apt install rkhunter -y</code></pre>
     <h3>Warning one: vulnerable packages found</h3>
     <p>
       Lynis flagged outdated packages with known vulnerabilities under finding
-      <code>PKGS-7392</code>. Ubuntu already runs <code>unattended-upgrades</code> for
+      <code translate="no">PKGS-7392</code>. Ubuntu already runs <code translate="no">unattended-upgrades</code> for
       security patches automatically in the background, so my working theory was that this
       warning was catching non-security package updates that had simply accumulated over
       time rather than a gap in the automatic patching itself. The fix looked simple:
     </p>
-    <pre><code>sudo apt update && sudo apt upgrade -y</code></pre>
+    <pre translate="no"><code translate="no">sudo apt update && sudo apt upgrade -y</code></pre>
     <p>
       This turned out to only be a partial fix, which I come back to in the
       troubleshooting section below, because a second look with
-      <code>lynis show details PKGS-7392</code> later showed dozens of security-relevant
-      packages still pending. The short version: <code>apt upgrade</code> will not touch a
+      <code translate="no">lynis show details PKGS-7392</code> later showed dozens of security-relevant
+      packages still pending. The short version: <code translate="no">apt upgrade</code> will not touch a
       package if resolving its dependencies requires removing or replacing something, and
-      <code>apt full-upgrade</code> will.
+      <code translate="no">apt full-upgrade</code> will.
     </p>
 
     <h3>Warning two: SMTP banner discloses OS and software information</h3>
     <p>
       This one flagged Postfix, Ubuntu's default mail transport agent, for leaking version
-      and OS details through its SMTP banner under finding <code>MAIL-8818</code>. The real
+      and OS details through its SMTP banner under finding <code translate="no">MAIL-8818</code>. The real
       question behind this warning is not "how do I hide the banner," it is "do I even need
       a local mail server running on this machine." For a personal development
       workstation, the honest answer was no. I do not send outbound mail from this box, and
       Postfix had been sitting there since the base install, unused and unconfigured.
       Rather than patch around the disclosure, I removed the service that was causing it.
     </p>
-    <pre><code>sudo apt remove --purge postfix -y</code></pre>
+    <pre translate="no"><code translate="no">sudo apt remove --purge postfix -y</code></pre>
 
     <figure class="post-figure">
       <img src="/assets/img/linux-hardening-audit-lynis-rkhunter/postfix-mail-server-removed-apt-purge-898.webp"
@@ -252,43 +253,43 @@ sudo apt install rkhunter -y</code></pre>
     <p>
       Lynis flagged that Fail2ban, which I had installed specifically to protect SSH
       against brute force login attempts, appeared to have every jail disabled under
-      finding <code>TOOL-5104</code>. My first instinct was that this was a Lynis false
+      finding <code translate="no">TOOL-5104</code>. My first instinct was that this was a Lynis false
       positive. Lynis performs mostly static analysis, meaning it reads configuration files
       rather than querying running services directly, and
-      <a href="https://github.com/fail2ban/fail2ban/wiki/Proper-fail2ban-configuration" rel="noopener" target="_blank">Fail2ban's config format has a <code>[DEFAULT]</code> section whose values individual jail sections like <code>[sshd]</code> can override</a>
+      <a href="https://github.com/fail2ban/fail2ban/wiki/Proper-fail2ban-configuration" rel="noopener" target="_blank">Fail2ban's config format has a <code translate="no">[DEFAULT]</code> section whose values individual jail sections like <code translate="no">[sshd]</code> can override</a>
       with their own settings. A scanner reading the file top to bottom without fully
       modeling that override behavior could plausibly flag the whole thing as disabled when
       it is not. That was a reasonable hypothesis. It was also wrong, and I only found that
       out because I checked instead of assuming.
     </p>
-    <pre><code>sudo fail2ban-client status
+    <pre translate="no"><code translate="no">sudo fail2ban-client status
 sudo fail2ban-client status sshd</code></pre>
     <p>
       The live status command showed the Fail2ban service was not running at all. It had
-      crashed. <code>systemctl status fail2ban</code> confirmed it, exit status 255, an
+      crashed. <code translate="no">systemctl status fail2ban</code> confirmed it, exit status 255, an
       exception, and a timestamp showing it had been down for roughly three hours already.
       That is the moment this stopped being a documentation exercise and became a real
       incident, however small. My SSH protection had silently gone offline hours earlier
       and I had no idea until a config auditor happened to flag something adjacent to it.
     </p>
     <p>
-      I went digging with <code>journalctl -u fail2ban -n 30 --no-pager</code> to find the
-      actual root cause. What I found was a mistake in my own <code>jail.local</code> file
+      I went digging with <code translate="no">journalctl -u fail2ban -n 30 --no-pager</code> to find the
+      actual root cause. What I found was a mistake in my own <code translate="no">jail.local</code> file
       from when I had originally set Fail2ban up. Somewhere near the top of the file there
       is an instructional example block, meant purely as documentation showing the format
       jail sections should follow, not something meant to actually run. At some point while
       configuring the sshd jail, I had added my real settings, max retry count, ban time,
       find time, underneath that example block instead of under the real functional
-      <code>[sshd]</code> section further down in the file. Worse, the section header
-      directly above my settings had been left commented out as <code># [sshd]</code>,
+      <code translate="no">[sshd]</code> section further down in the file. Worse, the section header
+      directly above my settings had been left commented out as <code translate="no"># [sshd]</code>,
       while the key-value pairs underneath it were left uncommented. That produced a parse
       error, file contains no section headers, because Fail2ban found configuration values
       sitting under nothing.
     </p>
     <p>
       My first attempted fix was to just uncomment that header, turning
-      <code># [sshd]</code> into <code>[sshd]</code>. That revealed a second problem. The
-      file already has its own separate, fully functional <code>[sshd]</code> section
+      <code translate="no"># [sshd]</code> into <code translate="no">[sshd]</code>. That revealed a second problem. The
+      file already has its own separate, fully functional <code translate="no">[sshd]</code> section
       further down, part of Fail2ban's standard shipped configuration under the real jails
       section. Uncommenting the top one created two sections with the same name, which
       Fail2ban correctly rejected with a duplicate section error.
@@ -296,12 +297,12 @@ sudo fail2ban-client status sshd</code></pre>
     <p>
       The actual fix was to leave that top instructional block exactly as it originally
       shipped, fully commented out, and instead add my real settings,
-      <code>enabled = true</code>, <code>maxretry = 4</code>, <code>bantime = 3600</code>,
-      <code>findtime = 600</code>, into the real <code>[sshd]</code> section further down,
-      appending them to the existing <code>port</code>, <code>logpath</code>, and
-      <code>backend</code> lines that were already there rather than replacing anything.
+      <code translate="no">enabled = true</code>, <code translate="no">maxretry = 4</code>, <code translate="no">bantime = 3600</code>,
+      <code translate="no">findtime = 600</code>, into the real <code translate="no">[sshd]</code> section further down,
+      appending them to the existing <code translate="no">port</code>, <code translate="no">logpath</code>, and
+      <code translate="no">backend</code> lines that were already there rather than replacing anything.
     </p>
-    <pre><code>sudo fail2ban-client reload
+    <pre translate="no"><code translate="no">sudo fail2ban-client reload
 sudo systemctl status fail2ban
 sudo fail2ban-client status sshd</code></pre>
     <p>
@@ -340,12 +341,12 @@ sudo fail2ban-client status sshd</code></pre>
     </p>
     <p>Six suggestions genuinely made sense for this machine and I acted on them.</p>
     <p>Cleaning up old package remnants left over from previous removals:</p>
-    <pre><code>sudo apt autoremove --purge -y</code></pre>
+    <pre translate="no"><code translate="no">sudo apt autoremove --purge -y</code></pre>
     <p>
       Installing rkhunter as the dedicated rootkit and backdoor scanner Lynis itself does
       not replace:
     </p>
-    <pre><code>sudo rkhunter --update
+    <pre translate="no"><code translate="no">sudo rkhunter --update
 sudo rkhunter --check</code></pre>
     <p>
       The scan checks system binaries against known-good properties, walks through several
@@ -376,7 +377,7 @@ sudo rkhunter --check</code></pre>
       Disabling unused network protocols that this machine has no legitimate reason to
       use, which reduces attack surface for essentially zero cost:
     </p>
-    <pre><code>echo "install dccp /bin/false
+    <pre translate="no"><code translate="no">echo "install dccp /bin/false
 install sctp /bin/false
 install rds /bin/false
 install tipc /bin/false" | sudo tee /etc/modprobe.d/disable-unused-protocols.conf</code></pre>
@@ -448,26 +449,26 @@ install tipc /bin/false" | sudo tee /etc/modprobe.d/disable-unused-protocols.con
     </figure>
 
     <p>Cleanup was a one-liner:</p>
-    <pre><code>sudo add-apt-repository --remove ppa:daniruiz/flat-remix -y</code></pre>
+    <pre translate="no"><code translate="no">sudo add-apt-repository --remove ppa:daniruiz/flat-remix -y</code></pre>
     <p>
       And as mentioned above, my first pass at fixing the vulnerable packages warning was
-      incomplete. Running <code>lynis show details PKGS-7392</code> again after the initial
+      incomplete. Running <code translate="no">lynis show details PKGS-7392</code> again after the initial
       upgrade still showed roughly fifty pending security-relevant packages, things like
       bind9, ncurses, util-linux, and several webkit components. The fix was switching from
-      <code>apt upgrade</code> to
-      <a href="https://manpages.ubuntu.com/manpages/noble/man8/apt-get.8.html" rel="noopener" target="_blank"><code>apt full-upgrade</code></a>,
+      <code translate="no">apt upgrade</code> to
+      <a href="https://manpages.ubuntu.com/manpages/noble/man8/apt-get.8.html" rel="noopener" target="_blank"><code translate="no">apt full-upgrade</code></a>,
       since plain upgrade will hold back a package entirely if satisfying its dependencies
       would require removing or replacing something else, while full-upgrade is allowed to
       make those removals and replacements to fully resolve the chain.
     </p>
-    <pre><code>sudo apt update && sudo apt full-upgrade -y</code></pre>
+    <pre translate="no"><code translate="no">sudo apt update && sudo apt full-upgrade -y</code></pre>
 
     <h2 id="re-running-the-scan-and-the-real-before-and-after">Re-running the scan and the real before and after</h2>
     <p>
       Once the warnings were resolved and the six suggestions were actioned, I ran Lynis
       again from a clean terminal.
     </p>
-    <pre><code>sudo lynis audit system</code></pre>
+    <pre translate="no"><code translate="no">sudo lynis audit system</code></pre>
 
     <figure class="post-figure">
       <img src="/assets/img/linux-hardening-audit-lynis-rkhunter/lynis-final-hardening-index-68-scan-summary-865.webp"
@@ -518,7 +519,7 @@ install tipc /bin/false" | sudo tee /etc/modprobe.d/disable-unused-protocols.con
       re-run both scans every month or two, or any time I make a meaningful change to the
       machine, installing a new service, opening a new port, adding new tooling.
     </p>
-    <pre><code>sudo lynis audit system
+    <pre translate="no"><code translate="no">sudo lynis audit system
 sudo rkhunter --update && sudo rkhunter --check</code></pre>
     <p>
       That is the whole maintenance plan. Low effort, low friction, and it is exactly the
@@ -583,7 +584,7 @@ sudo rkhunter --update && sudo rkhunter --check</code></pre>
 <footer class="ftr">
   <div class="wrap ftr-grid">
     <div>
-      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
       <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
     </div>
     <nav aria-label="Site">
@@ -591,6 +592,7 @@ sudo rkhunter --update && sudo rkhunter --check</code></pre>
       <ul>
         <li><a href="/projects">projects</a></li>
         <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
         <li><a href="/#about">about</a></li>
         <li><a href="/privacy">privacy</a></li>
         <li><a href="/feed.xml">rss feed</a></li>

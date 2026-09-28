@@ -272,8 +272,9 @@
     rotY += dt * 0.00012;
     frame(now);
   }
+  var userPaused = document.documentElement.classList.contains("motion-off");
   function start() {
-    if (running || reduced || !onScreen || document.hidden) return;
+    if (running || reduced || userPaused || !onScreen || document.hidden) return;
     running = true; last = 0;
     rafId = window.requestAnimationFrame(loop);
   }
@@ -286,6 +287,9 @@
   if (reduced) {
     // one still, fully drawn frame
     for (var r0 = 0; r0 < 6; r0++) spawn(0);
+    frame(0);
+  } else if (userPaused) {
+    for (var r1 = 0; r1 < 6; r1++) spawn(0);
     frame(0);
   } else {
     start();
@@ -304,6 +308,11 @@
   }
   document.addEventListener("visibilitychange", function () {
     if (document.hidden) stop(); else start();
+  });
+  // pause/resume switch in the hero console (main.js owns the button)
+  document.addEventListener("bfl:motion", function (ev) {
+    userPaused = !!(ev.detail && ev.detail.off);
+    if (userPaused) stop(); else start();
   });
 
   // gentle parallax: the globe leans toward the pointer (desktop only)

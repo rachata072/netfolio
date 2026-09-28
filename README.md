@@ -32,6 +32,35 @@ The home page, blog index, month groups, filter counts, RSS feed, sitemap,
 table of contents, series box, and previous/next links all update from that one file.
 Projects live in `src/projects.json`.
 
+## Publish a cheat sheet
+
+1. Export the sheet (PDF web, PDF print-letter, PDF print-a4, WebP full / web / social) using the naming rule
+   `bfl-<id>-<slug>_v<version>_<variant>.<ext>`.
+2. `python tools/sheetprep.py "D:/Cheat Sheet/networking/net-02/exports"`
+   checks the PDFs (no scripts, actions, forms, attachments; 1 page; < 2 MB), checks image sizes,
+   converts PNG/JPG to WebP, makes the card thumbnail and copies everything to `public/cheat-sheets/files/`.
+3. In `src/cheatsheets.json` set the sheet to `"status": "live"` and fill slug, version, date, exam,
+   use_when, summary, description (120-160 chars), tags and sources (copy NET-01).
+4. Write the text version in `src/cheat-sheets/<id>.html` (accessible alternative to the image, and what Google reads).
+5. `python tools/build.py`, `python tools/qa.py`, preview with `python tools/serve.py`.
+
+Pages: `/cheat-sheets` (library + roadmap of all 40) and `/cheat-sheets/<id>` (the QR code on each sheet
+points here). The roadmap statuses are `planned`, `audit` (shows "in review") and `live`.
+
+## Check the layout with playwright-cli
+
+```bash
+npm install -g @playwright/cli@latest
+python tools/serve.py &                        # in another terminal on Windows
+playwright-cli open http://localhost:8080/cheat-sheets
+playwright-cli resize 375 812                  # then 768 1024, 1280 800
+playwright-cli screenshot --full-page --filename=sheets-375.png
+playwright-cli eval "() => document.documentElement.scrollWidth - innerWidth"   # must be 0
+playwright-cli console error                   # must be empty
+```
+
+Design rules for new pages are in `DESIGN.md` (awesome-design-md format).
+
 ## Images: WebP only
 
 Every raster image on the site is WebP: post screenshots and the link-preview (OG)
@@ -53,14 +82,17 @@ netfolio-v2/
     assets/fonts/    IBM Plex Sans / Mono / Condensed, woff2, OFL licensed
     assets/img/      post screenshots (only the ones posts actually use)
     assets/og/       1200x630 link-preview images (WebP), generated
+    cheat-sheets/files/  sheet PDFs + WebP, copied in by tools/sheetprep.py
     _headers         security + cache headers
   src/
     site.json        name, links, blog categories, series
     projects.json    every project card
     pages/*.html     home, projects, blog, privacy, 404 templates
     posts/*.html     one file per post: meta JSON + article body
+    cheatsheets.json the 40-sheet catalog (status, wave, files, sources)
+    cheat-sheets/    text version of each live sheet
   tools/
-    build.py  qa.py  serve.py  og.py  imgprep.py
+    build.py  qa.py  serve.py  og.py  imgprep.py  sheetprep.py  pdfcheck.py
 ```
 
 ## Deploying
@@ -122,20 +154,29 @@ Other hardening: `default-src 'none'` instead of `'self'`, `base-uri 'none'`,
 The blog filter only accepts URL hash values that exactly match a hard-coded filter
 (allow-list), and nothing from the URL or the search box is ever written into the page.
 
-## Security posture (OWASP Top 10: 2021)
+## Security posture (OWASP Top 10:2025)
 
 | Risk | How it's handled |
 |---|---|
-| A01 Broken Access Control | No auth, no server logic, no admin panel. |
-| A02 Cryptographic Failures | HTTPS only, HSTS, no secrets anywhere in the repo. |
-| A03 Injection / XSS | No `innerHTML`/`eval` (qa.py enforces). All DOM writes are `textContent`/attributes. Build output is HTML-escaped. Strict CSP with no `unsafe-inline`. |
-| A04 Insecure Design | Static-first: no forms, no comments, mailto for contact. |
-| A05 Misconfiguration | `_headers`: CSP, frame-ancestors none, nosniff, referrer policy, permissions policy, COOP/CORP. |
-| A06 Vulnerable Components | Zero runtime dependencies. Fonts self-hosted. |
-| A07 Auth Failures | None on the site; protect GitHub + Cloudflare with 2FA. |
-| A08 Integrity Failures | No third-party scripts except Cloudflare's own beacon (injected by Cloudflare). |
-| A09 Logging & Monitoring | Cloudflare Web Analytics + access logs (now actually able to report, see bug #1). |
-| A10 SSRF | No server-side requests. |
+| A01 Broken Access Control | No auth, no server logic, no admin panel. Nothing private is deployed: only `public/` goes to Cloudflare. |
+| A02 Security Misconfiguration | `_headers`: strict CSP (`default-src 'none'`), frame-ancestors none, nosniff, referrer policy, permissions policy, COOP/CORP, HSTS. Downloads get their own narrower CSP (see below). |
+| A03 Software Supply Chain Failures | Zero runtime dependencies, no CDN, no npm packages shipped. Build tools are Python standard library (Pillow only for images). Fonts self-hosted. |
+| A04 Cryptographic Failures | HTTPS only, HSTS, no secrets anywhere in the repo. Every cheat-sheet download lists its SHA-256 hash. |
+| A05 Injection | No `innerHTML`/`eval` (qa.py enforces). DOM writes are `textContent`/attributes. Build output is HTML-escaped; JSON-LD can't close its script tag. Filter deep links are allow-listed. PDFs are scanned for JavaScript, actions and forms. |
+| A06 Insecure Design | Static-first: no forms, no comments, mailto for contact. Cheat sheets are flat one-page files; the site never accepts uploads. |
+| A07 Authentication Failures | None on the site; protect GitHub and Cloudflare with 2FA (the deploy chain is the real attack surface). |
+| A08 Software or Data Integrity Failures | `tools/pdfcheck.py` (run by qa.py and sheetprep.py) rejects PDFs with `/JavaScript`, `/Launch`, `/OpenAction`, forms, attachments, encryption or links outside breakfixlearn.com. SHA-256 per file on each sheet page and in JSON-LD. |
+| A09 Security Logging and Alerting Failures | Cloudflare Web Analytics + Workers logs; CSP allows the beacon to report. |
+| A10 Mishandling of Exceptional Conditions | Build fails loudly on missing files, bad IDs or unknown categories; qa.py fails on broken links; JS wraps storage access so a blocked localStorage never breaks a page; unknown URLs get the 404 page with a real 404 status. |
+
+### Cheat-sheet downloads
+
+- Files live in `public/cheat-sheets/files/` and are served with
+  `! Content-Security-Policy` + a PDF-only policy (`default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data: blob:; object-src 'self'; frame-ancestors 'none'`).
+  Chrome's PDF viewer injects styles, so the site-wide `style-src 'self'` would show a blank page.
+  Scripts stay blocked.
+- Download links are same-origin with the `download` attribute; external links use `rel="noopener"`.
+- Examples on every sheet use documentation-only addresses (RFC 5737, RFC 3849) and example.com.
 
 ## Before going live
 

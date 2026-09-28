@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#050D18">
 <meta name="color-scheme" content="dark">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/style.css?v=8f8c37b981">
+<link rel="stylesheet" href="/css/style.css?v=15c414d558">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
 <meta property="og:type" content="article">
@@ -33,20 +33,21 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"What Nine Packet Captures Taught Me About Networks I Thought I Already Understood","description":"Nine real packet captures (DNS, TCP, HTTP vs HTTPS, ICMP, packet loss, ARP, DHCP, Telnet vs SSH, FTP), each read and explained by hand for CCNA study.","datePublished":"2026-09-18","dateModified":"2026-09-18","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"publisher":{"@type":"Person","name":"Trey"},"mainEntityOfPage":"https://breakfixlearn.com/blog/wireshark-network-analysis-nine-packet-captures","image":"https://breakfixlearn.com/assets/og/wireshark-network-analysis-nine-packet-captures.webp","keywords":"Wireshark, CCNA, TCP/IP, Packet Analysis, Network Security","articleSection":"Networking","timeRequired":"PT19M"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://breakfixlearn.com/blog"},{"@type":"ListItem","position":3,"name":"What Nine Packet Captures Taught Me About Networks I Thought I Already Understood"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Why does this project skip VLAN trunking, OSPF, and Spanning Tree?","acceptedAnswer":{"@type":"Answer","text":"Those three scenarios were in the original plan, but producing genuine traffic for any of them needs simulated or real switch and router infrastructure, GNS3 or Packet Tracer, beyond what this particular lab build covers. Rather than fake the evidence with a guessed-at write-up dressed up as a real capture, they were cut outright. They're a clean follow-up project once that infrastructure exists, not a corner quietly cut, and the repository says so directly instead of padding the scenario count."}},{"@type":"Question","name":"Why does the Telnet capture use a stand-in script instead of a real Telnet server?","acceptedAnswer":{"@type":"Answer","text":"It's a real subset of RFC 854 on the wire, genuine IAC WILL/DO option negotiation followed by a plaintext username and password prompt, because running a full system telnetd deterministically in the original build environment wasn't practical. Every byte in that capture is real and unedited. The SSH half, and the home-lab version of this same comparison described in the runbook, use a completely genuine system daemon end to end. The credential-exposure result is identical either way; only the server implementation differs."}},{"@type":"Question","name":"If ping to a real host fails, does that mean the network is down?","acceptedAnswer":{"@type":"Answer","text":"Not necessarily. Pinging a real public resolver from this project's build environment returned a hundred percent packet loss, four requests out, nothing back at all, while DNS lookups and HTTPS requests from that same environment worked perfectly. That pattern means something on the path is silently filtering ICMP specifically, a common and deliberate network-security control, not a broken network. Recognizing that distinction, instead of escalating a false alarm, is the actual troubleshooting skill this scenario exists to teach."}},{"@type":"Question","name":"What's the difference between a closed port and a filtered port?","acceptedAnswer":{"@type":"Answer","text":"A closed port replies immediately with a TCP RST, the host is reachable and something confirms nothing is listening there. A filtered port replies with nothing at all and simply times out, a firewall or ACL somewhere on the path silently dropped the packet, so you can't tell from the outside whether the host even exists. That distinction is the entire logic a port scanner like nmap uses to classify open, closed, and filtered, and it's why a timeout during troubleshooting is a completely different signal from an active refusal."}}]}</script>
-<script src="/js/main.js?v=b6a070fa7c" defer></script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
 </head>
 <body>
 <div class="progress" aria-hidden="true"></div>
 <a class="skip" href="#main">Skip to content</a>
 <header class="hdr">
   <div class="wrap">
-    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
     <nav aria-label="Main">
       <ul class="ports">
         <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
         <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
         <li><a class="port" href="/blog" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
-        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span>about</a></li>
+        <li><a class="port" href="/cheat-sheets"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
       </ul>
     </nav>
   </div>
@@ -351,7 +352,7 @@
       part, a clean request and reply once the machines could actually see each
       other. The DHCP scenario came with its own version of the same lesson: I had
       to explicitly remove the static address I'd added for the ARP exercise before
-      <code>dhclient</code> could force a fresh lease negotiation, since releasing a DHCP lease
+      <code translate="no">dhclient</code> could force a fresh lease negotiation, since releasing a DHCP lease
       does nothing to an address you added by hand, a distinction I hadn't thought
       about until the release command errored out with "address already assigned"
       and I had to go figure out why.
@@ -561,9 +562,9 @@
       actual system log instead of guessing.
     </p>
     <p>
-      Setting up a real Telnet server through <code>xinetd</code> gave me a config file that
-      looked completely correct, and a <code>telnet</code> connection that was flatly refused
-      anyway. The fix wasn't in the config I'd written, it was in <code>xinetd</code>'s own
+      Setting up a real Telnet server through <code translate="no">xinetd</code> gave me a config file that
+      looked completely correct, and a <code translate="no">telnet</code> connection that was flatly refused
+      anyway. The fix wasn't in the config I'd written, it was in <code translate="no">xinetd</code>'s own
       startup log, which showed it had checked whether the binary I'd pointed it at
       actually existed, found that it didn't at that exact path, and silently
       disabled the entire Telnet service at boot rather than failing loudly about it.
@@ -572,24 +573,24 @@
     </p>
     <p>
       The SSH half had an even less intuitive version of the same category of
-      problem. I added a <code>Port 2222</code> line to <code>sshd_config</code>, restarted the service,
+      problem. I added a <code translate="no">Port 2222</code> line to <code translate="no">sshd_config</code>, restarted the service,
       and the new port simply never opened, no error anywhere. It turned out that
       current Ubuntu runs SSH under systemd socket activation by default: a separate
-      <code>ssh.socket</code> unit owns port 22 and only spins up <code>sshd</code> on demand, and an
-      <code>sshd</code> started that way listens exclusively on the socket it was handed,
-      completely ignoring any other <code>Port</code> line in its own config file. The fix was
-      to disable that socket unit and let <code>sshd</code> run the traditional way, standalone,
+      <code translate="no">ssh.socket</code> unit owns port 22 and only spins up <code translate="no">sshd</code> on demand, and an
+      <code translate="no">sshd</code> started that way listens exclusively on the socket it was handed,
+      completely ignoring any other <code translate="no">Port</code> line in its own config file. The fix was
+      to disable that socket unit and let <code translate="no">sshd</code> run the traditional way, standalone,
       actually reading its own configuration, something I only found by noticing a
-      <code>TriggeredBy: ssh.socket</code> line in the service's status output that I would
+      <code translate="no">TriggeredBy: ssh.socket</code> line in the service's status output that I would
       have skipped right past a week earlier.
     </p>
     <p>
-      FTP's version of this was smaller but just as easy to misread: <code>vsftpd</code> simply
+      FTP's version of this was smaller but just as easy to misread: <code translate="no">vsftpd</code> simply
       refused to start, reporting that its config file wasn't "owned by the correct
-      user." The file had arrived on the machine through a plain <code>git clone</code>, which
-      means it was owned by my own account, and <code>vsftpd</code> treats that as a security
+      user." The file had arrived on the machine through a plain <code translate="no">git clone</code>, which
+      means it was owned by my own account, and <code translate="no">vsftpd</code> treats that as a security
       red flag, refusing to trust a config file it can't verify belongs to root. One
-      <code>chown</code> fixed it, but only after I understood why a service would care about
+      <code translate="no">chown</code> fixed it, but only after I understood why a service would care about
       file ownership at all, which is itself a small, real security lesson about how
       much some daemons refuse to trust by default.
     </p>
@@ -642,8 +643,8 @@
       every time, regardless of which protocol I was capturing. Decide exactly what
       traffic I wanted to see. Start a capture with a filter narrow enough to isolate
       just that traffic and nothing else sharing the interface. Generate the traffic on
-      purpose. Stop the capture. Verify something actually got captured, with <code>capinfos</code>
-      or a quick <code>tcpdump -r</code>, before assuming the file is useless. Open it in the real
+      purpose. Stop the capture. Verify something actually got captured, with <code translate="no">capinfos</code>
+      or a quick <code translate="no">tcpdump -r</code>, before assuming the file is useless. Open it in the real
       Wireshark GUI. Apply a display filter or use Follow Stream to zoom into the part
       that matters. Read what's actually there and connect it back to the concept I was
       trying to demonstrate. Screenshot the evidence. That loop, repeated nine times
@@ -800,7 +801,7 @@
 <footer class="ftr">
   <div class="wrap ftr-grid">
     <div>
-      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
       <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
     </div>
     <nav aria-label="Site">
@@ -808,6 +809,7 @@
       <ul>
         <li><a href="/projects">projects</a></li>
         <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
         <li><a href="/#about">about</a></li>
         <li><a href="/privacy">privacy</a></li>
         <li><a href="/feed.xml">rss feed</a></li>
