@@ -5,8 +5,24 @@
   <link>https://breakfixlearn.com/</link>
   <description>CCNA lab walkthroughs, security write-ups, and Python network automation notes by Trey.</description>
   <language>en-ca</language>
-  <lastBuildDate>Mon, 28 Sep 2026 09:00:00 -0700</lastBuildDate>
+  <lastBuildDate>Tue, 29 Sep 2026 09:00:00 -0700</lastBuildDate>
   <atom:link href="https://breakfixlearn.com/feed.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>ShinyHunters Beat a WAF With One Percent Sign, and the FBI Found Out the Hard Way</title>
+    <link>https://breakfixlearn.com/blog/shinyhunters-peoplesoft-waf-bypass-cve-2026-35273</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/shinyhunters-peoplesoft-waf-bypass-cve-2026-35273.html</guid>
+    <pubDate>Tue, 29 Sep 2026 09:00:00 -0700</pubDate>
+    <category>NEWS</category>
+    <description>ShinyHunters revived a patched Oracle PeopleSoft zero-day, CVE-2026-35273, by encoding a single character in the vulnerable URL path so it slipped past WAF rules written to block the literal string. The technique hit the FBI&#x27;s own job application portals along with dozens of other organizations. A walk through exactly how /%50SEMHUB/ defeats a firewall, and why a patch would have stopped it from the start.</description>
+  </item>
+  <item>
+    <title>Two Citrix NetScaler Zero-Days Were Exploited for Weeks Before Anyone Outside Was Told</title>
+    <link>https://breakfixlearn.com/blog/citrix-netscaler-zero-day-cve-2026-88771-88772</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/citrix-netscaler-zero-day-cve-2026-88771-88772.html</guid>
+    <pubDate>Tue, 29 Sep 2026 09:00:00 -0700</pubDate>
+    <category>NEWS</category>
+    <description>CVE-2026-88771 and CVE-2026-88772 are unauthenticated remote code execution bugs in Citrix NetScaler ADC and Gateway, both CVSS 9.5, exploited by likely nation-state-aligned attackers for weeks before watchTowr&#x27;s honeypot network forced public disclosure ahead of Citrix&#x27;s own patch. Because exploitation predates the fix, patching is necessary but not sufficient. A walk through what these bugs do, why NetScaler is such a high-value target, and what to check before assuming a patch means you&#x27;re clean.</description>
+  </item>
   <item>
     <title>Wireshark 4.6.9: When the Tool You Trust to Read Traffic Has 19 Ways to Bite Back</title>
     <link>https://breakfixlearn.com/blog/wireshark-4-6-9-security-release-19-cves</link>
