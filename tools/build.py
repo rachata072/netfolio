@@ -64,7 +64,8 @@ def write(rel, content):
 
 
 def asset_hash(rel):
-    return hashlib.sha256((PUB / rel).read_bytes()).hexdigest()[:10]
+    # CRLF -> LF first: a Windows checkout and a Linux one must give the same ?v= hash
+    return hashlib.sha256((PUB / rel).read_bytes().replace(b"\r\n", b"\n")).hexdigest()[:10]
 
 
 def fmt_date(iso, long=False):
