@@ -174,12 +174,12 @@
               <text class="lbl" x="308" y="378">AD-LAB</text>
               <text class="sub" x="308" y="391">ws2022</text>
             </a>
-            <a href="/blog" aria-label="Blog: 21 write-ups">
+            <a href="/blog" aria-label="Blog: 23 write-ups">
               <rect class="dev" x="430" y="328" width="108" height="70" rx="4"/>
               <circle class="node-led" cx="527" cy="339" r="3"/>
               <path class="glyph" d="M444 338 h16 M444 344 h22 M444 350 h12 M444 356 h19"/>
               <text class="lbl" x="444" y="378">BLOG</text>
-              <text class="sub" x="444" y="391">21 logs</text>
+              <text class="sub" x="444" y="391">23 logs</text>
             </a>
 
           </svg>
@@ -249,12 +249,12 @@
               <text class="lbl" x="68" y="401">AD-LAB</text>
               <text class="sub" x="68" y="418">ws2022</text>
             </a>
-            <a href="/blog" aria-label="Blog: 21 write-ups">
+            <a href="/blog" aria-label="Blog: 23 write-ups">
               <rect class="dev" x="190" y="372" width="150" height="62" rx="4"/>
               <circle class="node-led" cx="329" cy="383" r="3.5"/>
               <path class="glyph" d="M204 389 h16 M204 395 h22 M204 401 h12 M204 407 h19"/>
               <text class="lbl" x="238" y="401">BLOG</text>
-              <text class="sub" x="238" y="418">21 logs</text>
+              <text class="sub" x="238" y="418">23 logs</text>
             </a>
           </svg>
           <figcaption class="console-foot" id="topo-cap">
@@ -339,7 +339,7 @@
         </div>
         <a class="more" href="/blog">show logging | full &rarr;</a>
       </div>
-      <div class="logs"><a class="logcard c-news" href="/blog/shinyhunters-peoplesoft-waf-bypass-cve-2026-35273"><span class="top"><span class="sev c-news">NEWS-2</span><time datetime="2026-09-29">Sep 29, 2026</time><span class="rt">&middot; 7 min</span></span><h3>ShinyHunters Beat a WAF With One Percent Sign, and the FBI Found Out the Hard Way</h3><p>ShinyHunters revived a patched Oracle PeopleSoft zero-day, CVE-2026-35273, by encoding a single character in the vulnerable URL path so it slipped past WAF rules written to block the literal string. The technique hit the FBI&#x27;s own job application portals along with dozens of other organizations. A walk through exactly how /%50SEMHUB/ defeats a firewall, and why a patch would have stopped it from the start.</p></a><a class="logcard c-news" href="/blog/citrix-netscaler-zero-day-cve-2026-88771-88772"><span class="top"><span class="sev c-news">NEWS-2</span><time datetime="2026-09-29">Sep 29, 2026</time><span class="rt">&middot; 7 min</span></span><h3>Two Citrix NetScaler Zero-Days Were Exploited for Weeks Before Anyone Outside Was Told</h3><p>CVE-2026-88771 and CVE-2026-88772 are unauthenticated remote code execution bugs in Citrix NetScaler ADC and Gateway, both CVSS 9.5, exploited by likely nation-state-aligned attackers for weeks before watchTowr&#x27;s honeypot network forced public disclosure ahead of Citrix&#x27;s own patch. Because exploitation predates the fix, patching is necessary but not sufficient. A walk through what these bugs do, why NetScaler is such a high-value target, and what to check before assuming a patch means you&#x27;re clean.</p></a><a class="logcard c-news" href="/blog/wireshark-4-6-9-security-release-19-cves"><span class="top"><span class="sev c-news">NEWS-2</span><time datetime="2026-09-28">Sep 28, 2026</time><span class="rt">&middot; 7 min</span></span><h3>Wireshark 4.6.9: When the Tool You Trust to Read Traffic Has 19 Ways to Bite Back</h3><p>Wireshark 4.6.9 and the parallel 4.4.19 release patch 19 CVE-numbered bugs, mostly dissector crashes and infinite loops, plus several code-execution bugs reported through Trend Micro&#x27;s Zero Day Initiative that do not have CVE numbers yet. A plain-language walk through what actually broke, why a passive-looking analysis tool has an attack surface in the first place, and what to check before opening your next capture.</p></a><a class="logcard c-news" href="/blog/sudo-cve-2026-96512-time-based-bypass"><span class="top"><span class="sev c-news">NEWS-2</span><time datetime="2026-09-27">Sep 27, 2026</time><span class="rt">&middot; 7 min</span></span><h3>The Sudo Bug That Turns Your Clock Against You: CVE-2026-96512</h3><p>CVE-2026-96512 lets an already-authenticated local user manipulate sudo&#x27;s TZ environment variable to shift its notion of time by roughly 25 hours, making expired NOTAFTER sudo rules look current or NOTBEFORE rules usable early. It only matters if your sudoers file uses time-bound rules without a trailing Z, and the fix for now is one character.</p></a></div>
+      <div class="logs"><a class="logcard c-sec" href="/blog/openclaw-nat64-ssrf-guard-bypass"><span class="top"><span class="sev c-sec">SEC-5</span><time datetime="2026-10-04">Oct 4, 2026</time><span class="rt">&middot; 8 min</span></span><h3>One IPv6 Address, Two Readings: How NAT64 Fooled OpenClaw&#x27;s SSRF Guard</h3><p>A write-up by researcher Anurag Mewar showed OpenClaw&#x27;s SSRF guard misreading an RFC 8215 NAT64 address: the guard saw a harmless public IP while a compliant NAT64 gateway routed the request to the cloud metadata address. A walk through the RFC 6052 byte layout behind the trick, a short Python demo of the two readings, and the habits that stop this class of bug.</p></a><a class="logcard c-ai" href="/blog/claude-code-mod-force-push-guard"><span class="top"><span class="sev c-ai">AI-3</span><time datetime="2026-10-04">Oct 4, 2026</time><span class="rt">&middot; 7 min</span></span><h3>Build a Claude Code Mod That Blocks Force Pushes, and Test It Offline</h3><p>A walk through building a small Claude Code mod that refuses git force pushes: the three-file layout, the rule, the validator and offline test runner, and a tested table of commands it blocks and the ones that slip past, plus why a protected branch on the server is the control that actually holds.</p></a><a class="logcard c-news" href="/blog/shinyhunters-peoplesoft-waf-bypass-cve-2026-35273"><span class="top"><span class="sev c-news">NEWS-2</span><time datetime="2026-09-29">Sep 29, 2026</time><span class="rt">&middot; 7 min</span></span><h3>ShinyHunters Beat a WAF With One Percent Sign, and the FBI Found Out the Hard Way</h3><p>ShinyHunters revived a patched Oracle PeopleSoft zero-day, CVE-2026-35273, by encoding a single character in the vulnerable URL path so it slipped past WAF rules written to block the literal string. The technique hit the FBI&#x27;s own job application portals along with dozens of other organizations. A walk through exactly how /%50SEMHUB/ defeats a firewall, and why a patch would have stopped it from the start.</p></a><a class="logcard c-news" href="/blog/citrix-netscaler-zero-day-cve-2026-88771-88772"><span class="top"><span class="sev c-news">NEWS-2</span><time datetime="2026-09-29">Sep 29, 2026</time><span class="rt">&middot; 7 min</span></span><h3>Two Citrix NetScaler Zero-Days Were Exploited for Weeks Before Anyone Outside Was Told</h3><p>CVE-2026-88771 and CVE-2026-88772 are unauthenticated remote code execution bugs in Citrix NetScaler ADC and Gateway, both CVSS 9.5, exploited by likely nation-state-aligned attackers for weeks before watchTowr&#x27;s honeypot network forced public disclosure ahead of Citrix&#x27;s own patch. Because exploitation predates the fix, patching is necessary but not sufficient. A walk through what these bugs do, why NetScaler is such a high-value target, and what to check before assuming a patch means you&#x27;re clean.</p></a></div>
     </div>
   </section>
 
@@ -366,7 +366,7 @@
           <a class="btn btn-sec" href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin <span aria-hidden="true">&#8599;</span></a>
         </div>
       </div>
-<pre class="runcfg" aria-label="Skills summary formatted as a router configuration"><span class="cm">! skills snapshot, last change Sep 29, 2026</span>
+<pre class="runcfg" aria-label="Skills summary formatted as a router configuration"><span class="cm">! skills snapshot, last change Oct 4, 2026</span>
 <span class="kw">hostname</span> <span class="va">trey</span>
 <span class="kw">certification</span> <span class="va">ccna</span> <span class="ok">active</span>
 <span class="kw">routing</span> <span class="va">ospf eigrp static</span>
@@ -410,7 +410,7 @@
   </div>
   <div class="wrap"><div class="ftr-base">
     <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
-    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 29, 2026 &middot; uptime: learning since 2024</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Oct 4, 2026 &middot; uptime: learning since 2024</span>
   </div></div>
 </footer>
 </body>

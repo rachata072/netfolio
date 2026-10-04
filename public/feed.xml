@@ -5,8 +5,24 @@
   <link>https://breakfixlearn.com/</link>
   <description>CCNA lab walkthroughs, security write-ups, and Python network automation notes by Trey.</description>
   <language>en-ca</language>
-  <lastBuildDate>Tue, 29 Sep 2026 09:00:00 -0700</lastBuildDate>
+  <lastBuildDate>Sun, 04 Oct 2026 09:00:00 -0700</lastBuildDate>
   <atom:link href="https://breakfixlearn.com/feed.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>One IPv6 Address, Two Readings: How NAT64 Fooled OpenClaw&#x27;s SSRF Guard</title>
+    <link>https://breakfixlearn.com/blog/openclaw-nat64-ssrf-guard-bypass</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/openclaw-nat64-ssrf-guard-bypass.html</guid>
+    <pubDate>Sun, 04 Oct 2026 09:00:00 -0700</pubDate>
+    <category>SEC</category>
+    <description>A write-up by researcher Anurag Mewar showed OpenClaw&#x27;s SSRF guard misreading an RFC 8215 NAT64 address: the guard saw a harmless public IP while a compliant NAT64 gateway routed the request to the cloud metadata address. A walk through the RFC 6052 byte layout behind the trick, a short Python demo of the two readings, and the habits that stop this class of bug.</description>
+  </item>
+  <item>
+    <title>Build a Claude Code Mod That Blocks Force Pushes, and Test It Offline</title>
+    <link>https://breakfixlearn.com/blog/claude-code-mod-force-push-guard</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/claude-code-mod-force-push-guard.html</guid>
+    <pubDate>Sun, 04 Oct 2026 09:00:00 -0700</pubDate>
+    <category>AI</category>
+    <description>A walk through building a small Claude Code mod that refuses git force pushes: the three-file layout, the rule, the validator and offline test runner, and a tested table of commands it blocks and the ones that slip past, plus why a protected branch on the server is the control that actually holds.</description>
+  </item>
   <item>
     <title>ShinyHunters Beat a WAF With One Percent Sign, and the FBI Found Out the Hard Way</title>
     <link>https://breakfixlearn.com/blog/shinyhunters-peoplesoft-waf-bypass-cve-2026-35273</link>
