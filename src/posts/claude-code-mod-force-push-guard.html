@@ -1,0 +1,254 @@
+<!--meta
+{
+  "title": "Build a Claude Code Mod That Blocks Force Pushes, and Test It Offline",
+  "seo_title": "Claude Code Mod Tutorial: Block git push --force",
+  "description": "Write a small Claude Code mod that refuses git push --force, validate it, and test it with no sign-in. Plus the commands it still misses and what really stops them.",
+  "og_description": "Claude Code mods run inside the tool itself, so a few lines can refuse a dangerous command before the shell sees it. Here is a force-push guard built from scratch, validated and tested offline, with an honest table of what it catches and what slips past.",
+  "summary": "A walk through building a small Claude Code mod that refuses git force pushes: the three-file layout, the rule, the validator and offline test runner, and a tested table of commands it blocks and the ones that slip past, plus why a protected branch on the server is the control that actually holds.",
+  "date": "2026-10-04",
+  "category": "ai",
+  "read_min": 7,
+  "tags": [
+    "Claude Code",
+    "AI Agents",
+    "Guardrails",
+    "Git",
+    "TypeScript",
+    "OWASP"
+  ],
+  "faq": [
+    [
+      "What is a Claude Code mod?",
+      "A mod is a plugin whose JavaScript or TypeScript functions run inside Claude Code's own process, instead of as separate shell commands. It can step into a tool call and allow or refuse it, add a slash command that answers without a model call, and change parts of the interface. Mods arrived in Claude Code 2.1.287, according to the write-up that inspired this post, and are on by default."
+    ],
+    [
+      "How is a mod different from a settings hook?",
+      "A settings hook starts a shell command, HTTP request, prompt or agent when an event fires and passes data back and forth as JSON. A mod is loaded once and stays loaded for the session, so its handlers can share variables, keep state and draw on screen. That in-process access is also why a mod deserves more suspicion than a one-line hook."
+    ],
+    [
+      "How do I check what a mod does before installing it?",
+      "Run claude plugin validate on the mod folder. It reads the manifest and the module source and prints which events the module hooks and which Claude Code APIs it calls, for example tool.call on the Bash tool and the command and toast calls. Reading the source is still the real check, because the listing shows what is called, not why."
+    ],
+    [
+      "Can I test a mod without signing in or calling a model?",
+      "Yes. claude plugin test runs every test file in the folder against the engine itself, in an environment with no network, file system or process access. My three tests for this guard ran in about a third of a second and needed no account."
+    ],
+    [
+      "Does the guard stop every force push?",
+      "No. It matches the text of the command, so it catches git push with --force, -f or a leading plus sign, including after && or a semicolon, but it misses a push wrapped in bash -c or built from a shell variable. Treat it as a guard against accidents. The control that actually holds is a protected branch on the server that rejects force pushes."
+    ],
+    [
+      "Why does a post about AI coding tools belong in a security blog?",
+      "Because an agent that can run shell commands has real authority over your repositories and machines. The OWASP Top 10 for LLM Applications (2025 edition) lists excessive agency as its own risk, and a small deny rule in front of the riskiest commands is a cheap way to reduce it. Layer it with permissions and server-side protections instead of relying on any one of them."
+    ]
+  ]
+}
+-->
+<p>
+  Claude Code can now be changed from the inside. A mod is a small plugin whose functions run in the
+  same process as the tool, and I wanted to try the smallest useful one: a rule that refuses
+  <code>git push --force</code> before the shell ever sees it. The idea came from a
+  <a href="https://pub.towardsai.net/how-to-build-a-claude-code-mod-50-lines-add-a-context-meter-and-a-force-push-guard-5aed1876e4f9" rel="noopener" target="_blank">write-up by Chew Loong Nian</a>
+  that builds a context meter and a force-push guard in about fifty lines. I wrote my own version from
+  scratch, ran it through the validator and the test runner on Claude Code 2.1.289, and noted what it
+  cannot catch, which turned out to be the most useful part.
+</p>
+
+<h2>What a mod is, and how it differs from a hook</h2>
+<p>
+  Claude Code already had settings hooks: a shell command, web request, prompt or agent that fires when
+  something happens and talks back through JSON. A mod is loaded once and stays loaded. Because its
+  handlers are ordinary functions inside the process, they can keep variables between events, answer a
+  slash command instantly without a model call, and redraw pieces of the interface. The two things I
+  used are the ones that matter for safety: a handler on <code>tool.call</code> that can return a
+  <code>deny</code> with a reason, and a registered command so I can ask the mod what it blocks.
+</p>
+<p>
+  The layout is three small pieces. A manifest at <code>.claude-plugin/plugin.json</code>, a
+  <code>hooks/hooks.json</code> that points at the module, and the module itself, which exports a
+  <code>register</code> function. Inside it, <code>on(event, matcher, hook)</code> adds a hook, and each
+  hook receives the engine, the event, and a <code>next</code> function that passes the call along to
+  whatever sits beneath. Return without calling <code>next</code> and you have answered the event
+  yourself.
+</p>
+
+<h2>The mod, in four small files</h2>
+<p>The manifest names it and points nothing else:</p>
+<pre><code>{ "name": "push-guard", "version": "0.1.0", "description": "Refuses git force pushes before the Bash tool runs them", "author": { "name": "breakfixlearn" } }</code></pre>
+<p>The hooks file lists the one module to load:</p>
+<pre><code>{ "modules": ["./register.ts"] }</code></pre>
+<p>
+  I kept the rule in its own file so it can be tested as a plain function. It splits the command line
+  on the usual separators, so a push chained after <code>&amp;&amp;</code> or a semicolon is still seen,
+  then looks for <code>git</code> followed by <code>push</code> and any force spelling after it:
+</p>
+<pre><code>// Split a shell line into the commands it chains, then look for a force push in each.
+const SEPARATORS = /&amp;&amp;|\|\||[;|\n]/
+
+export function isForcePush(line: string): boolean {
+  return line.split(SEPARATORS).some(part =&gt; {
+    const words = part.trim().split(/\s+/)
+    const push = words.findIndex((w, i) =&gt; w === 'git' &amp;&amp; words.slice(i + 1).includes('push'))
+    if (push === -1) return false
+    return words.slice(push).some(
+      w =&gt; w === '--force' || w === '-f' || /^-[a-zA-Z]*f[a-zA-Z]*$/.test(w) || w.startsWith('+'),
+    )
+  })
+}</code></pre>
+<p>
+  The module registers a <code>/push-guard</code> command at session start, answers it with a fixed
+  sentence, and puts a hook in front of the Bash tool. A force push gets a toast and a refusal the model
+  can read; everything else goes through <code>next</code> untouched:
+</p>
+<pre><code>import type { Register } from 'claude-code'
+
+import { isForcePush } from './rule'
+
+export const register: Register = on =&gt; {
+  on('session.start', async ($, e, next) =&gt; {
+    await $.command.register({
+      name: 'push-guard',
+      description: 'Explain what push-guard blocks',
+    })
+    return next(e)
+  })
+
+  on('command.run', { command: 'push-guard' }, async () =&gt; ({
+    text: 'push-guard refuses git push --force, -f and +refspec. --force-with-lease is allowed.',
+  }))
+
+  on('tool.call', { tool: 'Bash' }, ($, e, next) =&gt; {
+    if (!isForcePush(e.command)) return next(e)
+    $.ui.toast('push-guard blocked a force push')
+    return { deny: 'push-guard: force pushes are blocked here. Use --force-with-lease, or ask the user to run it.' }
+  })
+}</code></pre>
+<p>
+  I made one policy choice on purpose. <code>--force-with-lease</code> is allowed, because it refuses
+  to overwrite commits you have not seen, which makes it the safer habit rather than the dangerous one.
+  Change that if your team's rule is stricter.
+</p>
+
+<h2>Validate it, then test it with no sign-in</h2>
+<p>
+  <code>claude plugin validate</code> reads the manifest and the module the way the engine will and
+  reports what the module hooks and what it calls. For this mod it listed the session start hook, the
+  command hook, a <code>tool.call</code> hook on Bash, and exactly two calls: the command registration
+  and the toast. That listing is the part I would look at before installing anyone else's mod, since
+  it is a quick answer to what the code can touch. Mine also asked me to add author details, which I did.
+</p>
+<p>
+  <code>claude plugin test</code> runs the folder's test files against the engine in an environment
+  with no network, file system or process access, so no account or model is involved. I wrote three
+  tests: the rule flags the usual spellings, the rule leaves ordinary pushes and lookalikes such as
+  <code>git log -f</code> alone, and the Bash hook returns a refusal that mentions the guard.
+</p>
+<pre><code>import { describe, expect, test } from 'claude-code/testing'
+
+import { isForcePush } from './rule'
+
+describe('isForcePush', () =&gt; {
+  test('flags the usual spellings', async () =&gt; {
+    for (const line of [
+      'git push --force',
+      'git push -f origin main',
+      'git push origin +main',
+      'git status &amp;&amp; git push --force origin main',
+      'cd repo; git push -fu origin dev',
+    ]) expect(isForcePush(line)).toBe(true)
+  })
+
+  test('leaves ordinary pushes and lookalikes alone', async () =&gt; {
+    for (const line of [
+      'git push origin main',
+      'git push --force-with-lease origin main',
+      'git log --format=%h -f',
+      'echo "push -f is risky"',
+    ]) expect(isForcePush(line)).toBe(false)
+  })
+})
+
+describe('the Bash hook', () =&gt; {
+  test('denies a force push and says why', async $ =&gt; {
+    const ran = await $.tool.call({ tool: 'Bash', command: 'git push --force origin main' })
+    expect(ran.deny).toMatch(/force pushes are blocked/)
+  })
+})</code></pre>
+<p>
+  All three passed in about a third of a second. If you are newer to this kind of testing, it is the
+  same habit I try to follow in my own labs, and it is why
+  <a href="/blog/best-ai-tools-network-engineers-2026">I only let coding assistants near real gear after testing</a>:
+  check the behavior somewhere harmless first.
+</p>
+
+<h2>What this guard misses</h2>
+<p>
+  The rule reads the text of the command, so I tried it against a handful of inputs, including some meant
+  to dodge it. Here is what I got:
+</p>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">Command</th><th scope="col">Result</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name">git push --force origin main</td><td class="int-desc">Blocked</td></tr>
+      <tr><td class="int-name">git push origin main --force</td><td class="int-desc">Blocked</td></tr>
+      <tr><td class="int-name">git -C repo push --force</td><td class="int-desc">Blocked</td></tr>
+      <tr><td class="int-name">git push origin +main</td><td class="int-desc">Blocked (leading plus is a force)</td></tr>
+      <tr><td class="int-name">git push --force-with-lease</td><td class="int-desc">Allowed on purpose</td></tr>
+      <tr><td class="int-name">bash -c 'git push --force origin main'</td><td class="int-desc">Not caught, the quote hides the word git</td></tr>
+      <tr><td class="int-name">g=--force; git push $g</td><td class="int-desc">Not caught, the flag lives in a variable</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  That is the honest shape of a text-matching guard. It catches the accidental force push, the one a
+  tired person or a hurried model types in the normal way, and it does nothing against a command that
+  has been written to hide itself. If the real goal is that nobody can rewrite a shared branch, that
+  control belongs on the server, as a protected branch that rejects force pushes whatever the client
+  does. The mod is a seatbelt in front of the real barrier, and it is worth having for how cheap it is.
+</p>
+
+<h2>Why a security blog cares about this</h2>
+<p>
+  An agent that can run shell commands has real authority over your repositories and machines. The OWASP
+  Top 10 for LLM Applications (2025 edition) lists excessive agency as its own risk, and the usual
+  advice is to limit what the agent can do and to put a check in front of the dangerous actions. A mod
+  that denies a short list of commands is a small, readable way to do that, and it runs before the tool
+  does rather than after.
+</p>
+<p>
+  The same property cuts the other way. A mod is code that runs with Claude Code's own access on your
+  machine, written by whoever published it. One getting-started guide I read tells people to read the
+  repo first and install only from authors they trust, which is the right instinct and the same one you
+  would apply to any package. Run <code>claude plugin validate</code> to see what a mod calls, read the
+  source, and prefer a rule you wrote yourself over a stranger's. Fifty lines you understand beat five
+  hundred you do not.
+</p>
+
+<h2>Frequently asked questions</h2>
+<h3>What is a Claude Code mod?</h3>
+<p>
+  A mod is a plugin whose JavaScript or TypeScript functions run inside Claude Code's own process, instead of as separate shell commands. It can step into a tool call and allow or refuse it, add a slash command that answers without a model call, and change parts of the interface. Mods arrived in Claude Code 2.1.287, according to the write-up that inspired this post, and are on by default.
+</p>
+<h3>How is a mod different from a settings hook?</h3>
+<p>
+  A settings hook starts a shell command, HTTP request, prompt or agent when an event fires and passes data back and forth as JSON. A mod is loaded once and stays loaded for the session, so its handlers can share variables, keep state and draw on screen. That in-process access is also why a mod deserves more suspicion than a one-line hook.
+</p>
+<h3>How do I check what a mod does before installing it?</h3>
+<p>
+  Run claude plugin validate on the mod folder. It reads the manifest and the module source and prints which events the module hooks and which Claude Code APIs it calls, for example tool.call on the Bash tool and the command and toast calls. Reading the source is still the real check, because the listing shows what is called, not why.
+</p>
+<h3>Can I test a mod without signing in or calling a model?</h3>
+<p>
+  Yes. claude plugin test runs every test file in the folder against the engine itself, in an environment with no network, file system or process access. My three tests for this guard ran in about a third of a second and needed no account.
+</p>
+<h3>Does the guard stop every force push?</h3>
+<p>
+  No. It matches the text of the command, so it catches git push with --force, -f or a leading plus sign, including after &amp;&amp; or a semicolon, but it misses a push wrapped in bash -c or built from a shell variable. Treat it as a guard against accidents. The control that actually holds is a protected branch on the server that rejects force pushes.
+</p>
+<h3>Why does a post about AI coding tools belong in a security blog?</h3>
+<p>
+  Because an agent that can run shell commands has real authority over your repositories and machines. The OWASP Top 10 for LLM Applications (2025 edition) lists excessive agency as its own risk, and a small deny rule in front of the riskiest commands is a cheap way to reduce it. Layer it with permissions and server-side protections instead of relying on any one of them.
+</p>

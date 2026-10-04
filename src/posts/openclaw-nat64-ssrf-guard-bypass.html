@@ -1,0 +1,207 @@
+<!--meta
+{
+  "title": "One IPv6 Address, Two Readings: How NAT64 Fooled OpenClaw's SSRF Guard",
+  "seo_title": "NAT64 SSRF Bypass in OpenClaw Explained (RFC 8215)",
+  "description": "A crafted NAT64 address made OpenClaw's SSRF guard see 8.8.8.8 while the network routed to 169.254.169.254. Here is how RFC 8215 makes that possible, with Python.",
+  "og_description": "An SSRF guard checked the last 32 bits of an IPv6 address. The router read a different 32 bits. That mismatch, hidden inside the NAT64 spec, was enough to point an AI assistant at cloud metadata. Here is the byte layout, a Python demo, and what to do about it.",
+  "summary": "A write-up by researcher Anurag Mewar showed OpenClaw's SSRF guard misreading an RFC 8215 NAT64 address: the guard saw a harmless public IP while a compliant NAT64 gateway routed the request to the cloud metadata address. A walk through the RFC 6052 byte layout behind the trick, a short Python demo of the two readings, and the habits that stop this class of bug.",
+  "date": "2026-10-04",
+  "category": "sec",
+  "read_min": 8,
+  "tags": ["SSRF", "NAT64", "IPv6", "OpenClaw", "Python", "Cloud Metadata"],
+  "faq": [
+    [
+      "What is an SSRF vulnerability?",
+      "Server-side request forgery is when an attacker gets a server to make a network request on their behalf, usually to somewhere the attacker cannot reach directly, such as an internal service or a cloud metadata endpoint. Applications that fetch URLs or download media for users are the classic place for it, so they normally add a guard that refuses to connect to private or internal addresses."
+    ],
+    [
+      "What is NAT64 and why does it have its own IPv6 prefix?",
+      "NAT64 lets IPv6-only clients reach IPv4-only servers. A gateway translates between the two, and the IPv4 destination is embedded inside an IPv6 address under a reserved prefix. The well-known prefix is 64:ff9b::/96, where the IPv4 address sits in the last 32 bits, and RFC 8215 added a local-use prefix, 64:ff9b:1::/48, for networks that want their own translation range."
+    ],
+    [
+      "Why did the SSRF guard get this wrong?",
+      "According to the write-up, the guard decoded both NAT64 prefixes the same way, by reading the trailing 32 bits of the address. That is correct for the /96 prefix but wrong for the /48 prefix, where RFC 6052 spreads the IPv4 address across two separate chunks of bits and tells routers to ignore the bits at the end. An attacker can put the real target in the chunks the router reads and a harmless public address in the trailing bits the guard reads."
+    ],
+    [
+      "Does this affect every OpenClaw install?",
+      "No. The write-up says exploitation needs an RFC 8215 NAT64 gateway on the victim's network and an authenticated user, and it lists beta builds 2026.7.2-beta.1 through 2026.8.1-beta.2 as affected, with the fix shipped in v2026.8.1. The write-up does not cite a CVE number, and I did not find one for this specific bypass, so check the project's own release notes for your version."
+    ],
+    [
+      "Is this the first time this guard had IPv6 problems?",
+      "No. Earlier public advisories covered other IPv6 forms the guard missed, including a bypass through IPv6 special-use ranges fixed in 2026.3.28 (CVE-2026-41361, CVSS 5.1) and one through full-form IPv4-mapped IPv6 addresses. The pattern is common: IPv6 has many ways to write the same destination, and a blocklist has to understand all of them."
+    ],
+    [
+      "How do I stop this class of bug in my own code?",
+      "Validate the address you actually connect to, not a string you parsed beforehand, and do it at the socket or egress layer where possible. If you do not run NAT64, block both NAT64 prefixes outright. Add network-level controls too, such as egress filtering and requiring session tokens for cloud metadata, so one parsing mistake does not hand over credentials."
+    ]
+  ]
+}
+-->
+<p>
+  Most SSRF filters are a list of things you must not connect to: loopback, the private ranges, the
+  link-local block, the cloud metadata address. A researcher named Anurag Mewar showed that you can
+  walk past that kind of list without ever writing a forbidden address, by handing the filter an
+  IPv6 address that says one thing to the code checking it and another thing to the network
+  carrying it. His
+  <a href="https://medium.com/bugbountywriteup/how-i-tricked-openclaw-into-attacking-its-own-network-a-nat64-ssrf-bypass-9b93a7f11cd9" rel="noopener" target="_blank">write-up of the bypass in OpenClaw</a>
+  is a good excuse to look at something CCNA material only brushes past: how NAT64 actually hides
+  an IPv4 address inside an IPv6 one.
+</p>
+
+<h2>The setup: an AI assistant that fetches things for you</h2>
+<p>
+  OpenClaw is an AI assistant platform that runs on a user's own machine or endpoint and can fetch
+  URLs and download media on request. That makes it an always-on gateway sitting inside a trusted
+  network, which is exactly the shape of program where server-side request forgery matters. If a
+  user, or a prompt, can make it fetch an arbitrary address, then it can be pointed at things the
+  outside world should never reach, and the usual prize is the cloud metadata service at
+  <code>169.254.169.254</code>, which can hand out credentials to whatever instance asks.
+</p>
+<p>
+  So OpenClaw has a guard. It resolves the destination, inspects the resulting IP, and refuses to
+  connect if the address is private, loopback, link-local, or a metadata endpoint. Because IPv6 can
+  wrap an IPv4 address inside it, the guard also unwraps embedded addresses from the IPv6 transition
+  formats and checks the inner IPv4 the same way. That unwrapping step is where the story goes wrong.
+</p>
+
+<h2>NAT64 in one paragraph, and the part the spec makes awkward</h2>
+<p>
+  NAT64 lets an IPv6-only client talk to an IPv4-only server. A gateway sits in the middle and
+  translates, and the IPv4 destination travels inside an IPv6 address under a reserved prefix. The
+  easy version is the well-known prefix <code>64:ff9b::/96</code> from
+  <a href="https://www.rfc-editor.org/rfc/rfc6052" rel="noopener" target="_blank">RFC 6052</a>: the
+  IPv4 address is simply the last 32 bits. If you can read an IPv4 address off the tail of an IPv6
+  address, you have decoded it.
+</p>
+<p>
+  <a href="https://www.rfc-editor.org/rfc/rfc8215" rel="noopener" target="_blank">RFC 8215</a> added a
+  second, local-use prefix, <code>64:ff9b:1::/48</code>, so a network can run its own translation
+  range. A /48 prefix leaves only 80 bits for the rest of the address, and RFC 6052 has a fixed way of
+  fitting an IPv4 address into that space. The four IPv4 octets are split into two pairs. Bits 48 to
+  63 carry the first two octets, bits 64 to 71 are a reserved zero byte, bits 72 to 87 carry the last
+  two octets, and everything after bit 87 is a suffix that a compliant gateway ignores. The IPv4
+  address is not at the end anymore, and the end is not even read.
+</p>
+
+<h2>Two readings of the same address</h2>
+<p>
+  According to the write-up, the guard's helper treated both prefixes as the same thing and always
+  read the trailing 32 bits. For the /96 prefix that is correct. For the /48 prefix it reads bytes the
+  gateway throws away. So an attacker builds an address where the real destination sits in the
+  positions the gateway reads, and a harmless public address sits in the trailing positions the guard
+  reads. The example in the write-up is <code>64:ff9b:1:a9fe:a9:fe00:808:808</code>.
+</p>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">Who is reading</th><th scope="col">Which bits</th><th scope="col">Sees</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name">SSRF guard (trailing 32 bits)</td><td class="int-desc">Last two groups, 0808:0808</td><td class="int-desc">8.8.8.8, looks harmless</td></tr>
+      <tr><td class="int-name">RFC 6052 /48 gateway</td><td class="int-desc">a9fe, then a9 and fe after the reserved byte</td><td class="int-desc">169.254.169.254, the metadata address</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  I like this one because you can check it yourself in a few lines of Python with the standard
+  library, the same <code>ipaddress</code> module I leaned on in the
+  <a href="/blog/vlsm-subnet-calculator-python-tool">VLSM subnet calculator</a>. I ran this against the
+  example address from the write-up:
+</p>
+<pre><code>import ipaddress
+
+addr = ipaddress.IPv6Address("64:ff9b:1:a9fe:a9:fe00:808:808")
+b = addr.packed
+
+# what a naive guard reads: the last 32 bits
+print(ipaddress.IPv4Address(b[12:16]))                          # 8.8.8.8
+
+# what an RFC 6052 /48 gateway reads: bytes 6-7, skip byte 8, bytes 9-10
+print(ipaddress.IPv4Address(bytes([b[6], b[7], b[9], b[10]])))  # 169.254.169.254</code></pre>
+<p>
+  Same sixteen bytes, two different answers. The guard approves the connection because it believes the
+  destination is a public DNS server. The network then delivers it somewhere very different.
+</p>
+
+<h2>What it took, and what it was fixed in</h2>
+<p>
+  This is not a drive-by bug, and the write-up is straightforward about that. Exploitation needs an
+  RFC 8215 NAT64 gateway on the victim's network, because without one the address goes nowhere
+  useful, and the attacker has to be an authenticated user who can trigger a fetch or a media
+  download. When those conditions hold, the guard that exists specifically to stop internal requests
+  can be steered at internal infrastructure and cloud metadata anyway.
+</p>
+<p>
+  The write-up lists beta builds from 2026.7.2-beta.1 through 2026.8.1-beta.2 as affected, says the
+  exact stable versions were still being clarified when it was published on September 12, 2026, and
+  names v2026.8.1 and later as the fixed releases. It does not cite a CVE number and I did not find
+  one for this specific bypass, so treat the release notes as the authority on your version.
+  This was also not the guard's first IPv6 stumble. An earlier advisory,
+  CVE-2026-41361 (CVSS 5.1), covered IPv6 special-use ranges the guard failed to block and was fixed in
+  2026.3.28, and another covered full-form IPv4-mapped IPv6 addresses. IPv6 offers many ways to write
+  one destination, and a blocklist only works if it understands all of them.
+</p>
+
+<h2>What to take from it for your own code and lab</h2>
+<p>
+  The general lesson is to stop trusting the answer you computed before connecting. A guard that
+  parses an address and a network stack that routes it are two different programs with two different
+  ideas of what the address means, and the attacker lives in the gap. Where you can, validate the
+  address the socket actually connected to, or enforce the rule outside the application with an egress
+  proxy or firewall policy that does not parse strings at all. If you do not run NAT64, block both
+  NAT64 prefixes outright instead of trying to decode them. And do not let one filter be the only
+  thing between a fetch feature and your cloud credentials: egress filtering and a metadata service
+  that demands a session token mean one parsing mistake is not game over.
+</p>
+<p>
+  For anyone studying for the CCNA, it is a nice reminder that IPv6 transition mechanisms are not
+  just exam trivia. NAT64, 6to4, Teredo and IPv4-mapped addresses are all ways of tucking an IPv4
+  address inside an IPv6 one, and every one of them is a place where two implementations can disagree.
+  If you are building a lab, try the Python above on a few formats and see how many different
+  addresses decode to the same place.
+</p>
+
+<h2>Frequently asked questions</h2>
+<h3>What is an SSRF vulnerability?</h3>
+<p>
+  Server-side request forgery is when an attacker gets a server to make a network request on their
+  behalf, usually to somewhere the attacker cannot reach directly, such as an internal service or a
+  cloud metadata endpoint. Applications that fetch URLs or download media for users are the classic
+  place for it, so they normally add a guard that refuses to connect to private or internal addresses.
+</p>
+<h3>What is NAT64 and why does it have its own IPv6 prefix?</h3>
+<p>
+  NAT64 lets IPv6-only clients reach IPv4-only servers. A gateway translates between the two, and the
+  IPv4 destination is embedded inside an IPv6 address under a reserved prefix. The well-known prefix
+  is 64:ff9b::/96, where the IPv4 address sits in the last 32 bits, and RFC 8215 added a local-use
+  prefix, 64:ff9b:1::/48, for networks that want their own translation range.
+</p>
+<h3>Why did the SSRF guard get this wrong?</h3>
+<p>
+  According to the write-up, the guard decoded both NAT64 prefixes the same way, by reading the
+  trailing 32 bits of the address. That is correct for the /96 prefix but wrong for the /48 prefix,
+  where RFC 6052 spreads the IPv4 address across two separate chunks of bits and tells routers to
+  ignore the bits at the end. An attacker can put the real target in the chunks the router reads and
+  a harmless public address in the trailing bits the guard reads.
+</p>
+<h3>Does this affect every OpenClaw install?</h3>
+<p>
+  No. The write-up says exploitation needs an RFC 8215 NAT64 gateway on the victim's network and an
+  authenticated user, and it lists beta builds 2026.7.2-beta.1 through 2026.8.1-beta.2 as affected,
+  with the fix shipped in v2026.8.1. The write-up does not cite a CVE number, and I did not find one
+  for this specific bypass, so check the project's own release notes for your version.
+</p>
+<h3>Is this the first time this guard had IPv6 problems?</h3>
+<p>
+  No. Earlier public advisories covered other IPv6 forms the guard missed, including a bypass through
+  IPv6 special-use ranges fixed in 2026.3.28 (CVE-2026-41361, CVSS 5.1) and one through full-form
+  IPv4-mapped IPv6 addresses. The pattern is common: IPv6 has many ways to write the same
+  destination, and a blocklist has to understand all of them.
+</p>
+<h3>How do I stop this class of bug in my own code?</h3>
+<p>
+  Validate the address you actually connect to, not a string you parsed beforehand, and do it at the
+  socket or egress layer where possible. If you do not run NAT64, block both NAT64 prefixes outright.
+  Add network-level controls too, such as egress filtering and requiring session tokens for cloud
+  metadata, so one parsing mistake does not hand over credentials.
+</p>
