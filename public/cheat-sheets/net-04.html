@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NET-04 IPv6 essentials Cheat Sheet (PDF) | breakfixlearn</title>
+<meta name="description" content="Free one-page IPv6 cheat sheet: address anatomy, shortening rules, address types, Neighbor Discovery, SLAAC, Cisco IOS commands. PDF (Letter, A4) and image.">
+<link rel="canonical" href="https://breakfixlearn.com/cheat-sheets/net-04">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=59472e0728">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="IPv6 essentials cheat sheet (NET-04)">
+<meta property="og:description" content="IPv6 address anatomy and shortening rules, address types, Neighbor Discovery, SLAAC and EUI-64, IPv4 differences, Cisco commands and security basics.">
+<meta property="og:url" content="https://breakfixlearn.com/cheat-sheets/net-04">
+<meta property="og:image" content="https://breakfixlearn.com/cheat-sheets/files/bfl-net-04-ipv6_v1.0_social.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="NET-04 IPv6 essentials cheat sheet preview">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"NET-04 IPv6 essentials cheat sheet","description":"Free one-page IPv6 cheat sheet: address anatomy, shortening rules, address types, Neighbor Discovery, SLAAC, Cisco IOS commands. PDF (Letter, A4) and image.","url":"https://breakfixlearn.com/cheat-sheets/net-04","learningResourceType":"Cheat sheet","educationalLevel":"Beginner","teaches":"IPv6 essentials","keywords":"IPv6, SLAAC, Neighbor Discovery, EUI-64, Cisco IOS","inLanguage":"en","isAccessibleForFree":true,"license":"https://creativecommons.org/licenses/by-nc/4.0/","version":"1.0","datePublished":"2026-10-03","dateModified":"2026-10-03","image":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-04-ipv6_v1.0_social.webp","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"encoding":[{"@type":"MediaObject","name":"NET-04 IPv6 essentials (US Letter)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-04-ipv6_v1.0_print-letter.pdf","encodingFormat":"application/pdf","contentSize":"205 KB","sha256":"8db8ac253eb810fea2ea5aecdb274d6da8236a5550a979dbcd58e6072135b640"},{"@type":"MediaObject","name":"NET-04 IPv6 essentials (A4)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-04-ipv6_v1.0_print-a4.pdf","encodingFormat":"application/pdf","contentSize":"187 KB","sha256":"22ebb660bd68e32beecba866b0a659acbf78116899321f900efcca647ec57f89"},{"@type":"MediaObject","name":"NET-04 IPv6 essentials (Screen)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-04-ipv6_v1.0_web.pdf","encodingFormat":"application/pdf","contentSize":"188 KB","sha256":"141f4261f8b238f1399f7d3ff0aa5e07df80ad80bc02dcdf0c285c967dcc15d2"},{"@type":"MediaObject","name":"NET-04 IPv6 essentials (Hi-res image)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-04-ipv6_v1.0_full.webp","encodingFormat":"image/webp","contentSize":"598 KB","sha256":"cf2394defdf193a9376a9a793841af704aed7420ebc8f6870bcffbced23bee73"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Cheat sheets","item":"https://breakfixlearn.com/cheat-sheets"},{"@type":"ListItem","position":3,"name":"NET-04 IPv6 essentials"}]}</script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article class="sheet">
+  <header class="post-head sheet-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/cheat-sheets">cheat-sheets</a><span aria-hidden="true">/</span><a href="/cheat-sheets#networking">net</a></nav>
+      <p class="scard-meta"><span class="sid k-networking">NET-04</span><span>Networking</span></p>
+      <h1>IPv6 essentials</h1>
+      <p class="post-dek"><b>Use this when:</b> you read, shorten or configure an IPv6 address, or need to know which type it is and how it was assigned.</p>
+      <div class="post-meta"><span>CCNA 200-301 topics 1.8 and 1.9</span><span class="sep">/</span><span>v1.0</span><span class="sep">/</span><time datetime="2026-10-03">Oct 3, 2026</time><span class="sep">/</span><span>1 page</span><span class="sep">/</span><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license noopener" target="_blank">CC BY-NC 4.0</a></div>
+    </div>
+  </header>
+  <div class="wrap sheet-grid">
+    <figure class="sheet-paper">
+      <a href="/cheat-sheets/files/bfl-net-04-ipv6_v1.0_full.webp" aria-label="Open the full-size NET-04 image (2550 by 3300 pixels)">
+        <img src="/cheat-sheets/files/bfl-net-04-ipv6_v1.0_web.webp" srcset="/cheat-sheets/files/bfl-net-04-ipv6_v1.0_web.webp 1200w, /cheat-sheets/files/bfl-net-04-ipv6_v1.0_full.webp 2550w" sizes="(max-width: 60rem) calc(100vw - 2rem), 46rem"
+             width="1200" height="1553" fetchpriority="high" decoding="async"
+             alt="NET-04 IPv6 essentials cheat sheet. Every table on it is repeated as text below.">
+      </a>
+      <figcaption>Tap the sheet for the full-size image. The <a href="#text-version">text version</a> below is screen-reader friendly.</figcaption>
+    </figure>
+    <aside class="sheet-side" aria-labelledby="dl-h">
+      <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">copy</span> <span class="a">net-04 flash:</span></span>
+      <h2 id="dl-h" class="side-h">Download</h2>
+      <ul class="dl-list"><li><a class="dl dl-pri" href="/cheat-sheets/files/bfl-net-04-ipv6_v1.0_print-letter.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>US Letter</b><span class="dl-m">print &middot; 205 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-net-04-ipv6_v1.0_print-a4.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>A4</b><span class="dl-m">print &middot; 187 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-net-04-ipv6_v1.0_web.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>Screen</b><span class="dl-m">links work &middot; 188 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-net-04-ipv6_v1.0_full.webp" download><span class="dl-k">WebP</span><span class="dl-t"><b>Hi-res image</b><span class="dl-m">2550 &times; 3300 &middot; 598 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li></ul>
+      <p class="dl-open"><a href="/cheat-sheets/files/bfl-net-04-ipv6_v1.0_web.pdf">Open the PDF in your browser</a> instead of downloading it.</p>
+      <details class="sums">
+        <summary>Verify your download (SHA-256)</summary>
+        <div class="tbl"><table class="sheet-files"><thead><tr><th scope="col">File</th><th scope="col">SHA-256</th></tr></thead><tbody><tr><td translate="no">bfl-net-04-ipv6_v1.0_web.pdf</td><td translate="no">141f4261f8b238f1399f7d3ff0aa5e07df80ad80bc02dcdf0c285c967dcc15d2</td></tr><tr><td translate="no">bfl-net-04-ipv6_v1.0_print-letter.pdf</td><td translate="no">8db8ac253eb810fea2ea5aecdb274d6da8236a5550a979dbcd58e6072135b640</td></tr><tr><td translate="no">bfl-net-04-ipv6_v1.0_print-a4.pdf</td><td translate="no">22ebb660bd68e32beecba866b0a659acbf78116899321f900efcca647ec57f89</td></tr><tr><td translate="no">bfl-net-04-ipv6_v1.0_full.webp</td><td translate="no">cf2394defdf193a9376a9a793841af704aed7420ebc8f6870bcffbced23bee73</td></tr></tbody></table></div>
+        <p>Compare the hash with the one printed by
+          <code translate="no">Get-FileHash .\file.pdf -Algorithm SHA256</code> (PowerShell) or
+          <code translate="no">sha256sum file.pdf</code> (Linux, macOS: <code translate="no">shasum -a 256</code>). Different hash, different file: delete it.</p>
+      </details>
+      <p class="side-note">Free for personal and classroom use under CC BY-NC 4.0. Keep the credit line; don't sell it. Spotted a mistake? <a href="mailto:treyrct858@gmail.com?subject=NET-04%20v1.0%20correction">Email a correction</a>.</p>
+    </aside>
+  </div>
+  <section class="wrap sheet-text" aria-labelledby="text-version">
+    <div class="prose">
+      <h2 id="text-version">Text version</h2>
+      <p>Everything on the sheet, as plain HTML: handy for screen readers, copy-paste and search.</p>
+<h3 id="anatomy">Anatomy of an address</h3>
+<p>An IPv6 address is 128 bits written as 8 groups of hex. Example: <code translate="no">2001:db8:acad:1::10/64</code>, which expands to <code translate="no">2001:0db8:acad:0001:0000:0000:0000:0010</code>.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Part</th><th scope="col">Size</th><th scope="col">In the example</th><th scope="col">Set by</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Global routing prefix</th><td>48 bits</td><td>2001:0db8:acad</td><td>Your ISP or RIR</td></tr>
+    <tr><th scope="row">Subnet ID</th><td>16 bits</td><td>0001</td><td>You (65,536 LANs)</td></tr>
+    <tr><th scope="row">Interface ID</th><td>64 bits</td><td>0000:0000:0000:0010</td><td>Host: SLAAC, EUI-64 or manual</td></tr>
+  </tbody>
+</table></div>
+<p><b>Shorten it (RFC 5952):</b> drop leading zeros in each group, then replace the longest run of all-zero groups with <code translate="no">::</code>. Use <code translate="no">::</code> once only, never for a single zero group, and write hex in lowercase. The example becomes <code translate="no">2001:db8:acad:1::10</code>.</p>
+
+<h3 id="types">Address types</h3>
+<p>IPv6 has no broadcast. Multicast does that job.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Prefix</th><th scope="col">Type</th><th scope="col">Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code translate="no">2000::/3</code></td><th scope="row">Global unicast</th><td>Routable on the internet</td></tr>
+    <tr><td><code translate="no">fe80::/10</code></td><th scope="row">Link-local</th><td>One link only; every interface has one</td></tr>
+    <tr><td><code translate="no">fc00::/7</code></td><th scope="row">Unique local</th><td>Private; in practice <code translate="no">fd00::/8</code></td></tr>
+    <tr><td><code translate="no">ff00::/8</code></td><th scope="row">Multicast</th><td>One to many; replaces broadcast</td></tr>
+    <tr><td><code translate="no">::1/128</code></td><th scope="row">Loopback</th><td>This host (<code translate="no">::/128</code> means no address yet)</td></tr>
+    <tr><td><code translate="no">2001:db8::/32</code></td><th scope="row">Documentation</th><td>Use in examples, never on a live network</td></tr>
+  </tbody>
+</table></div>
+<p>Useful multicast groups: <code translate="no">ff02::1</code> all nodes, <code translate="no">ff02::2</code> all routers, and <code translate="no">ff02::1:ffXX:XXXX</code> solicited-node.</p>
+
+<h3 id="nd">Neighbor Discovery (replaces ARP)</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">ICMPv6 type</th><th scope="col">Message</th><th scope="col">Purpose</th></tr></thead>
+  <tbody>
+    <tr><td>133</td><th scope="row">Router Solicitation (RS)</th><td>Host asks for routers</td></tr>
+    <tr><td>134</td><th scope="row">Router Advertisement (RA)</th><td>Router announces prefix and gateway</td></tr>
+    <tr><td>135</td><th scope="row">Neighbor Solicitation (NS)</th><td>"Who has this address?"</td></tr>
+    <tr><td>136</td><th scope="row">Neighbor Advertisement (NA)</th><td>"I do, here is my MAC"</td></tr>
+    <tr><td>137</td><th scope="row">Redirect</th><td>Router names a better first hop</td></tr>
+  </tbody>
+</table></div>
+<p>NS and NA do the job of ARP and also find duplicate addresses. Every ND message uses hop limit 255, so messages from off-link senders are ignored.</p>
+
+<h3 id="assign">How a host gets its address</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Method</th><th scope="col">How it works</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">SLAAC</th><td>The host builds its interface ID from the RA prefix. Needs a /64.</td></tr>
+    <tr><th scope="row">DHCPv6</th><td>Stateless adds DNS and options; stateful assigns the address.</td></tr>
+    <tr><th scope="row">EUI-64</th><td>Flip bit 7 of the MAC and insert <code translate="no">fffe</code> in the middle.</td></tr>
+  </tbody>
+</table></div>
+<p>Example: MAC <code translate="no">00:00:5e:00:53:01</code> becomes interface ID <code translate="no">0200:5eff:fe00:5301</code>, so the link-local address is <code translate="no">fe80::200:5eff:fe00:5301</code>.</p>
+
+<h3 id="vs-ipv4">IPv4 vs IPv6</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col"></th><th scope="col">IPv4</th><th scope="col">IPv6</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Address</th><td>32 bits, dotted decimal</td><td>128 bits, hex</td></tr>
+    <tr><th scope="row">Header</th><td>20 bytes or more, with checksum</td><td>40 bytes fixed, no checksum</td></tr>
+    <tr><th scope="row">Fragmenting</th><td>Routers can</td><td>Source only (minimum link MTU 1280)</td></tr>
+    <tr><th scope="row">NAT</th><td>Common</td><td>Not needed; use a firewall</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="config">Configure and check</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code translate="no">ipv6 unicast-routing</code></td><td>Turn on IPv6 routing on the router</td></tr>
+    <tr><td><code translate="no">ipv6 address 2001:db8:acad:1::1/64</code></td><td>Static address</td></tr>
+    <tr><td><code translate="no">ipv6 address 2001:db8:acad:1::/64 eui-64</code></td><td>Prefix plus EUI-64 interface ID</td></tr>
+    <tr><td><code translate="no">ipv6 route ::/0 2001:db8:acad:1::2</code></td><td>Default route</td></tr>
+    <tr><td><code translate="no">show ipv6 interface brief</code></td><td>Addresses and up/up status</td></tr>
+    <tr><td><code translate="no">show ipv6 route</code>, <code translate="no">show ipv6 neighbors</code></td><td>Routing table, ND cache</td></tr>
+    <tr><td><code translate="no">ping -6</code>, <code translate="no">ipconfig</code>, <code translate="no">ip -6 addr</code></td><td>Windows, Windows, Linux</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="secure">Secure it</h3>
+<p class="note note-caution"><b>Danger.</b> A rogue Router Advertisement can hijack every host on the LAN. Enable RA Guard on access ports.</p>
+<p class="note note-caution"><b>Caution.</b> Never block all ICMPv6. Types 133 to 136 and Packet Too Big must pass, or addressing and paths break.</p>
+<p class="note note-caution"><b>Caution.</b> IPv6 is on by default. Firewall rules must cover it too.</p>
+
+<h3 id="remember">Remember</h3>
+<ul>
+  <li>/64 per LAN, /48 or /56 per site</li>
+  <li><code translate="no">fe80::</code> is on every interface</li>
+  <li><code translate="no">::</code> only once per address</li>
+</ul>
+      <h3>Sources</h3>
+      <ul><li><a href="https://www.rfc-editor.org/rfc/rfc4291" rel="noopener" target="_blank">RFC 4291, IPv6 addressing architecture</a></li><li><a href="https://www.rfc-editor.org/rfc/rfc5952" rel="noopener" target="_blank">RFC 5952, IPv6 address text representation</a></li><li><a href="https://www.rfc-editor.org/rfc/rfc4861" rel="noopener" target="_blank">RFC 4861, Neighbor Discovery for IPv6</a></li><li><a href="https://www.rfc-editor.org/rfc/rfc4193" rel="noopener" target="_blank">RFC 4193, unique local IPv6 unicast addresses</a></li><li><a href="https://www.rfc-editor.org/rfc/rfc3849" rel="noopener" target="_blank">RFC 3849, IPv6 documentation prefix</a></li><li><a href="https://www.rfc-editor.org/rfc/rfc8200" rel="noopener" target="_blank">RFC 8200, IPv6 specification</a></li><li><a href="https://www.rfc-editor.org/rfc/rfc4890" rel="noopener" target="_blank">RFC 4890, filtering ICMPv6 messages</a></li><li><a href="https://www.rfc-editor.org/rfc/rfc6105" rel="noopener" target="_blank">RFC 6105, IPv6 Router Advertisement Guard</a></li><li><a href="https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/ipv6_basic/configuration/xe-16/ip6b-xe-16-book/ip6-add-basic-conn-xe.html" rel="noopener" target="_blank">Cisco IOS XE, IPv6 basic connectivity</a></li></ul>
+      <h3>Go deeper on the blog</h3><ul><li><a href="/blog/vlsm-subnet-calculator-python-tool">I Kept Getting VLSM Wrong By Hand, So I Wrote a Tool That Can&#x27;t</a></li></ul>
+    </div>
+    <nav class="nexthop" aria-label="More cheat sheets"><a class="prev" href="/cheat-sheets/net-03"><span class="k">&larr; previous sheet</span>NET-03 IPv4 subnetting &amp; VLSM</a><a class="next" href="/cheat-sheets/sec-01"><span class="k">next sheet &rarr;</span>SEC-01 Security fundamentals &amp; key terms</a></nav>
+  </section>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 29, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!--
+  Text version of NET-04, shown under the sheet image on /cheat-sheets/net-04.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<h2 id="anatomy">Anatomy of an address</h2>
+<p>An IPv6 address is 128 bits written as 8 groups of hex. Example: <code>2001:db8:acad:1::10/64</code>, which expands to <code>2001:0db8:acad:0001:0000:0000:0000:0010</code>.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Part</th><th scope="col">Size</th><th scope="col">In the example</th><th scope="col">Set by</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Global routing prefix</th><td>48 bits</td><td>2001:0db8:acad</td><td>Your ISP or RIR</td></tr>
+    <tr><th scope="row">Subnet ID</th><td>16 bits</td><td>0001</td><td>You (65,536 LANs)</td></tr>
+    <tr><th scope="row">Interface ID</th><td>64 bits</td><td>0000:0000:0000:0010</td><td>Host: SLAAC, EUI-64 or manual</td></tr>
+  </tbody>
+</table></div>
+<p><b>Shorten it (RFC 5952):</b> drop leading zeros in each group, then replace the longest run of all-zero groups with <code>::</code>. Use <code>::</code> once only, never for a single zero group, and write hex in lowercase. The example becomes <code>2001:db8:acad:1::10</code>.</p>
+
+<h2 id="types">Address types</h2>
+<p>IPv6 has no broadcast. Multicast does that job.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Prefix</th><th scope="col">Type</th><th scope="col">Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>2000::/3</code></td><th scope="row">Global unicast</th><td>Routable on the internet</td></tr>
+    <tr><td><code>fe80::/10</code></td><th scope="row">Link-local</th><td>One link only; every interface has one</td></tr>
+    <tr><td><code>fc00::/7</code></td><th scope="row">Unique local</th><td>Private; in practice <code>fd00::/8</code></td></tr>
+    <tr><td><code>ff00::/8</code></td><th scope="row">Multicast</th><td>One to many; replaces broadcast</td></tr>
+    <tr><td><code>::1/128</code></td><th scope="row">Loopback</th><td>This host (<code>::/128</code> means no address yet)</td></tr>
+    <tr><td><code>2001:db8::/32</code></td><th scope="row">Documentation</th><td>Use in examples, never on a live network</td></tr>
+  </tbody>
+</table></div>
+<p>Useful multicast groups: <code>ff02::1</code> all nodes, <code>ff02::2</code> all routers, and <code>ff02::1:ffXX:XXXX</code> solicited-node.</p>
+
+<h2 id="nd">Neighbor Discovery (replaces ARP)</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">ICMPv6 type</th><th scope="col">Message</th><th scope="col">Purpose</th></tr></thead>
+  <tbody>
+    <tr><td>133</td><th scope="row">Router Solicitation (RS)</th><td>Host asks for routers</td></tr>
+    <tr><td>134</td><th scope="row">Router Advertisement (RA)</th><td>Router announces prefix and gateway</td></tr>
+    <tr><td>135</td><th scope="row">Neighbor Solicitation (NS)</th><td>"Who has this address?"</td></tr>
+    <tr><td>136</td><th scope="row">Neighbor Advertisement (NA)</th><td>"I do, here is my MAC"</td></tr>
+    <tr><td>137</td><th scope="row">Redirect</th><td>Router names a better first hop</td></tr>
+  </tbody>
+</table></div>
+<p>NS and NA do the job of ARP and also find duplicate addresses. Every ND message uses hop limit 255, so messages from off-link senders are ignored.</p>
+
+<h2 id="assign">How a host gets its address</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Method</th><th scope="col">How it works</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">SLAAC</th><td>The host builds its interface ID from the RA prefix. Needs a /64.</td></tr>
+    <tr><th scope="row">DHCPv6</th><td>Stateless adds DNS and options; stateful assigns the address.</td></tr>
+    <tr><th scope="row">EUI-64</th><td>Flip bit 7 of the MAC and insert <code>fffe</code> in the middle.</td></tr>
+  </tbody>
+</table></div>
+<p>Example: MAC <code>00:00:5e:00:53:01</code> becomes interface ID <code>0200:5eff:fe00:5301</code>, so the link-local address is <code>fe80::200:5eff:fe00:5301</code>.</p>
+
+<h2 id="vs-ipv4">IPv4 vs IPv6</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col"></th><th scope="col">IPv4</th><th scope="col">IPv6</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Address</th><td>32 bits, dotted decimal</td><td>128 bits, hex</td></tr>
+    <tr><th scope="row">Header</th><td>20 bytes or more, with checksum</td><td>40 bytes fixed, no checksum</td></tr>
+    <tr><th scope="row">Fragmenting</th><td>Routers can</td><td>Source only (minimum link MTU 1280)</td></tr>
+    <tr><th scope="row">NAT</th><td>Common</td><td>Not needed; use a firewall</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="config">Configure and check</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>ipv6 unicast-routing</code></td><td>Turn on IPv6 routing on the router</td></tr>
+    <tr><td><code>ipv6 address 2001:db8:acad:1::1/64</code></td><td>Static address</td></tr>
+    <tr><td><code>ipv6 address 2001:db8:acad:1::/64 eui-64</code></td><td>Prefix plus EUI-64 interface ID</td></tr>
+    <tr><td><code>ipv6 route ::/0 2001:db8:acad:1::2</code></td><td>Default route</td></tr>
+    <tr><td><code>show ipv6 interface brief</code></td><td>Addresses and up/up status</td></tr>
+    <tr><td><code>show ipv6 route</code>, <code>show ipv6 neighbors</code></td><td>Routing table, ND cache</td></tr>
+    <tr><td><code>ping -6</code>, <code>ipconfig</code>, <code>ip -6 addr</code></td><td>Windows, Windows, Linux</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="secure">Secure it</h2>
+<p class="note note-caution"><b>Danger.</b> A rogue Router Advertisement can hijack every host on the LAN. Enable RA Guard on access ports.</p>
+<p class="note note-caution"><b>Caution.</b> Never block all ICMPv6. Types 133 to 136 and Packet Too Big must pass, or addressing and paths break.</p>
+<p class="note note-caution"><b>Caution.</b> IPv6 is on by default. Firewall rules must cover it too.</p>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>/64 per LAN, /48 or /56 per site</li>
+  <li><code>fe80::</code> is on every interface</li>
+  <li><code>::</code> only once per address</li>
+</ul>

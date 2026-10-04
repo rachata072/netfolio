@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SEC-01 Security fundamentals &amp; key terms Cheat Sheet (PDF) | breakfixlearn</title>
+<meta name="description" content="Free one-page security fundamentals cheat sheet: CIA triad, AAA, risk, control types, zero trust, NIST CSF 2.0 and key terms. PDF (Letter, A4) and image.">
+<link rel="canonical" href="https://breakfixlearn.com/cheat-sheets/sec-01">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=59472e0728">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="Security fundamentals &amp; key terms cheat sheet (SEC-01)">
+<meta property="og:description" content="The CIA triad, AAA and MFA, risk terms, control types, design principles, the six NIST CSF 2.0 functions and key terms.">
+<meta property="og:url" content="https://breakfixlearn.com/cheat-sheets/sec-01">
+<meta property="og:image" content="https://breakfixlearn.com/cheat-sheets/files/bfl-sec-01-security-fundamentals_v1.0_social.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SEC-01 Security fundamentals &amp; key terms cheat sheet preview">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"SEC-01 Security fundamentals & key terms cheat sheet","description":"Free one-page security fundamentals cheat sheet: CIA triad, AAA, risk, control types, zero trust, NIST CSF 2.0 and key terms. PDF (Letter, A4) and image.","url":"https://breakfixlearn.com/cheat-sheets/sec-01","learningResourceType":"Cheat sheet","educationalLevel":"Beginner","teaches":"Security fundamentals & key terms","keywords":"CIA triad, AAA, Risk, Zero trust, NIST CSF","inLanguage":"en","isAccessibleForFree":true,"license":"https://creativecommons.org/licenses/by-nc/4.0/","version":"1.0","datePublished":"2026-10-03","dateModified":"2026-10-03","image":"https://breakfixlearn.com/cheat-sheets/files/bfl-sec-01-security-fundamentals_v1.0_social.webp","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"encoding":[{"@type":"MediaObject","name":"SEC-01 Security fundamentals & key terms (US Letter)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-sec-01-security-fundamentals_v1.0_print-letter.pdf","encodingFormat":"application/pdf","contentSize":"153 KB","sha256":"5d465959ccc49ab1eab604499c040b6190166dde362a6ce7e10b44a48c41beaa"},{"@type":"MediaObject","name":"SEC-01 Security fundamentals & key terms (A4)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-sec-01-security-fundamentals_v1.0_print-a4.pdf","encodingFormat":"application/pdf","contentSize":"153 KB","sha256":"a459a674ca918a97c125890424af06d1eca390bc37e86c969e2622d0485dea5f"},{"@type":"MediaObject","name":"SEC-01 Security fundamentals & key terms (Screen)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-sec-01-security-fundamentals_v1.0_web.pdf","encodingFormat":"application/pdf","contentSize":"128 KB","sha256":"eba118d6dc7c443327739984e6642549db8270bcb70cbebc4f1630dcf8ab41f6"},{"@type":"MediaObject","name":"SEC-01 Security fundamentals & key terms (Hi-res image)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-sec-01-security-fundamentals_v1.0_full.webp","encodingFormat":"image/webp","contentSize":"552 KB","sha256":"cdf1e0fbd27ac6f333a9aaea1785ff377741dcb50dfcb7f3c8b342831d187687"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Cheat sheets","item":"https://breakfixlearn.com/cheat-sheets"},{"@type":"ListItem","position":3,"name":"SEC-01 Security fundamentals & key terms"}]}</script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article class="sheet">
+  <header class="post-head sheet-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/cheat-sheets">cheat-sheets</a><span aria-hidden="true">/</span><a href="/cheat-sheets#cybersecurity">sec</a></nav>
+      <p class="scard-meta"><span class="sid k-cybersecurity">SEC-01</span><span>Cybersecurity</span></p>
+      <h1>Security fundamentals &amp; key terms</h1>
+      <p class="post-dek"><b>Use this when:</b> you start in security or help desk and need the core ideas, and the words analysts use, in one place.</p>
+      <div class="post-meta"><span>Security+, CC and CySA+</span><span class="sep">/</span><span>v1.0</span><span class="sep">/</span><time datetime="2026-10-03">Oct 3, 2026</time><span class="sep">/</span><span>1 page</span><span class="sep">/</span><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license noopener" target="_blank">CC BY-NC 4.0</a></div>
+    </div>
+  </header>
+  <div class="wrap sheet-grid">
+    <figure class="sheet-paper">
+      <a href="/cheat-sheets/files/bfl-sec-01-security-fundamentals_v1.0_full.webp" aria-label="Open the full-size SEC-01 image (2550 by 3300 pixels)">
+        <img src="/cheat-sheets/files/bfl-sec-01-security-fundamentals_v1.0_web.webp" srcset="/cheat-sheets/files/bfl-sec-01-security-fundamentals_v1.0_web.webp 1200w, /cheat-sheets/files/bfl-sec-01-security-fundamentals_v1.0_full.webp 2550w" sizes="(max-width: 60rem) calc(100vw - 2rem), 46rem"
+             width="1200" height="1553" fetchpriority="high" decoding="async"
+             alt="SEC-01 Security fundamentals &amp; key terms cheat sheet. Every table on it is repeated as text below.">
+      </a>
+      <figcaption>Tap the sheet for the full-size image. The <a href="#text-version">text version</a> below is screen-reader friendly.</figcaption>
+    </figure>
+    <aside class="sheet-side" aria-labelledby="dl-h">
+      <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">copy</span> <span class="a">sec-01 flash:</span></span>
+      <h2 id="dl-h" class="side-h">Download</h2>
+      <ul class="dl-list"><li><a class="dl dl-pri" href="/cheat-sheets/files/bfl-sec-01-security-fundamentals_v1.0_print-letter.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>US Letter</b><span class="dl-m">print &middot; 153 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-sec-01-security-fundamentals_v1.0_print-a4.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>A4</b><span class="dl-m">print &middot; 153 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-sec-01-security-fundamentals_v1.0_web.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>Screen</b><span class="dl-m">links work &middot; 128 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-sec-01-security-fundamentals_v1.0_full.webp" download><span class="dl-k">WebP</span><span class="dl-t"><b>Hi-res image</b><span class="dl-m">2550 &times; 3300 &middot; 552 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li></ul>
+      <p class="dl-open"><a href="/cheat-sheets/files/bfl-sec-01-security-fundamentals_v1.0_web.pdf">Open the PDF in your browser</a> instead of downloading it.</p>
+      <details class="sums">
+        <summary>Verify your download (SHA-256)</summary>
+        <div class="tbl"><table class="sheet-files"><thead><tr><th scope="col">File</th><th scope="col">SHA-256</th></tr></thead><tbody><tr><td translate="no">bfl-sec-01-security-fundamentals_v1.0_web.pdf</td><td translate="no">eba118d6dc7c443327739984e6642549db8270bcb70cbebc4f1630dcf8ab41f6</td></tr><tr><td translate="no">bfl-sec-01-security-fundamentals_v1.0_print-letter.pdf</td><td translate="no">5d465959ccc49ab1eab604499c040b6190166dde362a6ce7e10b44a48c41beaa</td></tr><tr><td translate="no">bfl-sec-01-security-fundamentals_v1.0_print-a4.pdf</td><td translate="no">a459a674ca918a97c125890424af06d1eca390bc37e86c969e2622d0485dea5f</td></tr><tr><td translate="no">bfl-sec-01-security-fundamentals_v1.0_full.webp</td><td translate="no">cdf1e0fbd27ac6f333a9aaea1785ff377741dcb50dfcb7f3c8b342831d187687</td></tr></tbody></table></div>
+        <p>Compare the hash with the one printed by
+          <code translate="no">Get-FileHash .\file.pdf -Algorithm SHA256</code> (PowerShell) or
+          <code translate="no">sha256sum file.pdf</code> (Linux, macOS: <code translate="no">shasum -a 256</code>). Different hash, different file: delete it.</p>
+      </details>
+      <p class="side-note">Free for personal and classroom use under CC BY-NC 4.0. Keep the credit line; don't sell it. Spotted a mistake? <a href="mailto:treyrct858@gmail.com?subject=SEC-01%20v1.0%20correction">Email a correction</a>.</p>
+    </aside>
+  </div>
+  <section class="wrap sheet-text" aria-labelledby="text-version">
+    <div class="prose">
+      <h2 id="text-version">Text version</h2>
+      <p>Everything on the sheet, as plain HTML: handy for screen readers, copy-paste and search.</p>
+<h3 id="cia">The CIA triad</h3>
+<p>Every security control serves one or more of these three goals.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Goal</th><th scope="col">Meaning</th><th scope="col">Broken by</th><th scope="col">Protect with</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Confidentiality</th><td>Only authorized people can see the data</td><td>Data leak, stolen password</td><td>Encryption, access control</td></tr>
+    <tr><th scope="row">Integrity</th><td>Data stays accurate and unaltered</td><td>Tampering, malware</td><td>Hashes, signatures</td></tr>
+    <tr><th scope="row">Availability</th><td>Systems and data work when needed</td><td>Ransomware, DDoS, outage</td><td>Backups, redundancy, patching</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="aaa">AAA: who, what, did what</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Term</th><th scope="col">Meaning</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Authentication</th><td>Prove who you are</td></tr>
+    <tr><th scope="row">Authorization</th><td>What you may do once in</td></tr>
+    <tr><th scope="row">Accounting</th><td>Log what you did (audit trail)</td></tr>
+  </tbody>
+</table></div>
+<p>Multi-factor authentication (MFA) uses two or more factor types: something you <b>know</b> (password), something you <b>have</b> (app, key) and something you <b>are</b> (fingerprint).</p>
+
+<h3 id="risk">Risk in plain words</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Term</th><th scope="col">Meaning</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Asset</th><td>Anything worth protecting</td></tr>
+    <tr><th scope="row">Threat</th><td>Something that could cause harm</td></tr>
+    <tr><th scope="row">Vulnerability</th><td>A weakness; an exploit uses it</td></tr>
+  </tbody>
+</table></div>
+<p>Risk = likelihood &times; impact.</p>
+
+<h3 id="controls">Control types</h3>
+<p>Categories: technical, managerial, operational and physical.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Type</th><th scope="col">Does what</th><th scope="col">Example</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Preventive</th><td>Stops it happening</td><td>Firewall, MFA</td></tr>
+    <tr><th scope="row">Deterrent</th><td>Discourages attackers</td><td>Warning banner, cameras</td></tr>
+    <tr><th scope="row">Detective</th><td>Spots it happening</td><td>IDS, log review</td></tr>
+    <tr><th scope="row">Corrective</th><td>Fixes the damage</td><td>Restore from backup</td></tr>
+    <tr><th scope="row">Compensating</th><td>Stand-in when you can't use the usual control</td><td>Extra logging</td></tr>
+    <tr><th scope="row">Directive</th><td>Tells people what to do</td><td>Security policy</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="principles">Design principles</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Principle</th><th scope="col">Meaning</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Least privilege</th><td>Only the access the job needs</td></tr>
+    <tr><th scope="row">Defense in depth</th><td>Layers, so one failure is not fatal</td></tr>
+    <tr><th scope="row">Zero trust</th><td>No trust from network location alone</td></tr>
+    <tr><th scope="row">Separation of duties</th><td>No one controls a whole process</td></tr>
+    <tr><th scope="row">Non-repudiation</th><td>Can't deny an action (signatures, logs)</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="csf">NIST CSF 2.0: six functions</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Function</th><th scope="col">Meaning</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Govern</th><td>Strategy, policy and roles</td></tr>
+    <tr><th scope="row">Identify</th><td>Know your assets and risks</td></tr>
+    <tr><th scope="row">Protect</th><td>Safeguards that reduce risk</td></tr>
+    <tr><th scope="row">Detect</th><td>Find attacks and compromises</td></tr>
+    <tr><th scope="row">Respond</th><td>Act on an incident</td></tr>
+    <tr><th scope="row">Recover</th><td>Restore operations</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="terms">Key terms</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Term</th><th scope="col">Meaning</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">CVE</th><td>Public ID for a known vulnerability</td></tr>
+    <tr><th scope="row">Zero-day</th><td>Exploited before a patch exists</td></tr>
+    <tr><th scope="row">IOC</th><td>Evidence of compromise (IP, hash)</td></tr>
+    <tr><th scope="row">IDS / IPS</th><td>Detects / detects and blocks</td></tr>
+    <tr><th scope="row">SIEM</th><td>Collects and correlates logs</td></tr>
+    <tr><th scope="row">EDR</th><td>Endpoint monitoring and response</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="safe">Stay safe and legal</h3>
+<p class="note note-caution"><b>Danger.</b> Suspect a breach? Disconnect, do not wipe, and escalate to security.</p>
+<p class="note note-auth"><b>Authorized use only.</b> Test only what you own or have written permission for.</p>
+<p class="note note-caution"><b>Caution.</b> Never share MFA codes with anyone.</p>
+
+<h3 id="remember">Remember</h3>
+<ul>
+  <li>C-I-A: Confidentiality, Integrity, Availability</li>
+  <li>Authentication is who; authorization is what</li>
+  <li>No control is perfect: use layers</li>
+</ul>
+      <h3>Sources</h3>
+      <ul><li><a href="https://csrc.nist.gov/glossary/term/information_security" rel="noopener" target="_blank">NIST CSRC glossary, information security</a></li><li><a href="https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf" rel="noopener" target="_blank">NIST Cybersecurity Framework 2.0 (CSWP 29)</a></li><li><a href="https://csrc.nist.gov/pubs/sp/800/207/final" rel="noopener" target="_blank">NIST SP 800-207, zero trust architecture</a></li><li><a href="https://www.comptia.org/en-us/certifications/security/" rel="noopener" target="_blank">CompTIA Security+ certification objectives</a></li></ul>
+      <h3>Go deeper on the blog</h3><ul><li><a href="/blog/vulnerability-management-program-tenable-powershell-bash">I Built a Vulnerability Management Program From Scratch, Policy to Remediation</a></li></ul>
+    </div>
+    <nav class="nexthop" aria-label="More cheat sheets"><a class="prev" href="/cheat-sheets/net-04"><span class="k">&larr; previous sheet</span>NET-04 IPv6 essentials</a><a class="next" href="/cheat-sheets/sec-02"><span class="k">next sheet &rarr;</span>SEC-02 Nmap scanning</a></nav>
+  </section>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Sep 29, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

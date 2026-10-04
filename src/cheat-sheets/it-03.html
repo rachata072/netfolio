@@ -1,0 +1,86 @@
+<!--
+  Text version of IT-03, shown under the sheet image on /cheat-sheets/it-03.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<h2 id="reads">How a command reads</h2>
+<p>PowerShell commands are Verb-Noun, then parameters, and you can pipe one into the next. Examples: <code>Get-Service -Name Spooler | Restart-Service</code> and <code>Get-Process | Sort-Object CPU -Descending</code>.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>Get-Command *dns*</code></td><td>Find a command</td></tr>
+    <tr><td><code>Get-Help Restart-Service -Examples</code></td><td>Show examples</td></tr>
+    <tr><td><code>Get-Service | Get-Member</code></td><td>See an object's properties</td></tr>
+    <tr><td><code>$PSVersionTable.PSVersion</code></td><td>Which PowerShell version</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="accounts">Accounts</h2>
+<p>These need the ActiveDirectory module from RSAT. Set <code>$pw = Read-Host -AsSecureString</code> before the reset.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>Get-ADUser jdoe -Properties LockedOut</code></td><td>Is the account locked?</td></tr>
+    <tr><td><code>Search-ADAccount -LockedOut</code></td><td>List all locked accounts</td></tr>
+    <tr><td><code>Unlock-ADAccount -Identity jdoe</code></td><td>Unlock</td></tr>
+    <tr><td><code>Set-ADAccountPassword jdoe -Reset -NewPassword $pw</code></td><td>Reset the password</td></tr>
+    <tr><td><code>Set-ADUser jdoe -ChangePasswordAtLogon $true</code></td><td>Force a change at next sign-in</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="pc">This PC</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>Get-ComputerInfo</code></td><td>OS and specs</td></tr>
+    <tr><td><code>Get-HotFix</code></td><td>Installed patches</td></tr>
+    <tr><td><code>Get-Volume</code></td><td>Free disk space</td></tr>
+    <tr><td><code>Get-Service</code></td><td>Services</td></tr>
+    <tr><td><code>Get-Process</code></td><td>Processes</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="network">Network</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>Get-NetIPConfiguration</code></td><td>IP, gateway and DNS</td></tr>
+    <tr><td><code>Test-NetConnection 192.0.2.10 -Port 443</code></td><td>Is the port open?</td></tr>
+    <tr><td><code>Resolve-DnsName example.com</code></td><td>DNS answer</td></tr>
+    <tr><td><code>Clear-DnsClientCache</code></td><td>Flush the DNS cache</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="events">Event logs</h2>
+<p>Errors from the System log in the last 24 hours: <code>Get-WinEvent -FilterHashtable @{LogName='System'; Level=2; StartTime=(Get-Date).AddHours(-24)} -MaxEvents 20</code>. Level 1 is critical, 2 error, 3 warning. <code>Get-EventLog</code> works in Windows PowerShell 5.1 only.</p>
+
+<h2 id="remote">Pipeline and remote</h2>
+<p>Stopped services to a CSV: <code>Get-Service | Where-Object Status -eq 'Stopped' | Select-Object Name, Status | Sort-Object Name | Export-Csv stopped.csv</code>. Add <code>-WhatIf</code> to preview and <code>-Confirm</code> to ask first.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>Enter-PSSession -ComputerName PC01</code></td><td>Open a remote prompt</td></tr>
+    <tr><td><code>Invoke-Command PC01 { Get-Service }</code></td><td>Run a command remotely</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="recipes">Ticket recipes</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Ticket</th><th scope="col">Command</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Printer stuck</th><td><code>Restart-Service Spooler</code></td></tr>
+    <tr><th scope="row">"Did you restart?"</th><td><code>(Get-Date) - (Get-CimInstance Win32_OperatingSystem).LastBootUpTime</code></td></tr>
+    <tr><th scope="row">Disk full</th><td><code>Get-Volume | Select-Object DriveLetter, SizeRemaining</code></td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="safe">Run it safely</h2>
+<p class="note note-caution"><b>Danger.</b> Never put a password in a script. Set <code>$pw = Read-Host -AsSecureString</code> first.</p>
+<p class="note note-caution"><b>Caution.</b> <code>Stop-Process</code>, <code>Remove-Item</code> and <code>Restart-Computer</code> act at once. Try <code>-WhatIf</code> first.</p>
+<p class="note note-caution"><b>Caution.</b> Read a script before you run it.</p>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>Open PowerShell as admin only for admin tasks</li>
+  <li><code>Get-</code> reads; <code>Set-</code> changes</li>
+  <li>Tab completes names and parameters</li>
+</ul>

@@ -1,0 +1,70 @@
+<!--
+  Text version of AI-02, shown under the sheet image on /cheat-sheets/ai-02.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<h2 id="patterns">6 patterns that fix most prompts</h2>
+<p>Add these to the six parts from the AI-01 sheet.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">#</th><th scope="col">Pattern</th><th scope="col">Use it when</th><th scope="col">Prompt starter</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><th scope="row">Few-shot</th><td>You need the same format or style every time</td><td>Give 3 to 5 varied input and output examples</td></tr>
+    <tr><td>2</td><th scope="row">Step by step</th><td>Troubleshooting, math or anything with logic</td><td>"Reason step by step, then give the final answer."</td></tr>
+    <tr><td>3</td><th scope="row">Structured output</th><td>The answer feeds a script, table or ticket</td><td>Return only JSON with keys: cause, fix, risk</td></tr>
+    <tr><td>4</td><th scope="row">Critique and revise</th><td>You need fewer errors in a draft or answer</td><td>"Check your answer for mistakes, then fix them."</td></tr>
+    <tr><td>5</td><th scope="row">Prompt chain</th><td>The job is big: split it into small prompts</td><td>1) list the options 2) rank them 3) write it up</td></tr>
+    <tr><td>6</td><th scope="row">Ask first</th><td>Key facts are missing from your request</td><td>"Ask up to 3 questions before you answer."</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="pick">Pick by problem</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Problem</th><th scope="col">Pattern</th></tr></thead>
+  <tbody>
+    <tr><td>Format keeps changing</td><td>1 or 3</td></tr>
+    <tr><td>Answer is rushed or wrong</td><td>2, then 4</td></tr>
+    <tr><td>Task is too big</td><td>5</td></tr>
+    <tr><td>Answer is too generic</td><td>6</td></tr>
+    <tr><td>Output goes into a tool</td><td>3, then validate</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="structured">Structured output tips</h2>
+<ul>
+  <li>Name the exact keys and allowed values</li>
+  <li>Say "JSON only, no extra text"</li>
+  <li>Allow <code>null</code> or "unknown" instead of guessing</li>
+  <li>Parse and validate before you use it</li>
+  <li>Show one finished example</li>
+</ul>
+
+<h2 id="stack">Stack them: one prompt, four patterns</h2>
+<p>Example for SOC log triage:</p>
+<ul>
+  <li><b>Role:</b> You are a SOC analyst. <b>Task:</b> Triage the lines in &lt;logs&gt;.</li>
+  <li><b>Few-shot:</b> &lt;example&gt;denied tcp 198.51.100.7 to 192.0.2.10:22 =&gt; ACTION&lt;/example&gt;</li>
+  <li><b>Step by step:</b> Reason through each line first.</li>
+  <li><b>Structured:</b> Then return JSON: [{"line": "...", "label": "ACTION|ROUTINE", "why": "..."}]</li>
+  <li><b>Critique:</b> Re-read your labels once and fix any mistakes.</li>
+</ul>
+
+<h2 id="combine">Combine them</h2>
+<ul>
+  <li><b>1 + 3:</b> examples that all end in the same JSON shape</li>
+  <li><b>2 + 4:</b> think it through, then review before the final answer</li>
+  <li><b>6 + 5:</b> ask questions first, then run the chain</li>
+  <li><b>3 + 4:</b> ask it to check its JSON against your keys</li>
+</ul>
+<p>Wrap examples in tags and keep them varied so the AI does not copy one.</p>
+
+<h2 id="safe">Use patterns safely</h2>
+<p>Aligned with the OWASP LLM Top 10 (2025).</p>
+<p class="note note-caution"><b>Danger.</b> Never run AI-written commands on production unread. Test them in a lab.</p>
+<p class="note note-caution"><b>Caution.</b> Validate JSON and commands before a script uses them. AI output is untrusted input.</p>
+<p class="note note-caution"><b>Caution.</b> Mask real data in your examples. Tag pasted text as data, not instructions.</p>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>3 to 5 varied examples beat a long rule list</li>
+  <li>Step-by-step text can sound sure and be wrong</li>
+  <li>One pattern at a time: test, then combine</li>
+</ul>

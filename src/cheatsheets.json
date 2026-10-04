@@ -165,10 +165,65 @@
     },
     {
       "id": "NET-04",
+      "slug": "ipv6",
       "title": "IPv6 essentials",
       "cat": "networking",
       "wave": 2,
-      "status": "planned"
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-10-03",
+      "exam": "CCNA 200-301 topics 1.8 and 1.9",
+      "use_when": "You read, shorten or configure an IPv6 address, or need to know which type it is and how it was assigned.",
+      "summary": "IPv6 address anatomy and shortening rules, address types, Neighbor Discovery, SLAAC and EUI-64, IPv4 differences, Cisco commands and security basics.",
+      "description": "Free one-page IPv6 cheat sheet: address anatomy, shortening rules, address types, Neighbor Discovery, SLAAC, Cisco IOS commands. PDF (Letter, A4) and image.",
+      "tags": [
+        "IPv6",
+        "SLAAC",
+        "Neighbor Discovery",
+        "EUI-64",
+        "Cisco IOS"
+      ],
+      "sources": [
+        [
+          "RFC 4291, IPv6 addressing architecture",
+          "https://www.rfc-editor.org/rfc/rfc4291"
+        ],
+        [
+          "RFC 5952, IPv6 address text representation",
+          "https://www.rfc-editor.org/rfc/rfc5952"
+        ],
+        [
+          "RFC 4861, Neighbor Discovery for IPv6",
+          "https://www.rfc-editor.org/rfc/rfc4861"
+        ],
+        [
+          "RFC 4193, unique local IPv6 unicast addresses",
+          "https://www.rfc-editor.org/rfc/rfc4193"
+        ],
+        [
+          "RFC 3849, IPv6 documentation prefix",
+          "https://www.rfc-editor.org/rfc/rfc3849"
+        ],
+        [
+          "RFC 8200, IPv6 specification",
+          "https://www.rfc-editor.org/rfc/rfc8200"
+        ],
+        [
+          "RFC 4890, filtering ICMPv6 messages",
+          "https://www.rfc-editor.org/rfc/rfc4890"
+        ],
+        [
+          "RFC 6105, IPv6 Router Advertisement Guard",
+          "https://www.rfc-editor.org/rfc/rfc6105"
+        ],
+        [
+          "Cisco IOS XE, IPv6 basic connectivity",
+          "https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/ipv6_basic/configuration/xe-16/ip6b-xe-16-book/ip6-add-basic-conn-xe.html"
+        ]
+      ],
+      "related": [
+        "vlsm-subnet-calculator-python-tool"
+      ]
     },
     {
       "id": "NET-05",
@@ -228,10 +283,45 @@
     },
     {
       "id": "SEC-01",
+      "slug": "security-fundamentals",
       "title": "Security fundamentals & key terms",
       "cat": "cybersecurity",
       "wave": 2,
-      "status": "planned"
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-10-03",
+      "exam": "Security+, CC and CySA+",
+      "use_when": "You start in security or help desk and need the core ideas, and the words analysts use, in one place.",
+      "summary": "The CIA triad, AAA and MFA, risk terms, control types, design principles, the six NIST CSF 2.0 functions and key terms.",
+      "description": "Free one-page security fundamentals cheat sheet: CIA triad, AAA, risk, control types, zero trust, NIST CSF 2.0 and key terms. PDF (Letter, A4) and image.",
+      "tags": [
+        "CIA triad",
+        "AAA",
+        "Risk",
+        "Zero trust",
+        "NIST CSF"
+      ],
+      "sources": [
+        [
+          "NIST CSRC glossary, information security",
+          "https://csrc.nist.gov/glossary/term/information_security"
+        ],
+        [
+          "NIST Cybersecurity Framework 2.0 (CSWP 29)",
+          "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf"
+        ],
+        [
+          "NIST SP 800-207, zero trust architecture",
+          "https://csrc.nist.gov/pubs/sp/800/207/final"
+        ],
+        [
+          "CompTIA Security+ certification objectives",
+          "https://www.comptia.org/en-us/certifications/security/"
+        ]
+      ],
+      "related": [
+        "vulnerability-management-program-tenable-powershell-bash"
+      ]
     },
     {
       "id": "SEC-02",
@@ -453,10 +543,49 @@
     },
     {
       "id": "IT-03",
+      "slug": "powershell",
       "title": "PowerShell for help desk",
       "cat": "it-support",
       "wave": 2,
-      "status": "planned"
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-10-03",
+      "exam": "CompTIA A+ Core 2 and Windows 10/11",
+      "use_when": "You fix accounts, services and network problems faster from a prompt than from five consoles.",
+      "summary": "How PowerShell commands read, plus account, PC, network and event log commands, ticket recipes and safe-use rules for help desk work.",
+      "description": "Free one-page PowerShell cheat sheet for help desk: AD account unlocks, services, network tests, event logs, remote commands. PDF (Letter, A4) and image.",
+      "tags": [
+        "PowerShell",
+        "Help desk",
+        "Active Directory",
+        "Windows",
+        "Troubleshooting"
+      ],
+      "sources": [
+        [
+          "Microsoft Learn, Unlock-ADAccount",
+          "https://learn.microsoft.com/en-us/powershell/module/activedirectory/unlock-adaccount"
+        ],
+        [
+          "Microsoft Learn, Set-ADAccountPassword",
+          "https://learn.microsoft.com/en-us/powershell/module/activedirectory/set-adaccountpassword"
+        ],
+        [
+          "Microsoft Learn, Get-WinEvent",
+          "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent"
+        ],
+        [
+          "Microsoft Learn, Clear-DnsClientCache",
+          "https://learn.microsoft.com/en-us/powershell/module/dnsclient/clear-dnsclientcache"
+        ],
+        [
+          "Microsoft Learn, Test-NetConnection",
+          "https://learn.microsoft.com/en-us/powershell/module/nettcpip/test-netconnection"
+        ]
+      ],
+      "related": [
+        "automate-microsoft-365-admin-tasks-powershell-graph"
+      ]
     },
     {
       "id": "IT-04",
@@ -538,10 +667,45 @@
     },
     {
       "id": "AI-02",
+      "slug": "prompt-patterns",
       "title": "Prompt patterns (few-shot, step-by-step, structured output)",
       "cat": "ai",
       "wave": 2,
-      "status": "planned"
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-10-03",
+      "exam": "Claude, ChatGPT and Gemini",
+      "use_when": "A plain prompt gives messy, wrong or inconsistent answers and you need a proven structure.",
+      "summary": "Six prompt patterns (few-shot, step by step, structured output, critique, chaining, ask first), when to use each, how to stack them and how to use them safely.",
+      "description": "Free one-page prompt patterns cheat sheet: few-shot, step by step, JSON output, critique, chaining, with a stacked example. PDF (Letter, A4) and image.",
+      "tags": [
+        "Prompt patterns",
+        "Few-shot",
+        "Structured output",
+        "Prompt chaining",
+        "LLM security"
+      ],
+      "sources": [
+        [
+          "Anthropic, prompt engineering overview",
+          "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview"
+        ],
+        [
+          "Anthropic, multishot prompting",
+          "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/multishot-prompting"
+        ],
+        [
+          "Anthropic, use XML tags",
+          "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/use-xml-tags"
+        ],
+        [
+          "OWASP Top 10 for LLM applications (2025)",
+          "https://genai.owasp.org/llm-top-10/"
+        ]
+      ],
+      "related": [
+        "best-ai-tools-network-engineers-2026"
+      ]
     },
     {
       "id": "AI-03",

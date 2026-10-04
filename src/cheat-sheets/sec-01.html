@@ -1,0 +1,100 @@
+<!--
+  Text version of SEC-01, shown under the sheet image on /cheat-sheets/sec-01.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<h2 id="cia">The CIA triad</h2>
+<p>Every security control serves one or more of these three goals.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Goal</th><th scope="col">Meaning</th><th scope="col">Broken by</th><th scope="col">Protect with</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Confidentiality</th><td>Only authorized people can see the data</td><td>Data leak, stolen password</td><td>Encryption, access control</td></tr>
+    <tr><th scope="row">Integrity</th><td>Data stays accurate and unaltered</td><td>Tampering, malware</td><td>Hashes, signatures</td></tr>
+    <tr><th scope="row">Availability</th><td>Systems and data work when needed</td><td>Ransomware, DDoS, outage</td><td>Backups, redundancy, patching</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="aaa">AAA: who, what, did what</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Term</th><th scope="col">Meaning</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Authentication</th><td>Prove who you are</td></tr>
+    <tr><th scope="row">Authorization</th><td>What you may do once in</td></tr>
+    <tr><th scope="row">Accounting</th><td>Log what you did (audit trail)</td></tr>
+  </tbody>
+</table></div>
+<p>Multi-factor authentication (MFA) uses two or more factor types: something you <b>know</b> (password), something you <b>have</b> (app, key) and something you <b>are</b> (fingerprint).</p>
+
+<h2 id="risk">Risk in plain words</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Term</th><th scope="col">Meaning</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Asset</th><td>Anything worth protecting</td></tr>
+    <tr><th scope="row">Threat</th><td>Something that could cause harm</td></tr>
+    <tr><th scope="row">Vulnerability</th><td>A weakness; an exploit uses it</td></tr>
+  </tbody>
+</table></div>
+<p>Risk = likelihood &times; impact.</p>
+
+<h2 id="controls">Control types</h2>
+<p>Categories: technical, managerial, operational and physical.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Type</th><th scope="col">Does what</th><th scope="col">Example</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Preventive</th><td>Stops it happening</td><td>Firewall, MFA</td></tr>
+    <tr><th scope="row">Deterrent</th><td>Discourages attackers</td><td>Warning banner, cameras</td></tr>
+    <tr><th scope="row">Detective</th><td>Spots it happening</td><td>IDS, log review</td></tr>
+    <tr><th scope="row">Corrective</th><td>Fixes the damage</td><td>Restore from backup</td></tr>
+    <tr><th scope="row">Compensating</th><td>Stand-in when you can't use the usual control</td><td>Extra logging</td></tr>
+    <tr><th scope="row">Directive</th><td>Tells people what to do</td><td>Security policy</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="principles">Design principles</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Principle</th><th scope="col">Meaning</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Least privilege</th><td>Only the access the job needs</td></tr>
+    <tr><th scope="row">Defense in depth</th><td>Layers, so one failure is not fatal</td></tr>
+    <tr><th scope="row">Zero trust</th><td>No trust from network location alone</td></tr>
+    <tr><th scope="row">Separation of duties</th><td>No one controls a whole process</td></tr>
+    <tr><th scope="row">Non-repudiation</th><td>Can't deny an action (signatures, logs)</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="csf">NIST CSF 2.0: six functions</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Function</th><th scope="col">Meaning</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Govern</th><td>Strategy, policy and roles</td></tr>
+    <tr><th scope="row">Identify</th><td>Know your assets and risks</td></tr>
+    <tr><th scope="row">Protect</th><td>Safeguards that reduce risk</td></tr>
+    <tr><th scope="row">Detect</th><td>Find attacks and compromises</td></tr>
+    <tr><th scope="row">Respond</th><td>Act on an incident</td></tr>
+    <tr><th scope="row">Recover</th><td>Restore operations</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="terms">Key terms</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Term</th><th scope="col">Meaning</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">CVE</th><td>Public ID for a known vulnerability</td></tr>
+    <tr><th scope="row">Zero-day</th><td>Exploited before a patch exists</td></tr>
+    <tr><th scope="row">IOC</th><td>Evidence of compromise (IP, hash)</td></tr>
+    <tr><th scope="row">IDS / IPS</th><td>Detects / detects and blocks</td></tr>
+    <tr><th scope="row">SIEM</th><td>Collects and correlates logs</td></tr>
+    <tr><th scope="row">EDR</th><td>Endpoint monitoring and response</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="safe">Stay safe and legal</h2>
+<p class="note note-caution"><b>Danger.</b> Suspect a breach? Disconnect, do not wipe, and escalate to security.</p>
+<p class="note note-auth"><b>Authorized use only.</b> Test only what you own or have written permission for.</p>
+<p class="note note-caution"><b>Caution.</b> Never share MFA codes with anyone.</p>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>C-I-A: Confidentiality, Integrity, Availability</li>
+  <li>Authentication is who; authorization is what</li>
+  <li>No control is perfect: use layers</li>
+</ul>
