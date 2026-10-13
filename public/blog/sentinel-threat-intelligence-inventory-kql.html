@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sentinel Threat Intelligence Part 1: KQL Inventory and Hunt | Trey</title>
+<meta name="description" content="Inventory the threat intelligence already in Microsoft Sentinel with KQL, find brute force IPs in your own logs, and check whether any of them later got in.">
+<link rel="canonical" href="https://breakfixlearn.com/blog/sentinel-threat-intelligence-inventory-kql">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=59472e0728">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="Threat Intelligence in Sentinel, Part 1: Inventory What You Already Have">
+<meta property="og:description" content="A feed switched on is not a feed working. Part 1 counts what Sentinel actually holds, collapses duplicate rows, then mines my own failed logons for 220 candidate bad IPs and asks the question that matters: did any of them get in?">
+<meta property="og:url" content="https://breakfixlearn.com/blog/sentinel-threat-intelligence-inventory-kql">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/sentinel-threat-intelligence-inventory-kql.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Threat Intelligence in Sentinel, Part 1: Inventory What You Already Have">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="article:published_time" content="2026-10-13">
+<meta property="article:tag" content="Microsoft Sentinel">
+<meta property="article:tag" content="Threat Intelligence">
+<meta property="article:tag" content="KQL">
+<meta property="article:tag" content="Blue Team">
+<meta property="article:tag" content="SOC">
+<meta property="article:tag" content="Brute Force">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Threat Intelligence in Sentinel, Part 1: Inventory What You Already Have","description":"Inventory the threat intelligence already in Microsoft Sentinel with KQL, find brute force IPs in your own logs, and check whether any of them later got in.","datePublished":"2026-10-13","dateModified":"2026-10-13","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"publisher":{"@type":"Person","name":"Trey"},"mainEntityOfPage":"https://breakfixlearn.com/blog/sentinel-threat-intelligence-inventory-kql","image":"https://breakfixlearn.com/assets/og/sentinel-threat-intelligence-inventory-kql.webp","keywords":"Microsoft Sentinel, Threat Intelligence, KQL, Blue Team, SOC, Brute Force, Defender XDR, MITRE ATT&CK","articleSection":"Security","timeRequired":"PT11M"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://breakfixlearn.com/blog"},{"@type":"ListItem","position":3,"name":"Threat Intelligence in Sentinel, Part 1: Inventory What You Already Have"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is the ThreatIntelIndicators table in Microsoft Sentinel?","acceptedAnswer":{"@type":"Answer","text":"It is the table where Sentinel stores threat indicators such as IP addresses, domains, URLs and file hashes, whether they came from Microsoft's own feed, a connector, a file import or the portal. It replaced the older ThreatIntelligenceIndicator table, and Microsoft's documentation says ingestion into the legacy table stopped after July 31, 2025, so queries written for the old table need to be moved over."}},{"@type":"Question","name":"Why do the Active and Indicators numbers in my inventory query not match?","acceptedAnswer":{"@type":"Answer","text":"Because Active counts rows and Indicators counts distinct values. Sentinel keeps a new row each time an indicator is updated, so one indicator can appear many times. In my workspace one source showed 133,525 distinct values against 564,978 active rows. Collapsing to the newest row per Id with arg_max, and checking ValidUntil, gives you the real number."}},{"@type":"Question","name":"Why filter out private and blank IP addresses before building indicators?","acceptedAnswer":{"@type":"Answer","text":"Because they are noise that looks like signal. In my 24-hour baseline the top source was a private 10.x address and the second was an empty RemoteIP, both ahead of any real attacker. An indicator for a private address can never be matched to anything useful, and one for your own network can cause alerts about yourself."}},{"@type":"Question","name":"What does the failed-then-succeeded join tell you?","acceptedAnswer":{"@type":"Answer","text":"It separates an annoyance from a possible incident. A source that failed logons ten or more times is background noise on an internet-facing machine. The same source followed by a successful logon means a guess may have worked, and that is the result you escalate. Always check it before you turn a brute force source into an indicator."}},{"@type":"Question","name":"Do I need Traffic Analytics and NTANetAnalytics to follow this series?","acceptedAnswer":{"@type":"Answer","text":"No. NTANetAnalytics, which comes from NSG flow logs with Traffic Analytics enabled, is only used for the network flow match in Part 2. If the table is empty in your workspace you can skip that one query and still finish everything else."}},{"@type":"Question","name":"Will this cost anything to run?","acceptedAnswer":{"@type":"Answer","text":"In the Cyber Range lab environment I did not pay anything beyond the course. In your own tenant, Sentinel bills for the data you ingest and keep, so check the pricing for your workspace before turning on extra connectors. The queries themselves are ordinary KQL and add no separate charge."}}]}</script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article>
+  <header class="post-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/blog">blog</a><span aria-hidden="true">/</span><a href="/blog#sec">sec</a></nav>
+      <span class="sev c-sec">%BLOG-5-SEC</span>
+      <h1 class="mt-2">Threat Intelligence in Sentinel, Part 1: Inventory What You Already Have</h1>
+      <p class="post-dek">A feed switched on is not a feed working. Part 1 counts what Sentinel actually holds, collapses duplicate rows, then mines my own failed logons for 220 candidate bad IPs and asks the question that matters: did any of them get in?</p>
+      <div class="post-meta"><time datetime="2026-10-13">Oct 13, 2026</time><span class="sep">/</span><span>11 min read</span><span class="sep">/</span><span>by Trey</span><span class="sep">/</span><a href="https://github.com/rachata072/threat-intel-sentinel" rel="noopener" target="_blank">source on github &#8599;</a></div>
+      <div class="post-tags"><span class="chip">Microsoft Sentinel</span><span class="chip">Threat Intelligence</span><span class="chip">KQL</span><span class="chip">Blue Team</span><span class="chip">SOC</span><span class="chip">Brute Force</span><span class="chip">Defender XDR</span><span class="chip">MITRE ATT&amp;CK</span></div>
+    </div>
+  </header>
+  <div class="wrap post-layout">
+    <div class="post-main">
+<nav class="series" aria-label="Threat-Intel-Sentinel series"><div class="series-head"><span>traceroute <b>Threat-Intel-Sentinel</b></span><span>hop 1 of 3</span></div><ol><li><span class="here" aria-current="page">Threat Intelligence in Sentinel, Part 1: Inventory What You Already Have</span></li><li><a href="/blog/sentinel-threat-intelligence-python-stix-indicators">Threat Intelligence in Sentinel, Part 2: Python, STIX and IOC Matching</a></li><li><a href="/blog/sentinel-threat-intelligence-analytics-rules-eicar">Threat Intelligence in Sentinel, Part 3: EICAR, Analytics Rules and Incidents</a></li></ol></nav>
+<details class="toc-mobile"><summary>show ip route | toc (7 sections)</summary><ol><li><a href="#preflight-four-checks-before-any-intelligence-work">Preflight: four checks before any intelligence work</a></li><li><a href="#query-1-1-what-kinds-of-indicators-do-you-own">Query 1.1: what kinds of indicators do you own?</a></li><li><a href="#queries-1-2-and-1-3-do-the-built-in-ips-and-hashes-exist">Queries 1.2 and 1.3: do the built-in IPs and hashes exist?</a></li><li><a href="#query-1-4-hygiene-before-you-match-anything">Query 1.4: hygiene before you match anything</a></li><li><a href="#finding-suspicious-ips-in-my-own-logs">Finding suspicious IPs in my own logs</a></li><li><a href="#what-goes-into-part-2">What goes into Part 2</a></li><li><a href="#frequently-asked-questions">Frequently asked questions</a></li></ol></details>
+<div class="prose">
+<p>
+  Turning on a threat intelligence feed in Microsoft Sentinel takes a couple of clicks. Finding out whether it does anything useful takes a lot more. This project is my attempt to close that gap: start from the intelligence Microsoft already provides, add indicators built from my own logs, match both against real telemetry, turn the matches into analytics rules, and then check whether any of it earned its place.
+</p>
+<p>
+  The labs behind it come from the <a href="https://www.skool.com/cyber-range/about?ref=fa6d17eac8a242ef8320accbb4bf913b" rel="noopener" target="_blank">Cyber Range community</a> (that link carries my referral code, so it costs you nothing and may credit me). I used them as a baseline and then extended them, which includes fixing a few inconsistencies in the originals. I point those out as they come up.
+</p>
+<p>
+  This is a three-part series. This post inventories what intelligence you already have and finds suspicious IPs in your own logs. <a href="/blog/sentinel-threat-intelligence-python-stix-indicators">Part 2</a> turns those IPs into STIX indicators with Python and matches them against logons, network flows and 90 days of history. <a href="/blog/sentinel-threat-intelligence-analytics-rules-eicar">Part 3</a> proves the file hash rule with the EICAR test file, builds three analytics rules and works through the incident. The full procedure lives in the <a href="https://github.com/rachata072/threat-intel-sentinel/blob/main/RUNBOOK.md" rel="noopener" target="_blank">RUNBOOK on GitHub</a> and every query is in the KQL library next to it.
+</p>
+<p>
+  One thing to know before the screenshots: the Cyber Range workspace is shared. Many students' virtual machines report into it, so some rows in the results come from machines that are not mine. My own VM is called <code translate="no">threatintel-lab</code>. Where the difference matters, I say so.
+</p>
+<h2 id="preflight-four-checks-before-any-intelligence-work">Preflight: four checks before any intelligence work</h2>
+<p>
+  Before querying indicators, confirm the data you will match them against actually exists. Four quick checks:
+</p>
+<ul>
+  <li><code translate="no">ThreatIntelIndicators | take 5</code> should return rows. If Sentinel says it failed to resolve the table, the connector is not on yet. Install the Threat Intelligence solution from the Content hub, connect Microsoft Defender Threat Intelligence, and wait fifteen to thirty minutes.</li>
+  <li><code translate="no">DeviceLogonEvents | take 5</code> should return rows. If it is empty, check that the Defender XDR connector is on with device events enabled.</li>
+  <li><code translate="no">NTANetAnalytics | take 5</code> should return rows if Traffic Analytics is enabled. It is only needed for one query in Part 2, so an empty table is not a blocker.</li>
+  <li>Create a watchlist called <code translate="no">TI-Allowlist</code> with one column, <code translate="no">IPAddress</code>, holding your own egress IP and any scanner or partner addresses you never want to alert on. The rules in Part 3 fail if this watchlist does not exist.</li>
+</ul>
+<p>
+  A note on schema, because it will trip you up if you copy older queries from blogs. Microsoft moved indicators into the <code translate="no">ThreatIntelIndicators</code> and <code translate="no">ThreatIntelObjects</code> tables, and its <a href="https://learn.microsoft.com/en-us/azure/sentinel/understand-threat-intelligence" rel="noopener" target="_blank">threat intelligence documentation</a> says ingestion into the legacy <code translate="no">ThreatIntelligenceIndicator</code> table stopped after July 31, 2025. A query that still points at the old table will quietly return stale data. If a column in my queries is missing in your tenant, run <code translate="no">ThreatIntelIndicators | take 1</code> and compare.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-watchlists-ti-allowlist-1200.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-watchlists-ti-allowlist-480.webp 480w, /assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-watchlists-ti-allowlist-800.webp 800w, /assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-watchlists-ti-allowlist-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="530"
+       loading="lazy" decoding="async"
+       alt="Microsoft Defender Watchlists page showing the TI-Allowlist watchlist with one row, source Trusted IP.csv and search key IPAddress">
+  <figcaption>The TI-Allowlist watchlist after creation: one row, search key IPAddress, status Succeeded. Every rule in this project reads from it, so it has to exist before the rules do.</figcaption>
+</figure>
+<h2 id="query-1-1-what-kinds-of-indicators-do-you-own">Query 1.1: what kinds of indicators do you own?</h2>
+<p>
+  You cannot match what you have not inventoried, so the first real query counts indicators by type and source.
+</p>
+<pre translate="no"><code translate="no">ThreatIntelIndicators
+| where TimeGenerated &gt; ago(30d)
+| summarize Indicators = dcount(ObservableValue), Active = countif(IsActive == true) by ObservableKey, SourceSystem
+| order by Indicators desc</code></pre>
+<p>
+  <code translate="no">ObservableKey</code> tells you what kind of thing the indicator describes, such as an IP in a network traffic object, a domain name or a file hash. <code translate="no">SourceSystem</code> tells you who supplied it.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-threat-intelligence-indicator-inventory-kql-1200.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-threat-intelligence-indicator-inventory-kql-480.webp 480w, /assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-threat-intelligence-indicator-inventory-kql-800.webp 800w, /assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-threat-intelligence-indicator-inventory-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="555"
+       loading="lazy" decoding="async"
+       alt="Microsoft Sentinel Logs results of a KQL query counting threat intelligence indicators by ObservableKey and SourceSystem, 51 rows">
+  <figcaption>Query 1.1 returned 51 rows. The largest groups are file hashes and network traffic indicators from Microsoft Defender Threat Intelligence and a Premium source.</figcaption>
+</figure>
+<p>
+  The query returned 51 rows. The biggest groups were not IPs at all:
+</p>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">Observable key</th><th scope="col">Source</th><th scope="col">Distinct values</th><th scope="col">Active rows</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name"><code translate="no">file:hashes.'SHA-256'</code></td><td class="int-desc">Premium</td><td class="int-desc">33,453</td><td class="int-desc">398,336</td></tr>
+      <tr><td class="int-name"><code translate="no">file:hashes.'SHA-256'</code></td><td class="int-desc">Microsoft Defender Threat Intelligence</td><td class="int-desc">32,710</td><td class="int-desc">378,834</td></tr>
+      <tr><td class="int-name"><code translate="no">network-traffic</code> (IP)</td><td class="int-desc">Premium</td><td class="int-desc">22,007</td><td class="int-desc">293,000</td></tr>
+      <tr><td class="int-name"><code translate="no">domain-name</code></td><td class="int-desc">Premium</td><td class="int-desc">16,152</td><td class="int-desc">130,367</td></tr>
+      <tr><td class="int-name"><code translate="no">domain-name</code></td><td class="int-desc">Microsoft Defender Threat Intelligence</td><td class="int-desc">5,998</td><td class="int-desc">47,322</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  Look at the last two columns together. The Active count is far bigger than the number of distinct values, and that is not a bug in the query. <code translate="no">Active</code> counts rows, and Sentinel stores a new row every time an indicator is updated. At the top of the list, one source showed 133,525 distinct values against 564,978 active rows. If I had counted rows and called them indicators, I would have overstated my coverage by a factor of four. That is the reason every later query collapses to the newest row per <code translate="no">Id</code>.
+</p>
+<h2 id="queries-1-2-and-1-3-do-the-built-in-ips-and-hashes-exist">Queries 1.2 and 1.3: do the built-in IPs and hashes exist?</h2>
+<p>
+  Next, confirm the two indicator types the rest of the series depends on. IP addresses first:
+</p>
+<pre translate="no"><code translate="no">ThreatIntelIndicators
+| where TimeGenerated &gt; ago(7d)
+| where IsActive == true
+| where ObservableKey == "network-traffic:src_ref.value"
+| project TimeGenerated, SourceSystem, ObservableValue, ObservableKey, ValidUntil, Confidence
+| order by TimeGenerated desc</code></pre>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-builtin-ipv4-indicators-kql-1200.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-builtin-ipv4-indicators-kql-480.webp 480w, /assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-builtin-ipv4-indicators-kql-800.webp 800w, /assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-builtin-ipv4-indicators-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="558"
+       loading="lazy" decoding="async"
+       alt="Sentinel Logs showing active built-in IPv4 threat intelligence indicators with confidence and ValidUntil columns, capped at 30,000 rows">
+  <figcaption>Query 1.2 hit the 30,000 row display limit, so there are at least that many active IP indicators from the last seven days. The visible rows mostly carry confidence 50.</figcaption>
+</figure>
+<p>
+  The results panel stopped at 30,000 rows, which tells you something by itself: the built-in feed is large. The confidence scores in the visible rows were mostly 50, with a 75 among them, and one indicator, 8.222.216.144, was valid until June 2034. A feed IP that stays active for eight years is exactly how a residential address ends up on a blocklist long after the botnet node moved on, and it is one reason I treat expiry as a first-class field later.
+</p>
+<p>
+  Then file hashes, summarised by key and source:
+</p>
+<pre translate="no"><code translate="no">ThreatIntelIndicators
+| where TimeGenerated &gt; ago(14d)
+| where IsActive == true
+| where ObservableKey has "hashes"
+| summarize Count = dcount(ObservableValue) by ObservableKey, SourceSystem</code></pre>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-builtin-file-hash-indicators-kql-1200.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-builtin-file-hash-indicators-kql-480.webp 480w, /assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-builtin-file-hash-indicators-kql-800.webp 800w, /assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-builtin-file-hash-indicators-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="556"
+       loading="lazy" decoding="async"
+       alt="Sentinel Logs result listing built-in file hash indicators by SHA-256, SHA-1 and MD5 key and source">
+  <figcaption>Query 1.3 returned six rows. SHA-256 dominates, but SHA-1 and MD5 indicators exist too, and that matters when we match antivirus events in Part 3.</figcaption>
+</figure>
+<p>
+  Six rows came back: SHA-256 from two sources, SHA-1 from two, and MD5 from two. Write down the exact key string for SHA-256. In my tenant it is <code translate="no">file:hashes.'SHA-256'</code>, quotes included, and later queries filter on it. I also noted that SHA-1 indicators exist, because that turns out to decide whether the hash test in Part 3 works at all.
+</p>
+<p>
+  The original lab heading talks about file hashes but its queries only use IPs. Query 1.3 and the hash matching in Part 3 are my additions to close that gap.
+</p>
+<h2 id="query-1-4-hygiene-before-you-match-anything">Query 1.4: hygiene before you match anything</h2>
+<p>
+  The last inventory query is the one I would keep running monthly. It collapses every indicator to its newest row, drops anything expired, and shows how much is about to expire:
+</p>
+<pre translate="no"><code translate="no">let LatestIndicators = ThreatIntelIndicators
+| where TimeGenerated &gt; ago(30d)
+| summarize arg_max(TimeGenerated, *) by Id
+| where IsActive == true and ValidUntil &gt; now();
+LatestIndicators
+| summarize Active = count(), ExpiringIn7Days = countif(ValidUntil &lt; now() + 7d) by SourceSystem</code></pre>
+<p>
+  Microsoft's documentation says indicators are deduplicated on the <code translate="no">Id</code> property and the newest <code translate="no">TimeGenerated</code> wins. In the raw table I still saw several rows per indicator, so I collapse them myself with <code translate="no">arg_max</code> in every query rather than trusting the portal to have done it. Stale indicators are the most common reason a threat intelligence rule gets noisy, and they are cheap to exclude.
+</p>
+<h2 id="finding-suspicious-ips-in-my-own-logs">Finding suspicious IPs in my own logs</h2>
+<p>
+  Third-party intelligence tells you what is bad somewhere in the world. The IPs that matter most are the ones that have already touched your own machines. So the next phase mines <code translate="no">DeviceLogonEvents</code> for them.
+</p>
+<h3>Query 2.1: the lab baseline</h3>
+<pre translate="no"><code translate="no">DeviceLogonEvents
+| where ActionType == "LogonFailed"
+| summarize Count = count() by RemoteIP, ActionType
+| order by Count desc</code></pre>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-brute-force-baseline-24h-kql-1200.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-brute-force-baseline-24h-kql-480.webp 480w, /assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-brute-force-baseline-24h-kql-800.webp 800w, /assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-brute-force-baseline-24h-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="558"
+       loading="lazy" decoding="async"
+       alt="Sentinel Logs showing failed logons grouped by RemoteIP over the last 24 hours, 113 rows, led by a private 10.0.0.8 address and a blank RemoteIP">
+  <figcaption>The 24-hour baseline returned 113 rows. The first two are not attackers: a private 10.0.0.8 address with 725 failures and an empty RemoteIP with 614.</figcaption>
+</figure>
+<p>
+  This is the baseline from the lab, and the top of the list is a good lesson in why you should never export a query like this straight into indicators. The biggest source, with 725 failed logons, was <code translate="no">10.0.0.8</code>, a private address. The second biggest, with 614, was an empty <code translate="no">RemoteIP</code>. The first real public address, 218.147.202.136, came third with 219, followed by 182.95.42.14 (193), 186.232.214.20 (175), 217.218.10.46 (126) and 109.160.32.35 (116).
+</p>
+<p>
+  A private address can never be a useful indicator, and a blank one is not an address at all. Both have to be filtered out.
+</p>
+<h3>Query 2.2: built to produce a defensible indicator</h3>
+<p>
+  My version adds a seven-day window, the private and empty filters, and three pieces of context: how many different devices the source hit, how many accounts it tried, and when it was first and last seen.
+</p>
+<pre translate="no"><code translate="no">let startTime = ago(7d);
+DeviceLogonEvents
+| where TimeGenerated &gt; startTime
+| where ActionType == "LogonFailed"
+| where isnotempty(RemoteIP)
+| where not(ipv4_is_private(RemoteIP))
+| summarize
+    FailedLogons = count(),
+    DistinctDevices = dcount(DeviceName),
+    DistinctAccounts = dcount(AccountName),
+    FirstSeen = min(TimeGenerated),
+    LastSeen = max(TimeGenerated)
+    by RemoteIP
+| where FailedLogons &gt;= 10
+| order by FailedLogons desc</code></pre>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-brute-force-enriched-7d-kql-1200.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-brute-force-enriched-7d-kql-480.webp 480w, /assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-brute-force-enriched-7d-kql-800.webp 800w, /assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-brute-force-enriched-7d-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="558"
+       loading="lazy" decoding="async"
+       alt="Sentinel Logs showing 220 public brute force source IPs with failed logon counts, distinct devices, distinct accounts, first seen and last seen">
+  <figcaption>Query 2.2 produced 220 candidate IPs. The top one, 138.91.109.48, failed 1,306 times across 30 devices.</figcaption>
+</figure>
+<p>
+  It returned 220 candidate IPs. The top four tell different stories:
+</p>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">Source IP</th><th scope="col">Failed logons</th><th scope="col">Devices hit</th><th scope="col">Accounts tried</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name">138.91.109.48</td><td class="int-desc">1,306</td><td class="int-desc">30</td><td class="int-desc">2</td></tr>
+      <tr><td class="int-name">80.94.95.83</td><td class="int-desc">1,161</td><td class="int-desc">18</td><td class="int-desc">7</td></tr>
+      <tr><td class="int-name">23.94.69.14</td><td class="int-desc">579</td><td class="int-desc">11</td><td class="int-desc">17</td></tr>
+      <tr><td class="int-name">80.66.83.43</td><td class="int-desc">521</td><td class="int-desc">10</td><td class="int-desc">2</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  The first and last rows are the same pattern: very few account names tried against many machines, which looks like a short username list swept across everything reachable (password guessing, <a href="https://attack.mitre.org/techniques/T1110/001/" rel="noopener" target="_blank">T1110.001 in MITRE ATT&amp;CK</a>). The third row is different. Seventeen accounts across eleven devices is a much wider spread of usernames, and a wide spread of accounts with only a modest number of failures per account is the pattern to check for password spraying (<a href="https://attack.mitre.org/techniques/T1110/003/" rel="noopener" target="_blank">T1110.003</a>). Counts alone cannot confirm it, and 579 failures over 17 accounts is not a textbook spray, but this is exactly the kind of detail that makes an indicator more convincing than a bare IP and a number. An address that failed 700 times against nine different machines tells a stronger story than one that failed twelve times against one.
+</p>
+<p>
+  Remember that this is the shared workspace, so "30 devices" means 30 devices across many students' labs, not 30 of mine.
+</p>
+<h3>Query 2.3: did any of them ever get in?</h3>
+<p>
+  A brute force source is an annoyance. A brute force source that later logged in is an incident, so this is the query I would not skip:
+</p>
+<pre translate="no"><code translate="no">let Attackers = DeviceLogonEvents
+| where TimeGenerated &gt; ago(7d)
+| where ActionType == "LogonFailed" and isnotempty(RemoteIP)
+| summarize Failed = count() by RemoteIP
+| where Failed &gt;= 10;
+DeviceLogonEvents
+| where TimeGenerated &gt; ago(7d)
+| where ActionType == "LogonSuccess"
+| join kind=inner Attackers on RemoteIP
+| project TimeGenerated, DeviceName, AccountName, RemoteIP, LogonType, Failed
+| order by TimeGenerated asc</code></pre>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-attacker-successful-logon-check-kql-1200.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-attacker-successful-logon-check-kql-480.webp 480w, /assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-attacker-successful-logon-check-kql-800.webp 800w, /assets/img/sentinel-threat-intelligence-inventory-kql/sentinel-attacker-successful-logon-check-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="565"
+       loading="lazy" decoding="async"
+       alt="Sentinel Logs showing 6,746 successful logons from IP addresses that previously failed ten or more times, with device, account, logon type and failure count">
+  <figcaption>Query 2.3 returned 6,746 rows instead of the zero a quiet range would give, so the next step is scoping to devices you own.</figcaption>
+</figure>
+<p>
+  On a quiet network the expected answer is zero rows, and my runbook says so. In this workspace the answer was 6,746 rows. The first visible row was a successful network logon on a device named <code translate="no">win-azrstigjt</code> from 20.80.241.91, an address with 25 earlier failures.
+</p>
+<p>
+  That number does not mean 6,746 compromises, and it does not mean the query is broken. My best explanation is that this is a shared, deliberately exposed lab range where lots of machines are reachable from the internet and most of them belong to other people, so a join across the whole workspace was never going to come back empty. The practical fix is the same one I use for the hash query in Part 3: scope the result to a device you own with <code translate="no">| where DeviceName startswith "threatintel-lab"</code>, or summarise by device and look at the ones with the largest ratio of successes to failures. Keep the query as it is for a production tenant, where a single row should wake someone up.
+</p>
+<h2 id="what-goes-into-part-2">What goes into Part 2</h2>
+<p>
+  The output of this post is a list of 220 public IPs that have repeatedly failed logons, with a count, a device spread and a time window for each, plus a baseline answer to whether any of them got in. <a href="/blog/sentinel-threat-intelligence-python-stix-indicators">Part 2</a> takes that list, validates it with Python, scores confidence and turns each address into a STIX indicator that Sentinel can match against logons, network flows and 90 days of history.
+</p>
+<p>
+  If you want to see what the free tools look like on the same idea, my <a href="/blog/soc-homelab-threat-hunt-report">SOC-HomeLab threat hunt write-up</a> walks through reading a day of Wazuh and Zeek alerts cold, and it is a useful contrast to doing the same work in Sentinel.
+</p>
+<h2 id="frequently-asked-questions">Frequently asked questions</h2>
+<h3>What is the ThreatIntelIndicators table in Microsoft Sentinel?</h3>
+<p>
+  It is the table where Sentinel stores threat indicators such as IP addresses, domains, URLs and file hashes, whether they came from Microsoft's own feed, a connector, a file import or the portal. It replaced the older ThreatIntelligenceIndicator table, and Microsoft's documentation says ingestion into the legacy table stopped after July 31, 2025, so queries written for the old table need to be moved over.
+</p>
+<h3>Why do the Active and Indicators numbers in my inventory query not match?</h3>
+<p>
+  Because Active counts rows and Indicators counts distinct values. Sentinel keeps a new row each time an indicator is updated, so one indicator can appear many times. In my workspace one source showed 133,525 distinct values against 564,978 active rows. Collapsing to the newest row per Id with arg_max, and checking ValidUntil, gives you the real number.
+</p>
+<h3>Why filter out private and blank IP addresses before building indicators?</h3>
+<p>
+  Because they are noise that looks like signal. In my 24-hour baseline the top source was a private 10.x address and the second was an empty RemoteIP, both ahead of any real attacker. An indicator for a private address can never be matched to anything useful, and one for your own network can cause alerts about yourself.
+</p>
+<h3>What does the failed-then-succeeded join tell you?</h3>
+<p>
+  It separates an annoyance from a possible incident. A source that failed logons ten or more times is background noise on an internet-facing machine. The same source followed by a successful logon means a guess may have worked, and that is the result you escalate. Always check it before you turn a brute force source into an indicator.
+</p>
+<h3>Do I need Traffic Analytics and NTANetAnalytics to follow this series?</h3>
+<p>
+  No. NTANetAnalytics, which comes from NSG flow logs with Traffic Analytics enabled, is only used for the network flow match in Part 2. If the table is empty in your workspace you can skip that one query and still finish everything else.
+</p>
+<h3>Will this cost anything to run?</h3>
+<p>
+  In the Cyber Range lab environment I did not pay anything beyond the course. In your own tenant, Sentinel bills for the data you ingest and keep, so check the pricing for your workspace before turning on extra connectors. The queries themselves are ordinary KQL and add no separate charge.
+</p>
+</div>
+      <footer class="post-end">
+        <div class="repo-box"><div><span class="k">source for this post</span><span class="v">github.com/rachata072/threat-intel-sentinel</span></div><a class="btn btn-sec" href="https://github.com/rachata072/threat-intel-sentinel" rel="noopener" target="_blank">view repo <span aria-hidden="true">&#8599;</span></a></div>
+        <nav class="nexthop" aria-label="More posts"><a class="prev" href="/blog/sentinel-threat-intelligence-analytics-rules-eicar"><span class="k">&larr; previous hop</span>Threat Intelligence in Sentinel, Part 3: EICAR, Analytics Rules and Incidents</a><a class="next" href="/blog/sentinel-threat-intelligence-python-stix-indicators"><span class="k">next hop &rarr;</span>Threat Intelligence in Sentinel, Part 2: Python, STIX and IOC Matching</a></nav>
+      </footer>
+    </div>
+    <aside class="toc" aria-label="On this page"><span class="toc-title"><span class="h">#</span> show ip route | toc</span><ol><li><a href="#preflight-four-checks-before-any-intelligence-work">Preflight: four checks before any intelligence work</a></li><li><a href="#query-1-1-what-kinds-of-indicators-do-you-own">Query 1.1: what kinds of indicators do you own?</a></li><li><a href="#queries-1-2-and-1-3-do-the-built-in-ips-and-hashes-exist">Queries 1.2 and 1.3: do the built-in IPs and hashes exist?</a></li><li><a href="#query-1-4-hygiene-before-you-match-anything">Query 1.4: hygiene before you match anything</a></li><li><a href="#finding-suspicious-ips-in-my-own-logs">Finding suspicious IPs in my own logs</a></li><li><a href="#what-goes-into-part-2">What goes into Part 2</a></li><li><a href="#frequently-asked-questions">Frequently asked questions</a></li></ol></aside>
+  </div>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Oct 13, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

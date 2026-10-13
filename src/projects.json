@@ -12,6 +12,17 @@
     "tags": ["Suricata", "Zeek", "Wazuh", "Grafana", "Blue team"]
   },
   {
+    "id": "threat-intel",
+    "name": "Threat-Intel-Sentinel",
+    "cat": "security",
+    "status": "up",
+    "repo": "threat-intel-sentinel",
+    "post": "sentinel-threat-intelligence-inventory-kql",
+    "post_label": "read the 3-part series",
+    "blurb": "Threat intelligence run end to end in Microsoft Sentinel: inventory the built-in feeds with KQL, mine 220 brute force IPs from my own logs, turn them into STIX indicators with a standard-library Python script, match them against logons, network flows and 90 days of history, then prove a file hash rule with EICAR and wire three analytics rules.",
+    "tags": ["Microsoft Sentinel", "KQL", "Python", "STIX", "Blue team"]
+  },
+  {
     "id": "config-backup",
     "name": "Py-ConfigBackup",
     "cat": "automation",

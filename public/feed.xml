@@ -5,8 +5,32 @@
   <link>https://breakfixlearn.com/</link>
   <description>CCNA lab walkthroughs, security write-ups, and Python network automation notes by Trey.</description>
   <language>en-ca</language>
-  <lastBuildDate>Sun, 04 Oct 2026 09:00:00 -0700</lastBuildDate>
+  <lastBuildDate>Tue, 13 Oct 2026 09:00:00 -0700</lastBuildDate>
   <atom:link href="https://breakfixlearn.com/feed.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>Threat Intelligence in Sentinel, Part 2: Python, STIX and IOC Matching</title>
+    <link>https://breakfixlearn.com/blog/sentinel-threat-intelligence-python-stix-indicators</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/sentinel-threat-intelligence-python-stix-indicators.html</guid>
+    <pubDate>Tue, 13 Oct 2026 09:00:00 -0700</pubDate>
+    <category>SEC</category>
+    <description>Part 2 of the Sentinel threat intelligence project. A standard-library Python script turns 220 failed-logon IPs into scored STIX 2.1 indicators with an audit file, Sentinel imports them, and KQL matches them against logons, NSG flows, outbound connections and a 90-day retrohunt. Not everything came back clean.</description>
+  </item>
+  <item>
+    <title>Threat Intelligence in Sentinel, Part 1: Inventory What You Already Have</title>
+    <link>https://breakfixlearn.com/blog/sentinel-threat-intelligence-inventory-kql</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/sentinel-threat-intelligence-inventory-kql.html</guid>
+    <pubDate>Tue, 13 Oct 2026 09:00:00 -0700</pubDate>
+    <category>SEC</category>
+    <description>Part 1 of a three-part Microsoft Sentinel threat intelligence project. I inventory the built-in indicators with KQL, learn why active row counts mislead, mine 220 brute force source IPs from my own failed logons, and run the failed-then-succeeded check that separates noise from an incident.</description>
+  </item>
+  <item>
+    <title>Threat Intelligence in Sentinel, Part 3: EICAR, Analytics Rules and Incidents</title>
+    <link>https://breakfixlearn.com/blog/sentinel-threat-intelligence-analytics-rules-eicar</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/sentinel-threat-intelligence-analytics-rules-eicar.html</guid>
+    <pubDate>Tue, 13 Oct 2026 09:00:00 -0700</pubDate>
+    <category>SEC</category>
+    <description>Part 3 of the Sentinel threat intelligence project. I prove a file hash rule with the EICAR test file and learn why antivirus events carry SHA-1, build three scheduled rules, triage the incident one of them created, and measure the feeds. One alert came from over 120,000 indicators, and two of my three rules have yet to fire.</description>
+  </item>
   <item>
     <title>One IPv6 Address, Two Readings: How NAT64 Fooled OpenClaw&#x27;s SSRF Guard</title>
     <link>https://breakfixlearn.com/blog/openclaw-nat64-ssrf-guard-bypass</link>

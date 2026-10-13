@@ -1,0 +1,361 @@
+<!--meta
+{
+  "title": "Threat Intelligence in Sentinel, Part 3: EICAR, Analytics Rules and Incidents",
+  "seo_title": "Sentinel Threat Intelligence Part 3: EICAR and Analytics Rules",
+  "description": "Prove a Sentinel file hash rule with the EICAR test file, build three threat intelligence analytics rules, work the incident, and check whether any of it paid off.",
+  "og_description": "Part 3 closes the loop: an EICAR hash proof that exposes the SHA-1 versus SHA-256 trap, three scheduled analytics rules, a real incident with a triage note, and a frank look at whether the feeds earned their place.",
+  "summary": "Part 3 of the Sentinel threat intelligence project. I prove a file hash rule with the EICAR test file and learn why antivirus events carry SHA-1, build three scheduled rules, triage the incident one of them created, and measure the feeds. One alert came from over 120,000 indicators, and two of my three rules have yet to fire.",
+  "date": "2026-10-13",
+  "category": "sec",
+  "tags": [
+    "Microsoft Sentinel",
+    "Threat Intelligence",
+    "KQL",
+    "Analytics Rules",
+    "EICAR",
+    "Incident Response",
+    "MITRE ATT&CK",
+    "Detection Engineering"
+  ],
+  "repo": "threat-intel-sentinel",
+  "series": "threat-intel-sentinel",
+  "series_part": 3,
+  "faq": [
+    [
+      "What is the EICAR test file and is it safe to use?",
+      "EICAR is a harmless 68-byte text file, created by the European Institute for Computer Antivirus Research, that antivirus products deliberately treat as a virus so you can test a scanner without handling real malware. It is safe, but use it on a lab machine rather than your daily one, and never paste its string into a document or repository because antivirus will quarantine the file."
+    ],
+    [
+      "Why did my SHA-256 indicator not match the EICAR detection?",
+      "Because Defender's antivirus detection rows in the DeviceEvents table carry the SHA-1 hash and leave the SHA256 column empty. A SHA-256 indicator has nothing to match. Import an indicator for each hash type your telemetry provides, and make the matching query compare every hash column, lowercased on both sides."
+    ],
+    [
+      "What run interval and lookback should a threat intelligence analytics rule use?",
+      "I run the rules every 5 minutes with a one hour lookback. The lookback has to be at least as long as the run interval plus the ingestion delay, otherwise events that land late are missed. The overlap means the same event can be seen twice, so group events into a single alert and group alerts into incidents by IP entity."
+    ],
+    [
+      "How do I stop a threat intelligence rule from alerting on my own IP address?",
+      "Put your egress address, scanners and partner addresses in a watchlist, then exclude them in the rule with a not-in check against that watchlist. Also remove any indicator that was created from your own address. A rule that alerts on the owner's home IP gets switched off within a week."
+    ],
+    [
+      "What is the difference between indicator confidence and alert severity?",
+      "Confidence is how likely the indicator is to be truly malicious. Severity is how urgent the match is. They can disagree: a low-confidence indicator that matches a successful logon is still urgent. My logon rule raises severity to High on any successful logon from an indicator address, whatever the confidence says."
+    ],
+    [
+      "Does a threat intelligence match mean a device is compromised?",
+      "No. A match means a known indicator appeared in your telemetry. For an inbound failed logon that is mostly background noise. For an outbound connection it is stronger, but you still need the initiating process, the command line and the account before calling it. My own triage note ended with a verdict of needs more data."
+    ],
+    [
+      "How do I know if a threat feed is worth keeping?",
+      "Count active indicators per source, compare that with the alerts each source actually produced, and review it on a schedule. A source with tens of thousands of indicators and no alerts is a cost, not a defence. In my workspace the two big feeds held over a hundred thousand active indicators between them and one alert came from all the rules in thirty days."
+    ],
+    [
+      "Which MITRE ATT&CK techniques does this project cover?",
+      "The logon rule maps to Brute Force (T1110), Valid Accounts (T1078) and External Remote Services (T1133). The file hash rule maps to User Execution: Malicious File (T1204.002). The outbound rule maps to Application Layer Protocol (T1071). A match gives you the indicator, not the whole technique chain."
+    ]
+  ],
+  "read_min": 13
+}
+-->
+<p>
+  <a href="/blog/sentinel-threat-intelligence-inventory-kql">Part 1</a> inventoried the intelligence in Microsoft Sentinel and found 220 brute force IPs in my own logs. <a href="/blog/sentinel-threat-intelligence-python-stix-indicators">Part 2</a> turned them into STIX indicators with Python and matched them against logons, flows, outbound connections and 90 days of history. Everything so far was a query someone had to remember to run. This post makes it automatic: it proves the file hash path with a harmless test file, builds three scheduled analytics rules, works an incident from alert to triage note, and then asks the uncomfortable question of whether any of it was worth doing.
+</p>
+<p>
+  The step-by-step version is the <a href="https://github.com/rachata072/threat-intel-sentinel/blob/main/RUNBOOK.md" rel="noopener" target="_blank">RUNBOOK on GitHub</a>. The labs this grew out of come from the <a href="https://www.skool.com/cyber-range/about?ref=fa6d17eac8a242ef8320accbb4bf913b" rel="noopener" target="_blank">Cyber Range community</a>, and as in Part 1 that link carries my referral code. The workspace is still shared, so some rows below come from machines that are not mine. Mine is <code>threatintel-lab</code>.
+</p>
+<h2>Proving the hash rule with EICAR</h2>
+<p>
+  The built-in hash indicators describe real malware. A clean lab will never match them, and a rule that has never matched anything is a rule you cannot trust. I needed something harmless that antivirus and threat intelligence both recognise, and that is what the <a href="https://www.eicar.org/download-anti-malware-testfile/" rel="noopener" target="_blank">EICAR test file</a> is for: a 68-byte text file that antivirus products deliberately treat as a virus. One rule in my repo is never to paste the EICAR string into a document, because antivirus will quarantine the file. Download it from the official page instead, and only on a lab machine.
+</p>
+<p>
+  Import two indicators, not one, with the source set to <code>MaliciousFlows-Lab</code> and a name like <code>MaliciousFlows - TEST - EICAR</code>:
+</p>
+<pre><code>SHA-256  275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f
+SHA-1    3395856ce81f2b7382dee72602f798b642f14140</code></pre>
+<p>
+  The reason for two is the most useful thing I learned in the whole project. When Defender blocks or deletes a file the moment it arrives, the evidence is an <code>AntivirusDetection</code> row in the <code>DeviceEvents</code> table, and there may be no ordinary row in <code>DeviceFileEvents</code> at all. Those antivirus rows carry the <strong>SHA-1</strong> and leave <code>SHA256</code> empty. An indicator for the SHA-256 alone has nothing to match against. A hash matching rule has to compare every hash type the telemetry provides.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-analytics-rules-eicar/defender-antivirus-eicar-test-detection-powershell-800.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-analytics-rules-eicar/defender-antivirus-eicar-test-detection-powershell-480.webp 480w, /assets/img/sentinel-threat-intelligence-analytics-rules-eicar/defender-antivirus-eicar-test-detection-powershell-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="154"
+       loading="lazy" decoding="async"
+       alt="PowerShell output of Get-MpThreatDetection on the lab VM showing an EICAR test file detection at C:\Users\Public\eicar.com.txt on October 12 2026">
+  <figcaption>Defender's own record on the lab VM: Get-MpThreatDetection lists the detection of eicar.com.txt in C:\Users\Public at 5:22 PM on October 12, 2026.</figcaption>
+</figure>
+<p>
+  With the file detected on the lab VM, here is Query 5.1. It looks in both <code>DeviceFileEvents</code> and the antivirus rows, puts both hashes of each event into an array, and joins every one of them to the indicators:
+</p>
+<pre><code>let BadHashes = ThreatIntelIndicators
+| where TimeGenerated &gt; ago(30d)
+| where ObservableKey has "hashes"
+| summarize arg_max(TimeGenerated, *) by Id
+| where IsActive == true and ValidUntil &gt; now()
+| project Hash = tolower(ObservableValue), Confidence, Source = SourceSystem;
+let FileHits = DeviceFileEvents
+| where TimeGenerated &gt; ago(1h)
+| project TimeGenerated, DeviceName, FileName, FolderPath, SHA256, SHA1, ActionType, Table = "DeviceFileEvents";
+let AvHits = DeviceEvents
+| where TimeGenerated &gt; ago(1h)
+| where ActionType == "AntivirusDetection"
+| project TimeGenerated, DeviceName, FileName, FolderPath, SHA256, SHA1, ActionType, Table = "DeviceEvents";
+union FileHits, AvHits
+| extend Hash = pack_array(tolower(SHA256), tolower(SHA1))
+| mv-expand Hash to typeof(string)
+| where isnotempty(Hash)
+| join kind=inner BadHashes on Hash
+| project TimeGenerated, DeviceName, FileName, FolderPath, ActionType, Table, Hash, Confidence, Source
+| order by TimeGenerated desc</code></pre>
+<p>
+  Lowercase both sides, because hash case is an easy way to miss a match. While testing, change both <code>ago(1h)</code> values to <code>ago(1d)</code> and add <code>| where DeviceName startswith "threatintel-lab"</code> after the union so other people's devices in the shared workspace do not appear.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-eicar-hash-match-device-events-kql-1200.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-eicar-hash-match-device-events-kql-480.webp 480w, /assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-eicar-hash-match-device-events-kql-800.webp 800w, /assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-eicar-hash-match-device-events-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="563"
+       loading="lazy" decoding="async"
+       alt="Sentinel Logs showing nine matches of eicar.com.txt on the threatintel-lab device from the DeviceEvents table with AntivirusDetection, a SHA-1 hash and confidence 90">
+  <figcaption>The hash match: nine rows, all eicar.com.txt on threatintel-lab, from the DeviceEvents table as AntivirusDetection, matched on the SHA-1 hash at confidence 90.</figcaption>
+</figure>
+<p>
+  It worked: nine rows, all <code>eicar.com.txt</code> on my VM, all from <code>DeviceEvents</code> as <code>AntivirusDetection</code>, matched on the SHA-1 hash with a confidence of 90. If yours does not, the checks are the same three every time. Is the stored hash lowercase? Does the indicator key really contain <code>SHA-256</code> or <code>SHA-1</code> (Query 1.3 shows the exact string)? And did Defender record the hash for that file at all?
+</p>
+<h2>Three rules, one pattern</h2>
+<p>
+  Each rule is a scheduled query that reuses a query from the series, runs every 5 minutes and looks back one hour. The lookback has to be at least as long as the run interval plus the ingestion delay, or events that arrive late slip past.
+</p>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">Rule</th><th scope="col">Matches</th><th scope="col">Severity</th><th scope="col">Tactics</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name">A: <code>TI Map IP Entity to DeviceLogonEvents - MaliciousFlows</code></td><td class="int-desc">Indicator IPs against device logons</td><td class="int-desc">Medium, High on any success or confidence 80+</td><td class="int-desc">Credential Access, Initial Access</td></tr>
+      <tr><td class="int-name">B: <code>TI Map SHA256 to DeviceFileEvents</code></td><td class="int-desc">Indicator hashes against file events and antivirus detections</td><td class="int-desc">High</td><td class="int-desc">Execution, Defense Evasion</td></tr>
+      <tr><td class="int-name">C: <code>TI Map IP Entity to DeviceNetworkEvents (outbound)</code></td><td class="int-desc">Indicator IPs against outbound connections</td><td class="int-desc">High</td><td class="int-desc">Command and Control</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  The ATT&amp;CK mapping is deliberately modest. Rule A covers <a href="https://attack.mitre.org/techniques/T1110/001/" rel="noopener" target="_blank">Brute Force (T1110)</a> as the source of the indicators, <a href="https://attack.mitre.org/techniques/T1078/" rel="noopener" target="_blank">Valid Accounts (T1078)</a> when a logon succeeds and <a href="https://attack.mitre.org/techniques/T1133/" rel="noopener" target="_blank">External Remote Services (T1133)</a> for exposed RDP or SSH. Rule B covers <a href="https://attack.mitre.org/techniques/T1204/002/" rel="noopener" target="_blank">User Execution: Malicious File (T1204.002)</a> and Rule C covers <a href="https://attack.mitre.org/techniques/T1071/" rel="noopener" target="_blank">Application Layer Protocol (T1071)</a>. A hash or IP match tells you the indicator, not which technique an attacker used.
+</p>
+<h3>Rule A: logons</h3>
+<pre><code>let Allow = _GetWatchlist('TI-Allowlist') | project IPAddress;
+let BadIPs = ThreatIntelIndicators
+| where TimeGenerated &gt; ago(365d)
+| where tostring(Data.name) startswith "MaliciousFlows"
+| summarize arg_max(TimeGenerated, *) by Id
+| where IsActive == true and ValidUntil &gt; now()
+| project BadIP = ObservableValue, Confidence, IndicatorName = tostring(Data.name), ValidUntil;
+DeviceLogonEvents
+| where TimeGenerated &gt; ago(1h)
+| where RemoteIP !in (Allow)
+| join kind=inner BadIPs on $left.RemoteIP == $right.BadIP
+| extend Outcome = iff(ActionType == "LogonSuccess", "SUCCESS after known bad", "Failed attempt")
+| extend Severity = case(ActionType == "LogonSuccess", "High", Confidence &gt;= 80, "High", Confidence &gt;= 50, "Medium", "Low")
+| project TimeGenerated, DeviceName, AccountName, RemoteIP, ActionType, Outcome, Confidence, IndicatorName, Severity</code></pre>
+<p>
+  Three details are doing real work here. The <code>Allow</code> watchlist keeps the rule from alerting on my own address. The join carries confidence and the indicator name into the alert. And the <code>Severity</code> column makes any successful logon High regardless of confidence, because confidence is not severity. A weak indicator that lines up with a login on a server is still the thing you look at first.
+</p>
+<p>
+  In the rule wizard I set the alert name format to <code>TI Match: {{RemoteIP}} on {{DeviceName}}</code>, took severity from the <code>Severity</code> column, grouped all events into a single alert, and grouped alerts into incidents by matching IP entity within 24 hours.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-analytics-rules-ti-map-filter-800.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-analytics-rules-ti-map-filter-480.webp 480w, /assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-analytics-rules-ti-map-filter-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="693"
+       loading="lazy" decoding="async"
+       alt="Microsoft Sentinel Analytics page filtered by the text TI Map in a workspace with 365 active rules">
+  <figcaption>The Analytics page filtered on my TI Map naming prefix. The shared workspace carries 365 active rules, so a clear prefix is the only way to find your own.</figcaption>
+</figure>
+<p>
+  Entity mapping is where a rule becomes useful to the person who gets the incident, because it is what lets an analyst pivot from the alert to the host, the IP and the account. The columns you map have to exist in the query output.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-analytics-rule-entity-mapping-800.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-analytics-rule-entity-mapping-480.webp 480w, /assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-analytics-rule-entity-mapping-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="598"
+       loading="lazy" decoding="async"
+       alt="Microsoft Sentinel analytics rule wizard entity mapping tab mapping Host HostName to DeviceName, IP Address to RemoteIP and Account FullName to AccountName">
+  <figcaption>Entity mapping for Rule A: Host from DeviceName, IP from RemoteIP and Account from AccountName. Check which identifier fits what your column actually holds.</figcaption>
+</figure>
+<h3>Rule B: file hashes</h3>
+<p>
+  Rule B uses Query 5.1 as it is. One practical note: the query projects a <code>Hash</code> column, not <code>SHA256</code>, so map the file hash entity to <code>Hash</code>, and add <code>InitiatingProcessAccountName</code> to the final project line if you want an Account entity to pivot on. The wizard only lets you map columns the query actually returns.
+</p>
+<h3>Rule C: outbound connections</h3>
+<p>
+  Rule C is Query 4.4 from Part 2 with the lookback shortened to match the schedule:
+</p>
+<pre><code>DeviceNetworkEvents
+| where TimeGenerated &gt; ago(1h)
+| where ActionType in ("ConnectionSuccess", "ConnectionAttempt")
+| join kind=inner BadIPs on $left.RemoteIP == $right.BadIP</code></pre>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-ti-map-analytics-rules-list-800.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-ti-map-analytics-rules-list-480.webp 480w, /assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-ti-map-analytics-rules-list-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="195"
+       loading="lazy" decoding="async"
+       alt="Microsoft Sentinel analytics rule list showing three enabled TI Map rules with MITRE tactics Command and Control T1071, Execution T1204.002 and Credential Access T1110">
+  <figcaption>All three rules enabled. The tactic and technique tags match the table above: Command and Control, Execution and Credential Access.</figcaption>
+</figure>
+<p>
+  There is a trap in Rule A. It only looks back one hour, so it will never fire on old test data, and you cannot create a fresh failed logon from someone else's IP. To prove it works, widen the lookback to seven days temporarily, take your screenshot, then set it back to one hour. Write down that you did it. A rule you have never seen fire is a rule you have not tested.
+</p>
+<h2>An incident, and the note I wrote</h2>
+<p>
+  The first incident came from Rule C, and it was High.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-incident-from-ti-map-rule-1200.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-incident-from-ti-map-rule-480.webp 480w, /assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-incident-from-ti-map-rule-800.webp 800w, /assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-incident-from-ti-map-rule-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="648"
+       loading="lazy" decoding="async"
+       alt="Microsoft Defender incident 549805 created from the TI Map outbound connection rule, severity High, status Active, unassigned, with one alert and one event">
+  <figcaption>Incident 549805: High, Active and unassigned, from the outbound connection rule, with one alert and one event. The workspace had roughly 1.3K open incidents.</figcaption>
+</figure>
+<p>
+  It was created on the evening of October 12, shortly after the rules were switched on, in a workspace with roughly 1,300 open incidents. The devices involved were lab machines in the shared environment, not mine, so containing anything was not an option and not my place. What I could do was triage it properly, and the runbook has a short template for that: what the indicator was, what it touched, whether any attempt succeeded, a verdict and an action. My note looked like this:
+</p>
+<ul>
+  <li><strong>Indicator:</strong> multiple MaliciousFlows and feed indicators, confidence 70 to 97.</li>
+  <li><strong>What it touched:</strong> outbound connections from lab devices in the shared workspace, not <code>threatintel-lab</code>.</li>
+  <li><strong>Did any attempt succeed:</strong> connections recorded as <code>ConnectionSuccess</code> or <code>ConnectionAttempt</code>, no account compromise confirmed.</li>
+  <li><strong>Verdict:</strong> needs more data. The devices are not my assets.</li>
+  <li><strong>Action:</strong> scoped the query to my own VM, fixed a missing entity mapping on the rule, no blocking performed.</li>
+</ul>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-incident-triage-note-1200.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-incident-triage-note-480.webp 480w, /assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-incident-triage-note-800.webp 800w, /assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-incident-triage-note-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="349"
+       loading="lazy" decoding="async"
+       alt="Microsoft Defender incident activity log showing a manual comment with the triage note covering indicator, what it touched, whether an attempt succeeded, the verdict needs more data, and the action taken">
+  <figcaption>The triage note saved as a comment on the incident. Verdict: needs more data, because the devices are not mine and no account compromise is confirmed.</figcaption>
+</figure>
+<p>
+  Writing "needs more data" felt unsatisfying, and it was still the right verdict. A confident wrong answer in an incident note is worse than an honest one. The same note records that I found a missing entity mapping on the rule while working the incident, which is the sort of fix you only find by actually using the output.
+</p>
+<p>
+  If a successful logon from an indicator address ever appears on a device you do own, the response changes. The runbook treats it as a potential compromise: disable the account, isolate the device, preserve logs and tell the security lead.
+</p>
+<h2>Did any of it earn its place?</h2>
+<p>
+  The last query is the one that keeps a threat intelligence program honest. It counts active indicators and average confidence per source, so you can set that against what each source actually produced.
+</p>
+<pre><code>let Hits = SecurityAlert
+| where TimeGenerated &gt; ago(30d)
+| where AlertName startswith "TI Map"
+| summarize AlertCount = count();
+ThreatIntelIndicators
+| where TimeGenerated &gt; ago(30d)
+| summarize arg_max(TimeGenerated, *) by Id
+| summarize ActiveIndicators = countif(IsActive == true), AvgConfidence = avg(toreal(Confidence)) by SourceSystem
+| extend Note = "Compare with alert counts per rule. A source with thousands of indicators and zero hits is cost, not value."</code></pre>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-indicator-effectiveness-by-source-kql-1200.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-indicator-effectiveness-by-source-kql-480.webp 480w, /assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-indicator-effectiveness-by-source-kql-800.webp 800w, /assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-indicator-effectiveness-by-source-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="527"
+       loading="lazy" decoding="async"
+       alt="Sentinel Logs showing active indicator counts and average confidence by source: Premium 68,147 at 71.9, Microsoft Defender Threat Intelligence 55,525 at 93.2, MaliciousFlows-Lab 222 at 48.1 and Custom 33 at 96.2">
+  <figcaption>Query 6.2 by source. The two large feeds hold over 120,000 active indicators between them, while my MaliciousFlows-Lab source holds 222 at a lower average confidence.</figcaption>
+</figure>
+<p>
+  The numbers by source:
+</p>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">Source</th><th scope="col">Active indicators</th><th scope="col">Average confidence</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name">Premium</td><td class="int-desc">68,147</td><td class="int-desc">71.9</td></tr>
+      <tr><td class="int-name">Microsoft Defender Threat Intelligence</td><td class="int-desc">55,525</td><td class="int-desc">93.2</td></tr>
+      <tr><td class="int-name">MaliciousFlows-Lab</td><td class="int-desc">222</td><td class="int-desc">48.1</td></tr>
+      <tr><td class="int-name">Custom</td><td class="int-desc">33</td><td class="int-desc">96.2</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  The 222 under <code>MaliciousFlows-Lab</code> is the 220 indicators from the script plus the two EICAR test indicators. Its average confidence is the lowest, which is fair: it is driven by failure counts, and most of those addresses had modest totals.
+</p>
+<p>
+  Then the check against reality. Searching <code>SecurityAlert</code> for alerts from the TI Map rules over 30 days returned a single alert.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-securityalert-ti-rules-kql-1200.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-securityalert-ti-rules-kql-480.webp 480w, /assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-securityalert-ti-rules-kql-800.webp 800w, /assets/img/sentinel-threat-intelligence-analytics-rules-eicar/sentinel-securityalert-ti-rules-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="549"
+       loading="lazy" decoding="async"
+       alt="Sentinel Logs showing one SecurityAlert row for the TI Map IP Entity to DeviceNetworkEvents outbound rule created on October 12 2026 at 6:26 PM">
+  <figcaption>One alert in 30 days from all three rules: the outbound connection rule at 6:26 PM on October 12, the same evening the rules were created.</figcaption>
+</figure>
+<p>
+  One alert, from Rule C, on the same evening I created the rules. Rule A and Rule B had no alerts in that window. That is not proof they work, and I would not treat it as proof they are broken either. Rule A only looks back one hour, so without a fresh logon from an indicator address it has nothing to match, and I did not force Rule B to fire. If I trusted them without running the seven-day test, I would be fooling myself. As a measure of the two big feeds, it is stark: more than 120,000 active indicators between them and one alert from the rules built on top. The query as written reports indicators per source and leaves the comparison with alert counts to the analyst, which is why the note column says so. The obvious improvement is to join alerts back to the source of the indicator that caused them.
+</p>
+<h2>The allowlist and the limits</h2>
+<p>
+  A rule that alerts on the owner's own address gets switched off within a week, so the allowlist is not optional. Create a watchlist named <code>TI-Allowlist</code> with a single <code>IPAddress</code> column holding your egress address, scanners and partner IPs, and exclude it in every matching rule:
+</p>
+<pre><code>let Allow = _GetWatchlist('TI-Allowlist') | project IPAddress;
+// ... then in the match query:
+| where RemoteIP !in (Allow)</code></pre>
+<p>
+  Now the honest part, because a project like this is easy to oversell. What I built detects known-bad infrastructure, and that is the weakest layer there is. David Bianco's <a href="https://detect-respond.blogspot.com/2013/03/the-pyramid-of-pain.html" rel="noopener" target="_blank">Pyramid of Pain</a> ranks indicators by how much it hurts an attacker when you deny them: hashes and IP addresses sit at the bottom because they cost almost nothing to change. That is why every indicator here expires in 30 days, and why this is only a starting layer. A new attacker on fresh addresses walks straight past it. Behaviour-based detections catch that, the same idea as the Suricata and Zeek signatures in my <a href="/blog/soc-homelab-suricata-ids-installation">SOC-HomeLab IDS setup</a>.
+</p>
+<p>
+  Other limits worth saying out loud:
+</p>
+<ul>
+  <li>Confidence from failure volume is a rough proxy. It tells you an address is persistent, not that it is malicious, and a shared NAT address can look the same.</li>
+  <li>The shared workspace meant I had no ground truth for devices that were not mine, so several results ended in "needs more data".</li>
+  <li>I did not block anything or automate any response. That is a deliberate stop, not an oversight.</li>
+  <li>Two of my three rules produced no alerts, and I have not yet proven them with the seven-day test.</li>
+</ul>
+<p>
+  Cleanup is short: expire or delete the lab indicators, disable the rules you do not want running, and delete any EICAR remnants. And do not commit your <code>out/</code> folder, your allowlist or real employer IPs to GitHub.
+</p>
+<p>
+  If you want to repeat this, start with the <a href="https://github.com/rachata072/threat-intel-sentinel/blob/main/RUNBOOK.md" rel="noopener" target="_blank">RUNBOOK on GitHub</a>, the query library and the Python script in the same repository, and the labs in the <a href="https://www.skool.com/cyber-range/about?ref=fa6d17eac8a242ef8320accbb4bf913b" rel="noopener" target="_blank">Cyber Range community</a>. Go back to <a href="/blog/sentinel-threat-intelligence-inventory-kql">Part 1</a> if you skipped the inventory, which is the step I would not skip.
+</p>
+<h2>Frequently asked questions</h2>
+<h3>What is the EICAR test file and is it safe to use?</h3>
+<p>
+  EICAR is a harmless 68-byte text file, created by the European Institute for Computer Antivirus Research, that antivirus products deliberately treat as a virus so you can test a scanner without handling real malware. It is safe, but use it on a lab machine rather than your daily one, and never paste its string into a document or repository because antivirus will quarantine the file.
+</p>
+<h3>Why did my SHA-256 indicator not match the EICAR detection?</h3>
+<p>
+  Because Defender's antivirus detection rows in the DeviceEvents table carry the SHA-1 hash and leave the SHA256 column empty. A SHA-256 indicator has nothing to match. Import an indicator for each hash type your telemetry provides, and make the matching query compare every hash column, lowercased on both sides.
+</p>
+<h3>What run interval and lookback should a threat intelligence analytics rule use?</h3>
+<p>
+  I run the rules every 5 minutes with a one hour lookback. The lookback has to be at least as long as the run interval plus the ingestion delay, otherwise events that land late are missed. The overlap means the same event can be seen twice, so group events into a single alert and group alerts into incidents by IP entity.
+</p>
+<h3>How do I stop a threat intelligence rule from alerting on my own IP address?</h3>
+<p>
+  Put your egress address, scanners and partner addresses in a watchlist, then exclude them in the rule with a not-in check against that watchlist. Also remove any indicator that was created from your own address. A rule that alerts on the owner's home IP gets switched off within a week.
+</p>
+<h3>What is the difference between indicator confidence and alert severity?</h3>
+<p>
+  Confidence is how likely the indicator is to be truly malicious. Severity is how urgent the match is. They can disagree: a low-confidence indicator that matches a successful logon is still urgent. My logon rule raises severity to High on any successful logon from an indicator address, whatever the confidence says.
+</p>
+<h3>Does a threat intelligence match mean a device is compromised?</h3>
+<p>
+  No. A match means a known indicator appeared in your telemetry. For an inbound failed logon that is mostly background noise. For an outbound connection it is stronger, but you still need the initiating process, the command line and the account before calling it. My own triage note ended with a verdict of needs more data.
+</p>
+<h3>How do I know if a threat feed is worth keeping?</h3>
+<p>
+  Count active indicators per source, compare that with the alerts each source actually produced, and review it on a schedule. A source with tens of thousands of indicators and no alerts is a cost, not a defence. In my workspace the two big feeds held over a hundred thousand active indicators between them and one alert came from all the rules in thirty days.
+</p>
+<h3>Which MITRE ATT&amp;CK techniques does this project cover?</h3>
+<p>
+  The logon rule maps to Brute Force (T1110), Valid Accounts (T1078) and External Remote Services (T1133). The file hash rule maps to User Execution: Malicious File (T1204.002). The outbound rule maps to Application Layer Protocol (T1071). A match gives you the indicator, not the whole technique chain.
+</p>

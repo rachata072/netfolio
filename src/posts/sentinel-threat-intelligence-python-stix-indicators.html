@@ -1,0 +1,393 @@
+<!--meta
+{
+  "title": "Threat Intelligence in Sentinel, Part 2: Python, STIX and IOC Matching",
+  "seo_title": "Sentinel Threat Intelligence Part 2: Python STIX Indicators",
+  "description": "Turn 220 brute force IPs into STIX indicators with a stdlib Python script, import them into Microsoft Sentinel, then match logons, flows and 90 days of history.",
+  "og_description": "Part 2 builds the indicator pipeline: a Python script that validates, scores and writes STIX indicators, a file import into Sentinel, and KQL matches against logons, network flows, outbound connections and a 90-day retrohunt.",
+  "summary": "Part 2 of the Sentinel threat intelligence project. A standard-library Python script turns 220 failed-logon IPs into scored STIX 2.1 indicators with an audit file, Sentinel imports them, and KQL matches them against logons, NSG flows, outbound connections and a 90-day retrohunt. Not everything came back clean.",
+  "date": "2026-10-13",
+  "category": "sec",
+  "tags": [
+    "Microsoft Sentinel",
+    "Threat Intelligence",
+    "Python",
+    "STIX",
+    "KQL",
+    "IOC",
+    "Retrohunting",
+    "Blue Team"
+  ],
+  "repo": "threat-intel-sentinel",
+  "series": "threat-intel-sentinel",
+  "series_part": 2,
+  "faq": [
+    [
+      "Why use a Python script instead of adding indicators in the portal?",
+      "The portal works for a handful of indicators, and I added three that way. For 220 addresses it is slow and error prone. A script validates every address, drops private and allow-listed ones, scores confidence the same way each time, and writes a review file explaining every decision, so the result is repeatable and auditable."
+    ],
+    [
+      "Which file do I import into Sentinel, the JSON array or the STIX bundle?",
+      "Import the plain JSON array, indicators.import.json. The STIX bundle is written for other platforms that expect a bundle object with a marking definition, and Sentinel's file import rejects it. If an import says the file is invalid, download the template from the import screen and compare the layout."
+    ],
+    [
+      "How is confidence calculated, and is it trustworthy?",
+      "The script uses failure volume: 500 or more failures scores 85, 100 to 499 scores 70, 25 to 99 scores 50 and anything lower scores 30. Optionally it averages that with an AbuseIPDB score. Volume is a rough proxy for persistence, not proof of malice, so treat the number as a triage hint and tune the thresholds for your own environment."
+    ],
+    [
+      "Why set a ValidUntil date of 30 days on every indicator?",
+      "Because IP addresses get reassigned. A residential or cloud address that was hammering your logon page this month can belong to a legitimate customer next quarter. A short lifetime means stale indicators expire on their own instead of turning into false positives."
+    ],
+    [
+      "Why are the indicators marked TLP:AMBER?",
+      "Indicators built from your own telemetry can reveal what you run and what was targeted. TLP:AMBER limits sharing to your organization and the partners who need it, which is the right default until you decide otherwise."
+    ],
+    [
+      "Why does the network flow query use a regular expression on SrcPublicIps?",
+      "In real NTANetAnalytics data the SrcPublicIps field holds an IP followed by pipe-separated counters, and sometimes several IPs. An exact match against the whole string never succeeds. A regular expression that extracts every IPv4 address matches all of them and ignores the counters."
+    ],
+    [
+      "What is retrohunting and why run it on a new indicator?",
+      "Retrohunting is searching old data with new intelligence. Indicators usually arrive after the activity they describe, so a 90-day lookback with today's indicators can reveal that an attacker touched your systems weeks before anyone knew their address. It is the most valuable thing you can do with a new indicator."
+    ],
+    [
+      "Can I try the script without access to Azure?",
+      "Yes. It uses only the Python standard library. Make a two-column CSV with the headers RemoteIP and Count, run the script against it, and open the generated review.csv and indicators.import.json. Nothing is sent anywhere unless you set an AbuseIPDB key."
+    ]
+  ],
+  "read_min": 12
+}
+-->
+<p>
+  <a href="/blog/sentinel-threat-intelligence-inventory-kql">Part 1</a> ended with 220 public IP addresses that repeatedly failed logons against devices in the Sentinel workspace. A list in a query result is not intelligence yet. It needs a name, a confidence, an expiry and a home in the <code>ThreatIntelIndicators</code> table where analytics rules can find it. This post covers that step with Python, and then the part that makes it worthwhile: matching the new indicators against logons, network flows, outbound connections and 90 days of history.
+</p>
+<p>
+  The whole procedure is in the <a href="https://github.com/rachata072/threat-intel-sentinel/blob/main/RUNBOOK.md" rel="noopener" target="_blank">RUNBOOK on GitHub</a>, and the labs the project grew from come from the Cyber Range community I linked in Part 1. As before, the workspace is shared, so many of the devices in the results belong to other people.
+</p>
+<h2>Two ways to create an indicator</h2>
+<p>
+  The portal path is fine for a few. In the Defender portal, open Threat intelligence, choose to add a new TI object of type Indicator, and fill in a name, the value, a confidence, a valid-from and valid-until date, a TLP marking and some tags. I did that for three addresses to see the shape of the thing, naming each one <code>MaliciousFlows - Brute Force Source - &lt;IP&gt;</code> and tagging them <code>brute-force</code> and <code>lab</code>.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-add-threat-intelligence-object-1200.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-add-threat-intelligence-object-480.webp 480w, /assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-add-threat-intelligence-object-800.webp 800w, /assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-add-threat-intelligence-object-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="623"
+       loading="lazy" decoding="async"
+       alt="Microsoft Sentinel Threat intelligence page filtered by the lab tag showing three manually created MaliciousFlows brute force IPv4 indicators and the detail pane for 218.147.202.136">
+  <figcaption>Three indicators created by hand and found again by filtering on the lab tag. The detail pane shows the STIX pattern behind the IP address.</figcaption>
+</figure>
+<p>
+  The detail pane is the useful part of that screenshot. Behind the form, an IP indicator is just a STIX pattern, in this case <code>[ipv4-addr:value = '218.147.202.136']</code>. Once you see that, writing them in bulk with code is obvious. <a href="https://oasis-open.github.io/cti-documentation/stix/intro" rel="noopener" target="_blank">STIX</a> is a free, open format for describing cyber threat information, and Sentinel's file import understands it.
+</p>
+<p>
+  Doing 220 of those through a form is not a good use of an afternoon, so the second path is a script.
+</p>
+<h2>What the script does, and why each check is there</h2>
+<p>
+  <code>ti_indicator_builder.py</code> reads a CSV with <code>RemoteIP</code> and <code>Count</code> columns (the export from Query 2.2, with <code>FailedLogons</code> renamed to <code>Count</code>) and produces indicators. It uses only the Python standard library, so there is nothing to install. The rules it applies, in order:
+</p>
+<ul>
+  <li>Validate every value with the <code>ipaddress</code> module. Anything that is not a valid IPv4 address is skipped with a reason.</li>
+  <li>Drop private, loopback, link-local, multicast, reserved and unspecified addresses.</li>
+  <li>Drop anything in an allowlist file, which can hold single IPs or CIDR ranges.</li>
+  <li>Drop addresses below a minimum failure count (10 by default).</li>
+  <li>Skip duplicates.</li>
+  <li>Score confidence from the failure count.</li>
+</ul>
+<p>
+  The <code>ipaddress</code> module is the same one I leaned on in my <a href="/blog/vlsm-subnet-calculator-python-tool">VLSM subnet calculator</a>, and it is a good example of why the standard library is enough for most network scripting. The check that decides whether an address is worth an indicator is only a few lines:
+</p>
+<pre><code>def is_routable_public(ip):
+    return not (
+        ip.is_private
+        or ip.is_loopback
+        or ip.is_link_local
+        or ip.is_multicast
+        or ip.is_reserved
+        or ip.is_unspecified
+    )</code></pre>
+<p>
+  Confidence is deliberately boring and explainable:
+</p>
+<pre><code>def score_confidence(count):
+    """Simple, explainable scoring. Tune these thresholds for your environment."""
+    if count &gt;= 500:
+        return 85
+    if count &gt;= 100:
+        return 70
+    if count &gt;= 25:
+        return 50
+    return 30</code></pre>
+<p>
+  If you set an <code>ABUSEIPDB_KEY</code> environment variable, the script also calls the <a href="https://docs.abuseipdb.com/" rel="noopener" target="_blank">AbuseIPDB check endpoint</a> for each address, using a 90-day look-back, and averages that community score with the volume score. Any failure in that call (a bad key, a network error, a quota hit) is caught and the run carries on. My run was volume only, with no key set, which you can see from the confidence values being exactly the four buckets above.
+</p>
+<p>
+  Run it like this:
+</p>
+<pre><code>python scripts/ti_indicator_builder.py --input failed_logons.csv --allowlist my_allowlist.txt --valid-days 30</code></pre>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-python-stix-indicators/ti-indicator-builder-python-script-run-1200.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-python-stix-indicators/ti-indicator-builder-python-script-run-480.webp 480w, /assets/img/sentinel-threat-intelligence-python-stix-indicators/ti-indicator-builder-python-script-run-800.webp 800w, /assets/img/sentinel-threat-intelligence-python-stix-indicators/ti-indicator-builder-python-script-run-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="668"
+       loading="lazy" decoding="async"
+       alt="VS Code showing the ti_indicator_builder.py functions load_allowlist, is_routable_public and score_confidence above a terminal that prints the paths of indicators.import.json, indicators.stix.json and review.csv">
+  <figcaption>The script in VS Code with its three output files listed in the terminal. The screenshot shows an out2 folder, the default is out.</figcaption>
+</figure>
+<p>
+  It writes three files, and each has a different job:
+</p>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">File</th><th scope="col">What it is for</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name"><code>indicators.import.json</code></td><td class="int-desc">A plain JSON array of STIX indicators. This is the one Sentinel's file import wants.</td></tr>
+      <tr><td class="int-name"><code>indicators.stix.json</code></td><td class="int-desc">A full STIX 2.1 bundle with a TLP:AMBER marking definition, for platforms that expect a bundle.</td></tr>
+      <tr><td class="int-name"><code>review.csv</code></td><td class="int-desc">One row per input line with the decision and the reason. The audit trail.</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  Every indicator in the array looks like this (trimmed to the fields that matter):
+</p>
+<pre><code>{
+  "type": "indicator",
+  "spec_version": "2.1",
+  "name": "MaliciousFlows - Brute Force Source - 138.91.109.48",
+  "description": "1306 failed logons observed against our endpoints. Confidence derived from failure volume.",
+  "indicator_types": ["malicious-activity"],
+  "pattern": "[ipv4-addr:value = '138.91.109.48']",
+  "pattern_type": "stix",
+  "valid_from": "2026-10-12T23:24:06.000Z",
+  "valid_until": "2026-11-11T23:24:06.000Z",
+  "confidence": 85,
+  "labels": ["brute-force", "first-party-observation", "tlp:amber"]
+}</code></pre>
+<p>
+  The review file is where the script earns trust. Mine looked like this once opened in a spreadsheet, with every row marked as an indicator and the reason recorded next to it.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-python-stix-indicators/ti-indicator-builder-review-csv-800.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-python-stix-indicators/ti-indicator-builder-review-csv-480.webp 480w, /assets/img/sentinel-threat-intelligence-python-stix-indicators/ti-indicator-builder-review-csv-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="601"
+       loading="lazy" decoding="async"
+       alt="review.csv opened in Excel with columns RemoteIP, FailedLogons, Confidence, Decision and Reason, showing 138.91.109.48 with 1306 failures and confidence 85">
+  <figcaption>The decision log. Each address has its failure count, confidence and the reason it became an indicator.</figcaption>
+</figure>
+<p>
+  All 220 rows became indicators and none were skipped. That is because Query 2.2 had already removed private and blank addresses and anything under ten failures, so the script's own checks had nothing left to catch. I keep both on purpose: the query is one safety net and the script is a second one for the day someone feeds it a hand-edited CSV. The confidence spread came out as 4 indicators at 85, 43 at 70, 98 at 50 and 75 at 30, which is what you would expect from a long tail of low-volume sources and a short head of persistent ones.
+</p>
+<h2>Importing the file</h2>
+<p>
+  In the Defender portal go to Microsoft Sentinel, Threat management, Threat intelligence, then choose Import and Import using a file. In the Azure portal the same screen is under your workspace's Threat management menu.
+</p>
+<ul>
+  <li>Choose JSON as the file format, and download the template once to see the expected layout.</li>
+  <li>Drop <code>indicators.import.json</code> into the upload box, not the <code>.stix.json</code> bundle.</li>
+  <li>For Source, type <code>MaliciousFlows-Lab</code>. That value is stamped on every indicator as <code>SourceSystem</code>, which makes them easy to separate from the built-in feeds later.</li>
+  <li>Track the job under Manage file imports.</li>
+</ul>
+<p>
+  If the import says the file is invalid, you almost certainly uploaded the bundle, or the file is not a top-level array. The template is the source of truth. Microsoft also has an upload API for doing the same thing from code, described in its <a href="https://learn.microsoft.com/en-us/azure/sentinel/connect-threat-intelligence-upload-api" rel="noopener" target="_blank">upload API documentation</a>, which is the natural next step once the file approach feels slow.
+</p>
+<h2>Query 3.1: did the indicators land?</h2>
+<p>
+  Ingestion takes a few minutes. The check uses one naming convention everywhere. The source lab filters on <code>Malicious Behavior</code> in one place and tells you to name things <code>MaliciousFlows</code> in another, and I picked <code>MaliciousFlows</code> for the whole project.
+</p>
+<pre><code>ThreatIntelIndicators
+| where tostring(Data.name) startswith "MaliciousFlows"
+| summarize arg_max(TimeGenerated, *) by Id
+| project ObservableValue, ObservableKey, IsActive, Confidence, ValidUntil, Name = tostring(Data.name)</code></pre>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-custom-indicators-confirmed-kql-1200.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-custom-indicators-confirmed-kql-480.webp 480w, /assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-custom-indicators-confirmed-kql-800.webp 800w, /assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-custom-indicators-confirmed-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="538"
+       loading="lazy" decoding="async"
+       alt="Sentinel Logs showing MaliciousFlows indicators with IsActive true, confidence values and a ValidUntil date of November 11 2026">
+  <figcaption>Query 3.1 returned 128 rows on this run. The visible rows are active, with ValidUntil on November 11, thirty days after creation.</figcaption>
+</figure>
+<p>
+  This run returned 128 rows. The ones visible were active and expired on November 11, which is the 30-day lifetime the script wrote. The effectiveness query in Part 3 later counts 222 under the <code>MaliciousFlows-Lab</code> source, which is the 220 script indicators plus two EICAR test indicators, so the full set did land. If your count is short, give ingestion time and run it again before assuming something failed.
+</p>
+<h2>Matching against telemetry</h2>
+<p>
+  Now the part the whole project is for. Each of these queries starts the same way: take the newest row for each <code>MaliciousFlows</code> indicator, keep the active and unexpired ones, and join to a telemetry table. I use a join instead of the lab's <code>toscalar(... make_set())</code> because a dynamic set is capped at roughly 1 MB, which a real feed can exceed, and a join carries confidence and source along for enrichment.
+</p>
+<h3>Against logons</h3>
+<pre><code>let BadIPs = ThreatIntelIndicators
+| where TimeGenerated &gt; ago(365d)
+| where tostring(Data.name) startswith "MaliciousFlows"
+| summarize arg_max(TimeGenerated, *) by Id
+| where IsActive == true and ValidUntil &gt; now()
+| project BadIP = ObservableValue, Confidence, Name = tostring(Data.name), ValidUntil;
+DeviceLogonEvents
+| where TimeGenerated &gt; ago(7d)
+| join kind=inner BadIPs on $left.RemoteIP == $right.BadIP
+| project TimeGenerated, DeviceName, AccountName, ActionType, LogonType, RemoteIP, Confidence, Name
+| order by TimeGenerated desc</code></pre>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-indicator-match-device-logons-kql-1200.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-indicator-match-device-logons-kql-480.webp 480w, /assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-indicator-match-device-logons-kql-800.webp 800w, /assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-indicator-match-device-logons-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="525"
+       loading="lazy" decoding="async"
+       alt="Sentinel Logs showing 18,452 DeviceLogonEvents rows matched to MaliciousFlows indicators with device name, account name, failed network logons and confidence">
+  <figcaption>Query 4.2 matched 18,452 logon events in seven days, for example failed network logons from 218.147.202.136 at confidence 70.</figcaption>
+</figure>
+<p>
+  It matched 18,452 logon events. That sounds impressive until you remember where the indicators came from. They were built from these exact logs, so of course they match. The value of this query is not discovery. It proves the pipeline works end to end, from a failed logon through a CSV, a script, an import and an indicator back to the same logon, with confidence and name attached.
+</p>
+<h3>Against network flows</h3>
+<p>
+  The network version needs NSG flow logs with Traffic Analytics, which populates <code>NTANetAnalytics</code>. The field worth understanding is <code>SrcPublicIps</code>:
+</p>
+<pre><code>let BadIPs = ThreatIntelIndicators
+| where TimeGenerated &gt; ago(365d)
+| where tostring(Data.name) startswith "MaliciousFlows"
+| summarize arg_max(TimeGenerated, *) by Id
+| where IsActive == true and ValidUntil &gt; now()
+| project BadIP = ObservableValue;
+NTANetAnalytics
+| where TimeGenerated &gt; ago(7d)
+| where isnotempty(SrcPublicIps)
+| extend FoundIPs = extract_all(@"(\d{1,3}(?:\.\d{1,3}){3})", SrcPublicIps)
+| mv-expand RemoteIP = FoundIPs to typeof(string)
+| join kind=inner BadIPs on $left.RemoteIP == $right.BadIP
+| project TimeGenerated, RemoteIP, SrcIp, DestIp, DestPort, FlowDirection, FlowType, AllowedInFlows, DeniedInFlows, SrcPublicIps
+| order by TimeGenerated desc</code></pre>
+<p>
+  In real data <code>SrcPublicIps</code> looks like <code>80.94.95.83|717|740|740</code>: an address followed by pipe-separated counters, possibly with more addresses after it. The original lab splits on the pipe and takes the first element, which only ever sees one address. The regular expression pulls out every IPv4 address in the field and ignores the counters. I keep <code>DeniedInFlows</code> in the output so blocked attempts show up next to allowed ones, and adding <code>| where AllowedInFlows &gt; 0</code> narrows it to traffic that actually got through. Always inspect the real field first with <code>NTANetAnalytics | where isnotempty(SrcPublicIps) | take 5</code>. That is how I found the format.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-indicator-match-inbound-network-kql-1200.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-indicator-match-inbound-network-kql-480.webp 480w, /assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-indicator-match-inbound-network-kql-800.webp 800w, /assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-indicator-match-inbound-network-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="560"
+       loading="lazy" decoding="async"
+       alt="Sentinel Logs showing NTANetAnalytics flows from external public IP addresses to internal hosts on destination port 3389 matched against MaliciousFlows indicators">
+  <figcaption>Query 4.1 hit the 30,000 row cap. Several rows are inbound RDP, destination port 3389, from external public addresses that NSG rules allowed.</figcaption>
+</figure>
+<p>
+  The results also hit the 30,000 row limit, and the rows I could see were inbound RDP on port 3389 from external public addresses: 217.218.10.46 to 10.2.0.14 (5 allowed flows), 172.93.215.215 to 10.0.0.155 (107) and 192.3.22.170 to 10.0.0.101 (8). Remote Desktop open to the internet is <a href="https://attack.mitre.org/techniques/T1133/" rel="noopener" target="_blank">External Remote Services (T1133)</a> in ATT&amp;CK terms, and the <code>AllowedInFlows</code> column is the part that matters: the NSG let that traffic through.
+</p>
+<h3>Against outbound connections</h3>
+<p>
+  Inbound brute force is noise. An internal host connecting out to a known bad address is a much stronger signal, because it can mean a compromised machine calling home.
+</p>
+<pre><code>let BadIPs = ThreatIntelIndicators
+| where TimeGenerated &gt; ago(30d)
+| where ObservableKey == "network-traffic:src_ref.value" or ObservableKey == "ipv4-addr:value"
+| summarize arg_max(TimeGenerated, *) by Id
+| where IsActive == true and ValidUntil &gt; now()
+| project BadIP = ObservableValue, Confidence;
+DeviceNetworkEvents
+| where TimeGenerated &gt; ago(1d)
+| where ActionType in ("ConnectionSuccess", "ConnectionAttempt")
+| join kind=inner BadIPs on $left.RemoteIP == $right.BadIP
+| project TimeGenerated, DeviceName, InitiatingProcessFileName, InitiatingProcessCommandLine, RemoteIP, RemotePort, Confidence</code></pre>
+<p>
+  My runbook says zero rows is the healthy answer here. The workspace disagreed.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-indicator-match-outbound-connections-kql-1200.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-indicator-match-outbound-connections-kql-480.webp 480w, /assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-indicator-match-outbound-connections-kql-800.webp 800w, /assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-indicator-match-outbound-connections-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="540"
+       loading="lazy" decoding="async"
+       alt="Sentinel Logs showing 207 DeviceNetworkEvents rows where internal devices connected out to IP addresses that match threat intelligence indicators, with remote ports and confidence">
+  <figcaption>Query 4.4 returned 207 outbound matches instead of zero. Several devices connected to 95.189.105.172 on high ports, and one reached 23.94.69.14 at confidence 85.</figcaption>
+</figure>
+<p>
+  It returned 207 rows. Three devices, <code>corp-ra01-te123</code>, <code>corp-na01-w11</code> and <code>abdol-vm</code>, connected out to 95.189.105.172 on ports 6942, 29480 and 43505 at confidence 70. Another, <code>corp-na72-fe267</code>, connected to 23.94.69.14 on port 59652 with confidence 85. That second address is also the third entry in my brute force table from Part 1, a source that failed 579 logons against other machines in the workspace.
+</p>
+<p>
+  I would not call any of that a confirmed compromise. These are not my devices, the indicator list in this query includes the built-in feeds as well as mine, and an IP match without the initiating process and command line proves almost nothing on its own. What it does show is the pipeline working: the right columns are there, the ports are unusual, and the next step for an analyst is clear.
+</p>
+<h2>Retrohunting: was the attacker here before I knew?</h2>
+<p>
+  Intelligence arrives late. The most valuable thing to do with a fresh indicator is search old data with it.
+</p>
+<pre><code>let BadIPs = ThreatIntelIndicators
+| where tostring(Data.name) startswith "MaliciousFlows"
+| summarize arg_max(TimeGenerated, *) by Id
+| where IsActive == true
+| project BadIP = ObservableValue;
+DeviceLogonEvents
+| where TimeGenerated &gt; ago(90d)
+| join kind=inner BadIPs on $left.RemoteIP == $right.BadIP
+| summarize FirstSeen = min(TimeGenerated), LastSeen = max(TimeGenerated),
+            Attempts = count(), Successes = countif(ActionType == "LogonSuccess")
+            by RemoteIP, DeviceName
+| order by Attempts desc</code></pre>
+<figure class="post-figure">
+  <img src="/assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-threat-intelligence-retrohunt-90-days-kql-1200.webp"
+       srcset="/assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-threat-intelligence-retrohunt-90-days-kql-480.webp 480w, /assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-threat-intelligence-retrohunt-90-days-kql-800.webp 800w, /assets/img/sentinel-threat-intelligence-python-stix-indicators/sentinel-threat-intelligence-retrohunt-90-days-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="539"
+       loading="lazy" decoding="async"
+       alt="Sentinel Logs showing a 90-day retrohunt with 1,985 rows listing RemoteIP, DeviceName, FirstSeen, LastSeen, Attempts and Successes for known bad IP addresses">
+  <figcaption>The 90-day retrohunt returned 1,985 rows. The interesting column is Successes, where some device and IP pairs show successful logons.</figcaption>
+</figure>
+<p>
+  The retrohunt returned 1,985 rows, and the <code>Successes</code> column is the one to read first:
+</p>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">Source IP</th><th scope="col">Device</th><th scope="col">Window</th><th scope="col">Attempts</th><th scope="col">Successes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name">202.128.70.30</td><td class="int-desc">goodkiddmaddcit</td><td class="int-desc">Aug 28 to Aug 31</td><td class="int-desc">790</td><td class="int-desc">14</td></tr>
+      <tr><td class="int-name">20.80.241.91</td><td class="int-desc">vm-final-lab-mi</td><td class="int-desc">Jul 24 to Jul 25</td><td class="int-desc">726</td><td class="int-desc">391</td></tr>
+      <tr><td class="int-name">202.128.70.30</td><td class="int-desc">w11-vm-10-7-26</td><td class="int-desc">Oct 7 to Oct 8</td><td class="int-desc">572</td><td class="int-desc">0</td></tr>
+      <tr><td class="int-name">210.99.112.82</td><td class="int-desc">linux-target-1...</td><td class="int-desc">Sep 28 to Oct 11</td><td class="int-desc">543</td><td class="int-desc">0</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  Two of those rows had successful logons, and one of them, 391 successes out of 726 attempts in a day, is a ratio that deserves a closer look. In a lab full of intentionally weak machines I cannot say whether that is guessing that worked or a student's own script. In a production tenant it would be an incident. The first source in that list, 202.128.70.30, is also one of the three indicators I created by hand in the portal, so the same address shows up across both methods.
+</p>
+<p>
+  This is the same logic that matters when a vendor discloses a bug that was already being exploited. When I wrote up the <a href="/blog/citrix-netscaler-zero-day-cve-2026-88771-88772">NetScaler zero-days</a>, the question that follows every advisory is the retrohunt one: not "are we vulnerable today" but "did anyone get in before the patch existed".
+</p>
+<h2>What Part 3 does with all this</h2>
+<p>
+  By now there are indicators in the workspace, matches against logons, flows and outbound connections, and a 90-day history. None of it alerts anyone yet, because everything so far was a query someone had to run. <a href="/blog/sentinel-threat-intelligence-analytics-rules-eicar">Part 3</a> fixes that. It proves a file hash rule using the EICAR test file, builds three scheduled analytics rules, works an incident from alert to triage note, and asks whether any of this was worth doing.
+</p>
+<h2>Frequently asked questions</h2>
+<h3>Why use a Python script instead of adding indicators in the portal?</h3>
+<p>
+  The portal works for a handful of indicators, and I added three that way. For 220 addresses it is slow and error prone. A script validates every address, drops private and allow-listed ones, scores confidence the same way each time, and writes a review file explaining every decision, so the result is repeatable and auditable.
+</p>
+<h3>Which file do I import into Sentinel, the JSON array or the STIX bundle?</h3>
+<p>
+  Import the plain JSON array, indicators.import.json. The STIX bundle is written for other platforms that expect a bundle object with a marking definition, and Sentinel's file import rejects it. If an import says the file is invalid, download the template from the import screen and compare the layout.
+</p>
+<h3>How is confidence calculated, and is it trustworthy?</h3>
+<p>
+  The script uses failure volume: 500 or more failures scores 85, 100 to 499 scores 70, 25 to 99 scores 50 and anything lower scores 30. Optionally it averages that with an AbuseIPDB score. Volume is a rough proxy for persistence, not proof of malice, so treat the number as a triage hint and tune the thresholds for your own environment.
+</p>
+<h3>Why set a ValidUntil date of 30 days on every indicator?</h3>
+<p>
+  Because IP addresses get reassigned. A residential or cloud address that was hammering your logon page this month can belong to a legitimate customer next quarter. A short lifetime means stale indicators expire on their own instead of turning into false positives.
+</p>
+<h3>Why are the indicators marked TLP:AMBER?</h3>
+<p>
+  Indicators built from your own telemetry can reveal what you run and what was targeted. TLP:AMBER limits sharing to your organization and the partners who need it, which is the right default until you decide otherwise.
+</p>
+<h3>Why does the network flow query use a regular expression on SrcPublicIps?</h3>
+<p>
+  In real NTANetAnalytics data the SrcPublicIps field holds an IP followed by pipe-separated counters, and sometimes several IPs. An exact match against the whole string never succeeds. A regular expression that extracts every IPv4 address matches all of them and ignores the counters.
+</p>
+<h3>What is retrohunting and why run it on a new indicator?</h3>
+<p>
+  Retrohunting is searching old data with new intelligence. Indicators usually arrive after the activity they describe, so a 90-day lookback with today's indicators can reveal that an attacker touched your systems weeks before anyone knew their address. It is the most valuable thing you can do with a new indicator.
+</p>
+<h3>Can I try the script without access to Azure?</h3>
+<p>
+  Yes. It uses only the Python standard library. Make a two-column CSV with the headers RemoteIP and Count, run the script against it, and open the generated review.csv and indicators.import.json. Nothing is sent anywhere unless you set an AbuseIPDB key.
+</p>

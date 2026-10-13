@@ -66,6 +66,11 @@
       "name": "SOC-HomeLab",
       "repo": "soc-homelab",
       "project": "soc-lab"
+    },
+    "threat-intel-sentinel": {
+      "name": "Threat-Intel-Sentinel",
+      "repo": "threat-intel-sentinel",
+      "project": "threat-intel"
     }
   }
 }
