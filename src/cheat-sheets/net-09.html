@@ -1,0 +1,83 @@
+<!--
+  Text version of NET-09, shown under the sheet image on /cheat-sheets/net-09.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<h2 id="wildcard">Wildcard masks</h2>
+<p>A 0 bit means the address bit must match; a 1 bit means ignore it. Wildcard = 255.255.255.255 minus the subnet mask.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Match</th><th scope="col">Address and wildcard</th><th scope="col">Covers</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">One host</th><td><code>192.0.2.10 0.0.0.0</code></td><td>Same as <code>host 192.0.2.10</code></td></tr>
+    <tr><th scope="row">/24</th><td><code>192.0.2.0 0.0.0.255</code></td><td>192.0.2.0 to .255</td></tr>
+    <tr><th scope="row">/26</th><td><code>192.0.2.64 0.0.0.63</code></td><td>192.0.2.64 to .127</td></tr>
+    <tr><th scope="row">Everything</th><td><code>0.0.0.0 255.255.255.255</code></td><td>Same as <code>any</code></td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="decides">How an ACL decides</h2>
+<ol>
+  <li>It checks lines from top to bottom.</li>
+  <li>The first match wins, and checking stops there.</li>
+  <li>No match? A hidden <code>deny any</code> at the end drops the packet.</li>
+</ol>
+
+<h2 id="types">Standard vs extended</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col"></th><th scope="col">Standard</th><th scope="col">Extended</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Numbers</th><td>1-99, 1300-1999</td><td>100-199, 2000-2699</td></tr>
+    <tr><th scope="row">Matches</th><td>Source IP only</td><td>Protocol, source, destination, ports</td></tr>
+    <tr><th scope="row">Place it</th><td>Near the destination</td><td>Near the source</td></tr>
+  </tbody>
+</table></div>
+<p>Named ACLs: <code>ip access-list standard NAME</code> or <code>ip access-list extended NAME</code>.</p>
+
+<h2 id="rules">Rules of thumb</h2>
+<ul>
+  <li>One ACL per interface, per direction, per protocol</li>
+  <li>Inbound ACLs run before routing; outbound after</li>
+  <li>Put specific lines above general ones</li>
+  <li>Port operators: <code>eq</code>, <code>gt</code>, <code>lt</code>, <code>neq</code>, <code>range</code></li>
+</ul>
+
+<h2 id="extended">Extended, named ACL</h2>
+<ul>
+  <li><code>ip access-list extended WEB-IN</code></li>
+  <li><code>remark HTTPS to the web server</code></li>
+  <li><code>10 permit tcp any host 192.0.2.10 eq 443</code></li>
+  <li><code>20 permit tcp 198.51.100.0 0.0.0.255 host 192.0.2.10 eq 22</code></li>
+  <li><code>30 deny ip any any log</code></li>
+  <li><code>interface g0/1</code>, then <code>ip access-group WEB-IN in</code></li>
+</ul>
+<p>Sequence numbers let you insert a line (<code>15 permit ...</code>) or delete one (<code>no 20</code>).</p>
+
+<h2 id="ssh">Lock down SSH</h2>
+<ul>
+  <li><code>access-list 10 permit host 198.51.100.5</code></li>
+  <li><code>line vty 0 15</code>, then <code>access-class 10 in</code> and <code>transport input ssh</code></li>
+</ul>
+<p>Only the admin PC can SSH in. On lines, use a numbered standard ACL with <code>access-class</code>, not <code>access-group</code>.</p>
+
+<h2 id="check">Check it</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">Shows</th></tr></thead>
+  <tbody>
+    <tr><td><code>show access-lists</code></td><td>Lines and hit counts</td></tr>
+    <tr><td><code>show ip interface g0/1</code></td><td>Which ACL is applied, and which way</td></tr>
+    <tr><td><code>show run | section access-list</code></td><td>The config</td></tr>
+    <tr><td><code>clear access-list counters</code></td><td>Reset hit counts</td></tr>
+    <tr><td><code>deny ip any any log</code></td><td>See what the hidden deny drops</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="lockout">Don't lock yourself out</h2>
+<p class="note note-caution"><b>Danger.</b> A new ACL on your management path can cut you off. Permit your admin subnet first, and set <code>reload in 10</code> as a safety net.</p>
+<p class="note note-caution"><b>Caution.</b> An ACL with only <code>deny</code> lines blocks everything.</p>
+<p class="note note-caution"><b>Caution.</b> An outbound ACL does not filter traffic the router itself sends.</p>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>/27 mask .224 = wildcard .31</li>
+  <li>First match wins</li>
+  <li>Hidden deny any at the end</li>
+</ul>

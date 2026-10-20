@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NET-07 STP/RSTP &amp; EtherChannel Cheat Sheet (PDF) | breakfixlearn</title>
+<meta name="description" content="Free one-page STP, RSTP and EtherChannel cheat sheet: root election, bridge ID, port cost, timers, PortFast, LACP and PAgP modes. PDF (Letter, A4) and image.">
+<link rel="canonical" href="https://breakfixlearn.com/cheat-sheets/net-07">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=59472e0728">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="STP/RSTP &amp; EtherChannel cheat sheet (NET-07)">
+<meta property="og:description" content="How STP elects a root and blocks ports, bridge ID, port costs, STP vs RSTP, PortFast and BPDU Guard, and LACP or PAgP EtherChannel.">
+<meta property="og:url" content="https://breakfixlearn.com/cheat-sheets/net-07">
+<meta property="og:image" content="https://breakfixlearn.com/cheat-sheets/files/bfl-net-07-stp-etherchannel_v1.0_social.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="NET-07 STP/RSTP &amp; EtherChannel cheat sheet preview">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"NET-07 STP/RSTP & EtherChannel cheat sheet","description":"Free one-page STP, RSTP and EtherChannel cheat sheet: root election, bridge ID, port cost, timers, PortFast, LACP and PAgP modes. PDF (Letter, A4) and image.","url":"https://breakfixlearn.com/cheat-sheets/net-07","learningResourceType":"Cheat sheet","educationalLevel":"Beginner","teaches":"STP/RSTP & EtherChannel","keywords":"STP, RSTP, EtherChannel, LACP, PortFast","inLanguage":"en","isAccessibleForFree":true,"license":"https://creativecommons.org/licenses/by-nc/4.0/","version":"1.0","datePublished":"2026-10-19","dateModified":"2026-10-19","image":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-07-stp-etherchannel_v1.0_social.webp","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"encoding":[{"@type":"MediaObject","name":"NET-07 STP/RSTP & EtherChannel (US Letter)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-07-stp-etherchannel_v1.0_print-letter.pdf","encodingFormat":"application/pdf","contentSize":"172 KB","sha256":"7bedc0c0e03d4f9766ccd94478bf95ccce555b894c650e3753724c7bb138b3b3"},{"@type":"MediaObject","name":"NET-07 STP/RSTP & EtherChannel (A4)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-07-stp-etherchannel_v1.0_print-a4.pdf","encodingFormat":"application/pdf","contentSize":"172 KB","sha256":"7b574c2459142ea5d4e833f46ed512db6a88ed0f71c2dfa50b309c7f4e96d912"},{"@type":"MediaObject","name":"NET-07 STP/RSTP & EtherChannel (Screen)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-07-stp-etherchannel_v1.0_web.pdf","encodingFormat":"application/pdf","contentSize":"153 KB","sha256":"18beb8fde5e2f00198d99cade26901bd6c511506661cdc7a7a337efe03d8dc57"},{"@type":"MediaObject","name":"NET-07 STP/RSTP & EtherChannel (Hi-res image)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-07-stp-etherchannel_v1.0_full.webp","encodingFormat":"image/webp","contentSize":"516 KB","sha256":"e520b1d91e16c44c70afb056d6af7964535f6df62d99f64269daed4bdd3442c1"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Cheat sheets","item":"https://breakfixlearn.com/cheat-sheets"},{"@type":"ListItem","position":3,"name":"NET-07 STP/RSTP & EtherChannel"}]}</script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article class="sheet">
+  <header class="post-head sheet-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/cheat-sheets">cheat-sheets</a><span aria-hidden="true">/</span><a href="/cheat-sheets#networking">net</a></nav>
+      <p class="scard-meta"><span class="sid k-networking">NET-07</span><span>Networking</span></p>
+      <h1>STP/RSTP &amp; EtherChannel</h1>
+      <p class="post-dek"><b>Use this when:</b> you add redundant links between switches and need to know which port blocks, how fast it recovers, or how to bundle links.</p>
+      <div class="post-meta"><span>CCNA 200-301 topics 2.4 and 2.5</span><span class="sep">/</span><span>v1.0</span><span class="sep">/</span><time datetime="2026-10-19">Oct 19, 2026</time><span class="sep">/</span><span>1 page</span><span class="sep">/</span><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license noopener" target="_blank">CC BY-NC 4.0</a></div>
+    </div>
+  </header>
+  <div class="wrap sheet-grid">
+    <figure class="sheet-paper">
+      <a href="/cheat-sheets/files/bfl-net-07-stp-etherchannel_v1.0_full.webp" aria-label="Open the full-size NET-07 image (2550 by 3300 pixels)">
+        <img src="/cheat-sheets/files/bfl-net-07-stp-etherchannel_v1.0_web.webp" srcset="/cheat-sheets/files/bfl-net-07-stp-etherchannel_v1.0_web.webp 1200w, /cheat-sheets/files/bfl-net-07-stp-etherchannel_v1.0_full.webp 2550w" sizes="(max-width: 60rem) calc(100vw - 2rem), 46rem"
+             width="1200" height="1553" fetchpriority="high" decoding="async"
+             alt="NET-07 STP/RSTP &amp; EtherChannel cheat sheet. Every table on it is repeated as text below.">
+      </a>
+      <figcaption>Tap the sheet for the full-size image. The <a href="#text-version">text version</a> below is screen-reader friendly.</figcaption>
+    </figure>
+    <aside class="sheet-side" aria-labelledby="dl-h">
+      <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">copy</span> <span class="a">net-07 flash:</span></span>
+      <h2 id="dl-h" class="side-h">Download</h2>
+      <ul class="dl-list"><li><a class="dl dl-pri" href="/cheat-sheets/files/bfl-net-07-stp-etherchannel_v1.0_print-letter.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>US Letter</b><span class="dl-m">print &middot; 172 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-net-07-stp-etherchannel_v1.0_print-a4.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>A4</b><span class="dl-m">print &middot; 172 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-net-07-stp-etherchannel_v1.0_web.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>Screen</b><span class="dl-m">links work &middot; 153 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-net-07-stp-etherchannel_v1.0_full.webp" download><span class="dl-k">WebP</span><span class="dl-t"><b>Hi-res image</b><span class="dl-m">2550 &times; 3300 &middot; 516 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li></ul>
+      <p class="dl-open"><a href="/cheat-sheets/files/bfl-net-07-stp-etherchannel_v1.0_web.pdf">Open the PDF in your browser</a> instead of downloading it.</p>
+      <details class="sums">
+        <summary>Verify your download (SHA-256)</summary>
+        <div class="tbl"><table class="sheet-files"><thead><tr><th scope="col">File</th><th scope="col">SHA-256</th></tr></thead><tbody><tr><td translate="no">bfl-net-07-stp-etherchannel_v1.0_web.pdf</td><td translate="no">18beb8fde5e2f00198d99cade26901bd6c511506661cdc7a7a337efe03d8dc57</td></tr><tr><td translate="no">bfl-net-07-stp-etherchannel_v1.0_print-letter.pdf</td><td translate="no">7bedc0c0e03d4f9766ccd94478bf95ccce555b894c650e3753724c7bb138b3b3</td></tr><tr><td translate="no">bfl-net-07-stp-etherchannel_v1.0_print-a4.pdf</td><td translate="no">7b574c2459142ea5d4e833f46ed512db6a88ed0f71c2dfa50b309c7f4e96d912</td></tr><tr><td translate="no">bfl-net-07-stp-etherchannel_v1.0_full.webp</td><td translate="no">e520b1d91e16c44c70afb056d6af7964535f6df62d99f64269daed4bdd3442c1</td></tr></tbody></table></div>
+        <p>Compare the hash with the one printed by
+          <code translate="no">Get-FileHash .\file.pdf -Algorithm SHA256</code> (PowerShell) or
+          <code translate="no">sha256sum file.pdf</code> (Linux, macOS: <code translate="no">shasum -a 256</code>). Different hash, different file: delete it.</p>
+      </details>
+      <p class="side-note">Free for personal and classroom use under CC BY-NC 4.0. Keep the credit line; don't sell it. Spotted a mistake? <a href="mailto:treyrct858@gmail.com?subject=NET-07%20v1.0%20correction">Email a correction</a>.</p>
+    </aside>
+  </div>
+  <section class="wrap sheet-text" aria-labelledby="text-version">
+    <div class="prose">
+      <h2 id="text-version">Text version</h2>
+      <p>Everything on the sheet, as plain HTML: handy for screen readers, copy-paste and search.</p>
+<h3 id="tree">How STP picks a loop-free tree</h3>
+<p>Cisco switches run one tree per VLAN with PVST+ or Rapid PVST+.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Step</th><th scope="col">What happens</th></tr></thead>
+  <tbody>
+    <tr><td>1. Elect the root</td><td>Lowest bridge ID wins. A tie on priority goes to the lowest MAC.</td></tr>
+    <tr><td>2. Root ports</td><td>Each other switch picks the port with the lowest cost to the root.</td></tr>
+    <tr><td>3. Designated ports</td><td>On each link, the side closest to the root forwards.</td></tr>
+    <tr><td>4. Block the rest</td><td>Leftover ports become alternate (or backup) and block.</td></tr>
+  </tbody>
+</table></div>
+<p>Bridge ID = priority (4 bits; default 32768, in steps of 4096) + extended system ID (12 bits, equal to the VLAN number) + MAC address (48 bits, the tie-breaker).</p>
+
+<h3 id="cost">Port cost</h3>
+<p>Lower is better. <code translate="no">show spanning-tree summary</code> shows which method the switch uses.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Speed</th><th scope="col">Short (802.1D)</th><th scope="col">Long (802.1t)</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">10 Mbps</th><td>100</td><td>2,000,000</td></tr>
+    <tr><th scope="row">100 Mbps</th><td>19</td><td>200,000</td></tr>
+    <tr><th scope="row">1 Gbps</th><td>4</td><td>20,000</td></tr>
+    <tr><th scope="row">10 Gbps</th><td>2</td><td>2,000</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="rstp">STP vs RSTP</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col"></th><th scope="col">STP</th><th scope="col">RSTP</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Standard</th><td>802.1D</td><td>802.1w (Cisco: Rapid PVST+)</td></tr>
+    <tr><th scope="row">Port states</th><td>Blocking, listening, learning, forwarding</td><td>Discarding, learning, forwarding</td></tr>
+    <tr><th scope="row">Convergence</th><td>30 to 50 seconds</td><td>A few seconds</td></tr>
+  </tbody>
+</table></div>
+<p>Timers: hello 2 s, forward delay 15 s, max age 20 s.</p>
+
+<h3 id="configure-stp">Configure STP</h3>
+<ul>
+  <li><code translate="no">spanning-tree mode rapid-pvst</code></li>
+  <li><code translate="no">spanning-tree vlan 10 root primary</code> (sets priority 24576, or lower if needed)</li>
+  <li><code translate="no">spanning-tree vlan 20 priority 4096</code></li>
+  <li>On a PC or server port: <code translate="no">spanning-tree portfast</code> and <code translate="no">spanning-tree bpduguard enable</code></li>
+  <li><code translate="no">show spanning-tree vlan 10</code> shows the root, port roles and costs</li>
+</ul>
+
+<h3 id="etherchannel">EtherChannel: bundle links</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Protocol</th><th scope="col">Starts</th><th scope="col">Waits</th><th scope="col">Won't form</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">LACP (IEEE)</th><td>active</td><td>passive</td><td>passive + passive</td></tr>
+    <tr><th scope="row">PAgP (Cisco)</th><td>desirable</td><td>auto</td><td>auto + auto</td></tr>
+    <tr><th scope="row">Static</th><td colspan="2">on (no protocol)</td><td>Forms only with on</td></tr>
+  </tbody>
+</table></div>
+<p>Example: <code translate="no">interface range g0/1 - 2</code>, <code translate="no">channel-group 1 mode active</code>, then <code translate="no">interface port-channel 1</code> and <code translate="no">switchport mode trunk</code>.</p>
+
+<h3 id="rules">Bundle rules</h3>
+<ul>
+  <li>Up to 8 active members (LACP can hold 8 more on standby)</li>
+  <li>Members must match speed, duplex, access VLAN or trunk VLANs, and native VLAN</li>
+  <li>Never mix LACP and PAgP in one bundle</li>
+  <li>Check with <code translate="no">show etherchannel summary</code> (you want SU and P)</li>
+</ul>
+
+<h3 id="loops">Avoid loops</h3>
+<p class="note note-caution"><b>Danger.</b> Use PortFast only on end-host ports. On a switch link it can loop the network.</p>
+<p class="note note-caution"><b>Caution.</b> Mode <code translate="no">on</code> skips negotiation; a mismatch can cause a loop.</p>
+<p class="note note-caution"><b>Caution.</b> Pick the root on purpose, not by lowest MAC.</p>
+
+<h3 id="remember">Remember</h3>
+<ul>
+  <li>The lowest bridge ID is the root</li>
+  <li>BPDU Guard err-disables the port</li>
+  <li>One bundle = one logical STP link</li>
+</ul>
+      <h3>Sources</h3>
+      <ul><li><a href="https://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst9200/software/release/17-14/configuration_guide/lyr2/b_1714_lyr2_9200_cg/configuring_spanning_tree_protocol.html" rel="noopener" target="_blank">Cisco Catalyst 9200 STP configuration guide (17.14)</a></li><li><a href="https://www.cisco.com/c/en/us/td/docs/switches/lan/c9000/lyr2-fwd/etherchannel/etherchannel-configuration-guide/etherchannels.html" rel="noopener" target="_blank">Cisco IOS XE 17 EtherChannel configuration guide</a></li><li><a href="https://learningnetwork.cisco.com/s/ccna-exam-topics" rel="noopener" target="_blank">Cisco CCNA 200-301 exam topics</a></li></ul>
+      <h3>Go deeper on the blog</h3><ul><li><a href="/blog/py-configbackup-netmiko-config-backup-alerts">I Built a Netmiko Config Backup Tool So I&#x27;d Stop Losing Arguments With My Own Router</a></li></ul>
+    </div>
+    <nav class="nexthop" aria-label="More cheat sheets"><a class="prev" href="/cheat-sheets/net-06"><span class="k">&larr; previous sheet</span>NET-06 VLANs &amp; 802.1Q trunking</a><a class="next" href="/cheat-sheets/net-09"><span class="k">next sheet &rarr;</span>NET-09 ACLs &amp; wildcard masks</a></nav>
+  </section>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Oct 20, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

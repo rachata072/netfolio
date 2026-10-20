@@ -1,0 +1,84 @@
+<!--
+  Text version of NET-05, shown under the sheet image on /cheat-sheets/net-05.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<h2 id="modes">Command modes: read the prompt</h2>
+<p>Each mode only accepts its own commands.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Prompt</th><th scope="col">Mode</th><th scope="col">Used for</th><th scope="col">Get there with</th></tr></thead>
+  <tbody>
+    <tr><td><code>R1&gt;</code></td><th scope="row">User EXEC</th><td>Basic show, ping</td><td>Log in</td></tr>
+    <tr><td><code>R1#</code></td><th scope="row">Privileged EXEC</th><td>All show, copy, reload</td><td><code>enable</code></td></tr>
+    <tr><td><code>R1(config)#</code></td><th scope="row">Global config</th><td>Settings for the whole device</td><td><code>configure terminal</code></td></tr>
+    <tr><td><code>R1(config-if)#</code></td><th scope="row">Interface config</th><td>One port</td><td><code>interface g0/1</code></td></tr>
+  </tbody>
+</table></div>
+<p>Lines use <code>line vty 0 15</code> or <code>line console 0</code>. <code>exit</code> goes up one level, <code>end</code> or Ctrl+Z goes straight back to <code>#</code>, and <code>disable</code> returns to <code>&gt;</code>.</p>
+
+<h2 id="help">Help and shortcuts</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Key or command</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>?</code>, <code>sh?</code>, <code>show ?</code></td><td>What can I type here?</td></tr>
+    <tr><td>Tab</td><td>Complete the word</td></tr>
+    <tr><td>Ctrl+Shift+6</td><td>Stop a ping or traceroute</td></tr>
+    <tr><td><code>do show ip int brief</code></td><td>Run a show command from config mode</td></tr>
+    <tr><td><code>no shutdown</code></td><td><code>no</code> undoes a command</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="show">Look before you touch</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">Shows</th></tr></thead>
+  <tbody>
+    <tr><td><code>show running-config</code></td><td>Live config in RAM (<code>show startup-config</code> = saved in NVRAM)</td></tr>
+    <tr><td><code>show version</code></td><td>IOS version, uptime, model</td></tr>
+    <tr><td><code>show ip interface brief</code></td><td>IP addresses and up/up status</td></tr>
+    <tr><td><code>show run | section line vty</code></td><td>One section of the config</td></tr>
+    <tr><td><code>show run | include hostname</code></td><td>Matching lines only</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="baseline">Secure baseline</h2>
+<p>Replace <code>&lt;secret&gt;</code> with your own value. Keep owner, model and IOS details out of banners.</p>
+<ul>
+  <li><code>hostname R1</code></li>
+  <li><code>no ip domain-lookup</code> (typos don't hang the console)</li>
+  <li><code>enable algorithm-type scrypt secret &lt;secret&gt;</code></li>
+  <li><code>username admin privilege 15 algorithm-type scrypt secret &lt;secret&gt;</code></li>
+  <li><code>ip domain-name lab.example.com</code></li>
+  <li><code>crypto key generate rsa modulus 2048</code></li>
+  <li><code>ip ssh version 2</code></li>
+  <li><code>line vty 0 15</code>, then <code>transport input ssh</code>, <code>login local</code> and <code>exec-timeout 10 0</code></li>
+  <li><code>banner login # Authorized access only #</code></li>
+</ul>
+
+<h2 id="status">Read interface status</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Status / protocol</th><th scope="col">Means</th></tr></thead>
+  <tbody>
+    <tr><td>up / up</td><td>Working</td></tr>
+    <tr><td>administratively down</td><td><code>shutdown</code> is set</td></tr>
+    <tr><td>down / down</td><td>Layer 1: cable, or the far end is off</td></tr>
+    <tr><td>up / down</td><td>Layer 2: encapsulation or clocking</td></tr>
+  </tbody>
+</table></div>
+<p><code>show interfaces g0/1</code> adds errors, duplex and speed.</p>
+
+<h2 id="save">Save and recover</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>copy running-config startup-config</code></td><td>Save. <code>write memory</code> does the same.</td></tr>
+    <tr><td><code>reload in 10</code></td><td>Reboots to the saved config in 10 minutes unless you run <code>reload cancel</code>. A safety net for risky changes.</td></tr>
+  </tbody>
+</table></div>
+<p class="note note-caution"><b>Danger.</b> <code>erase startup-config</code> followed by <code>reload</code> wipes the device.</p>
+<p class="note note-caution"><b>Caution.</b> Type 7 passwords (<code>service password-encryption</code>) are easy to reverse. Use <code>secret</code>.</p>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>Running config lives in RAM: save it or lose it</li>
+  <li><code>secret</code> beats <code>password</code></li>
+  <li>Abbreviate: <code>sh ip int br</code></li>
+</ul>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NET-06 VLANs &amp; 802.1Q trunking Cheat Sheet (PDF) | breakfixlearn</title>
+<meta name="description" content="Free one-page VLAN and 802.1Q trunking cheat sheet: tag format, VLAN ranges, DTP, access and trunk config, inter-VLAN routing. PDF (Letter, A4) and image.">
+<link rel="canonical" href="https://breakfixlearn.com/cheat-sheets/net-06">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=59472e0728">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="VLANs &amp; 802.1Q trunking cheat sheet (NET-06)">
+<meta property="og:description" content="The 802.1Q tag, VLAN ranges, DTP trunk negotiation, access and trunk configuration, inter-VLAN routing and VLAN hopping defenses.">
+<meta property="og:url" content="https://breakfixlearn.com/cheat-sheets/net-06">
+<meta property="og:image" content="https://breakfixlearn.com/cheat-sheets/files/bfl-net-06-vlans-trunking_v1.0_social.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="NET-06 VLANs &amp; 802.1Q trunking cheat sheet preview">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"NET-06 VLANs & 802.1Q trunking cheat sheet","description":"Free one-page VLAN and 802.1Q trunking cheat sheet: tag format, VLAN ranges, DTP, access and trunk config, inter-VLAN routing. PDF (Letter, A4) and image.","url":"https://breakfixlearn.com/cheat-sheets/net-06","learningResourceType":"Cheat sheet","educationalLevel":"Beginner","teaches":"VLANs & 802.1Q trunking","keywords":"VLAN, 802.1Q, Trunking, DTP, Inter-VLAN routing","inLanguage":"en","isAccessibleForFree":true,"license":"https://creativecommons.org/licenses/by-nc/4.0/","version":"1.0","datePublished":"2026-10-19","dateModified":"2026-10-19","image":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-06-vlans-trunking_v1.0_social.webp","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"encoding":[{"@type":"MediaObject","name":"NET-06 VLANs & 802.1Q trunking (US Letter)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-06-vlans-trunking_v1.0_print-letter.pdf","encodingFormat":"application/pdf","contentSize":"172 KB","sha256":"6cd9355697a0479279ae9c5ca82986a305745e90590f97aa533b1d6cba26966f"},{"@type":"MediaObject","name":"NET-06 VLANs & 802.1Q trunking (A4)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-06-vlans-trunking_v1.0_print-a4.pdf","encodingFormat":"application/pdf","contentSize":"172 KB","sha256":"78b712fda8a472a89ee46380ed7656b6403248edb72ef046be4f08b37de26b83"},{"@type":"MediaObject","name":"NET-06 VLANs & 802.1Q trunking (Screen)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-06-vlans-trunking_v1.0_web.pdf","encodingFormat":"application/pdf","contentSize":"158 KB","sha256":"0fed069cee2abb639bbcef048782bbb40dbfafcf4152bae4a3ef967f253deb68"},{"@type":"MediaObject","name":"NET-06 VLANs & 802.1Q trunking (Hi-res image)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-06-vlans-trunking_v1.0_full.webp","encodingFormat":"image/webp","contentSize":"482 KB","sha256":"6b0b65984e4fd2353b30b7c44c5993c72b1333451964ab8b1db7eeffe5cfb681"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Cheat sheets","item":"https://breakfixlearn.com/cheat-sheets"},{"@type":"ListItem","position":3,"name":"NET-06 VLANs & 802.1Q trunking"}]}</script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article class="sheet">
+  <header class="post-head sheet-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/cheat-sheets">cheat-sheets</a><span aria-hidden="true">/</span><a href="/cheat-sheets#networking">net</a></nav>
+      <p class="scard-meta"><span class="sid k-networking">NET-06</span><span>Networking</span></p>
+      <h1>VLANs &amp; 802.1Q trunking</h1>
+      <p class="post-dek"><b>Use this when:</b> you split a switch into separate networks, carry them between switches on a trunk, or route between them.</p>
+      <div class="post-meta"><span>CCNA 200-301 topics 2.1 and 2.2</span><span class="sep">/</span><span>v1.0</span><span class="sep">/</span><time datetime="2026-10-19">Oct 19, 2026</time><span class="sep">/</span><span>1 page</span><span class="sep">/</span><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license noopener" target="_blank">CC BY-NC 4.0</a></div>
+    </div>
+  </header>
+  <div class="wrap sheet-grid">
+    <figure class="sheet-paper">
+      <a href="/cheat-sheets/files/bfl-net-06-vlans-trunking_v1.0_full.webp" aria-label="Open the full-size NET-06 image (2550 by 3300 pixels)">
+        <img src="/cheat-sheets/files/bfl-net-06-vlans-trunking_v1.0_web.webp" srcset="/cheat-sheets/files/bfl-net-06-vlans-trunking_v1.0_web.webp 1200w, /cheat-sheets/files/bfl-net-06-vlans-trunking_v1.0_full.webp 2550w" sizes="(max-width: 60rem) calc(100vw - 2rem), 46rem"
+             width="1200" height="1553" fetchpriority="high" decoding="async"
+             alt="NET-06 VLANs &amp; 802.1Q trunking cheat sheet. Every table on it is repeated as text below.">
+      </a>
+      <figcaption>Tap the sheet for the full-size image. The <a href="#text-version">text version</a> below is screen-reader friendly.</figcaption>
+    </figure>
+    <aside class="sheet-side" aria-labelledby="dl-h">
+      <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">copy</span> <span class="a">net-06 flash:</span></span>
+      <h2 id="dl-h" class="side-h">Download</h2>
+      <ul class="dl-list"><li><a class="dl dl-pri" href="/cheat-sheets/files/bfl-net-06-vlans-trunking_v1.0_print-letter.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>US Letter</b><span class="dl-m">print &middot; 172 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-net-06-vlans-trunking_v1.0_print-a4.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>A4</b><span class="dl-m">print &middot; 172 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-net-06-vlans-trunking_v1.0_web.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>Screen</b><span class="dl-m">links work &middot; 158 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-net-06-vlans-trunking_v1.0_full.webp" download><span class="dl-k">WebP</span><span class="dl-t"><b>Hi-res image</b><span class="dl-m">2550 &times; 3300 &middot; 482 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li></ul>
+      <p class="dl-open"><a href="/cheat-sheets/files/bfl-net-06-vlans-trunking_v1.0_web.pdf">Open the PDF in your browser</a> instead of downloading it.</p>
+      <details class="sums">
+        <summary>Verify your download (SHA-256)</summary>
+        <div class="tbl"><table class="sheet-files"><thead><tr><th scope="col">File</th><th scope="col">SHA-256</th></tr></thead><tbody><tr><td translate="no">bfl-net-06-vlans-trunking_v1.0_web.pdf</td><td translate="no">0fed069cee2abb639bbcef048782bbb40dbfafcf4152bae4a3ef967f253deb68</td></tr><tr><td translate="no">bfl-net-06-vlans-trunking_v1.0_print-letter.pdf</td><td translate="no">6cd9355697a0479279ae9c5ca82986a305745e90590f97aa533b1d6cba26966f</td></tr><tr><td translate="no">bfl-net-06-vlans-trunking_v1.0_print-a4.pdf</td><td translate="no">78b712fda8a472a89ee46380ed7656b6403248edb72ef046be4f08b37de26b83</td></tr><tr><td translate="no">bfl-net-06-vlans-trunking_v1.0_full.webp</td><td translate="no">6b0b65984e4fd2353b30b7c44c5993c72b1333451964ab8b1db7eeffe5cfb681</td></tr></tbody></table></div>
+        <p>Compare the hash with the one printed by
+          <code translate="no">Get-FileHash .\file.pdf -Algorithm SHA256</code> (PowerShell) or
+          <code translate="no">sha256sum file.pdf</code> (Linux, macOS: <code translate="no">shasum -a 256</code>). Different hash, different file: delete it.</p>
+      </details>
+      <p class="side-note">Free for personal and classroom use under CC BY-NC 4.0. Keep the credit line; don't sell it. Spotted a mistake? <a href="mailto:treyrct858@gmail.com?subject=NET-06%20v1.0%20correction">Email a correction</a>.</p>
+    </aside>
+  </div>
+  <section class="wrap sheet-text" aria-labelledby="text-version">
+    <div class="prose">
+      <h2 id="text-version">Text version</h2>
+      <p>Everything on the sheet, as plain HTML: handy for screen readers, copy-paste and search.</p>
+<h3 id="tag">The 802.1Q tag</h3>
+<p>A trunk adds a 4-byte tag between the source MAC and the Type field of each Ethernet frame.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Field</th><th scope="col">Size</th><th scope="col">Purpose</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">TPID</th><td>16 bits</td><td>0x8100 marks the frame as tagged</td></tr>
+    <tr><th scope="row">PCP</th><td>3 bits</td><td>Priority (QoS)</td></tr>
+    <tr><th scope="row">DEI</th><td>1 bit</td><td>Drop eligible</td></tr>
+    <tr><th scope="row">VLAN ID</th><td>12 bits</td><td>1 to 4094</td></tr>
+  </tbody>
+</table></div>
+<p>An access port carries one VLAN with no tag. A trunk carries many VLANs, each tagged. The native VLAN is the one sent untagged (VLAN 1 by default).</p>
+
+<h3 id="numbers">VLAN numbers</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Range</th><th scope="col">Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Default; can't be deleted. Don't use it for users.</td></tr>
+    <tr><td>2 to 1001</td><td>Normal range, your VLANs</td></tr>
+    <tr><td>1002 to 1005</td><td>Reserved (Token Ring, FDDI)</td></tr>
+    <tr><td>1006 to 4094</td><td>Extended range</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="dtp">Does a trunk form? (DTP)</h3>
+<p>Switch ports default to dynamic auto.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">One side</th><th scope="col">auto</th><th scope="col">desirable</th><th scope="col">trunk</th><th scope="col">access</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">auto</th><td>No</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+    <tr><th scope="row">desirable</th><td>Yes</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+    <tr><th scope="row">trunk</th><td>Yes</td><td>Yes</td><td>Yes</td><td>Mismatch</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="configure">Configure</h3>
+<p>Access port:</p>
+<ul>
+  <li><code translate="no">vlan 10</code>, then <code translate="no">name SALES</code></li>
+  <li><code translate="no">interface g0/1</code>, then <code translate="no">switchport mode access</code> and <code translate="no">switchport access vlan 10</code></li>
+  <li><code translate="no">switchport voice vlan 150</code> for an IP phone</li>
+</ul>
+<p>Trunk port:</p>
+<ul>
+  <li><code translate="no">interface g0/24</code>, then <code translate="no">switchport mode trunk</code></li>
+  <li><code translate="no">switchport nonegotiate</code> (no DTP)</li>
+  <li><code translate="no">switchport trunk native vlan 999</code></li>
+  <li><code translate="no">switchport trunk allowed vlan 10,20,150</code>, and later <code translate="no">switchport trunk allowed vlan add 30</code></li>
+</ul>
+
+<h3 id="routing">Route between VLANs</h3>
+<p><b>Router on a stick:</b> <code translate="no">interface g0/0.10</code>, <code translate="no">encapsulation dot1q 10</code>, <code translate="no">ip address 192.0.2.1 255.255.255.192</code>.</p>
+<p><b>Layer 3 switch (SVI):</b> <code translate="no">ip routing</code>, <code translate="no">interface vlan 10</code>, <code translate="no">ip address 192.0.2.1 255.255.255.192</code>, <code translate="no">no shutdown</code>.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">Shows</th></tr></thead>
+  <tbody>
+    <tr><td><code translate="no">show vlan brief</code></td><td>VLANs and access ports</td></tr>
+    <tr><td><code translate="no">show interfaces trunk</code></td><td>Trunks, native VLAN, allowed VLANs</td></tr>
+    <tr><td><code translate="no">show interfaces g0/1 switchport</code></td><td>Mode of one port</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="hopping">Stop VLAN hopping</h3>
+<p class="note note-caution"><b>Danger.</b> Ports left in dynamic mode let an attacker negotiate a trunk. Set <code translate="no">access</code>, or <code translate="no">trunk</code> plus <code translate="no">nonegotiate</code>.</p>
+<p class="note note-caution"><b>Caution.</b> Use an unused native VLAN (999) and the same one on both ends.</p>
+<p class="note note-caution"><b>Caution.</b> <code translate="no">switchport trunk allowed vlan 30</code> replaces the whole list. Use <code translate="no">add</code>.</p>
+
+<h3 id="trunk-down">Trunk down? Check</h3>
+<ul>
+  <li><b>Native VLAN:</b> the same on both ends? CDP logs a mismatch.</li>
+  <li><b>Allowed list:</b> is the VLAN allowed on both trunks?</li>
+  <li><b>VLAN exists:</b> was it created on the far switch too?</li>
+</ul>
+
+<h3 id="remember">Remember</h3>
+<ul>
+  <li>One VLAN = one subnet</li>
+  <li>auto + auto = no trunk</li>
+  <li>Shut unused ports and park them in an unused VLAN</li>
+</ul>
+      <h3>Sources</h3>
+      <ul><li><a href="https://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst1000/software/releases/15_2_7_e/configuration_guides/vlan/b_1527e_vlan_c1000_cg/configuring_vlan.html" rel="noopener" target="_blank">Cisco Catalyst 1000 VLAN configuration guide</a></li><li><a href="https://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst9400/software/release/17-6/configuration_guide/vlan/b_176_vlan_9400_cg/configuring_vlan_trunks.pdf" rel="noopener" target="_blank">Cisco Catalyst 9400 VLAN trunk configuration guide</a></li><li><a href="https://learningnetwork.cisco.com/s/ccna-exam-topics" rel="noopener" target="_blank">Cisco CCNA 200-301 exam topics</a></li></ul>
+      <h3>Go deeper on the blog</h3><ul><li><a href="/blog/vlsm-subnet-calculator-python-tool">I Kept Getting VLSM Wrong By Hand, So I Wrote a Tool That Can&#x27;t</a></li></ul>
+    </div>
+    <nav class="nexthop" aria-label="More cheat sheets"><a class="prev" href="/cheat-sheets/net-05"><span class="k">&larr; previous sheet</span>NET-05 Cisco IOS CLI essentials</a><a class="next" href="/cheat-sheets/net-07"><span class="k">next sheet &rarr;</span>NET-07 STP/RSTP &amp; EtherChannel</a></nav>
+  </section>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Oct 20, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

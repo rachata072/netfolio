@@ -1,0 +1,79 @@
+<!--
+  Text version of NET-07, shown under the sheet image on /cheat-sheets/net-07.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<h2 id="tree">How STP picks a loop-free tree</h2>
+<p>Cisco switches run one tree per VLAN with PVST+ or Rapid PVST+.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Step</th><th scope="col">What happens</th></tr></thead>
+  <tbody>
+    <tr><td>1. Elect the root</td><td>Lowest bridge ID wins. A tie on priority goes to the lowest MAC.</td></tr>
+    <tr><td>2. Root ports</td><td>Each other switch picks the port with the lowest cost to the root.</td></tr>
+    <tr><td>3. Designated ports</td><td>On each link, the side closest to the root forwards.</td></tr>
+    <tr><td>4. Block the rest</td><td>Leftover ports become alternate (or backup) and block.</td></tr>
+  </tbody>
+</table></div>
+<p>Bridge ID = priority (4 bits; default 32768, in steps of 4096) + extended system ID (12 bits, equal to the VLAN number) + MAC address (48 bits, the tie-breaker).</p>
+
+<h2 id="cost">Port cost</h2>
+<p>Lower is better. <code>show spanning-tree summary</code> shows which method the switch uses.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Speed</th><th scope="col">Short (802.1D)</th><th scope="col">Long (802.1t)</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">10 Mbps</th><td>100</td><td>2,000,000</td></tr>
+    <tr><th scope="row">100 Mbps</th><td>19</td><td>200,000</td></tr>
+    <tr><th scope="row">1 Gbps</th><td>4</td><td>20,000</td></tr>
+    <tr><th scope="row">10 Gbps</th><td>2</td><td>2,000</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="rstp">STP vs RSTP</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col"></th><th scope="col">STP</th><th scope="col">RSTP</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Standard</th><td>802.1D</td><td>802.1w (Cisco: Rapid PVST+)</td></tr>
+    <tr><th scope="row">Port states</th><td>Blocking, listening, learning, forwarding</td><td>Discarding, learning, forwarding</td></tr>
+    <tr><th scope="row">Convergence</th><td>30 to 50 seconds</td><td>A few seconds</td></tr>
+  </tbody>
+</table></div>
+<p>Timers: hello 2 s, forward delay 15 s, max age 20 s.</p>
+
+<h2 id="configure-stp">Configure STP</h2>
+<ul>
+  <li><code>spanning-tree mode rapid-pvst</code></li>
+  <li><code>spanning-tree vlan 10 root primary</code> (sets priority 24576, or lower if needed)</li>
+  <li><code>spanning-tree vlan 20 priority 4096</code></li>
+  <li>On a PC or server port: <code>spanning-tree portfast</code> and <code>spanning-tree bpduguard enable</code></li>
+  <li><code>show spanning-tree vlan 10</code> shows the root, port roles and costs</li>
+</ul>
+
+<h2 id="etherchannel">EtherChannel: bundle links</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Protocol</th><th scope="col">Starts</th><th scope="col">Waits</th><th scope="col">Won't form</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">LACP (IEEE)</th><td>active</td><td>passive</td><td>passive + passive</td></tr>
+    <tr><th scope="row">PAgP (Cisco)</th><td>desirable</td><td>auto</td><td>auto + auto</td></tr>
+    <tr><th scope="row">Static</th><td colspan="2">on (no protocol)</td><td>Forms only with on</td></tr>
+  </tbody>
+</table></div>
+<p>Example: <code>interface range g0/1 - 2</code>, <code>channel-group 1 mode active</code>, then <code>interface port-channel 1</code> and <code>switchport mode trunk</code>.</p>
+
+<h2 id="rules">Bundle rules</h2>
+<ul>
+  <li>Up to 8 active members (LACP can hold 8 more on standby)</li>
+  <li>Members must match speed, duplex, access VLAN or trunk VLANs, and native VLAN</li>
+  <li>Never mix LACP and PAgP in one bundle</li>
+  <li>Check with <code>show etherchannel summary</code> (you want SU and P)</li>
+</ul>
+
+<h2 id="loops">Avoid loops</h2>
+<p class="note note-caution"><b>Danger.</b> Use PortFast only on end-host ports. On a switch link it can loop the network.</p>
+<p class="note note-caution"><b>Caution.</b> Mode <code>on</code> skips negotiation; a mismatch can cause a loop.</p>
+<p class="note note-caution"><b>Caution.</b> Pick the root on purpose, not by lowest MAC.</p>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>The lowest bridge ID is the root</li>
+  <li>BPDU Guard err-disables the port</li>
+  <li>One bundle = one logical STP link</li>
+</ul>

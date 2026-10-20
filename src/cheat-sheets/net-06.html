@@ -1,0 +1,84 @@
+<!--
+  Text version of NET-06, shown under the sheet image on /cheat-sheets/net-06.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<h2 id="tag">The 802.1Q tag</h2>
+<p>A trunk adds a 4-byte tag between the source MAC and the Type field of each Ethernet frame.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Field</th><th scope="col">Size</th><th scope="col">Purpose</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">TPID</th><td>16 bits</td><td>0x8100 marks the frame as tagged</td></tr>
+    <tr><th scope="row">PCP</th><td>3 bits</td><td>Priority (QoS)</td></tr>
+    <tr><th scope="row">DEI</th><td>1 bit</td><td>Drop eligible</td></tr>
+    <tr><th scope="row">VLAN ID</th><td>12 bits</td><td>1 to 4094</td></tr>
+  </tbody>
+</table></div>
+<p>An access port carries one VLAN with no tag. A trunk carries many VLANs, each tagged. The native VLAN is the one sent untagged (VLAN 1 by default).</p>
+
+<h2 id="numbers">VLAN numbers</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Range</th><th scope="col">Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Default; can't be deleted. Don't use it for users.</td></tr>
+    <tr><td>2 to 1001</td><td>Normal range, your VLANs</td></tr>
+    <tr><td>1002 to 1005</td><td>Reserved (Token Ring, FDDI)</td></tr>
+    <tr><td>1006 to 4094</td><td>Extended range</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="dtp">Does a trunk form? (DTP)</h2>
+<p>Switch ports default to dynamic auto.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">One side</th><th scope="col">auto</th><th scope="col">desirable</th><th scope="col">trunk</th><th scope="col">access</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">auto</th><td>No</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+    <tr><th scope="row">desirable</th><td>Yes</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+    <tr><th scope="row">trunk</th><td>Yes</td><td>Yes</td><td>Yes</td><td>Mismatch</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="configure">Configure</h2>
+<p>Access port:</p>
+<ul>
+  <li><code>vlan 10</code>, then <code>name SALES</code></li>
+  <li><code>interface g0/1</code>, then <code>switchport mode access</code> and <code>switchport access vlan 10</code></li>
+  <li><code>switchport voice vlan 150</code> for an IP phone</li>
+</ul>
+<p>Trunk port:</p>
+<ul>
+  <li><code>interface g0/24</code>, then <code>switchport mode trunk</code></li>
+  <li><code>switchport nonegotiate</code> (no DTP)</li>
+  <li><code>switchport trunk native vlan 999</code></li>
+  <li><code>switchport trunk allowed vlan 10,20,150</code>, and later <code>switchport trunk allowed vlan add 30</code></li>
+</ul>
+
+<h2 id="routing">Route between VLANs</h2>
+<p><b>Router on a stick:</b> <code>interface g0/0.10</code>, <code>encapsulation dot1q 10</code>, <code>ip address 192.0.2.1 255.255.255.192</code>.</p>
+<p><b>Layer 3 switch (SVI):</b> <code>ip routing</code>, <code>interface vlan 10</code>, <code>ip address 192.0.2.1 255.255.255.192</code>, <code>no shutdown</code>.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">Shows</th></tr></thead>
+  <tbody>
+    <tr><td><code>show vlan brief</code></td><td>VLANs and access ports</td></tr>
+    <tr><td><code>show interfaces trunk</code></td><td>Trunks, native VLAN, allowed VLANs</td></tr>
+    <tr><td><code>show interfaces g0/1 switchport</code></td><td>Mode of one port</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="hopping">Stop VLAN hopping</h2>
+<p class="note note-caution"><b>Danger.</b> Ports left in dynamic mode let an attacker negotiate a trunk. Set <code>access</code>, or <code>trunk</code> plus <code>nonegotiate</code>.</p>
+<p class="note note-caution"><b>Caution.</b> Use an unused native VLAN (999) and the same one on both ends.</p>
+<p class="note note-caution"><b>Caution.</b> <code>switchport trunk allowed vlan 30</code> replaces the whole list. Use <code>add</code>.</p>
+
+<h2 id="trunk-down">Trunk down? Check</h2>
+<ul>
+  <li><b>Native VLAN:</b> the same on both ends? CDP logs a mismatch.</li>
+  <li><b>Allowed list:</b> is the VLAN allowed on both trunks?</li>
+  <li><b>VLAN exists:</b> was it created on the far switch too?</li>
+</ul>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>One VLAN = one subnet</li>
+  <li>auto + auto = no trunk</li>
+  <li>Shut unused ports and park them in an unused VLAN</li>
+</ul>

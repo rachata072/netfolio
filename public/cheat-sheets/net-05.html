@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NET-05 Cisco IOS CLI essentials Cheat Sheet (PDF) | breakfixlearn</title>
+<meta name="description" content="Free one-page Cisco IOS CLI cheat sheet: command modes, show commands, secure SSH baseline, interface status, save and reload. PDF (Letter, A4) and image.">
+<link rel="canonical" href="https://breakfixlearn.com/cheat-sheets/net-05">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=59472e0728">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="Cisco IOS CLI essentials cheat sheet (NET-05)">
+<meta property="og:description" content="IOS command modes, help keys, show commands, a secure SSH baseline, interface status meanings and how to save and recover.">
+<meta property="og:url" content="https://breakfixlearn.com/cheat-sheets/net-05">
+<meta property="og:image" content="https://breakfixlearn.com/cheat-sheets/files/bfl-net-05-cisco-ios-cli_v1.0_social.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="NET-05 Cisco IOS CLI essentials cheat sheet preview">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"NET-05 Cisco IOS CLI essentials cheat sheet","description":"Free one-page Cisco IOS CLI cheat sheet: command modes, show commands, secure SSH baseline, interface status, save and reload. PDF (Letter, A4) and image.","url":"https://breakfixlearn.com/cheat-sheets/net-05","learningResourceType":"Cheat sheet","educationalLevel":"Beginner","teaches":"Cisco IOS CLI essentials","keywords":"Cisco IOS, CLI, SSH, Router, Switch","inLanguage":"en","isAccessibleForFree":true,"license":"https://creativecommons.org/licenses/by-nc/4.0/","version":"1.0","datePublished":"2026-10-19","dateModified":"2026-10-19","image":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-05-cisco-ios-cli_v1.0_social.webp","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"encoding":[{"@type":"MediaObject","name":"NET-05 Cisco IOS CLI essentials (US Letter)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-05-cisco-ios-cli_v1.0_print-letter.pdf","encodingFormat":"application/pdf","contentSize":"158 KB","sha256":"075285930932f2b74661314473338ae35d7eb1f331a125f85ecf2f18b6c1530c"},{"@type":"MediaObject","name":"NET-05 Cisco IOS CLI essentials (A4)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-05-cisco-ios-cli_v1.0_print-a4.pdf","encodingFormat":"application/pdf","contentSize":"157 KB","sha256":"2b41924b644e6704ee4b7660cd814dd7e62947ea0b641952095510965d9f823c"},{"@type":"MediaObject","name":"NET-05 Cisco IOS CLI essentials (Screen)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-05-cisco-ios-cli_v1.0_web.pdf","encodingFormat":"application/pdf","contentSize":"144 KB","sha256":"b34383cd6d3e1a7436afa6501206f2b0c320fdaedd7ac369d4b78625bc5a6ec8"},{"@type":"MediaObject","name":"NET-05 Cisco IOS CLI essentials (Hi-res image)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-net-05-cisco-ios-cli_v1.0_full.webp","encodingFormat":"image/webp","contentSize":"487 KB","sha256":"512265102a19536e367aaee93044230cd8dca226120be680eabd8c3f6cdc89e4"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Cheat sheets","item":"https://breakfixlearn.com/cheat-sheets"},{"@type":"ListItem","position":3,"name":"NET-05 Cisco IOS CLI essentials"}]}</script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article class="sheet">
+  <header class="post-head sheet-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/cheat-sheets">cheat-sheets</a><span aria-hidden="true">/</span><a href="/cheat-sheets#networking">net</a></nav>
+      <p class="scard-meta"><span class="sid k-networking">NET-05</span><span>Networking</span></p>
+      <h1>Cisco IOS CLI essentials</h1>
+      <p class="post-dek"><b>Use this when:</b> you sit at a Cisco router or switch prompt and need to move between modes, find a command, secure the box and save your work.</p>
+      <div class="post-meta"><span>CCNA 200-301, Cisco IOS and IOS XE</span><span class="sep">/</span><span>v1.0</span><span class="sep">/</span><time datetime="2026-10-19">Oct 19, 2026</time><span class="sep">/</span><span>1 page</span><span class="sep">/</span><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license noopener" target="_blank">CC BY-NC 4.0</a></div>
+    </div>
+  </header>
+  <div class="wrap sheet-grid">
+    <figure class="sheet-paper">
+      <a href="/cheat-sheets/files/bfl-net-05-cisco-ios-cli_v1.0_full.webp" aria-label="Open the full-size NET-05 image (2550 by 3300 pixels)">
+        <img src="/cheat-sheets/files/bfl-net-05-cisco-ios-cli_v1.0_web.webp" srcset="/cheat-sheets/files/bfl-net-05-cisco-ios-cli_v1.0_web.webp 1200w, /cheat-sheets/files/bfl-net-05-cisco-ios-cli_v1.0_full.webp 2550w" sizes="(max-width: 60rem) calc(100vw - 2rem), 46rem"
+             width="1200" height="1553" fetchpriority="high" decoding="async"
+             alt="NET-05 Cisco IOS CLI essentials cheat sheet. Every table on it is repeated as text below.">
+      </a>
+      <figcaption>Tap the sheet for the full-size image. The <a href="#text-version">text version</a> below is screen-reader friendly.</figcaption>
+    </figure>
+    <aside class="sheet-side" aria-labelledby="dl-h">
+      <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">copy</span> <span class="a">net-05 flash:</span></span>
+      <h2 id="dl-h" class="side-h">Download</h2>
+      <ul class="dl-list"><li><a class="dl dl-pri" href="/cheat-sheets/files/bfl-net-05-cisco-ios-cli_v1.0_print-letter.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>US Letter</b><span class="dl-m">print &middot; 158 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-net-05-cisco-ios-cli_v1.0_print-a4.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>A4</b><span class="dl-m">print &middot; 157 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-net-05-cisco-ios-cli_v1.0_web.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>Screen</b><span class="dl-m">links work &middot; 144 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-net-05-cisco-ios-cli_v1.0_full.webp" download><span class="dl-k">WebP</span><span class="dl-t"><b>Hi-res image</b><span class="dl-m">2550 &times; 3300 &middot; 487 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li></ul>
+      <p class="dl-open"><a href="/cheat-sheets/files/bfl-net-05-cisco-ios-cli_v1.0_web.pdf">Open the PDF in your browser</a> instead of downloading it.</p>
+      <details class="sums">
+        <summary>Verify your download (SHA-256)</summary>
+        <div class="tbl"><table class="sheet-files"><thead><tr><th scope="col">File</th><th scope="col">SHA-256</th></tr></thead><tbody><tr><td translate="no">bfl-net-05-cisco-ios-cli_v1.0_web.pdf</td><td translate="no">b34383cd6d3e1a7436afa6501206f2b0c320fdaedd7ac369d4b78625bc5a6ec8</td></tr><tr><td translate="no">bfl-net-05-cisco-ios-cli_v1.0_print-letter.pdf</td><td translate="no">075285930932f2b74661314473338ae35d7eb1f331a125f85ecf2f18b6c1530c</td></tr><tr><td translate="no">bfl-net-05-cisco-ios-cli_v1.0_print-a4.pdf</td><td translate="no">2b41924b644e6704ee4b7660cd814dd7e62947ea0b641952095510965d9f823c</td></tr><tr><td translate="no">bfl-net-05-cisco-ios-cli_v1.0_full.webp</td><td translate="no">512265102a19536e367aaee93044230cd8dca226120be680eabd8c3f6cdc89e4</td></tr></tbody></table></div>
+        <p>Compare the hash with the one printed by
+          <code translate="no">Get-FileHash .\file.pdf -Algorithm SHA256</code> (PowerShell) or
+          <code translate="no">sha256sum file.pdf</code> (Linux, macOS: <code translate="no">shasum -a 256</code>). Different hash, different file: delete it.</p>
+      </details>
+      <p class="side-note">Free for personal and classroom use under CC BY-NC 4.0. Keep the credit line; don't sell it. Spotted a mistake? <a href="mailto:treyrct858@gmail.com?subject=NET-05%20v1.0%20correction">Email a correction</a>.</p>
+    </aside>
+  </div>
+  <section class="wrap sheet-text" aria-labelledby="text-version">
+    <div class="prose">
+      <h2 id="text-version">Text version</h2>
+      <p>Everything on the sheet, as plain HTML: handy for screen readers, copy-paste and search.</p>
+<h3 id="modes">Command modes: read the prompt</h3>
+<p>Each mode only accepts its own commands.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Prompt</th><th scope="col">Mode</th><th scope="col">Used for</th><th scope="col">Get there with</th></tr></thead>
+  <tbody>
+    <tr><td><code translate="no">R1&gt;</code></td><th scope="row">User EXEC</th><td>Basic show, ping</td><td>Log in</td></tr>
+    <tr><td><code translate="no">R1#</code></td><th scope="row">Privileged EXEC</th><td>All show, copy, reload</td><td><code translate="no">enable</code></td></tr>
+    <tr><td><code translate="no">R1(config)#</code></td><th scope="row">Global config</th><td>Settings for the whole device</td><td><code translate="no">configure terminal</code></td></tr>
+    <tr><td><code translate="no">R1(config-if)#</code></td><th scope="row">Interface config</th><td>One port</td><td><code translate="no">interface g0/1</code></td></tr>
+  </tbody>
+</table></div>
+<p>Lines use <code translate="no">line vty 0 15</code> or <code translate="no">line console 0</code>. <code translate="no">exit</code> goes up one level, <code translate="no">end</code> or Ctrl+Z goes straight back to <code translate="no">#</code>, and <code translate="no">disable</code> returns to <code translate="no">&gt;</code>.</p>
+
+<h3 id="help">Help and shortcuts</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Key or command</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code translate="no">?</code>, <code translate="no">sh?</code>, <code translate="no">show ?</code></td><td>What can I type here?</td></tr>
+    <tr><td>Tab</td><td>Complete the word</td></tr>
+    <tr><td>Ctrl+Shift+6</td><td>Stop a ping or traceroute</td></tr>
+    <tr><td><code translate="no">do show ip int brief</code></td><td>Run a show command from config mode</td></tr>
+    <tr><td><code translate="no">no shutdown</code></td><td><code translate="no">no</code> undoes a command</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="show">Look before you touch</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">Shows</th></tr></thead>
+  <tbody>
+    <tr><td><code translate="no">show running-config</code></td><td>Live config in RAM (<code translate="no">show startup-config</code> = saved in NVRAM)</td></tr>
+    <tr><td><code translate="no">show version</code></td><td>IOS version, uptime, model</td></tr>
+    <tr><td><code translate="no">show ip interface brief</code></td><td>IP addresses and up/up status</td></tr>
+    <tr><td><code translate="no">show run | section line vty</code></td><td>One section of the config</td></tr>
+    <tr><td><code translate="no">show run | include hostname</code></td><td>Matching lines only</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="baseline">Secure baseline</h3>
+<p>Replace <code translate="no">&lt;secret&gt;</code> with your own value. Keep owner, model and IOS details out of banners.</p>
+<ul>
+  <li><code translate="no">hostname R1</code></li>
+  <li><code translate="no">no ip domain-lookup</code> (typos don't hang the console)</li>
+  <li><code translate="no">enable algorithm-type scrypt secret &lt;secret&gt;</code></li>
+  <li><code translate="no">username admin privilege 15 algorithm-type scrypt secret &lt;secret&gt;</code></li>
+  <li><code translate="no">ip domain-name lab.example.com</code></li>
+  <li><code translate="no">crypto key generate rsa modulus 2048</code></li>
+  <li><code translate="no">ip ssh version 2</code></li>
+  <li><code translate="no">line vty 0 15</code>, then <code translate="no">transport input ssh</code>, <code translate="no">login local</code> and <code translate="no">exec-timeout 10 0</code></li>
+  <li><code translate="no">banner login # Authorized access only #</code></li>
+</ul>
+
+<h3 id="status">Read interface status</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Status / protocol</th><th scope="col">Means</th></tr></thead>
+  <tbody>
+    <tr><td>up / up</td><td>Working</td></tr>
+    <tr><td>administratively down</td><td><code translate="no">shutdown</code> is set</td></tr>
+    <tr><td>down / down</td><td>Layer 1: cable, or the far end is off</td></tr>
+    <tr><td>up / down</td><td>Layer 2: encapsulation or clocking</td></tr>
+  </tbody>
+</table></div>
+<p><code translate="no">show interfaces g0/1</code> adds errors, duplex and speed.</p>
+
+<h3 id="save">Save and recover</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code translate="no">copy running-config startup-config</code></td><td>Save. <code translate="no">write memory</code> does the same.</td></tr>
+    <tr><td><code translate="no">reload in 10</code></td><td>Reboots to the saved config in 10 minutes unless you run <code translate="no">reload cancel</code>. A safety net for risky changes.</td></tr>
+  </tbody>
+</table></div>
+<p class="note note-caution"><b>Danger.</b> <code translate="no">erase startup-config</code> followed by <code translate="no">reload</code> wipes the device.</p>
+<p class="note note-caution"><b>Caution.</b> Type 7 passwords (<code translate="no">service password-encryption</code>) are easy to reverse. Use <code translate="no">secret</code>.</p>
+
+<h3 id="remember">Remember</h3>
+<ul>
+  <li>Running config lives in RAM: save it or lose it</li>
+  <li><code translate="no">secret</code> beats <code translate="no">password</code></li>
+  <li>Abbreviate: <code translate="no">sh ip int br</code></li>
+</ul>
+      <h3>Sources</h3>
+      <ul><li><a href="https://www.cisco.com/c/en/us/support/docs/ip/access-lists/13608-21.html" rel="noopener" target="_blank">Cisco Guide to Harden Cisco IOS Devices</a></li><li><a href="https://learningnetwork.cisco.com/s/ccna-exam-topics" rel="noopener" target="_blank">Cisco CCNA 200-301 exam topics</a></li></ul>
+      <h3>Go deeper on the blog</h3><ul><li><a href="/blog/py-configbackup-netmiko-config-backup-alerts">I Built a Netmiko Config Backup Tool So I&#x27;d Stop Losing Arguments With My Own Router</a></li></ul>
+    </div>
+    <nav class="nexthop" aria-label="More cheat sheets"><a class="prev" href="/cheat-sheets/net-04"><span class="k">&larr; previous sheet</span>NET-04 IPv6 essentials</a><a class="next" href="/cheat-sheets/net-06"><span class="k">next sheet &rarr;</span>NET-06 VLANs &amp; 802.1Q trunking</a></nav>
+  </section>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Oct 20, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

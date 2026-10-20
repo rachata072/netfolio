@@ -1,0 +1,83 @@
+<!--
+  Text version of SEC-04, shown under the sheet image on /cheat-sheets/sec-04.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<h2 id="permissions">Read a permission line</h2>
+<p>Example: <code>-rwxr-x--- alice ops script.sh</code>. Add r = 4, w = 2 and x = 1 for each group: owner <code>rwx</code> = 7, group <code>r-x</code> = 5, others <code>---</code> = 0, so <code>chmod 750 script.sh</code> sets exactly that. The first character is the type: <code>-</code> file, <code>d</code> directory, <code>l</code> link. <code>chmod u+x</code> adds execute for the owner and <code>chown alice:ops</code> sets owner and group.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Mode</th><th scope="col">Use for</th></tr></thead>
+  <tbody>
+    <tr><td>644</td><td>Normal files</td></tr>
+    <tr><td>755</td><td>Directories, scripts</td></tr>
+    <tr><td>600</td><td>Private keys, secrets</td></tr>
+    <tr><td>700</td><td><code>~/.ssh</code></td></tr>
+    <tr><td>4000</td><td>SUID: runs as the file owner</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="access">Who has access?</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">Shows</th></tr></thead>
+  <tbody>
+    <tr><td><code>id</code>, <code>whoami</code></td><td>My user and groups</td></tr>
+    <tr><td><code>sudo -l</code></td><td>What I can run with sudo</td></tr>
+    <tr><td><code>w</code>, <code>last</code></td><td>Who is on, recent logins</td></tr>
+    <tr><td><code>sudo lastb</code></td><td>Failed logins</td></tr>
+    <tr><td><code>awk -F: '$3==0' /etc/passwd</code></td><td>Accounts with UID 0 (root)</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="running">What is running and listening?</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">Shows</th></tr></thead>
+  <tbody>
+    <tr><td><code>ss -tulpn</code></td><td>Listening ports and their processes</td></tr>
+    <tr><td><code>sudo lsof -i :22</code></td><td>Who uses port 22</td></tr>
+    <tr><td><code>ps aux --sort=-%cpu | head</code></td><td>Top CPU processes</td></tr>
+    <tr><td><code>systemctl --state=running</code></td><td>Running units</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="changed">What changed? Find risky files</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">Finds</th></tr></thead>
+  <tbody>
+    <tr><td><code>find / -xdev -perm -4000 -type f</code></td><td>SUID files</td></tr>
+    <tr><td><code>find / -xdev -perm -0002 -type f</code></td><td>World-writable files</td></tr>
+    <tr><td><code>find /etc -mtime -1</code></td><td>Files changed in the last 24 hours</td></tr>
+    <tr><td><code>sha256sum file.iso</code></td><td>A hash to compare with the publisher's</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="logs">Read the logs</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">Shows</th></tr></thead>
+  <tbody>
+    <tr><td><code>journalctl -u ssh --since today</code></td><td>Today's SSH log</td></tr>
+    <tr><td><code>journalctl -p err -b</code></td><td>Errors since this boot</td></tr>
+    <tr><td><code>grep "Failed password" /var/log/auth.log</code></td><td>SSH password guessing</td></tr>
+  </tbody>
+</table></div>
+<p>Ubuntu and Debian shown. On RHEL use <code>/var/log/secure</code> and the unit <code>sshd</code>.</p>
+
+<h2 id="harden">Lock it down</h2>
+<ul>
+  <li>Keys first, from your PC: <code>ssh-keygen -t ed25519</code>, then <code>ssh-copy-id admin@192.0.2.10</code></li>
+  <li>Firewall (Ubuntu ufw): <code>sudo ufw default deny incoming</code>, <code>sudo ufw limit 22/tcp</code> (SSH, rate-limited), <code>sudo ufw enable</code>, <code>sudo ufw status verbose</code></li>
+  <li>In <code>/etc/ssh/sshd_config</code>: <code>PermitRootLogin no</code> and <code>PasswordAuthentication no</code></li>
+  <li>Test and apply: <code>sudo sshd -t</code>, then <code>sudo systemctl reload ssh</code></li>
+  <li>Patches: <code>sudo apt update</code> and <code>sudo apt upgrade</code> (RHEL: <code>sudo dnf upgrade</code>)</li>
+</ul>
+
+<h2 id="safe">Before you press Enter</h2>
+<p class="note note-caution"><b>Danger.</b> <code>chmod -R 777</code> and <code>rm -rf</code> on the wrong path can't be undone.</p>
+<p class="note note-caution"><b>Caution.</b> Allow SSH before <code>ufw enable</code>, or a remote session locks you out.</p>
+<p class="note note-caution"><b>Caution.</b> Set up SSH keys and keep a second session open before you turn off passwords.</p>
+<p class="note note-auth"><b>Authorized use only.</b> Run these only on systems you administer.</p>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>Use sudo per command, not a root shell</li>
+  <li>Run <code>sshd -t</code> before every reload</li>
+  <li>Patch on a schedule, not when you remember</li>
+</ul>

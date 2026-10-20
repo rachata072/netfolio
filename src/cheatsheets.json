@@ -227,24 +227,113 @@
     },
     {
       "id": "NET-05",
+      "slug": "cisco-ios-cli",
       "title": "Cisco IOS CLI essentials",
       "cat": "networking",
       "wave": 2,
-      "status": "planned"
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-10-19",
+      "exam": "CCNA 200-301, Cisco IOS and IOS XE",
+      "use_when": "You sit at a Cisco router or switch prompt and need to move between modes, find a command, secure the box and save your work.",
+      "summary": "IOS command modes, help keys, show commands, a secure SSH baseline, interface status meanings and how to save and recover.",
+      "description": "Free one-page Cisco IOS CLI cheat sheet: command modes, show commands, secure SSH baseline, interface status, save and reload. PDF (Letter, A4) and image.",
+      "tags": [
+        "Cisco IOS",
+        "CLI",
+        "SSH",
+        "Router",
+        "Switch"
+      ],
+      "sources": [
+        [
+          "Cisco Guide to Harden Cisco IOS Devices",
+          "https://www.cisco.com/c/en/us/support/docs/ip/access-lists/13608-21.html"
+        ],
+        [
+          "Cisco CCNA 200-301 exam topics",
+          "https://learningnetwork.cisco.com/s/ccna-exam-topics"
+        ]
+      ],
+      "related": [
+        "py-configbackup-netmiko-config-backup-alerts"
+      ]
     },
     {
       "id": "NET-06",
+      "slug": "vlans-trunking",
       "title": "VLANs & 802.1Q trunking",
       "cat": "networking",
       "wave": 2,
-      "status": "planned"
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-10-19",
+      "exam": "CCNA 200-301 topics 2.1 and 2.2",
+      "use_when": "You split a switch into separate networks, carry them between switches on a trunk, or route between them.",
+      "summary": "The 802.1Q tag, VLAN ranges, DTP trunk negotiation, access and trunk configuration, inter-VLAN routing and VLAN hopping defenses.",
+      "description": "Free one-page VLAN and 802.1Q trunking cheat sheet: tag format, VLAN ranges, DTP, access and trunk config, inter-VLAN routing. PDF (Letter, A4) and image.",
+      "tags": [
+        "VLAN",
+        "802.1Q",
+        "Trunking",
+        "DTP",
+        "Inter-VLAN routing"
+      ],
+      "sources": [
+        [
+          "Cisco Catalyst 1000 VLAN configuration guide",
+          "https://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst1000/software/releases/15_2_7_e/configuration_guides/vlan/b_1527e_vlan_c1000_cg/configuring_vlan.html"
+        ],
+        [
+          "Cisco Catalyst 9400 VLAN trunk configuration guide",
+          "https://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst9400/software/release/17-6/configuration_guide/vlan/b_176_vlan_9400_cg/configuring_vlan_trunks.pdf"
+        ],
+        [
+          "Cisco CCNA 200-301 exam topics",
+          "https://learningnetwork.cisco.com/s/ccna-exam-topics"
+        ]
+      ],
+      "related": [
+        "vlsm-subnet-calculator-python-tool"
+      ]
     },
     {
       "id": "NET-07",
+      "slug": "stp-etherchannel",
       "title": "STP/RSTP & EtherChannel",
       "cat": "networking",
       "wave": 2,
-      "status": "planned"
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-10-19",
+      "exam": "CCNA 200-301 topics 2.4 and 2.5",
+      "use_when": "You add redundant links between switches and need to know which port blocks, how fast it recovers, or how to bundle links.",
+      "summary": "How STP elects a root and blocks ports, bridge ID, port costs, STP vs RSTP, PortFast and BPDU Guard, and LACP or PAgP EtherChannel.",
+      "description": "Free one-page STP, RSTP and EtherChannel cheat sheet: root election, bridge ID, port cost, timers, PortFast, LACP and PAgP modes. PDF (Letter, A4) and image.",
+      "tags": [
+        "STP",
+        "RSTP",
+        "EtherChannel",
+        "LACP",
+        "PortFast"
+      ],
+      "sources": [
+        [
+          "Cisco Catalyst 9200 STP configuration guide (17.14)",
+          "https://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst9200/software/release/17-14/configuration_guide/lyr2/b_1714_lyr2_9200_cg/configuring_spanning_tree_protocol.html"
+        ],
+        [
+          "Cisco IOS XE 17 EtherChannel configuration guide",
+          "https://www.cisco.com/c/en/us/td/docs/switches/lan/c9000/lyr2-fwd/etherchannel/etherchannel-configuration-guide/etherchannels.html"
+        ],
+        [
+          "Cisco CCNA 200-301 exam topics",
+          "https://learningnetwork.cisco.com/s/ccna-exam-topics"
+        ]
+      ],
+      "related": [
+        "py-configbackup-netmiko-config-backup-alerts"
+      ]
     },
     {
       "id": "NET-08",
@@ -255,10 +344,37 @@
     },
     {
       "id": "NET-09",
+      "slug": "acls-wildcard-masks",
       "title": "ACLs & wildcard masks",
       "cat": "networking",
       "wave": 2,
-      "status": "planned"
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-10-19",
+      "exam": "CCNA 200-301 topic 5.6",
+      "use_when": "You permit or deny traffic on a router or switch, or lock down who can SSH to it.",
+      "summary": "Wildcard masks, how an ACL decides, standard vs extended ACLs, a named extended example, vty lockdown and how to check hit counts.",
+      "description": "Free one-page ACL and wildcard mask cheat sheet: wildcard math, standard vs extended, named ACL example, SSH lockdown, verification. PDF (Letter, A4) and image.",
+      "tags": [
+        "ACL",
+        "Wildcard mask",
+        "Cisco IOS",
+        "Firewall",
+        "SSH"
+      ],
+      "sources": [
+        [
+          "Cisco Catalyst 9300 IPv4 ACL configuration guide (17.9)",
+          "https://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst9300/software/release/17-9/configuration_guide/sec/b_179_sec_9300_cg/configuring_ipv4_acls.html"
+        ],
+        [
+          "Cisco CCNA 200-301 exam topics",
+          "https://learningnetwork.cisco.com/s/ccna-exam-topics"
+        ]
+      ],
+      "related": [
+        "vlsm-subnet-calculator-python-tool"
+      ]
     },
     {
       "id": "NET-10",
@@ -402,10 +518,49 @@
     },
     {
       "id": "SEC-04",
+      "slug": "linux-security-commands",
       "title": "Linux security commands",
       "cat": "cybersecurity",
       "wave": 2,
-      "status": "planned"
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-10-19",
+      "exam": "Security+ and Linux+",
+      "use_when": "You check a Linux box for who has access, what is running and listening, what changed, and how to lock it down.",
+      "summary": "Linux permissions, account and login checks, listening ports, risky files, log searches, and a ufw and SSH hardening baseline.",
+      "description": "Free one-page Linux security commands cheat sheet: permissions, users, ss, find SUID, journalctl, ufw and SSH hardening. PDF (Letter, A4) and image.",
+      "tags": [
+        "Linux",
+        "Hardening",
+        "SSH",
+        "ufw",
+        "Permissions"
+      ],
+      "sources": [
+        [
+          "ss(8) manual page",
+          "https://man7.org/linux/man-pages/man8/ss.8.html"
+        ],
+        [
+          "find(1) manual page",
+          "https://man7.org/linux/man-pages/man1/find.1.html"
+        ],
+        [
+          "journalctl(1) manual page",
+          "https://man7.org/linux/man-pages/man1/journalctl.1.html"
+        ],
+        [
+          "sshd_config(5) manual page",
+          "https://man7.org/linux/man-pages/man5/sshd_config.5.html"
+        ],
+        [
+          "ufw(8) manual page (Debian)",
+          "https://manpages.debian.org/bookworm/ufw/ufw.8.en.html"
+        ]
+      ],
+      "related": [
+        "linux-hardening-audit-lynis-rkhunter"
+      ]
     },
     {
       "id": "SEC-05",
