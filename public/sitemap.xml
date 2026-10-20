@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://breakfixlearn.com/</loc><lastmod>2026-10-13</lastmod></url>
-  <url><loc>https://breakfixlearn.com/projects</loc><lastmod>2026-10-13</lastmod></url>
-  <url><loc>https://breakfixlearn.com/blog</loc><lastmod>2026-10-13</lastmod></url>
+  <url><loc>https://breakfixlearn.com/</loc><lastmod>2026-10-20</lastmod></url>
+  <url><loc>https://breakfixlearn.com/projects</loc><lastmod>2026-10-20</lastmod></url>
+  <url><loc>https://breakfixlearn.com/blog</loc><lastmod>2026-10-20</lastmod></url>
   <url><loc>https://breakfixlearn.com/cheat-sheets</loc><lastmod>2026-10-03</lastmod></url>
   <url><loc>https://breakfixlearn.com/privacy</loc><lastmod>2026-09-28</lastmod></url>
   <url><loc>https://breakfixlearn.com/cheat-sheets/net-01</loc><lastmod>2026-09-28</lastmod></url>
@@ -17,6 +17,7 @@
   <url><loc>https://breakfixlearn.com/cheat-sheets/it-03</loc><lastmod>2026-10-03</lastmod></url>
   <url><loc>https://breakfixlearn.com/cheat-sheets/ai-01</loc><lastmod>2026-09-28</lastmod></url>
   <url><loc>https://breakfixlearn.com/cheat-sheets/ai-02</loc><lastmod>2026-10-03</lastmod></url>
+  <url><loc>https://breakfixlearn.com/blog/copilot-prompt-injection-threat-hunt-echoleak</loc><lastmod>2026-10-20</lastmod></url>
   <url><loc>https://breakfixlearn.com/blog/sentinel-threat-intelligence-python-stix-indicators</loc><lastmod>2026-10-13</lastmod></url>
   <url><loc>https://breakfixlearn.com/blog/sentinel-threat-intelligence-inventory-kql</loc><lastmod>2026-10-13</lastmod></url>
   <url><loc>https://breakfixlearn.com/blog/sentinel-threat-intelligence-analytics-rules-eicar</loc><lastmod>2026-10-13</lastmod></url>

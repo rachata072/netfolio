@@ -71,6 +71,11 @@
       "name": "Threat-Intel-Sentinel",
       "repo": "threat-intel-sentinel",
       "project": "threat-intel"
+    },
+    "threat-hunting-casebook": {
+      "name": "Threat-Hunting-Casebook",
+      "repo": "threat-hunting-casebook",
+      "project": "threat-hunting"
     }
   }
 }

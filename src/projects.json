@@ -23,6 +23,17 @@
     "tags": ["Microsoft Sentinel", "KQL", "Python", "STIX", "Blue team"]
   },
   {
+    "id": "threat-hunting",
+    "name": "Threat-Hunting-Casebook",
+    "cat": "security",
+    "status": "up",
+    "repo": "threat-hunting-casebook",
+    "post": "copilot-prompt-injection-threat-hunt-echoleak",
+    "post_label": "read incident 01",
+    "blurb": "A growing casebook of threat hunts reconstructed from raw telemetry with KQL, one folder per incident with the same file set every time. Incident 01 traces a Microsoft 365 Copilot prompt injection from one poisoned email to 13 exposed files and image-link exfiltration, with ATT&CK and ATLAS mapping, five detections and a formal report.",
+    "tags": ["Threat hunting", "KQL", "Microsoft Sentinel", "MITRE ATLAS", "Blue team"]
+  },
+  {
     "id": "config-backup",
     "name": "Py-ConfigBackup",
     "cat": "automation",

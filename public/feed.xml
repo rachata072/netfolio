@@ -5,8 +5,16 @@
   <link>https://breakfixlearn.com/</link>
   <description>CCNA lab walkthroughs, security write-ups, and Python network automation notes by Trey.</description>
   <language>en-ca</language>
-  <lastBuildDate>Tue, 13 Oct 2026 09:00:00 -0700</lastBuildDate>
+  <lastBuildDate>Tue, 20 Oct 2026 09:00:00 -0700</lastBuildDate>
   <atom:link href="https://breakfixlearn.com/feed.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>Threat Hunting Casebook 01: Hunting a Hijacked Microsoft 365 Copilot Session</title>
+    <link>https://breakfixlearn.com/blog/copilot-prompt-injection-threat-hunt-echoleak</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/copilot-prompt-injection-threat-hunt-echoleak.html</guid>
+    <pubDate>Tue, 20 Oct 2026 09:00:00 -0700</pubDate>
+    <category>SEC</category>
+    <description>Incident 01 of my Threat Hunting Casebook. A poisoned email hijacked a Microsoft 365 Copilot session: no malware, no stolen password, 13 sensitive files read and leaked through Markdown image links. How I proved it with KQL across three audit tables, ruled out the alternatives, and where the evidence ends.</description>
+  </item>
   <item>
     <title>Threat Intelligence in Sentinel, Part 2: Python, STIX and IOC Matching</title>
     <link>https://breakfixlearn.com/blog/sentinel-threat-intelligence-python-stix-indicators</link>
