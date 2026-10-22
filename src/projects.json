@@ -34,6 +34,17 @@
     "tags": ["Threat hunting", "KQL", "Microsoft Sentinel", "MITRE ATLAS", "Blue team"]
   },
   {
+    "id": "stig-win11",
+    "name": "Win11-STIG-Remediations",
+    "cat": "security",
+    "status": "up",
+    "repo": "windows11-stig-remediations",
+    "post": "windows-11-disa-stig-remediation-tenable-powershell",
+    "post_label": "read the 2-part series",
+    "blurb": "Ten DISA Windows 11 STIG findings from a credentialed Tenable scan, each fixed by hand, undone to prove the scanner catches it, then fixed again with an idempotent PowerShell script. Caught a Group Policy audit.csv side effect that silently disabled 13 audit checks. Failed checks 151 to 140, no regressions.",
+    "tags": ["DISA STIG", "Tenable", "PowerShell", "Windows 11", "Hardening"]
+  },
+  {
     "id": "config-backup",
     "name": "Py-ConfigBackup",
     "cat": "automation",

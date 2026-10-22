@@ -5,8 +5,24 @@
   <link>https://breakfixlearn.com/</link>
   <description>CCNA lab walkthroughs, security write-ups, and Python network automation notes by Trey.</description>
   <language>en-ca</language>
-  <lastBuildDate>Tue, 20 Oct 2026 09:00:00 -0700</lastBuildDate>
+  <lastBuildDate>Thu, 22 Oct 2026 09:00:00 -0700</lastBuildDate>
   <atom:link href="https://breakfixlearn.com/feed.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>Hardening Windows 11 Against DISA STIGs, Part 2: Audit Policy, WDigest, AutoPlay and Seclogon</title>
+    <link>https://breakfixlearn.com/blog/windows-11-stig-audit-policy-wdigest-autoplay-seclogon</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/windows-11-stig-audit-policy-wdigest-autoplay-seclogon.html</guid>
+    <pubDate>Thu, 22 Oct 2026 09:00:00 -0700</pubDate>
+    <category>SEC</category>
+    <description>Part 2 of the Windows 11 DISA STIG remediation project: the local Group Policy audit.csv that silently disabled 13 audit subcategories, WDigest, AutoPlay, password history and a NOT_STOPPABLE Secondary Logon service, plus the PowerShell script rules and the final 151 to 140 failed result.</description>
+  </item>
+  <item>
+    <title>Hardening Windows 11 Against DISA STIGs, Part 1: Baseline, Method and Logging Fixes</title>
+    <link>https://breakfixlearn.com/blog/windows-11-disa-stig-remediation-tenable-powershell</link>
+    <guid isPermaLink="false">https://breakfixlearn.com/blog/windows-11-disa-stig-remediation-tenable-powershell.html</guid>
+    <pubDate>Thu, 22 Oct 2026 09:00:00 -0700</pubDate>
+    <category>SEC</category>
+    <description>Part 1 of a Windows 11 DISA STIG remediation project: a credentialed Tenable scan, a 151-of-258 failed baseline, the fix-prove-undo-prove method, and the first five fixes (event log sizes, PowerShell Script Block Logging and Transcription), each done by hand and then with a PowerShell script.</description>
+  </item>
   <item>
     <title>REA Can Reverse Engineer Almost Anything. Here Is What That Actually Changes</title>
     <link>https://breakfixlearn.com/blog/rea-reverse-engineer-anything-ai-agents-what-it-means</link>

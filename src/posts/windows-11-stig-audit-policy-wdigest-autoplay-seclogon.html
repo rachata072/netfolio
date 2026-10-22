@@ -1,0 +1,543 @@
+<!--meta
+{
+  "title": "Hardening Windows 11 Against DISA STIGs, Part 2: The Audit Policy Trap, WDigest and a Service That Would Not Stop",
+  "list_title": "Hardening Windows 11 Against DISA STIGs, Part 2: Audit Policy, WDigest, AutoPlay and Seclogon",
+  "seo_title": "Windows 11 STIG Part 2: Audit Policy, WDigest and Seclogon",
+  "description": "Five more Windows 11 STIG fixes: an audit policy change that silently broke 13 checks, WDigest, AutoPlay, password history, and a service that would not stop.",
+  "og_description": "Part 2 of a Windows 11 DISA STIG project: a Process Creation fix that passed while switching off 13 other audit checks, WDigest, AutoPlay's hex trap, password history, a Secondary Logon service that refused to stop, and the final 151 to 140 result.",
+  "summary": "Part 2 of the Windows 11 DISA STIG remediation project: the local Group Policy audit.csv that silently disabled 13 audit subcategories, WDigest, AutoPlay, password history and a NOT_STOPPABLE Secondary Logon service, plus the PowerShell script rules and the final 151 to 140 failed result.",
+  "date": "2026-10-22",
+  "category": "sec",
+  "tags": [
+    "DISA STIG",
+    "Windows 11",
+    "auditpol",
+    "PowerShell",
+    "Hardening",
+    "Group Policy",
+    "Tenable",
+    "Blue Team"
+  ],
+  "repo": "windows11-stig-remediations",
+  "series": "windows11-stig",
+  "series_part": 2,
+  "faq": [
+    [
+      "Why did enabling one audit subcategory turn off others?",
+      "Configuring Advanced Audit Policy in the Local Group Policy Editor writes an audit.csv file that lists only the subcategories you set. When it applies, it replaces the whole audit policy rather than adding to it, so every subcategory not in the file becomes No Auditing. In this lab, enabling only Process Creation switched off 13 default subcategories and turned 13 passing STIG checks into failures."
+    ],
+    [
+      "How do I enable a single audit subcategory without breaking the others?",
+      "Use auditpol, for example auditpol /set /subcategory with the Process Creation GUID and /success:enable. It changes one subcategory and leaves the rest alone. In a domain, define every required subcategory in the same GPO so the replacement is complete and intentional, and make sure Force audit policy subcategory settings (WN11-SO-000030) is enabled."
+    ],
+    [
+      "Does setting a Group Policy back to Not Configured restore the default?",
+      "No. Not Configured means Group Policy stops managing the setting, not that the original value comes back. Some settings, advanced audit policy in particular, stay applied afterwards. Always verify a rollback with the actual tool, such as auditpol, the registry or a rescan, instead of assuming it worked."
+    ],
+    [
+      "Why set WDigest UseLogonCredential to 0 if Windows 11 already disables it?",
+      "Because the STIG treats a missing value as a finding, and because an explicit 0 documents intent and gives you something to monitor. An attacker with admin rights can create the value and set it to 1 so that passwords are kept in memory in a recoverable form. A change from 0 to 1 on that key is a high-fidelity alert."
+    ],
+    [
+      "Why must NoDriveTypeAutoRun be 255?",
+      "Each bit of the value represents a drive type, and 255 (hex FF) covers all of them. The common mistake is typing 255 in the Registry Editor while it is in its default hexadecimal mode, which stores 0x255, or 597 in decimal, and fails the check. Enter ff in hexadecimal or 255 in decimal. PowerShell's -Value 255 is always decimal."
+    ],
+    [
+      "Does the local password history setting apply on domain-joined machines?",
+      "Not for domain accounts. On domain-joined machines the password policy comes from the domain, usually the Default Domain Policy, and a local change is overwritten. The local setting matters for workgroup machines and local accounts, which is what this lab VM is."
+    ],
+    [
+      "Why will the Secondary Logon service not stop?",
+      "On this Windows 11 25H2 build, sc.exe queryex seclogon reports the service as NOT_STOPPABLE, PAUSABLE and IGNORES_SHUTDOWN, so Windows rejects a stop request while it is running. The STIG checks the startup type, so setting it to Disabled makes the machine compliant, and a reboot leaves the service stopped."
+    ],
+    [
+      "Does disabling Secondary Logon break Run as different user?",
+      "Yes. Secondary Logon is what makes Run as different user and runas work, so helpdesk workflows that rely on it stop working. Plan for it: give the helpdesk an alternative such as the remote support tool's own elevation, run a pilot, and keep a documented exception process for machines that genuinely need it."
+    ],
+    [
+      "Why do the remediation scripts return exit codes?",
+      "Exit 0 for compliant and 1 for not compliant lets the same script run as an Intune remediation, a scheduled task or from an RMM tool, and the platform knows whether it worked without parsing text output."
+    ]
+  ],
+  "read_min": 17
+}
+-->
+<p>
+  <a href="/blog/windows-11-disa-stig-remediation-tenable-powershell">Part 1</a> covered the lab, a credentialed Tenable scan that failed 151 of 258 DISA Windows 11 STIG checks, the fix, undo, fix-again method, and the first five controls: event log sizes, PowerShell Script Block Logging and Transcription.
+</p>
+<p>
+  This part covers the other five, and they are the more interesting ones because each introduces a different fix mechanism and a different way to get it wrong. One manual fix passed its own check while silently switching off thirteen others. One looked impossible to do by hand because Group Policy has no setting for it. One fails if you type the right number in the wrong mode. And one service simply refused to stop. Then the final numbers, the script rules, and what I would tell anyone starting this.
+</p>
+<p>
+  Everything here, including the scripts, runbook and evidence, is in the <a href="https://github.com/rachata072/windows11-stig-remediations" rel="noopener" target="_blank">GitHub repository</a>.
+</p>
+<h2>STIG 6: Audit Process Creation (WN11-AU-000050)</h2>
+<p>
+  This setting turns on Security event 4688, "A new process has been created." Process creation is the backbone of endpoint detection. Without it, the Security log cannot tell you that Microsoft Word launched PowerShell, one of the most common signs of a malicious document. Every hunt I have written up on this site, from the <a href="/blog/sentinel-threat-intelligence-inventory-kql">Sentinel threat intelligence series</a> to the <a href="/blog/copilot-prompt-injection-threat-hunt-echoleak">Copilot prompt injection threat hunt</a>, depends on this kind of telemetry existing in the first place.
+</p>
+<h3>The hidden dependency</h3>
+<p>
+  Windows has two layers of audit policy: the old category-level settings and the newer, more granular subcategory settings. A separate STIG, WN11-SO-000030, requires "Audit: Force audit policy subcategory settings to override audit policy category settings" to be enabled. If it is not, the category-level policy can quietly override the subcategory you just configured, and your setting looks correct but does nothing. Microsoft documents the behaviour on the <a href="https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/audit-force-audit-policy-subcategory-settings-to-override" rel="noopener" target="_blank">policy's own page</a>. My script sets both.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-so-000030-force-audit-subcategory-settings-1200.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-so-000030-force-audit-subcategory-settings-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-so-000030-force-audit-subcategory-settings-800.webp 800w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-so-000030-force-audit-subcategory-settings-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="766"
+       loading="lazy" decoding="async"
+       alt="Local Security Policy option Audit Force audit policy subcategory settings to override audit policy category settings set to Enabled">
+  <figcaption>The dependency, WN11-SO-000030: "Force audit policy subcategory settings" enabled, so subcategory settings actually take effect.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-au-000050-audit-process-creation-gpedit-1200.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-au-000050-audit-process-creation-gpedit-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-au-000050-audit-process-creation-gpedit-800.webp 800w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-au-000050-audit-process-creation-gpedit-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="763"
+       loading="lazy" decoding="async"
+       alt="Advanced Audit Policy Configuration in the Local Group Policy Editor with Audit Process Creation set to Success under Detailed Tracking">
+  <figcaption>The manual fix: Advanced Audit Policy Configuration, Detailed Tracking, Audit Process Creation, Success. This is the step that caused the regression.</figcaption>
+</figure>
+<h3>The fix that passed and broke thirteen other checks</h3>
+<p>
+  The manual fix worked: Process Creation passed on the rescan.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-au-000050-tenable-passed-manual-800.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-au-000050-tenable-passed-manual-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-au-000050-tenable-passed-manual-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-AU-000050 highlighted in the Audits PASSED section after the manual fix">
+  <figcaption>WN11-AU-000050 in Audits PASSED after the manual round, rescan 21 Oct 2026 07:13 UTC. The target passed. The overall numbers did not.</figcaption>
+</figure>
+<p>
+  But the totals went the wrong way. Passed checks dropped from 96 to 94 and failed checks rose from 151 to 153, even though all ten of my targets now passed. When I compared the two reports line by line, 13 audit checks that passed at baseline were now failing: WN11-AU-000030, 040, 065, 070, 075, 080, 100, 105, 130, 135, 140, 155 and 160. Logon, logoff, special logon, account management, audit policy change, security state change and system integrity. Every one is a subcategory Windows audits by default.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/tenable-13-audit-checks-regressed-audit-csv-1200.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/tenable-13-audit-checks-regressed-audit-csv-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/tenable-13-audit-checks-regressed-audit-csv-800.webp 800w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/tenable-13-audit-checks-regressed-audit-csv-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="898"
+       loading="lazy" decoding="async"
+       alt="Tenable Audits FAILED list after the manual round with 13 regressed Windows 11 audit subcategory checks highlighted in red">
+  <figcaption>The side effect: 13 audit checks that passed at baseline, highlighted in red, now in Audits FAILED.</figcaption>
+</figure>
+<p>
+  Running <code>auditpol /get /category:*</code> on the VM confirmed it. Every one of those subcategories said "No Auditing". The only one still on was the Process Creation setting I had just configured.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/auditpol-default-subcategories-no-auditing-1200.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/auditpol-default-subcategories-no-auditing-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/auditpol-default-subcategories-no-auditing-800.webp 800w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/auditpol-default-subcategories-no-auditing-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="293"
+       loading="lazy" decoding="async"
+       alt="auditpol output showing Logon, Logoff, Special Logon, User Account Management and System Integrity at No Auditing while Process Creation is Success">
+  <figcaption>auditpol after the manual fix: the defaults are all "No Auditing" and only Process Creation is on.</figcaption>
+</figure>
+<p>
+  The cause is how Advanced Audit Policy works in Group Policy. Configuring it in the Local Group Policy Editor writes a file called <code>audit.csv</code> that lists only the subcategories you set. When that file applies, it does not add to the existing audit policy. It replaces it. Everything not in the file is switched off. I had turned on one audit setting and silently turned off thirteen.
+</p>
+<h3>Undoing it took three steps, not one</h3>
+<p>
+  Setting the policy back to Not Configured was not enough, because "Not Configured" means "Group Policy stops managing this," not "put it back to the default." The audit settings stick. The real undo was: set the policy to Not Configured, delete both <code>audit.csv</code> files so the next refresh cannot reapply them, and restore the defaults with auditpol.
+</p>
+<pre><code>Remove-Item "C:\Windows\System32\GroupPolicy\Machine\Microsoft\Windows NT\Audit\audit.csv" -Force -ErrorAction SilentlyContinue
+Remove-Item "C:\Windows\security\audit\audit.csv" -Force -ErrorAction SilentlyContinue
+gpupdate /force
+auditpol /set /subcategory:"Security Group Management" /success:enable
+auditpol /set /subcategory:"User Account Management" /success:enable
+auditpol /set /subcategory:"Logon" /success:enable /failure:enable
+auditpol /set /subcategory:"Logoff" /success:enable
+auditpol /set /subcategory:"Special Logon" /success:enable
+auditpol /set /subcategory:"Audit Policy Change" /success:enable
+auditpol /set /subcategory:"Authentication Policy Change" /success:enable
+auditpol /set /subcategory:"Security State Change" /success:enable
+auditpol /set /subcategory:"Other System Events" /success:enable /failure:enable
+auditpol /set /subcategory:"System Integrity" /success:enable /failure:enable</code></pre>
+<p>
+  The undo scan showed my ten targets failing again and all 13 regressions passing again, which proved both causes at once.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-au-000050-tenable-failed-after-undo-800.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-au-000050-tenable-failed-after-undo-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-au-000050-tenable-failed-after-undo-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-AU-000050 highlighted in the Audits FAILED section after the fix was undone">
+  <figcaption>After the three-step undo, WN11-AU-000050 is back in Audits FAILED and the 13 regressions are passing again (rescan 22 Oct 2026 01:26 UTC).</figcaption>
+</figure>
+<h3>Why the PowerShell version uses auditpol, not Group Policy</h3>
+<p>
+  <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/auditpol-set" rel="noopener" target="_blank">auditpol /set</a> changes exactly one subcategory and leaves the rest alone. The script also uses the subcategory GUID instead of the English name, because names are translated on non-English Windows and GUIDs are not:
+</p>
+<pre><code># Dependency WN11-SO-000030
+New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa' `
+    -Name 'SCENoApplyLegacyAuditPolicy' -PropertyType DWord -Value 1 -Force | Out-Null
+
+# Process Creation, by GUID so it works on any OS language
+$ProcessCreationGuid = '{0CCE922B-69AE-11D9-BED3-505054503030}'
+auditpol.exe /set /subcategory:$ProcessCreationGuid /success:enable
+
+# Verify from CSV output so spacing and language do not matter
+$Row = auditpol.exe /get /subcategory:$ProcessCreationGuid /r | Where-Object { $_ } | ConvertFrom-Csv
+$Row.'Inclusion Setting'</code></pre>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-au-000050-tenable-passed-powershell-800.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-au-000050-tenable-passed-powershell-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-au-000050-tenable-passed-powershell-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-AU-000050 highlighted in the Audits PASSED section after the PowerShell remediation script">
+  <figcaption>PASSED after the auditpol-based script, with every default subcategory still on (final rescan 22 Oct 2026 03:11 UTC).</figcaption>
+</figure>
+<p>
+  In a domain you would solve this differently: put every required subcategory in the same GPO, so the replacement is complete and intentional. The lesson that carries over is bigger than one setting: <strong>a fix that passes its own check can still break something else, and only a full rescan tells you.</strong> If I had only looked for WN11-AU-000050 in the report, I would have shipped a change that switched off logon auditing on every machine.
+</p>
+<h2>STIG 7: WDigest authentication (WN11-CC-000038)</h2>
+<p>
+  This one best illustrates "a missing value is a finding."
+</p>
+<p>
+  WDigest is a legacy authentication protocol. When its credential caching is active, Windows keeps a copy of the user's password in LSASS memory in a form that credential-dumping tools can recover. WDigest caching has been off by default since Windows 8.1, so why does a fresh Windows 11 VM fail the check? Because the registry value <code>UseLogonCredential</code> does not exist, and the STIG says that if it does not exist, it is a finding.
+</p>
+<p>
+  At first that felt pedantic. Then the reasoning clicks: an attacker who already has admin rights can create the value, set it to 1, and wait for an administrator to log in, at which point that admin's password is sitting in memory. Setting it explicitly to 0 documents intent and gives you something to monitor. A change from 0 to 1 on that key is a very high-fidelity alert, and a compliance rescan catches it too.
+</p>
+<p>
+  There is no Group Policy setting for this by default. DISA ships custom templates, SecGuide.admx and SecGuide.adml, in the STIG package; copied into <code>C:\Windows\PolicyDefinitions</code>, the setting appears under "MS Security Guide". For the lab I set it directly in the Registry Editor.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000038-wdigest-uselogoncredential-regedit-800.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000038-wdigest-uselogoncredential-regedit-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000038-wdigest-uselogoncredential-regedit-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="406"
+       loading="lazy" decoding="async"
+       alt="Registry Editor at HKLM SYSTEM CurrentControlSet Control SecurityProviders WDigest with UseLogonCredential REG_DWORD set to 0">
+  <figcaption>WN11-CC-000038: UseLogonCredential created as a DWORD with value 0 under the WDigest key. The undo is deleting the value, never setting it to 1.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000038-tenable-passed-manual-800.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000038-tenable-passed-manual-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000038-tenable-passed-manual-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-CC-000038 highlighted in the Audits PASSED section after the manual fix">
+  <figcaption>WN11-CC-000038 (WDigest disabled) in Audits PASSED after the manual round, rescan 21 Oct 2026 07:13 UTC.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000038-tenable-failed-after-undo-800.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000038-tenable-failed-after-undo-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000038-tenable-failed-after-undo-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-CC-000038 highlighted in the Audits FAILED section after the fix was undone">
+  <figcaption>WN11-CC-000038 back in Audits FAILED after the undo, rescan 22 Oct 2026 01:26 UTC.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000038-tenable-passed-powershell-800.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000038-tenable-passed-powershell-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000038-tenable-passed-powershell-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-CC-000038 highlighted in the Audits PASSED section after the PowerShell remediation script">
+  <figcaption>WN11-CC-000038 PASSED after the PowerShell script, final rescan 22 Oct 2026 03:11 UTC.</figcaption>
+</figure>
+<h2>STIG 8: AutoPlay for all drives (WN11-CC-000190)</h2>
+<p>
+  AutoPlay pops up a dialog, or runs something, when you plug in a USB drive or insert a disc. Removable media autorun has been a malware delivery path for a long time, and USB drop attacks still show up in penetration tests. This is also the only CAT I finding of the ten in the v2r9 audit.
+</p>
+<p>
+  The fix sets <code>NoDriveTypeAutoRun</code> to 255 under <code>HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer</code>. Each bit represents a drive type, and 255 (hex FF) means all of them. In Group Policy it is "Turn off Autoplay", Enabled, on All drives.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000190-turn-off-autoplay-all-drives-gpedit-1200.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000190-turn-off-autoplay-all-drives-gpedit-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000190-turn-off-autoplay-all-drives-gpedit-800.webp 800w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000190-turn-off-autoplay-all-drives-gpedit-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="669"
+       loading="lazy" decoding="async"
+       alt="Group Policy setting Turn off Autoplay enabled for All drives under AutoPlay Policies">
+  <figcaption>WN11-CC-000190: "Turn off Autoplay" enabled for All drives, which writes NoDriveTypeAutoRun = 255.</figcaption>
+</figure>
+<p>
+  This is where Registry Editor catches people. When you create a DWORD, regedit asks whether the value is hexadecimal or decimal, and hexadecimal is the default. Type 255 in hex mode and you get 0x255, which is 597 in decimal, and the check fails. The correct entry is "ff" in hex or "255" in decimal. PowerShell does not have this problem, because <code>-Value 255</code> is always decimal. A tiny thing, and exactly the kind of mistake that makes a manual fix look right and fail anyway.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000190-tenable-passed-manual-800.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000190-tenable-passed-manual-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000190-tenable-passed-manual-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-CC-000190 highlighted in the Audits PASSED section after the manual fix">
+  <figcaption>WN11-CC-000190 (AutoPlay off) in Audits PASSED after the manual round, rescan 21 Oct 2026 07:13 UTC.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000190-tenable-failed-after-undo-800.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000190-tenable-failed-after-undo-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000190-tenable-failed-after-undo-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-CC-000190 highlighted in the Audits FAILED section after the fix was undone">
+  <figcaption>WN11-CC-000190 back in Audits FAILED after the undo, rescan 22 Oct 2026 01:26 UTC.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000190-tenable-passed-powershell-800.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000190-tenable-passed-powershell-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-cc-000190-tenable-passed-powershell-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-CC-000190 highlighted in the Audits PASSED section after the PowerShell remediation script">
+  <figcaption>WN11-CC-000190 PASSED after the PowerShell script, final rescan 22 Oct 2026 03:11 UTC.</figcaption>
+</figure>
+<h2>STIG 9: Password history (WN11-AC-000020)</h2>
+<p>
+  The STIG requires Windows to remember the last 24 passwords. For users it is a minor annoyance. After an incident it matters a lot: you force everyone affected to change their password because the attacker may have it, and without history a user changes it and immediately changes it back. The stolen password works again.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-ac-000020-enforce-password-history-24-secpol-1200.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-ac-000020-enforce-password-history-24-secpol-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-ac-000020-enforce-password-history-24-secpol-800.webp 800w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-ac-000020-enforce-password-history-24-secpol-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="549"
+       loading="lazy" decoding="async"
+       alt="Local Security Policy Password Policy with Enforce password history set to 24 passwords remembered">
+  <figcaption>WN11-AC-000020: Enforce password history set to 24 in secpol.msc.</figcaption>
+</figure>
+<p>
+  The PowerShell version sets it with <code>net accounts /uniquepw:24</code>. For verification I avoided parsing the text output of <code>net accounts</code>, because that text is translated on non-English systems. The script exports the local security policy and reads the number instead:
+</p>
+<pre><code>secedit.exe /export /cfg $Export /areas SECURITYPOLICY
+Select-String -Path $Export -Pattern '^\s*PasswordHistorySize\s*=\s*(\d+)'</code></pre>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-ac-000020-tenable-passed-manual-800.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-ac-000020-tenable-passed-manual-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-ac-000020-tenable-passed-manual-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-AC-000020 highlighted in the Audits PASSED section after the manual fix">
+  <figcaption>WN11-AC-000020 (password history 24) in Audits PASSED after the manual round, rescan 21 Oct 2026 07:13 UTC.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-ac-000020-tenable-failed-after-undo-800.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-ac-000020-tenable-failed-after-undo-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-ac-000020-tenable-failed-after-undo-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-AC-000020 highlighted in the Audits FAILED section after the fix was undone">
+  <figcaption>WN11-AC-000020 back in Audits FAILED after the undo, rescan 22 Oct 2026 01:26 UTC.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-ac-000020-tenable-passed-powershell-800.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-ac-000020-tenable-passed-powershell-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-ac-000020-tenable-passed-powershell-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="375"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-AC-000020 highlighted in the Audits PASSED section after the PowerShell remediation script">
+  <figcaption>WN11-AC-000020 PASSED after the PowerShell script, final rescan 22 Oct 2026 03:11 UTC.</figcaption>
+</figure>
+<p>
+  On a domain-joined machine this setting comes from the domain's password policy and a local change would be overwritten. The lab VM is a workgroup machine, so local policy is the right place. Knowing where a setting actually comes from is half of being able to fix it. My <a href="/blog/active-directory-home-lab-windows-server-2022-gpo">Active Directory home lab</a> covers the domain side of that story.
+</p>
+<h2>STIG 10: Secondary Logon service (WN11-00-000175)</h2>
+<p>
+  Secondary Logon (<code>seclogon</code>) is what makes "Run as different user" and <code>runas</code> work. It lets a process start with different credentials from inside an existing session. The STIG wants it disabled because that capability is useful for lateral movement and credential abuse, and the service has had its own privilege escalation bugs over the years.
+</p>
+<p>
+  This was technically the simplest of the ten and organisationally the hardest. Helpdesk technicians use "Run as different user" constantly. In the change advisory board role play I wrote for the repo, the desktop team lead pushes back on exactly this point. The resolution is a pilot group, a two-week grace period for the helpdesk to switch to their remote support tool's own elevation, and a documented exception process for machines that genuinely need it. That is how hardening actually lands: not "the STIG says so," but "here is the risk, here is who it affects, here is how we make it work for them."
+</p>
+<h3>The service that would not stop</h3>
+<p>
+  In the Services console I clicked Pause instead of Stop by mistake. The startup type was already Disabled, which is what the STIG checks, but the service sat there Paused.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-00-000175-secondary-logon-disabled-services-800.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-00-000175-secondary-logon-disabled-services-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-00-000175-secondary-logon-disabled-services-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="585"
+       loading="lazy" decoding="async"
+       alt="Secondary Logon service properties with startup type Disabled and service status Paused">
+  <figcaption>The manual fix with a mistake in it: startup type Disabled, but the service Paused instead of stopped.</figcaption>
+</figure>
+<p>
+  Resuming it worked. Stopping it from PowerShell did not: "Cannot stop seclogon service." Instead of guessing, I asked the service what it accepts:
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/seclogon-sc-queryex-not-stoppable-800.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/seclogon-sc-queryex-not-stoppable-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/seclogon-sc-queryex-not-stoppable-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="256"
+       loading="lazy" decoding="async"
+       alt="sc.exe queryex seclogon output showing STATE 4 RUNNING with NOT_STOPPABLE PAUSABLE IGNORES_SHUTDOWN flags">
+  <figcaption>The answer was in the state flags: NOT_STOPPABLE, PAUSABLE, IGNORES_SHUTDOWN. On this 25H2 build, Secondary Logon will not accept a stop while Windows is running.</figcaption>
+</figure>
+<p>
+  The STIG checks the startup type, which was already Disabled, so the machine was compliant. A reboot left the service stopped for good.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/seclogon-stopped-disabled-after-reboot-800.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/seclogon-stopped-disabled-after-reboot-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/seclogon-stopped-disabled-after-reboot-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="118"
+       loading="lazy" decoding="async"
+       alt="Get-Service seclogon output showing Status Stopped and StartType Disabled after a reboot">
+  <figcaption>After the reboot: Stopped and Disabled.</figcaption>
+</figure>
+<p>
+  The more useful outcome was what it did to the script. The first version stopped the service and then disabled it. On this build the stop failed, the script exited, and Disabled was never written. The final version sets Disabled first, because that is what compliance depends on, then tries to stop it and warns instead of failing:
+</p>
+<pre><code>Set-Service -Name seclogon -StartupType Disabled -ErrorAction Stop
+
+$Svc = Get-Service -Name seclogon
+if ($Svc.Status -eq 'Paused') { Resume-Service -Name seclogon -ErrorAction SilentlyContinue }
+if ($Svc.Status -ne 'Stopped') {
+    try   { Stop-Service -Name seclogon -Force -ErrorAction Stop }
+    catch { Write-Host "[WARN] seclogon would not stop while Windows is running. It is Disabled and will stay stopped after a reboot." }
+}</code></pre>
+<p>
+  A lab finding is only fixed once the automation handles it.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-00-000175-tenable-passed-manual-800.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-00-000175-tenable-passed-manual-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-00-000175-tenable-passed-manual-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-00-000175 highlighted in the Audits PASSED section after the manual fix">
+  <figcaption>WN11-00-000175 (Secondary Logon disabled) in Audits PASSED after the manual round, rescan 21 Oct 2026 07:13 UTC.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-00-000175-tenable-failed-after-undo-800.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-00-000175-tenable-failed-after-undo-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-00-000175-tenable-failed-after-undo-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-00-000175 highlighted in the Audits FAILED section after the fix was undone">
+  <figcaption>WN11-00-000175 back in Audits FAILED after the undo, rescan 22 Oct 2026 01:26 UTC.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-00-000175-tenable-passed-powershell-800.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-00-000175-tenable-passed-powershell-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/wn11-00-000175-tenable-passed-powershell-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="378"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-00-000175 highlighted in the Audits PASSED section after the PowerShell remediation script">
+  <figcaption>WN11-00-000175 PASSED after the PowerShell script, final rescan 22 Oct 2026 03:11 UTC.</figcaption>
+</figure>
+<h2>Writing the scripts: four rules</h2>
+<p>
+  Every script uses the internship's template header (synopsis, author, STIG ID, documentation link and a "tested on" block), and every script follows the same four rules:
+</p>
+<ul>
+  <li><strong>It requires administrator rights.</strong> <code>#Requires -RunAsAdministrator</code> means it refuses to run unelevated instead of half-running and failing silently.</li>
+  <li><strong>It is idempotent.</strong> Running it twice does no harm. <code>New-ItemProperty -Force</code> overwrites instead of erroring, and the service script only stops the service if it is not already stopped.</li>
+  <li><strong>It verifies its own work.</strong> After applying the fix it reads the setting back and prints <code>[PASS]</code> or <code>[FAIL]</code>.</li>
+  <li><strong>It returns an exit code.</strong> 0 for compliant, 1 for not. That one detail means the same script can run as an Intune remediation, a scheduled task or from an RMM tool, and the platform knows whether it worked.</li>
+</ul>
+<p>
+  I used AI as a drafting partner for some of the PowerShell, which the methodology encourages. My rule was that I never ran anything I could not explain line by line. Several of the robustness choices, the audit subcategory GUID, well-known SIDs for folder permissions, a <code>secedit</code> export instead of parsing <code>net accounts</code>, came from asking "what happens if this runs on a machine set to a different language?" That is not a question an AI asks on its own. It is the question you learn to ask by thinking about where a script will actually run.
+</p>
+<p>
+  Two helper tools complete the repo: <code>Test-STIGCompliance.ps1</code>, the pre-check from Part 1, and <code>Undo-STIGRemediation.ps1</code>, which puts one STIG (or <code>-All</code>) back to the Windows default for lab use. The undo tool doubles as the rollback plan for each control.
+</p>
+<h2>The results</h2>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/test-stigcompliance-final-10-of-10-800.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/test-stigcompliance-final-10-of-10-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/test-stigcompliance-final-10-of-10-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="638"
+       loading="lazy" decoding="async"
+       alt="Test-STIGCompliance.ps1 showing 10 of 10 after the PowerShell round, with auditpol confirming Process Creation on and default subcategories intact">
+  <figcaption>The local pre-check after the PowerShell round: 10 of 10, and auditpol shows Process Creation on with Logon, Logoff and System Integrity still audited. No regression this time.</figcaption>
+</figure>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">Round</th><th scope="col">Expected</th><th scope="col">Actual</th><th scope="col">Passed / Failed</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name">Baseline</td><td class="int-desc">10 FAILED</td><td class="int-desc">10 FAILED</td><td class="int-desc">96 / 151</td></tr>
+      <tr><td class="int-name">After manual fixes</td><td class="int-desc">10 PASSED</td><td class="int-desc">10 PASSED, but 13 audit checks regressed</td><td class="int-desc">94 / 153</td></tr>
+      <tr><td class="int-name">After undo</td><td class="int-desc">10 FAILED</td><td class="int-desc">10 FAILED, 13 regressions fixed</td><td class="int-desc">97 / 150</td></tr>
+      <tr><td class="int-name">After PowerShell</td><td class="int-desc">10 PASSED</td><td class="int-desc">10 PASSED, no regressions</td><td class="int-desc">107 / 140</td></tr>
+    </tbody>
+  </table>
+</div>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/windows-11-stig-before-after-151-to-140-failed-1200.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/windows-11-stig-before-after-151-to-140-failed-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/windows-11-stig-before-after-151-to-140-failed-800.webp 800w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/windows-11-stig-before-after-151-to-140-failed-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="589"
+       loading="lazy" decoding="async"
+       alt="Grouped bar chart of passed and failed DISA Windows 11 STIG checks across four Tenable scans: baseline, after manual fixes, after undo and after PowerShell fixes">
+  <figcaption>All four scans side by side. The manual round's dip is the audit.csv regression; the PowerShell round ends at 107 passed and 140 failed.</figcaption>
+</figure>
+<p>
+  Failed checks went from 151 to 140 and passed from 96 to 107. That is eleven, not ten, because the Process Creation fix also enables WN11-SO-000030, the dependency it needs. Comparing the final report with the baseline, the failed list lost exactly those eleven and gained nothing.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/tenable-final-scan-107-passed-140-failed-1200.webp"
+       srcset="/assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/tenable-final-scan-107-passed-140-failed-480.webp 480w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/tenable-final-scan-107-passed-140-failed-800.webp 800w, /assets/img/windows-11-stig-audit-policy-wdigest-autoplay-seclogon/tenable-final-scan-107-passed-140-failed-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="523"
+       loading="lazy" decoding="async"
+       alt="Tenable Vulnerability Management Audits tab for the final scan showing 140 Failed, 11 Warning and 107 Passed out of 258 results">
+  <figcaption>The final Tenable scan, 21 Oct 2026 8:11 PM Pacific: 140 failed, 11 warning, 107 passed of 258.</figcaption>
+</figure>
+<p>
+  Eleven checks out of 258 is not a dramatic percentage, and I do not want to oversell it. The real result is a tested, documented, repeatable process for taking any registry, audit policy, security policy or service-based STIG from FAILED to PASSED with evidence, plus ten scripts ready to reuse.
+</p>
+<h2>What I would tell someone starting this</h2>
+<ul>
+  <li><strong>Read the check text before the fix text.</strong> The fix text says what to change; the check text says what the scanner looks at. When they disagree in your head, the check text wins.</li>
+  <li><strong>"Not Configured" is not "default".</strong> It means Group Policy stops managing the setting. Always verify a rollback.</li>
+  <li><strong>A missing value is a finding.</strong> Windows often behaves securely without writing an explicit value. Scanners check for the value. Setting it documents intent and makes tampering visible.</li>
+  <li><strong>Export before you undo.</strong> <code>reg export</code>, <code>auditpol /backup</code> and <code>secedit /export</code> turn a GUI change into text you can read, compare and automate.</li>
+  <li><strong>Rescan everything, not just the target.</strong> The 13 regressions were invisible from WN11-AU-000050's own result.</li>
+  <li><strong>Every hardening change has a person on the other end.</strong> Ask "who uses this today?" before a change goes on the list, and talk to that team before the meeting, not in it.</li>
+  <li><strong>Batch your scans.</strong> Four scans instead of thirty gave the same proof.</li>
+</ul>
+<h2>Where this goes next</h2>
+<p>
+  In a real organisation these settings would not be applied with ten scripts run by hand. On domain-joined machines they belong in a GPO linked to a pilot OU first, because Group Policy keeps reapplying settings and prevents drift. On Intune-managed machines they live in the Settings Catalog, and the scripts can run as Intune Remediations because of their exit codes. They also belong in the golden image build, so new machines start compliant instead of being fixed later, with a scheduled compliance scan to catch drift.
+</p>
+<p>
+  My next steps are working through more of the failed list, starting with the remaining CAT I findings, and building a small report that compares two Tenable compliance exports and shows exactly what changed between scans, so the next regression gets caught automatically.
+</p>
+<p>
+  All ten scripts, the full <a href="https://github.com/rachata072/windows11-stig-remediations/blob/main/RUNBOOK.md" rel="noopener" target="_blank">runbook</a> with every manual step, the evidence checklist and the change advisory board meeting script are in the <a href="https://github.com/rachata072/windows11-stig-remediations" rel="noopener" target="_blank">windows11-stig-remediations repository</a>. The lab environment is the <a href="https://www.skool.com/cyber-range/about?ref=fa6d17eac8a242ef8320accbb4bf913b" rel="noopener" target="_blank">Cyber Range community</a> (referral link). If you are working through STIGs and get stuck on one, I would like to hear which one and what tripped you up.
+</p>
+<h2>Frequently asked questions</h2>
+<h3>Why did enabling one audit subcategory turn off others?</h3>
+<p>
+  Configuring Advanced Audit Policy in the Local Group Policy Editor writes an audit.csv file that lists only the subcategories you set. When it applies, it replaces the whole audit policy rather than adding to it, so every subcategory not in the file becomes No Auditing. In this lab, enabling only Process Creation switched off 13 default subcategories and turned 13 passing STIG checks into failures.
+</p>
+<h3>How do I enable a single audit subcategory without breaking the others?</h3>
+<p>
+  Use auditpol, for example auditpol /set /subcategory with the Process Creation GUID and /success:enable. It changes one subcategory and leaves the rest alone. In a domain, define every required subcategory in the same GPO so the replacement is complete and intentional, and make sure Force audit policy subcategory settings (WN11-SO-000030) is enabled.
+</p>
+<h3>Does setting a Group Policy back to Not Configured restore the default?</h3>
+<p>
+  No. Not Configured means Group Policy stops managing the setting, not that the original value comes back. Some settings, advanced audit policy in particular, stay applied afterwards. Always verify a rollback with the actual tool, such as auditpol, the registry or a rescan, instead of assuming it worked.
+</p>
+<h3>Why set WDigest UseLogonCredential to 0 if Windows 11 already disables it?</h3>
+<p>
+  Because the STIG treats a missing value as a finding, and because an explicit 0 documents intent and gives you something to monitor. An attacker with admin rights can create the value and set it to 1 so that passwords are kept in memory in a recoverable form. A change from 0 to 1 on that key is a high-fidelity alert.
+</p>
+<h3>Why must NoDriveTypeAutoRun be 255?</h3>
+<p>
+  Each bit of the value represents a drive type, and 255 (hex FF) covers all of them. The common mistake is typing 255 in the Registry Editor while it is in its default hexadecimal mode, which stores 0x255, or 597 in decimal, and fails the check. Enter ff in hexadecimal or 255 in decimal. PowerShell's -Value 255 is always decimal.
+</p>
+<h3>Does the local password history setting apply on domain-joined machines?</h3>
+<p>
+  Not for domain accounts. On domain-joined machines the password policy comes from the domain, usually the Default Domain Policy, and a local change is overwritten. The local setting matters for workgroup machines and local accounts, which is what this lab VM is.
+</p>
+<h3>Why will the Secondary Logon service not stop?</h3>
+<p>
+  On this Windows 11 25H2 build, sc.exe queryex seclogon reports the service as NOT_STOPPABLE, PAUSABLE and IGNORES_SHUTDOWN, so Windows rejects a stop request while it is running. The STIG checks the startup type, so setting it to Disabled makes the machine compliant, and a reboot leaves the service stopped.
+</p>
+<h3>Does disabling Secondary Logon break Run as different user?</h3>
+<p>
+  Yes. Secondary Logon is what makes Run as different user and runas work, so helpdesk workflows that rely on it stop working. Plan for it: give the helpdesk an alternative such as the remote support tool's own elevation, run a pilot, and keep a documented exception process for machines that genuinely need it.
+</p>
+<h3>Why do the remediation scripts return exit codes?</h3>
+<p>
+  Exit 0 for compliant and 1 for not compliant lets the same script run as an Intune remediation, a scheduled task or from an RMM tool, and the platform knows whether it worked without parsing text output.
+</p>

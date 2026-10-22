@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Windows 11 DISA STIG Remediation with Tenable and PowerShell | Trey</title>
+<meta name="description" content="Scan Windows 11 against the DISA STIG with Tenable, then fix event log sizes and PowerShell logging by hand, undo each fix, and automate it with PowerShell.">
+<link rel="canonical" href="https://breakfixlearn.com/blog/windows-11-disa-stig-remediation-tenable-powershell">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=59472e0728">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="Hardening Windows 11 Against DISA STIGs, Part 1: Baseline, Method and Logging Fixes">
+<meta property="og:description" content="A fresh Windows 11 VM failed 151 of 258 DISA STIG checks. Part 1 builds a fast credentialed Tenable scan, explains the fix, undo, fix-again method, and remediates event log sizes, Script Block Logging and Transcription, manually and with PowerShell.">
+<meta property="og:url" content="https://breakfixlearn.com/blog/windows-11-disa-stig-remediation-tenable-powershell">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/windows-11-disa-stig-remediation-tenable-powershell.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Hardening Windows 11 Against DISA STIGs, Part 1: Baseline, Method and Logging Fixes">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="article:published_time" content="2026-10-22">
+<meta property="article:tag" content="DISA STIG">
+<meta property="article:tag" content="Windows 11">
+<meta property="article:tag" content="Tenable">
+<meta property="article:tag" content="PowerShell">
+<meta property="article:tag" content="Hardening">
+<meta property="article:tag" content="Compliance">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Hardening Windows 11 Against DISA STIGs, Part 1: Baseline, Method and Logging Fixes","description":"Scan Windows 11 against the DISA STIG with Tenable, then fix event log sizes and PowerShell logging by hand, undo each fix, and automate it with PowerShell.","datePublished":"2026-10-22","dateModified":"2026-10-22","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"publisher":{"@type":"Person","name":"Trey"},"mainEntityOfPage":"https://breakfixlearn.com/blog/windows-11-disa-stig-remediation-tenable-powershell","image":"https://breakfixlearn.com/assets/og/windows-11-disa-stig-remediation-tenable-powershell.webp","keywords":"DISA STIG, Windows 11, Tenable, PowerShell, Hardening, Compliance, Group Policy, Blue Team","articleSection":"Security","timeRequired":"PT18M"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://breakfixlearn.com/blog"},{"@type":"ListItem","position":3,"name":"Hardening Windows 11 Against DISA STIGs, Part 1: Baseline, Method and Logging Fixes"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is a DISA STIG?","acceptedAnswer":{"@type":"Answer","text":"A Security Technical Implementation Guide is a hardening standard published by the US Defense Information Systems Agency for a specific product, such as Windows 11, Windows Server or Cisco IOS. Each requirement has an ID like WN11-AU-000500, a severity from CAT I (most serious) to CAT III, a check text that says what to inspect, and a fix text that says what to change."}},{"@type":"Question","name":"Why does a fresh Windows 11 install fail so many STIG checks?","acceptedAnswer":{"@type":"Answer","text":"Microsoft ships defaults that work for the widest range of users, while DISA writes for systems that may be targeted by capable attackers and must support investigations. On top of that, many checks fail simply because a registry value is missing, even when Windows already behaves securely by default. My fresh Windows 11 25H2 VM failed 151 of 258 checks, 58.5 percent."}},{"@type":"Question","name":"Do I need a credentialed scan for STIG compliance?","acceptedAnswer":{"@type":"Answer","text":"Yes. Compliance checks read the registry, audit policy, local security policy and service configuration, which a scanner can only see after logging in. Without credentials a compliance scan sees almost nothing. In Tenable that means adding Windows credentials to the scan, and in a lab it often also means letting the scanner reach SMB on TCP 445."}},{"@type":"Question","name":"Why undo a STIG fix that already passed?","acceptedAnswer":{"@type":"Answer","text":"Because a pass after a change does not prove the change caused it. Undoing the fix and watching the check fail again proves cause and effect: your setting, and only your setting, controls that result. It also gives you a tested rollback plan, which is exactly what a change advisory board asks for."}},{"@type":"Question","name":"How large should the Windows Security event log be for the STIG?","acceptedAnswer":{"@type":"Answer","text":"WN11-AU-000505 requires a size that holds at least one week of audit records. Older STIG releases and many audit files expect 1024000 KB, and newer guidance uses 5120000 KB as its example. Setting 5120000 KB passes both. It is a maximum, not a reservation, so it does not consume 5 GB of disk the moment you set it."}},{"@type":"Question","name":"What is the difference between PowerShell Script Block Logging and Transcription?","acceptedAnswer":{"@type":"Answer","text":"Script Block Logging records the code PowerShell actually executes, after decoding, as event 4104 in the Microsoft-Windows-PowerShell/Operational log in Windows PowerShell 5.1. Transcription writes a text file of the whole session, what was typed and what came back. One shows the code, the other reads like a recording of the session."}},{"@type":"Question","name":"Can PowerShell transcription capture passwords?","acceptedAnswer":{"@type":"Answer","text":"Yes, if someone pastes a secret into the console it lands in the transcript. That is why the STIG requires a locked-down output folder where normal users can write but not read, and why the better habit is never pasting secrets at all, using a credential prompt or a secret store instead."}},{"@type":"Question","name":"Should STIG settings be applied with Group Policy or PowerShell?","acceptedAnswer":{"@type":"Answer","text":"On domain-joined machines, Group Policy or Intune, because they keep reapplying the setting and prevent drift. PowerShell scripts fill the gaps: workgroup machines, golden image builds, and anything the management platform misses. Scripts that return an exit code can also run as Intune remediations."}}]}</script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article>
+  <header class="post-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/blog">blog</a><span aria-hidden="true">/</span><a href="/blog#sec">sec</a></nav>
+      <span class="sev c-sec">%BLOG-5-SEC</span>
+      <h1 class="mt-2">Hardening Windows 11 Against DISA STIGs, Part 1: Baseline, Method and Logging Fixes</h1>
+      <p class="post-dek">A fresh Windows 11 VM failed 151 of 258 DISA STIG checks. Part 1 builds a fast credentialed Tenable scan, explains the fix, undo, fix-again method, and remediates event log sizes, Script Block Logging and Transcription, manually and with PowerShell.</p>
+      <div class="post-meta"><time datetime="2026-10-22">Oct 22, 2026</time><span class="sep">/</span><span>18 min read</span><span class="sep">/</span><span>by Trey</span><span class="sep">/</span><a href="https://github.com/rachata072/windows11-stig-remediations" rel="noopener" target="_blank">source on github &#8599;</a></div>
+      <div class="post-tags"><span class="chip">DISA STIG</span><span class="chip">Windows 11</span><span class="chip">Tenable</span><span class="chip">PowerShell</span><span class="chip">Hardening</span><span class="chip">Compliance</span><span class="chip">Group Policy</span><span class="chip">Blue Team</span></div>
+    </div>
+  </header>
+  <div class="wrap post-layout">
+    <div class="post-main">
+<nav class="series" aria-label="Win11-STIG-Remediation series"><div class="series-head"><span>traceroute <b>Win11-STIG-Remediation</b></span><span>hop 1 of 2</span></div><ol><li><span class="here" aria-current="page">Hardening Windows 11 Against DISA STIGs, Part 1: Baseline, Method and Logging Fixes</span></li><li><a href="/blog/windows-11-stig-audit-policy-wdigest-autoplay-seclogon">Hardening Windows 11 Against DISA STIGs, Part 2: The Audit Policy Trap, WDigest and a Service That Would Not Stop</a></li></ol></nav>
+<details class="toc-mobile"><summary>show ip route | toc (11 sections)</summary><ol><li><a href="#what-a-stig-is-and-why-it-matters-outside-the-military">What a STIG is, and why it matters outside the military</a></li><li><a href="#the-lab">The lab</a></li><li><a href="#building-a-fast-stig-only-tenable-scan">Building a fast, STIG-only Tenable scan</a></li><li><a href="#the-baseline-151-of-258-checks-failed">The baseline: 151 of 258 checks failed</a></li><li><a href="#choosing-ten-out-of-151">Choosing ten out of 151</a></li><li><a href="#the-method-fix-it-prove-it-break-it-prove-it-again">The method: fix it, prove it, break it, prove it again</a></li><li><a href="#stigs-1-to-3-event-log-sizes">STIGs 1 to 3: event log sizes</a></li><li><a href="#stig-4-powershell-script-block-logging-wn11-cc-000326">STIG 4: PowerShell Script Block Logging (WN11-CC-000326)</a></li><li><a href="#stig-5-powershell-transcription-wn11-cc-000327">STIG 5: PowerShell Transcription (WN11-CC-000327)</a></li><li><a href="#what-part-1-proved">What Part 1 proved</a></li><li><a href="#frequently-asked-questions">Frequently asked questions</a></li></ol></details>
+<div class="prose">
+<p>
+  There is a moment in most security jobs where someone hands you a scan report with a few hundred red lines in it and says "fix these." You do not know where to start, which lines matter, or how you would ever prove you fixed anything.
+</p>
+<p>
+  This two-part series is how I worked through that moment with Windows 11 and the DISA Security Technical Implementation Guides, better known as STIGs. I scanned a fresh Windows 11 VM with Tenable against the DISA Windows 11 STIG, picked ten failed controls, and fixed each one twice: once by hand and once with PowerShell. In between, I undid every fix and scanned again to watch it fail. That step sounds like wasted time. It turned out to be the most useful thing I did, because it caught a fix that quietly broke thirteen other checks.
+</p>
+<p>
+  This part covers the lab, the scan, the baseline, the method, and the first five fixes: three event log sizes and two PowerShell logging controls. <a href="/blog/windows-11-stig-audit-policy-wdigest-autoplay-seclogon">Part 2</a> covers the audit policy trap, WDigest, AutoPlay, password history, a Secondary Logon service that refused to stop, and the final numbers. Every script, the full runbook and all the evidence are in the <a href="https://github.com/rachata072/windows11-stig-remediations" rel="noopener" target="_blank">GitHub repository</a>.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/windows-11-stig-baseline-96-passed-151-failed-1200.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/windows-11-stig-baseline-96-passed-151-failed-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/windows-11-stig-baseline-96-passed-151-failed-800.webp 800w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/windows-11-stig-baseline-96-passed-151-failed-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="552"
+       loading="lazy" decoding="async"
+       alt="Bar chart of the baseline DISA Windows 11 STIG v2r9 Tenable scan: 96 passed, 151 failed and 11 warning out of 258 checks">
+  <figcaption>The starting point: a fresh Windows 11 Pro 25H2 VM failed 151 of 258 DISA Windows 11 STIG checks, 58.5 percent.</figcaption>
+</figure>
+<h2 id="what-a-stig-is-and-why-it-matters-outside-the-military">What a STIG is, and why it matters outside the military</h2>
+<p>
+  STIGs are published by DISA, the Defense Information Systems Agency in the US Department of Defense. Each one is a long list of specific configuration requirements for one product: Windows 11, Windows Server 2022, Red Hat Enterprise Linux, Cisco IOS, Chrome and dozens more.
+</p>
+<p>
+  Every requirement has an ID such as WN11-AU-000500. "WN11" is Windows 11, "AU" is the audit family, the number is the item. Each one carries three things that matter:
+</p>
+<ul>
+  <li>a <strong>severity</strong>, from CAT I (most serious) to CAT III</li>
+  <li>a <strong>check text</strong>, which says exactly what to inspect to decide compliance</li>
+  <li>a <strong>fix text</strong>, which says how to make it compliant</li>
+</ul>
+<p>
+  Defense contractors and government agencies have to follow them. Everyone else benefits too, because STIGs are one of the most specific public descriptions of what a hardened system looks like. CIS Benchmarks cover similar ground and many companies use those instead, but the skill transfers directly: read the requirement, understand the risk, change the setting, prove it changed. "Experience with STIG compliance" and "experience with Tenable or Nessus" also show up in a lot of entry-level security and sysadmin job postings, so "here are ten STIGs I fixed and the evidence" is more useful than "familiar with security frameworks."
+</p>
+<p>
+  The free <a href="https://stigaview.com/products/win11/latest" rel="noopener" target="_blank">STIG-A-View</a> site makes the Windows 11 STIG searchable, and I used it for every check and fix text in this project.
+</p>
+<h2 id="the-lab">The lab</h2>
+<p>
+  The environment came from the Cyber Range, the hands-on lab I use for my LogN Pacific cybersecurity internship. It provides Azure VMs and a shared Tenable instance, so I did not have to build a scanner. If you want the same environment, it is <a href="https://www.skool.com/cyber-range/about?ref=fa6d17eac8a242ef8320accbb4bf913b" rel="noopener" target="_blank">the Cyber Range community</a> (that link carries my referral code).
+</p>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">Component</th><th scope="col">Detail</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name">Target</td><td class="int-desc">Windows 11 Pro 25H2, OS build 26200.9711, Azure VM, workgroup (not domain joined)</td></tr>
+      <tr><td class="int-name">Scanner</td><td class="int-desc">Tenable Vulnerability Management with an internal scan engine</td></tr>
+      <tr><td class="int-name">Audit</td><td class="int-desc">DISA Microsoft Windows 11 STIG v2r9</td></tr>
+      <tr><td class="int-name">Scripting</td><td class="int-desc">Windows PowerShell 5.1, built into Windows 11</td></tr>
+      <tr><td class="int-name">Reference</td><td class="int-desc">STIG-A-View, Windows 11 STIG V2R11</td></tr>
+    </tbody>
+  </table>
+</div>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/windows-11-25h2-winver-build-26200-480.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/windows-11-25h2-winver-build-26200-480.webp 480w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="480" height="438"
+       loading="lazy" decoding="async"
+       alt="About Windows dialog showing Windows 11 version 25H2, OS build 26200.9711">
+  <figcaption>winver on the lab VM: Windows 11 Pro 25H2, build 26200.9711. The build matters later, when the Secondary Logon service behaves differently than older guides describe.</figcaption>
+</figure>
+<h2 id="building-a-fast-stig-only-tenable-scan">Building a fast, STIG-only Tenable scan</h2>
+<p>
+  The scan is a credentialed Advanced Network Scan, so Tenable can log in and read the registry, audit policy and local security policy directly. A compliance scan without credentials sees almost nothing.
+</p>
+<p>
+  Three settings made the difference between a useless scan and a useful one. First, <strong>Use fast network discovery</strong> in the Discovery settings. Without it my early scans finished in about a minute with no compliance results at all, because host discovery never confirmed the VM was alive.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/tenable-advanced-network-scan-fast-network-discovery-1200.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/tenable-advanced-network-scan-fast-network-discovery-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/tenable-advanced-network-scan-fast-network-discovery-800.webp 800w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/tenable-advanced-network-scan-fast-network-discovery-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="409"
+       loading="lazy" decoding="async"
+       alt="Tenable Advanced Network Scan Discovery settings with Use fast network discovery enabled">
+  <figcaption>Discovery settings: "Use fast network discovery" on. Without it, the scan never confirmed the host was up and returned no audit results.</figcaption>
+</figure>
+<p>
+  Second, the compliance audit itself: the DISA Microsoft Windows 11 STIG, v2r9 in this lab. Write the exact audit name down, because expected values can change between versions.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/tenable-compliance-audit-disa-windows-11-stig-v2r9-1200.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/tenable-compliance-audit-disa-windows-11-stig-v2r9-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/tenable-compliance-audit-disa-windows-11-stig-v2r9-800.webp 800w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/tenable-compliance-audit-disa-windows-11-stig-v2r9-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="381"
+       loading="lazy" decoding="async"
+       alt="Tenable scan Compliance tab with the DISA Microsoft Windows 11 STIG v2r9 audit added">
+  <figcaption>The Compliance tab with the DISA Microsoft Windows 11 STIG v2r9 audit. This is what turns a vulnerability scan into a STIG check.</figcaption>
+</figure>
+<p>
+  Third, I disabled every plugin family except Policy Compliance and enabled only Windows Compliance Checks inside it. That turned a long vulnerability scan into a focused STIG scan that finishes in minutes.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/tenable-plugins-policy-compliance-only-1200.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/tenable-plugins-policy-compliance-only-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/tenable-plugins-policy-compliance-only-800.webp 800w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/tenable-plugins-policy-compliance-only-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="404"
+       loading="lazy" decoding="async"
+       alt="Tenable Plugins tab with only the Policy Compliance family enabled and every other family turned off">
+  <figcaption>Plugins limited to Policy Compliance (Windows Compliance Checks). Everything else is off, which keeps a single-host STIG scan to a few minutes.</figcaption>
+</figure>
+<p>
+  I also turned off the Windows Firewall on the VM so the scanner could reach it over SMB. That is a lab shortcut, and I want to be clear about it: in a real company you would never disable the firewall, you would allow the scanner's IP through on TCP 445. That is why WN11-00-000135, the host firewall check, fails in every scan here.
+</p>
+<p>
+  If you have done vulnerability scanning before, this will feel familiar. My earlier <a href="/blog/vulnerability-management-program-tenable-powershell-bash">vulnerability management program write-up</a> used the same Tenable platform for vulnerabilities; this project uses it for configuration compliance instead.
+</p>
+<h2 id="the-baseline-151-of-258-checks-failed">The baseline: 151 of 258 checks failed</h2>
+<p>
+  The baseline scan showed 96 passed, 151 failed and 11 warning or informational results out of 258 checks. That number surprises people. Windows 11 is a modern, well-maintained operating system, so how can it fail that many security checks out of the box?
+</p>
+<p>
+  Part of the answer is that Microsoft and DISA optimise for different things. Microsoft ships defaults that work for everyone from a home user to a developer running containers. DISA writes for systems that may be targeted by capable attackers and need to support forensic investigation. Neither is wrong.
+</p>
+<p>
+  The other part is subtle and comes up again and again: <strong>a missing registry value counts as a failure</strong>, even when Windows already behaves the right way by default. The scanner checks for an explicit value, not for good intentions.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/tenable-baseline-audits-failed-10-target-stigs-1200.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/tenable-baseline-audits-failed-10-target-stigs-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/tenable-baseline-audits-failed-10-target-stigs-800.webp 800w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/tenable-baseline-audits-failed-10-target-stigs-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="1741"
+       loading="lazy" decoding="async"
+       alt="Baseline Tenable Audits FAILED list across four report pages with the ten target Windows 11 STIG IDs highlighted">
+  <figcaption>The baseline Audits FAILED list, four report pages, with the ten STIGs I picked highlighted in yellow.</figcaption>
+</figure>
+<h2 id="choosing-ten-out-of-151">Choosing ten out of 151</h2>
+<p>
+  I did not want ten random findings, and I did not want ten of the same kind of fix. Three rules shaped the list.
+</p>
+<p>
+  <strong>Start with visibility.</strong> If something bad happened on this machine, could anyone reconstruct it? On a default install the honest answer is "not for long." So six of the ten are about logging.
+</p>
+<p>
+  <strong>Close attack paths that need no exploit.</strong> WDigest credential caching, USB autorun and password reuse are abused as features, not vulnerabilities.
+</p>
+<p>
+  <strong>Learn a different fix mechanism each time.</strong> Registry policy, advanced audit policy, local security policy and a Windows service each behave differently.
+</p>
+<div class="int-table-scroll">
+  <table class="int-brief">
+    <thead>
+      <tr><th scope="col">#</th><th scope="col">STIG ID</th><th scope="col">Requirement</th><th scope="col">Severity</th><th scope="col">Fix mechanism</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="int-name">1</td><td class="int-desc"><a href="https://stigaview.com/products/win11/v2r11/WN11-AU-000500" rel="noopener" target="_blank">WN11-AU-000500</a></td><td class="int-desc">Application log at least 32768 KB</td><td class="int-desc">CAT II</td><td class="int-desc">Registry policy</td></tr>
+      <tr><td class="int-name">2</td><td class="int-desc"><a href="https://stigaview.com/products/win11/v2r11/WN11-AU-000505" rel="noopener" target="_blank">WN11-AU-000505</a></td><td class="int-desc">Security log holds a week of events</td><td class="int-desc">CAT II</td><td class="int-desc">Registry policy</td></tr>
+      <tr><td class="int-name">3</td><td class="int-desc"><a href="https://stigaview.com/products/win11/v2r11/WN11-AU-000510" rel="noopener" target="_blank">WN11-AU-000510</a></td><td class="int-desc">System log at least 32768 KB</td><td class="int-desc">CAT II</td><td class="int-desc">Registry policy</td></tr>
+      <tr><td class="int-name">4</td><td class="int-desc"><a href="https://stigaview.com/products/win11/v2r11/WN11-CC-000326" rel="noopener" target="_blank">WN11-CC-000326</a></td><td class="int-desc">PowerShell Script Block Logging on</td><td class="int-desc">CAT II</td><td class="int-desc">Registry policy</td></tr>
+      <tr><td class="int-name">5</td><td class="int-desc"><a href="https://stigaview.com/products/win11/v2r11/WN11-CC-000327" rel="noopener" target="_blank">WN11-CC-000327</a></td><td class="int-desc">PowerShell Transcription on</td><td class="int-desc">CAT II</td><td class="int-desc">Registry policy plus folder ACL</td></tr>
+      <tr><td class="int-name">6</td><td class="int-desc"><a href="https://stigaview.com/products/win11/v2r11/WN11-AU-000050" rel="noopener" target="_blank">WN11-AU-000050</a></td><td class="int-desc">Audit Process Creation successes</td><td class="int-desc">CAT II</td><td class="int-desc">Advanced audit policy</td></tr>
+      <tr><td class="int-name">7</td><td class="int-desc"><a href="https://stigaview.com/products/win11/v2r11/WN11-CC-000038" rel="noopener" target="_blank">WN11-CC-000038</a></td><td class="int-desc">WDigest authentication disabled</td><td class="int-desc">CAT II</td><td class="int-desc">Registry, no default template</td></tr>
+      <tr><td class="int-name">8</td><td class="int-desc"><a href="https://stigaview.com/products/win11/v2r11/WN11-CC-000190" rel="noopener" target="_blank">WN11-CC-000190</a></td><td class="int-desc">AutoPlay off for all drives</td><td class="int-desc">CAT I</td><td class="int-desc">Registry policy</td></tr>
+      <tr><td class="int-name">9</td><td class="int-desc"><a href="https://stigaview.com/products/win11/v2r11/WN11-AC-000020" rel="noopener" target="_blank">WN11-AC-000020</a></td><td class="int-desc">Remember 24 previous passwords</td><td class="int-desc">CAT II</td><td class="int-desc">Local security policy</td></tr>
+      <tr><td class="int-name">10</td><td class="int-desc"><a href="https://stigaview.com/products/win11/v2r11/WN11-00-000175" rel="noopener" target="_blank">WN11-00-000175</a></td><td class="int-desc">Secondary Logon service disabled</td><td class="int-desc">CAT II</td><td class="int-desc">Windows service</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  Severities come from the Tenable report for the v2r9 audit. Only one of the ten, AutoPlay, is CAT I, which is worth knowing if you are prioritising by severity alone.
+</p>
+<h2 id="the-method-fix-it-prove-it-break-it-prove-it-again">The method: fix it, prove it, break it, prove it again</h2>
+<p>
+  The methodology came from the internship brief, and one step looked strange to me at first. For every STIG:
+</p>
+<ul>
+  <li>Read the STIG on STIG-A-View and confirm it is FAILED in the baseline.</li>
+  <li>Fix it manually in Group Policy, the Registry Editor, Services or Local Security Policy.</li>
+  <li>Rescan and confirm PASSED.</li>
+  <li><strong>Export the change, undo it, rescan, and confirm FAILED again.</strong></li>
+  <li>Write a PowerShell script that applies the fix, run it, rescan, confirm PASSED.</li>
+  <li>Publish the script.</li>
+</ul>
+<p>
+  The undo step is the strange one. Why undo a fix that worked? Because when a check flips from FAILED to PASSED after you change something, it is tempting to assume your change caused it. Maybe the scanner reads a different path that something else set. Maybe a reboot applied a pending policy. Maybe you changed two things and only one mattered. When you undo your change and the check goes back to FAILED, you have proven cause and effect. It is a control group, and it is also exactly what a change manager wants: "show me what happens if we roll this back."
+</p>
+<p>
+  Thirty separate scans for ten STIGs would take a long time, so I batched them into three rounds after the baseline: all ten manual fixes with one reboot and one scan, all ten undone with one scan, and all ten PowerShell scripts with one scan. Four scans in total, same proof.
+</p>
+<p>
+  I also wrote a small pre-check, <code translate="no">Test-STIGCompliance.ps1</code>, that prints PASS or FAIL for all ten settings in a few seconds, so I never launched a ten-minute scan without knowing roughly what it would say.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/test-stigcompliance-baseline-0-of-10-800.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/test-stigcompliance-baseline-0-of-10-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/test-stigcompliance-baseline-0-of-10-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="353"
+       loading="lazy" decoding="async"
+       alt="PowerShell output of Test-STIGCompliance.ps1 at baseline showing all ten Windows 11 STIG checks failing with values not set">
+  <figcaption>The local pre-check at baseline: 0 of 10. Most values are simply "not set", which is exactly why the scanner fails them.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/test-stigcompliance-after-manual-10-of-10-800.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/test-stigcompliance-after-manual-10-of-10-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/test-stigcompliance-after-manual-10-of-10-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="464"
+       loading="lazy" decoding="async"
+       alt="PowerShell output of Test-STIGCompliance.ps1 after the manual fixes showing all ten Windows 11 STIG checks passing">
+  <figcaption>After the manual round and a gpupdate: 10 of 10, with the actual values in the right-hand column.</figcaption>
+</figure>
+<p>
+  Undoing Group Policy settings properly has its own trap, which Part 2 explains in detail. The short version: "Not Configured" means "Group Policy stops managing this," not "put the default back." For the undo round I checked that no policy I had touched was still Enabled.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/gpedit-all-settings-not-configured-undo-1200.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/gpedit-all-settings-not-configured-undo-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/gpedit-all-settings-not-configured-undo-800.webp 800w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/gpedit-all-settings-not-configured-undo-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="576"
+       loading="lazy" decoding="async"
+       alt="Local Group Policy Editor All Settings view sorted by state showing every setting Not configured after the undo round">
+  <figcaption>The undo round in the Local Group Policy Editor: All Settings sorted by State, with nothing left Enabled.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/test-stigcompliance-after-undo-0-of-10-800.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/test-stigcompliance-after-undo-0-of-10-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/test-stigcompliance-after-undo-0-of-10-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="618"
+       loading="lazy" decoding="async"
+       alt="Test-STIGCompliance.ps1 showing 0 of 10 after the undo, with auditpol confirming default audit subcategories restored">
+  <figcaption>Back to 0 of 10 after the undo. The auditpol output underneath matters for Part 2: the default audit subcategories are back on.</figcaption>
+</figure>
+<h2 id="stigs-1-to-3-event-log-sizes">STIGs 1 to 3: event log sizes</h2>
+<p>
+  The first three are the same idea applied to three logs, which makes them a good place to learn the loop. When a Windows event log fills up, the oldest events are overwritten. Think about what that means during an incident: a user clicks a phishing link on Monday, the attacker runs a few commands, creates a scheduled task for persistence and goes quiet. Nobody notices until Thursday. By then a busy machine has rolled its Security log over several times. The evidence is gone.
+</p>
+<p>
+  The STIG requires the Application and System logs to allow at least 32768 KB. The Group Policy help text on this build says those two default to 20 MB, and the Security log to 40 MB. For the Security log, older STIG releases required 1024000 KB (about 1 GB). The current requirement is "at least one week of audit records," and V2R11 uses 5120000 KB (about 5 GB) as its example. I set 5120000 so the script passes both old and new audit files. The value is a ceiling, not a reservation, so it does not eat 5 GB of disk on day one.
+</p>
+<p>
+  The manual fix is in the Local Group Policy Editor under Computer Configuration, Administrative Templates, Windows Components, Event Log Service, then the log name, then "Specify the maximum log file size (KB)". Behind the scenes it writes a DWORD called <code translate="no">MaxSize</code> under <code translate="no">HKLM\SOFTWARE\Policies\Microsoft\Windows\EventLog\&lt;LogName&gt;</code>, which is exactly what Tenable checks.
+</p>
+<h3>WN11-AU-000500: Application log</h3>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000500-application-log-size-gpedit-32768-800.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000500-application-log-size-gpedit-32768-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000500-application-log-size-gpedit-32768-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="729"
+       loading="lazy" decoding="async"
+       alt="Group Policy setting Specify the maximum log file size enabled with 32768 KB for the Windows Application event log">
+  <figcaption>The manual fix for WN11-AU-000500: Application log maximum size set to 32768 KB. The help text confirms the 20 MB default.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000500-tenable-passed-manual-800.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000500-tenable-passed-manual-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000500-tenable-passed-manual-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-AU-000500 highlighted in the Audits PASSED section after the manual fix">
+  <figcaption>WN11-AU-000500 (Application log size) in the Audits PASSED section of the manual-round rescan, 21 Oct 2026 07:13 UTC.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000500-tenable-failed-after-undo-800.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000500-tenable-failed-after-undo-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000500-tenable-failed-after-undo-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-AU-000500 highlighted in the Audits FAILED section after the fix was undone">
+  <figcaption>After the undo, WN11-AU-000500 is back in Audits FAILED (rescan 22 Oct 2026 01:26 UTC). The scanner really is testing the setting I changed.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000500-tenable-passed-powershell-800.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000500-tenable-passed-powershell-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000500-tenable-passed-powershell-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-AU-000500 highlighted in the Audits PASSED section after the PowerShell remediation script">
+  <figcaption>PASSED again after the PowerShell script, final rescan 22 Oct 2026 03:11 UTC.</figcaption>
+</figure>
+<p>
+  Before undoing the fix, I exported the key with <code translate="no">reg export</code>. Reading the .reg file is a small skill that pays off constantly:
+</p>
+<pre translate="no"><code translate="no">reg export "HKLM\SOFTWARE\Policies\Microsoft\Windows\EventLog\Application" C:\STIG\backup\WN11-AU-000500.reg /y</code></pre>
+<p>
+  The file contains <code translate="no">"MaxSize"=dword:00008000</code>. Hex 8000 is 32768 decimal. Once you can see the exact value a GUI setting writes, you can automate it. The core of the PowerShell version:
+</p>
+<pre translate="no"><code translate="no">$RegPath   = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\Application'
+$Required  = 32768
+if (-not (Test-Path -Path $RegPath)) { New-Item -Path $RegPath -Force | Out-Null }
+New-ItemProperty -Path $RegPath -Name 'MaxSize' -PropertyType DWord -Value $Required -Force | Out-Null
+
+# Apply the size to the live log now (wevtutil takes bytes), no reboot needed
+wevtutil sl Application /ms:$([int64]$Required * 1024)</code></pre>
+<p>
+  It then reads the value back and prints <code translate="no">[PASS]</code> or <code translate="no">[FAIL]</code> with exit code 0 or 1. The <code translate="no">wevtutil sl</code> line is my addition: the policy value is what the scanner checks, and this makes the live log grow immediately instead of after a reboot.
+</p>
+<h3>WN11-AU-000505: Security log</h3>
+<p>
+  The Security log is where logons (4624, 4625), process creation (4688), privilege use and account changes live. It is the single most important log in most investigations.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000505-security-log-size-gpedit-5120000-1200.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000505-security-log-size-gpedit-5120000-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000505-security-log-size-gpedit-5120000-800.webp 800w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000505-security-log-size-gpedit-5120000-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="773"
+       loading="lazy" decoding="async"
+       alt="Group Policy setting Specify the maximum log file size enabled with 5120000 KB for the Windows Security event log">
+  <figcaption>WN11-AU-000505 set to 5120000 KB, which satisfies both the older 1024000 KB value and the newer one-week example.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000505-tenable-passed-manual-800.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000505-tenable-passed-manual-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000505-tenable-passed-manual-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-AU-000505 highlighted in the Audits PASSED section after the manual fix">
+  <figcaption>WN11-AU-000505 (Security log size) in the Audits PASSED section of the manual-round rescan, 21 Oct 2026 07:13 UTC.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000505-tenable-failed-after-undo-800.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000505-tenable-failed-after-undo-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000505-tenable-failed-after-undo-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-AU-000505 highlighted in the Audits FAILED section after the fix was undone">
+  <figcaption>After the undo, WN11-AU-000505 is back in Audits FAILED (rescan 22 Oct 2026 01:26 UTC). The scanner really is testing the setting I changed.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000505-tenable-passed-powershell-800.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000505-tenable-passed-powershell-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000505-tenable-passed-powershell-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-AU-000505 highlighted in the Audits PASSED section after the PowerShell remediation script">
+  <figcaption>PASSED again after the PowerShell script, final rescan 22 Oct 2026 03:11 UTC.</figcaption>
+</figure>
+<h3>WN11-AU-000510: System log</h3>
+<p>
+  The System log holds service installs (event 7045), driver loads and unexpected shutdowns. Event 7045 is one of the first places to look for persistence and for tools like PsExec.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000510-system-log-size-gpedit-32768-1200.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000510-system-log-size-gpedit-32768-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000510-system-log-size-gpedit-32768-800.webp 800w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000510-system-log-size-gpedit-32768-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="568"
+       loading="lazy" decoding="async"
+       alt="Group Policy setting Specify the maximum log file size enabled with 32768 KB for the Windows System event log">
+  <figcaption>WN11-AU-000510: System log maximum size set to 32768 KB in the same Event Log Service policy folder.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000510-tenable-passed-manual-800.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000510-tenable-passed-manual-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000510-tenable-passed-manual-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-AU-000510 highlighted in the Audits PASSED section after the manual fix">
+  <figcaption>WN11-AU-000510 (System log size) in the Audits PASSED section of the manual-round rescan, 21 Oct 2026 07:13 UTC.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000510-tenable-failed-after-undo-800.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000510-tenable-failed-after-undo-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000510-tenable-failed-after-undo-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-AU-000510 highlighted in the Audits FAILED section after the fix was undone">
+  <figcaption>After the undo, WN11-AU-000510 is back in Audits FAILED (rescan 22 Oct 2026 01:26 UTC). The scanner really is testing the setting I changed.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000510-tenable-passed-powershell-800.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000510-tenable-passed-powershell-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-au-000510-tenable-passed-powershell-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-AU-000510 highlighted in the Audits PASSED section after the PowerShell remediation script">
+  <figcaption>PASSED again after the PowerShell script, final rescan 22 Oct 2026 03:11 UTC.</figcaption>
+</figure>
+<p>
+  After three rounds of the same pattern, one point is worth making: in a real environment all three belong in a single Group Policy Object. The scripts are for machines Group Policy does not reach, such as workgroup machines, golden image builds and Intune gaps.
+</p>
+<h2 id="stig-4-powershell-script-block-logging-wn11-cc-000326">STIG 4: PowerShell Script Block Logging (WN11-CC-000326)</h2>
+<p>
+  If you take one control from this series, take this one. PowerShell is on every Windows machine and attackers love it. A common trick is passing a Base64-encoded command with <code translate="no">-EncodedCommand</code> so the real code never appears in plain text on the command line.
+</p>
+<p>
+  Script Block Logging defeats that. With it on, PowerShell logs the full text of every script block it executes, after decoding, as event 4104. In Windows PowerShell 5.1 that goes to the Microsoft-Windows-PowerShell/Operational log. Code downloaded straight into memory that never touched disk still lands in the log in readable form. (Microsoft's <a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_logging_windows" rel="noopener" target="_blank">PowerShell logging documentation</a> is written for PowerShell 7, which logs to a separate PowerShellCore/Operational channel, so check which one you are querying.)
+</p>
+<p>
+  The fix is one Group Policy setting, "Turn on PowerShell Script Block Logging", which writes <code translate="no">EnableScriptBlockLogging = 1</code> under <code translate="no">HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging</code>.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000326-powershell-script-block-logging-gpedit-1200.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000326-powershell-script-block-logging-gpedit-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000326-powershell-script-block-logging-gpedit-800.webp 800w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000326-powershell-script-block-logging-gpedit-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="746"
+       loading="lazy" decoding="async"
+       alt="Group Policy setting Turn on PowerShell Script Block Logging enabled in the Windows PowerShell administrative template">
+  <figcaption>WN11-CC-000326: "Turn on PowerShell Script Block Logging" enabled. Invocation start/stop logging stays off; it adds a lot of volume for little value here.</figcaption>
+</figure>
+<p>
+  The scan proves the registry value. To prove the logging actually works, open a new PowerShell window and check for your own test string:
+</p>
+<pre translate="no"><code translate="no">Write-Output "stig-test-4104"
+Get-WinEvent -LogName 'Microsoft-Windows-PowerShell/Operational' -MaxEvents 20 |
+    Where-Object Id -eq 4104 | Select-Object TimeCreated, Message -First 3</code></pre>
+<p>
+  Your test string shows up inside a 4104 event. That is the kind of check that explains the control to a non-technical reader in two seconds.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000326-tenable-passed-manual-800.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000326-tenable-passed-manual-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000326-tenable-passed-manual-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="399"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-CC-000326 highlighted in the Audits PASSED section after the manual fix">
+  <figcaption>WN11-CC-000326 (Script Block Logging) in the Audits PASSED section of the manual-round rescan, 21 Oct 2026 07:13 UTC.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000326-tenable-failed-after-undo-800.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000326-tenable-failed-after-undo-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000326-tenable-failed-after-undo-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="452"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-CC-000326 highlighted in the Audits FAILED section after the fix was undone">
+  <figcaption>After the undo, WN11-CC-000326 is back in Audits FAILED (rescan 22 Oct 2026 01:26 UTC). The scanner really is testing the setting I changed.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000326-tenable-passed-powershell-800.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000326-tenable-passed-powershell-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000326-tenable-passed-powershell-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="429"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-CC-000326 highlighted in the Audits PASSED section after the PowerShell remediation script">
+  <figcaption>PASSED again after the PowerShell script, final rescan 22 Oct 2026 03:11 UTC.</figcaption>
+</figure>
+<h2 id="stig-5-powershell-transcription-wn11-cc-000327">STIG 5: PowerShell Transcription (WN11-CC-000327)</h2>
+<p>
+  Script Block Logging records the code. Transcription records the session: what was typed and what came back on screen, written to a text file. During an investigation a transcript reads almost like a screen recording.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000327-powershell-transcription-gpedit-1200.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000327-powershell-transcription-gpedit-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000327-powershell-transcription-gpedit-800.webp 800w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000327-powershell-transcription-gpedit-1200.webp 1200w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="1200" height="706"
+       loading="lazy" decoding="async"
+       alt="Group Policy setting Turn on PowerShell Transcription enabled with output directory C:\ProgramData\PS_Transcript and invocation headers">
+  <figcaption>WN11-CC-000327: transcription enabled, output directory C:\ProgramData\PS_Transcript, invocation headers on.</figcaption>
+</figure>
+<p>
+  There is a detail here that is easy to miss. Turning transcription on is not enough: the output folder must be locked so standard users can write transcripts into it but cannot read or change them. Otherwise an attacker running as a normal user could delete the evidence, or read an administrator's transcript that contains something sensitive.
+</p>
+<p>
+  The script creates the folder, removes inherited permissions, gives Administrators and SYSTEM full control, and gives Users and Authenticated Users only Write Data and Append Data. It uses well-known SIDs instead of group names, so it works on a Windows install in any language, where "Administrators" might be "Administradores":
+</p>
+<pre translate="no"><code translate="no"># *S-1-5-32-544 = Administrators, *S-1-5-18 = SYSTEM
+# *S-1-5-32-545 = Users, *S-1-5-11 = Authenticated Users
+icacls.exe $TranscriptDir /inheritance:r /grant:r '*S-1-5-32-544:(OI)(CI)(F)' '*S-1-5-18:(OI)(CI)(F)'
+icacls.exe $TranscriptDir /grant:r '*S-1-5-32-545:(OI)(CI)(WD,AD)' '*S-1-5-11:(OI)(CI)(WD,AD)'</code></pre>
+<p>
+  Then it writes three policy values: <code translate="no">EnableTranscripting</code>, <code translate="no">OutputDirectory</code> and <code translate="no">EnableInvocationHeader</code>.
+</p>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000327-tenable-passed-manual-800.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000327-tenable-passed-manual-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000327-tenable-passed-manual-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="329"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-CC-000327 highlighted in the Audits PASSED section after the manual fix">
+  <figcaption>WN11-CC-000327 (Transcription) in the Audits PASSED section of the manual-round rescan, 21 Oct 2026 07:13 UTC.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000327-tenable-failed-after-undo-800.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000327-tenable-failed-after-undo-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000327-tenable-failed-after-undo-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="453"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-CC-000327 highlighted in the Audits FAILED section after the fix was undone">
+  <figcaption>After the undo, WN11-CC-000327 is back in Audits FAILED (rescan 22 Oct 2026 01:26 UTC). The scanner really is testing the setting I changed.</figcaption>
+</figure>
+<figure class="post-figure">
+  <img src="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000327-tenable-passed-powershell-800.webp"
+       srcset="/assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000327-tenable-passed-powershell-480.webp 480w, /assets/img/windows-11-disa-stig-remediation-tenable-powershell/wn11-cc-000327-tenable-passed-powershell-800.webp 800w"
+       sizes="(max-width: 46rem) 100vw, 46rem"
+       width="800" height="406"
+       loading="lazy" decoding="async"
+       alt="Tenable compliance report extract with WN11-CC-000327 highlighted in the Audits PASSED section after the PowerShell remediation script">
+  <figcaption>PASSED again after the PowerShell script, final rescan 22 Oct 2026 03:11 UTC.</figcaption>
+</figure>
+<p>
+  There is a real risk to name here. People paste secrets into PowerShell: API keys, passwords, connection strings. With transcription on, those land in a text file. The locked folder limits who can read it, but the better answer is a habit: never paste a secret into the console, use <code translate="no">Get-Credential</code> or a secret store. That nuance is exactly what a change advisory board wants to hear before approving a logging change.
+</p>
+<h2 id="what-part-1-proved">What Part 1 proved</h2>
+<p>
+  Five controls, three rounds, each one FAILED at baseline, PASSED after the manual fix, FAILED after the undo and PASSED after the script. Event logs that keep a week or more of history instead of hours, and PowerShell activity recorded both as code and as sessions.
+</p>
+<p>
+  The next five did not go as smoothly. One of them passed its own check while silently switching off thirteen others, and another refused to stop no matter how I asked. That is all in <a href="/blog/windows-11-stig-audit-policy-wdigest-autoplay-seclogon">Part 2</a>, along with the final numbers and the script design rules. If you work on Linux too, the same "measure, harden, re-measure" loop is what I used in my <a href="/blog/linux-hardening-audit-lynis-rkhunter">Linux hardening audit with Lynis and rkhunter</a>.
+</p>
+<p>
+  The full procedure, including every Group Policy path, registry path and undo step, is in the <a href="https://github.com/rachata072/windows11-stig-remediations/blob/main/RUNBOOK.md" rel="noopener" target="_blank">RUNBOOK on GitHub</a>.
+</p>
+<h2 id="frequently-asked-questions">Frequently asked questions</h2>
+<h3>What is a DISA STIG?</h3>
+<p>
+  A Security Technical Implementation Guide is a hardening standard published by the US Defense Information Systems Agency for a specific product, such as Windows 11, Windows Server or Cisco IOS. Each requirement has an ID like WN11-AU-000500, a severity from CAT I (most serious) to CAT III, a check text that says what to inspect, and a fix text that says what to change.
+</p>
+<h3>Why does a fresh Windows 11 install fail so many STIG checks?</h3>
+<p>
+  Microsoft ships defaults that work for the widest range of users, while DISA writes for systems that may be targeted by capable attackers and must support investigations. On top of that, many checks fail simply because a registry value is missing, even when Windows already behaves securely by default. My fresh Windows 11 25H2 VM failed 151 of 258 checks, 58.5 percent.
+</p>
+<h3>Do I need a credentialed scan for STIG compliance?</h3>
+<p>
+  Yes. Compliance checks read the registry, audit policy, local security policy and service configuration, which a scanner can only see after logging in. Without credentials a compliance scan sees almost nothing. In Tenable that means adding Windows credentials to the scan, and in a lab it often also means letting the scanner reach SMB on TCP 445.
+</p>
+<h3>Why undo a STIG fix that already passed?</h3>
+<p>
+  Because a pass after a change does not prove the change caused it. Undoing the fix and watching the check fail again proves cause and effect: your setting, and only your setting, controls that result. It also gives you a tested rollback plan, which is exactly what a change advisory board asks for.
+</p>
+<h3>How large should the Windows Security event log be for the STIG?</h3>
+<p>
+  WN11-AU-000505 requires a size that holds at least one week of audit records. Older STIG releases and many audit files expect 1024000 KB, and newer guidance uses 5120000 KB as its example. Setting 5120000 KB passes both. It is a maximum, not a reservation, so it does not consume 5 GB of disk the moment you set it.
+</p>
+<h3>What is the difference between PowerShell Script Block Logging and Transcription?</h3>
+<p>
+  Script Block Logging records the code PowerShell actually executes, after decoding, as event 4104 in the Microsoft-Windows-PowerShell/Operational log in Windows PowerShell 5.1. Transcription writes a text file of the whole session, what was typed and what came back. One shows the code, the other reads like a recording of the session.
+</p>
+<h3>Can PowerShell transcription capture passwords?</h3>
+<p>
+  Yes, if someone pastes a secret into the console it lands in the transcript. That is why the STIG requires a locked-down output folder where normal users can write but not read, and why the better habit is never pasting secrets at all, using a credential prompt or a secret store instead.
+</p>
+<h3>Should STIG settings be applied with Group Policy or PowerShell?</h3>
+<p>
+  On domain-joined machines, Group Policy or Intune, because they keep reapplying the setting and prevent drift. PowerShell scripts fill the gaps: workgroup machines, golden image builds, and anything the management platform misses. Scripts that return an exit code can also run as Intune remediations.
+</p>
+</div>
+      <footer class="post-end">
+        <div class="repo-box"><div><span class="k">source for this post</span><span class="v">github.com/rachata072/windows11-stig-remediations</span></div><a class="btn btn-sec" href="https://github.com/rachata072/windows11-stig-remediations" rel="noopener" target="_blank">view repo <span aria-hidden="true">&#8599;</span></a></div>
+        <nav class="nexthop" aria-label="More posts"><a class="prev" href="/blog/rea-reverse-engineer-anything-ai-agents-what-it-means"><span class="k">&larr; previous hop</span>REA Can Reverse Engineer Almost Anything. Here Is What That Actually Changes</a><a class="next" href="/blog/windows-11-stig-audit-policy-wdigest-autoplay-seclogon"><span class="k">next hop &rarr;</span>Hardening Windows 11 Against DISA STIGs, Part 2: Audit Policy, WDigest, AutoPlay and Seclogon</a></nav>
+      </footer>
+    </div>
+    <aside class="toc" aria-label="On this page"><span class="toc-title"><span class="h">#</span> show ip route | toc</span><ol><li><a href="#what-a-stig-is-and-why-it-matters-outside-the-military">What a STIG is, and why it matters outside the military</a></li><li><a href="#the-lab">The lab</a></li><li><a href="#building-a-fast-stig-only-tenable-scan">Building a fast, STIG-only Tenable scan</a></li><li><a href="#the-baseline-151-of-258-checks-failed">The baseline: 151 of 258 checks failed</a></li><li><a href="#choosing-ten-out-of-151">Choosing ten out of 151</a></li><li><a href="#the-method-fix-it-prove-it-break-it-prove-it-again">The method: fix it, prove it, break it, prove it again</a></li><li><a href="#stigs-1-to-3-event-log-sizes">STIGs 1 to 3: event log sizes</a></li><li><a href="#stig-4-powershell-script-block-logging-wn11-cc-000326">STIG 4: PowerShell Script Block Logging (WN11-CC-000326)</a></li><li><a href="#stig-5-powershell-transcription-wn11-cc-000327">STIG 5: PowerShell Transcription (WN11-CC-000327)</a></li><li><a href="#what-part-1-proved">What Part 1 proved</a></li><li><a href="#frequently-asked-questions">Frequently asked questions</a></li></ol></aside>
+  </div>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Oct 22, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

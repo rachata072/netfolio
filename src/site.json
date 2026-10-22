@@ -76,6 +76,11 @@
       "name": "Threat-Hunting-Casebook",
       "repo": "threat-hunting-casebook",
       "project": "threat-hunting"
+    },
+    "windows11-stig": {
+      "name": "Win11-STIG-Remediation",
+      "repo": "windows11-stig-remediations",
+      "project": "stig-win11"
     }
   }
 }
