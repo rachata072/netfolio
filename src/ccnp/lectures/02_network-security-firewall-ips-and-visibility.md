@@ -5,7 +5,7 @@
 > **2.1** Describe network security solutions and deployment models that provide intrusion prevention and firewall capabilities
 > **2.2** Describe security monitoring and telemetry technologies
 >
-> **Module scope:** three connected lectures. Lecture 1 shows how traffic splits into three planes, Lecture 2 covers the firewall and IPS solutions and where you deploy them (2.1), and Lecture 3 covers monitoring and telemetry (2.2).
+> **Module scope:** how traffic splits into three planes, the firewall and IPS solutions and where you deploy them (2.1), and monitoring and telemetry (2.2).
 > **Level:** CCNA → CCNP. Assumes VLANs, routing, ACLs, and basic AAA.
 > **Blueprint version:** objective wording and all cross-references follow the official **v2.0** exam topics (testing since 27 Aug 2026).
 
@@ -20,20 +20,20 @@ The two objectives answer two questions:
 1. **2.1: What enforces, and where do you put it?** Firewalls, IPS/IDS, and next-generation firewalls, plus the deployment models: inline vs. passive, routed vs. transparent, appliance vs. virtual vs. cloud-delivered, and how they stay up (HA).
 2. **2.2: How do you see what's happening?** Syslog, SNMPv3, NetFlow/IPFIX, streaming telemetry, packet capture, firewall events, NDR, SIEM, and identity context from ISE/pxGrid.
 
-| Lecture | Core objective | Also reinforces (v2.0 numbering) |
+| Part | Core objective | Also reinforces (v2.0 numbering) |
 |---|---|---|
-| 1. Securing the Three Planes | Framework for 2.1 (which plane each control protects) | 2.3 L2 security · 2.4 in-band vs. OOB · 2.5 CIS hardening · 2.6 AAA · 2.7 secure mgmt |
-| 2. Firewall & IPS Solutions and Deployment Models | **2.1** | 2.4 management options · 2.8 FTD policies · 4.x Secure Access · 3.4 Multicloud Defense |
-| 3. Security Monitoring & Telemetry | **2.2** | 2.7 SNMPv3 / secure syslog / NTP · 6.5 exfiltration · 6.6 XDR & SIEM · 6.8 Splunk |
+| [Securing the three planes](#securing-the-three-planes-management-control-and-data) | Framework for 2.1 (which plane each control protects) | 2.3 L2 security · 2.4 in-band vs. OOB · 2.5 CIS hardening · 2.6 AAA · 2.7 secure mgmt |
+| [Firewall and IPS solutions](#firewall-ips-solutions-and-deployment-models) | **2.1** | 2.4 management options · 2.8 FTD policies · 4.x Secure Access · 3.4 Multicloud Defense |
+| [Security monitoring and telemetry](#security-monitoring-telemetry-technologies) | **2.2** | 2.7 SNMPv3 / secure syslog / NTP · 6.5 exfiltration · 6.6 XDR & SIEM · 6.8 Splunk |
 
-> Read the module top to bottom once. After that, each lecture stands alone for review. The **coverage checklist** at the very end shows where every 2.1/2.2 idea is taught.
+> Read the module top to bottom once. After that, each part stands alone for review. The **coverage checklist** at the very end shows where every 2.1/2.2 idea is taught.
 
 ---
 ---
 
-# Lecture 1: Securing the Three Planes (Management, Control, and Data)
+# Securing the Three Planes (Management, Control, and Data)
 
-> **Role in this module:** the organizing framework. Every firewall, IPS, and telemetry feature in Lectures 2 and 3 protects or observes one of these planes.
+> **Role in this module:** the organizing framework. Every firewall, IPS, and telemetry feature in the rest of this module protects or observes one of these planes.
 > **Deeper coverage elsewhere:** Layer 2 attacks (2.3), management options (2.4), CIS benchmarks (2.5), AAA troubleshooting (2.6), secure management config (2.7).
 
 ---
@@ -93,7 +93,7 @@ The management plane is the keys to the kingdom. If attackers compromise it, the
 | FTP / TFTP | **SCP / SFTP** | Encrypted transfer of configs and images |
 | SNMPv1 / v2c | **SNMPv3 (authPriv)** | v1/v2c send community strings in plaintext; v3 adds authentication and encryption |
 
-SNMPv3's security levels are covered fully in Lecture 3, §5. The configuration belongs to **2.7**.
+SNMPv3's security levels are covered fully in [SNMPv3](#snmpv3). The configuration belongs to **2.7**.
 
 ### 2.2 Harden the login path
 
@@ -117,7 +117,7 @@ SNMPv3's security levels are covered fully in Lecture 3, §5. The configuration 
 
 ### 2.4 Keep clocks in sync with NTP, and log everything
 
-Ship logs from every device to a central Syslog server or SIEM. **Authenticated NTP** keeps every timestamp aligned, which correlation, certificate validation, and Kerberos all depend on. Lecture 3 explains why this is the foundation of visibility.
+Ship logs from every device to a central Syslog server or SIEM. **Authenticated NTP** keeps every timestamp aligned, which correlation, certificate validation, and Kerberos all depend on. [The foundation: inventory, time, and logs](#the-foundation-inventory-time-and-logs) explains why this is the foundation of visibility.
 
 ### 2.5 Use out-of-band (OOB) management
 
@@ -161,14 +161,14 @@ CPPr also adds **port-filtering** (drop traffic to closed ports early) and **que
 
 ## 4. Securing the data plane
 
-The goals: **allow only wanted traffic, keep it confidential and intact, contain the blast radius, and watch it for abuse.** Most of Lecture 2's firewall and IPS content lives here.
+The goals: **allow only wanted traffic, keep it confidential and intact, contain the blast radius, and watch it for abuse.** Most of the firewall and IPS content in [Firewall and IPS solutions](#firewall-ips-solutions-and-deployment-models) lives here.
 
 | Control | What it does | Where it's taught |
 |---|---|---|
 | **ACLs** | Stateless L3/L4 permit/deny | CCNA baseline |
 | **Segmentation** (VLAN, VRF, SGT) | Breaks a flat network into zones you can put policy between | 2.3 |
-| **Stateful firewall / zones** | Permits return traffic only for sessions you started | **Lecture 2** |
-| **IPS** | Inspects inline and drops exploits and malware callbacks | **Lecture 2** |
+| **Stateful firewall / zones** | Permits return traffic only for sessions you started | [What a firewall does](#what-a-firewall-does) |
+| **IPS** | Inspects inline and drops exploits and malware callbacks | [IPS and IDS](#ips-and-ids) |
 | **Encryption in transit** (IPsec, TLS) | Confidentiality and integrity across untrusted paths | 1.5, 1.6, 2.9 |
 | **uRPF** | Drops spoofed sources. **Strict**: the source must route back out the arrival interface. **Loose**: the source just has to exist in the FIB | here |
 | **Rate limiting / QoS** | Caps floods; protects voice/video | here |
@@ -179,7 +179,7 @@ The goals: **allow only wanted traffic, keep it confidential and intact, contain
 
 ## 5. Visibility (pointer)
 
-Hardening reduces risk; **monitoring** catches what gets through. NetFlow, Syslog, SNMPv3, telemetry, NDR, and SIEM are the whole subject of **Lecture 3 (2.2)**.
+Hardening reduces risk; **monitoring** catches what gets through. NetFlow, Syslog, SNMPv3, telemetry, NDR, and SIEM are the whole subject of [Security monitoring and telemetry](#security-monitoring-telemetry-technologies) (2.2).
 
 ---
 
@@ -193,12 +193,12 @@ Hardening reduces risk; **monitoring** catches what gets through. NetFlow, Syslo
 | Redirect traffic | Control | Inject a route or become STP root | Routing auth; BPDU/Root Guard; GTSM |
 | Man-in-the-middle a LAN | Control (L2) | ARP spoof; rogue DHCP | DHCP snooping + DAI |
 | Spoof source IPs | Data | Forged sources for DoS/reflection | uRPF |
-| Deliver an exploit | Data | Malicious payload in transit | Inline IPS (Lecture 2) |
-| Exfiltrate data | Data | Tunnel out over DNS/HTTPS | DLP; NetFlow anomaly hunting (Lecture 3) |
+| Deliver an exploit | Data | Malicious payload in transit | Inline IPS |
+| Exfiltrate data | Data | Tunnel out over DNS/HTTPS | DLP; NetFlow anomaly hunting |
 
 ---
 
-## 7. Lecture 1 exam traps
+## 7. Exam traps: the three planes
 
 - **Which plane?** ARP, CDP/LLDP, STP, and routing protocols are **control**. User traffic passing through is **data**. SSH/SNMP/Syslog between an admin and the box is **management**.
 - **RADIUS vs. TACACS+:** RADIUS (UDP) encrypts *only the password*; TACACS+ (TCP 49) encrypts *the whole body*. RadSec encrypts all of RADIUS.
@@ -209,7 +209,7 @@ Hardening reduces risk; **monitoring** catches what gets through. NetFlow, Syslo
 ---
 ---
 
-# Lecture 2: Firewall & IPS Solutions and Deployment Models
+# Firewall & IPS Solutions and Deployment Models
 
 > **Maps to:** **2.1** in full. Describe network security solutions and deployment models that provide intrusion prevention and firewall capabilities.
 > **Reinforces:** 2.4 (management options), 2.8 (FTD policy implementation), 3.4 (Multicloud Defense), 4.x (Secure Access).
@@ -281,13 +281,13 @@ Without state, you'd have to write ACLs permitting every possible return flow, w
 | **Packet filter** (ACL) | L3/L4 headers, per packet | IP, port, protocol | Sessions, apps, payload |
 | **Stateful firewall** | L3/L4 + connection state | Who started the conversation | What's inside it |
 | **Application / proxy firewall** | Up to L7 for specific protocols | Application commands (HTTP methods, FTP verbs) | Scales poorly; one proxy per protocol |
-| **NGFW** | L3–L7 on every flow, plus files | App, URL category, **user identity**, file verdicts, exploits (integrated IPS) | Encrypted payload, unless decrypted (§4.2) |
+| **NGFW** | L3–L7 on every flow, plus files | App, URL category, **user identity**, file verdicts, exploits (integrated IPS) | Encrypted payload, unless decrypted (see [Next-generation firewalls](#next-generation-firewalls-ngfw)) |
 
 ---
 
 ## 3. IPS and IDS
 
-An **Intrusion Prevention System (IPS)** detects **and blocks** malicious traffic. An **Intrusion Detection System (IDS)** only **detects and alerts**. That one difference drives where each can be deployed (§6).
+An **Intrusion Prevention System (IPS)** detects **and blocks** malicious traffic. An **Intrusion Detection System (IDS)** only **detects and alerts**. That one difference drives where each can be deployed ([inline vs. passive](#deployment-model-1-inline-vs-passive)).
 
 ### 3.1 How an IPS decides
 
@@ -394,7 +394,7 @@ Cisco now pitches these together as a **hybrid mesh firewall**: many enforcement
 Where you place a device in the path decides what it can **do**.
 
 **Inline:** traffic *passes through* the device, so it **can drop** malicious packets before delivery. This is required for a firewall and for any IPS that should *prevent*.
-- Downside: it's in the path, so it adds latency and becomes a potential bottleneck or single point of failure. Size it properly, use HA, and decide **fail-open vs. fail-closed** (§8).
+- Downside: it's in the path, so it adds latency and becomes a potential bottleneck or single point of failure. Size it properly, use HA, and decide **fail-open vs. fail-closed** ([resilience and scale](#deployment-model-3-resilience-and-scale)).
 
 **Passive (out-of-band):** the device gets a **copy** of traffic from a **SPAN** port or a network **TAP**. It **can analyze and alert, but never block**: the real packet has already moved on. This is IDS behavior.
 
@@ -505,7 +505,7 @@ SSE + SD-WAN = **SASE**. Configuration is objectives **4.2–4.4**.
 
 ---
 
-## 11. Lecture 2 exam traps
+## 11. Exam traps: firewall and IPS
 
 - **IPS vs. IDS:** IPS prevents (inline); IDS only alerts (passive).
 - **To block, be inline.** Passive, SPAN, TAP, and ERSPAN can never block.
@@ -521,7 +521,7 @@ SSE + SD-WAN = **SASE**. Configuration is objectives **4.2–4.4**.
 
 ---
 
-## 12. Lecture 2 self-check
+## 12. Self-check: firewall and IPS
 
 <details><summary>1. A team wants to evaluate a new IPS on a production link without any chance of dropping traffic, then start blocking once it's tuned. Which FTD interface modes, in what order?</summary>
 
@@ -556,7 +556,7 @@ FTD failover is **active/standby** only. For several units sharing load, use **c
 ---
 ---
 
-# Lecture 3: Security Monitoring & Telemetry Technologies
+# Security Monitoring & Telemetry Technologies
 
 > **Maps to:** **2.2** in full. Describe security monitoring and telemetry technologies.
 > **Reinforces:** 2.7 (SNMPv3, secure syslog, NTP config), 6.5 (exfiltration), 6.6 (XDR/SIEM/SOAR), 6.8 (Splunk).
@@ -567,7 +567,7 @@ FTD failover is **active/standby** only. For several units sharing load, use **c
 
 **You can't protect what you can't see.** If an asset isn't in your inventory, you don't know to defend it. If an event isn't logged, you can't investigate it. If "normal" was never recorded, you can't recognize "abnormal."
 
-Monitoring is also the half of security that catches what prevention misses. Lecture 2 put firewalls and IPS in the path; this lecture is about how you **prove** they're working and **notice** the attacker who got past them.
+Monitoring is also the half of security that catches what prevention misses. The firewall and IPS part put enforcement in the path; this part is about how you **prove** they're working and **notice** the attacker who got past them.
 
 ### Learning objectives
 
@@ -703,7 +703,7 @@ Row three should stop you cold. **DNS almost never moves nearly 10 MB in one sus
 
 ## 6. Packet capture and traffic mirroring
 
-When metadata isn't enough, you need the packets. These are also the feeds for the **passive IDS** from Lecture 2:
+When metadata isn't enough, you need the packets. These are also the feeds for the **passive IDS** described in [inline vs. passive](#deployment-model-1-inline-vs-passive):
 
 | Method | How | Reach |
 |---|---|---|
@@ -734,7 +734,7 @@ Traditional monitoring **polls** (SNMP asks every N minutes). **Model-driven tel
 
 ## 8. Firewall and IPS events (FTD / FMC)
 
-The NGFW from Lecture 2 is itself a rich telemetry source. FMC records:
+The NGFW is itself a rich telemetry source. FMC records:
 
 | Event type | Tells you |
 |---|---|
@@ -827,7 +827,7 @@ Configuring Splunk ingestion and automation belongs to **3.5, 6.6, and 6.8**. Fo
 
 ---
 
-## 14. Lecture 3 exam traps
+## 14. Exam traps: monitoring and telemetry
 
 - **NetFlow ≠ packet capture.** It's metadata (key fields + counters), no payload.
 - **v5** is fixed and IPv4-only; **v9** is template-based; **IPFIX** is the IETF standard based on v9 (UDP 4739).
@@ -843,7 +843,7 @@ Configuring Splunk ingestion and automation belongs to **3.5, 6.6, and 6.8**. Fo
 
 ---
 
-## 15. Lecture 3 self-check
+## 15. Self-check: monitoring and telemetry
 
 <details><summary>1. A branch router can't export NetFlow, but you need flow visibility for that segment in Secure Network Analytics. What do you add?</summary>
 
@@ -882,7 +882,7 @@ The firewall can write **user- and group-based** rules from ISE session context.
 
 - **2.1 is enforcement plus placement.** A firewall tracks state and enforces zones; an IPS drops malicious patterns; an NGFW fuses both with app, URL, user, and malware awareness. Then the deployment questions: *inline or passive? routed or transparent? appliance, virtual, cloud-native, or cloud-delivered? standalone, HA pair, or cluster?*
 - **2.2 is evidence.** Syslog, SNMPv3, NetFlow/IPFIX/NSEL, streaming telemetry, capture, firewall events, NDR, ISE context, and SIEM/XDR tell you whether the enforcement works and what got past it.
-- **Lecture 1's planes** tell you *which traffic* each control protects or observes.
+- **The three planes** tell you *which traffic* each control protects or observes.
 
 ### The five reflexes to carry into the exam
 
@@ -898,38 +898,38 @@ The firewall can write **user- and group-based** rules from ISE session context.
 
 **2.1 Network security solutions and deployment models (firewall & IPS)**
 
-| Concept | Where |
+| Concept | Section |
 |---|---|
-| Stateful vs. stateless filtering | L2 §1.1 |
-| Firewall generations, NGFW capabilities | L2 §2, §4 |
-| IPS vs. IDS, detection methods, false positives/negatives | L2 §3 |
-| IPS policy trade-offs (base policies), Talos, Snort 3 | L2 §3.1–3.2 |
-| Security zones and IOS ZBFW | L2 §4.1 |
-| Encrypted traffic: decryption vs. EVE | L2 §4.2 |
-| Cisco portfolio: FTD, ASA, FTDv/ASAv, Multicloud Defense, Secure Access, IOS XE, Meraki MX | L2 §5 |
-| ASA vs. FTD; management options | L2 §5.1–5.2 |
-| Inline vs. passive; TAP vs. SPAN | L2 §6 |
-| Routed vs. transparent; FTD IPS interface modes | L2 §7 |
-| HA: failover, clustering, multi-instance, contexts; fail-open/closed | L2 §8 |
-| On-prem / virtual / cloud / cloud-delivered / hybrid mesh | L2 §9 |
-| Placement in SAFE places in the network | L2 §9.1 |
+| Stateful vs. stateless filtering | [What a firewall does](#what-a-firewall-does) |
+| Firewall generations, NGFW capabilities | [From packet filter to NGFW](#from-packet-filter-to-ngfw), [Next-generation firewalls](#next-generation-firewalls-ngfw) |
+| IPS vs. IDS, detection methods, false positives/negatives | [IPS and IDS](#ips-and-ids) |
+| IPS policy trade-offs (base policies), Talos, Snort 3 | [IPS and IDS](#ips-and-ids) |
+| Security zones and IOS ZBFW | [Next-generation firewalls](#next-generation-firewalls-ngfw) |
+| Encrypted traffic: decryption vs. EVE | [Next-generation firewalls](#next-generation-firewalls-ngfw) |
+| Cisco portfolio: FTD, ASA, FTDv/ASAv, Multicloud Defense, Secure Access, IOS XE, Meraki MX | [Cisco solutions](#cisco-solutions-that-provide-firewall-and-ips) |
+| ASA vs. FTD; management options | [Cisco solutions](#cisco-solutions-that-provide-firewall-and-ips) |
+| Inline vs. passive; TAP vs. SPAN | [Inline vs. passive](#deployment-model-1-inline-vs-passive) |
+| Routed vs. transparent; FTD IPS interface modes | [Firewall and interface mode](#deployment-model-2-firewall-mode-and-interface-mode) |
+| HA: failover, clustering, multi-instance, contexts; fail-open/closed | [Resilience and scale](#deployment-model-3-resilience-and-scale) |
+| On-prem / virtual / cloud / cloud-delivered / hybrid mesh | [Where it runs](#deployment-model-4-where-it-runs-on-prem-virtual-cloud-hybri) |
+| Placement in SAFE places in the network | [Where it runs](#deployment-model-4-where-it-runs-on-prem-virtual-cloud-hybri) |
 
 **2.2 Security monitoring and telemetry technologies**
 
-| Concept | Where |
+| Concept | Section |
 |---|---|
-| Inventory, NTP, centralized off-box logging, what to log | L3 §1 |
-| Technology comparison (push/poll/stream, granularity) | L3 §2 |
-| Syslog severities, facility, secure syslog | L3 §3 |
-| SNMPv3 levels, MIB/OID, traps vs. informs | L3 §4 |
-| NetFlow v5/v9, FNF, IPFIX, sampling, NSEL | L3 §5 |
-| SPAN / RSPAN / ERSPAN / TAP / on-box capture | L3 §6 |
-| Model-driven telemetry (YANG, dial-in/out, periodic/on-change) | L3 §7 |
-| FTD/FMC event types and export | L3 §8 |
-| NDR: Secure Network Analytics components, ETA, NVM, Secure Cloud Analytics → XDR | L3 §9 |
-| ISE context + pxGrid, Rapid Threat Containment | L3 §10 |
-| SIEM vs. SOAR vs. XDR | L3 §11 |
-| NetFlow vs. telemetry vs. capture | L3 §12 |
+| Inventory, NTP, centralized off-box logging, what to log | [The foundation](#the-foundation-inventory-time-and-logs) |
+| Technology comparison (push/poll/stream, granularity) | [Visibility toolkit](#the-visibility-toolkit-at-a-glance) |
+| Syslog severities, facility, secure syslog | [Syslog](#syslog) |
+| SNMPv3 levels, MIB/OID, traps vs. informs | [SNMPv3](#snmpv3) |
+| NetFlow v5/v9, FNF, IPFIX, sampling, NSEL | [NetFlow, IPFIX, NSEL](#netflow-ipfix-and-nsel-conversation-metadata) |
+| SPAN / RSPAN / ERSPAN / TAP / on-box capture | [Packet capture](#packet-capture-and-traffic-mirroring) |
+| Model-driven telemetry (YANG, dial-in/out, periodic/on-change) | [Streaming telemetry](#streaming-telemetry-model-driven-telemetry) |
+| FTD/FMC event types and export | [Firewall events](#firewall-and-ips-events-ftd-fmc) |
+| NDR: Secure Network Analytics components, ETA, NVM, Secure Cloud Analytics → XDR | [NDR](#ndr-cisco-secure-network-analytics) |
+| ISE context + pxGrid, Rapid Threat Containment | [ISE and pxGrid](#ise-and-pxgrid-adding-who-and-what) |
+| SIEM vs. SOAR vs. XDR | [SIEM, SOAR, XDR](#siem-soar-and-xdr) |
+| NetFlow vs. telemetry vs. capture | [NetFlow vs. telemetry](#netflow-vs-telemetry-the-decision-table) |
 
 ---
 

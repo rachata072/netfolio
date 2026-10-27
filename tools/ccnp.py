@@ -165,8 +165,8 @@ def render_lecture(site, hashes, last_change, course, lec, counts):
 <article class="lecture">
   <header class="post-head">
     <div class="wrap">
-      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="{BASE}">ccnp-security</a><span aria-hidden="true">/</span><span>module {esc(lec["module"])}</span></nav>
-      <p class="scard-meta"><span class="sid">SCOR {esc(course["exam"]["code"])} v{esc(course["exam"]["version"])}</span><span>Module {esc(lec["module"])} &middot; Domain {esc(d0)} {esc(course["domains"][int(d0)-1]["name"])}</span></p>
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="{BASE}">ccnp-security</a><span aria-hidden="true">/</span><span>{esc(" + ".join(lec["objectives"]))}</span></nav>
+      <p class="scard-meta"><span class="sid">SCOR {esc(course["exam"]["code"])} v{esc(course["exam"]["version"])}</span><span>Domain {esc(d0)} {esc(course["domains"][int(d0)-1]["name"])} &middot; topics {esc(", ".join(lec["objectives"]))}</span></p>
       <h1 class="mt-2">{esc(lec["title"])}</h1>
       <p class="post-dek">{esc(lec["dek"])}</p>
       <div class="post-meta"><time datetime="{lec["date"]}">updated {B.fmt_date(lec.get("updated", lec["date"]))}</time><span class="sep">/</span><span>{lec["read_min"]} min read</span><span class="sep">/</span><span>by {esc(site["author"])}</span></div>
@@ -342,7 +342,7 @@ def block_lectures(course):
     for lec in course["lectures"]:
         chips = "".join(obj_chip(o, course) for o in lec["objectives"])
         items.append(
-            f'<li><a class="lec" href="{lec["path"]}"><span class="mod">{esc(lec["module"])}</span>'
+            f'<li><a class="lec" href="{lec["path"]}"><span class="mod">D{esc(lec["objectives"][0].split(".")[0])}</span>'
             f'<span class="lt"><b>{esc(lec["title"])}</b><span class="ld">{esc(lec["dek"])}</span>'
             f'<span class="lc">{chips}<span class="lm">{lec["read_min"]} min &middot; {B.fmt_date(lec.get("updated", lec["date"]))}</span></span></span></a></li>')
     return '<ol class="lecs">' + "".join(items) + "</ol>"
