@@ -157,7 +157,7 @@
     "name": "CCNP-Security-Notes",
     "cat": "security",
     "status": "admin",
-    "blurb": "Study notes, lab write-ups, and a spaced-repetition flashcard deck for CCNP Security, replacing the CCNA-Notes project now that I've moved on to the professional-level security track.",
-    "tags": ["CCNP Security", "Study notes"]
+    "blurb": "Lecture notes in blueprint order, Packet Tracer labs (walkthroughs plus downloadable baseline files), web flashcards, and mock exams for CCNP Security (SCOR 350-701 v2.0).",
+    "tags": ["CCNP Security", "SCOR 350-701", "Packet Tracer"]
   }
 ]
