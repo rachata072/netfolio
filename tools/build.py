@@ -142,6 +142,7 @@ def footer(site, last_change):
         <li><a href="/projects">projects</a></li>
         <li><a href="/blog">blog</a></li>
         <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/ccnp-security">ccnp security</a></li>
         <li><a href="/#about">about</a></li>
         <li><a href="/privacy">privacy</a></li>
         <li><a href="/feed.xml">rss feed</a></li>
@@ -489,6 +490,10 @@ def block_project_cards(site, projects, posts_by_slug):
             if p["post"] not in posts_by_slug:
                 sys.exit(f'project {p["id"]}: unknown post {p["post"]}')
             links.append(f'<a href="/blog/{p["post"]}">{esc(p.get("post_label", "read the write-up"))} &rarr;</a>')
+        if p.get("link"):  # internal page, e.g. the CCNP study hub
+            if not re.fullmatch(r"/[a-z0-9/-]+", p["link"]):
+                sys.exit(f'project {p["id"]}: link must be a site path')
+            links.append(f'<a href="{esc(p["link"])}">{esc(p.get("link_label", "open"))} &rarr;</a>')
         if p.get("repo"):
             links.append(f'<a href="{esc(site["github"])}/{esc(p["repo"])}" rel="noopener" target="_blank">repo &#8599;</a>')
         if not links:
@@ -847,6 +852,9 @@ def main():
         write(f'cheat-sheets/{sh["key"]}.html', render_sheet(site, hashes, last_change, sheets, sh, by_slug))
     n_sheets = len(sheets["sheets"])
 
+    import ccnp  # CCNP Security study hub (lectures, flashcards, mock exam)
+    ccnp_tokens, ccnp_pages = ccnp.build(site, hashes, last_change)
+
     tokens = {
         "POST_COUNT": str(len(posts)),
         "LAST_CHANGE": fmt_date(last_change),
@@ -865,6 +873,7 @@ def main():
         "SHEET_COUNT": str(n_sheets),
         "SHEET_LIVE": str(len(live_sheets)),
         "SHEETS_TEASER": block_sheet_teaser(sheets, live_sheets),
+        **ccnp_tokens,
     }
 
     for f in sorted((SRC / "pages").glob("*.html")):
@@ -901,8 +910,9 @@ def main():
     sheets_mod = max([sh.get("updated", sh["date"]) for sh in live_sheets] or [last_change])
     write("sitemap.xml", sitemap(site, posts, [("/", last_change), ("/projects", last_change),
                                                 ("/blog", last_change), ("/cheat-sheets", sheets_mod),
-                                                ("/privacy", "2026-09-28")]
-                                 + [(sh["path"], sh.get("updated", sh["date"])) for sh in live_sheets]))
+                                                ("/privacy", "2026-10-26")]
+                                 + [(sh["path"], sh.get("updated", sh["date"])) for sh in live_sheets]
+                                 + ccnp_pages))
     print("done")
 
 

@@ -1,0 +1,92 @@
+<!--meta
+{
+  "out": "ccnp-security/mock-exam.html",
+  "path": "/ccnp-security/mock-exam",
+  "nav": "",
+  "title": "Free CCNP Security Mock Exam (SCOR 350-701 v2.0) | breakfixlearn",
+  "description": "Free SCOR 350-701 v2.0 practice exam: original questions weighted like the real blueprint, a timed exam mode, and explanations that link to the notes.",
+  "og_title": "CCNP Security mock exam",
+  "og_description": "Original SCOR 350-701 v2.0 practice questions, weighted like the blueprint. Timed exam mode or instant-feedback practice mode.",
+  "preload_display": true,
+  "scripts": ["exam"]
+}
+-->
+<main id="main">
+  <header class="page-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/ccnp-security">ccnp-security</a><span aria-hidden="true">/</span><span>mock-exam</span></nav>
+      <span class="cli"><span class="h">edge#</span> <span class="v">test</span> <span class="a">scor-350-701</span></span>
+      <h1>Mock exam</h1>
+      <p class="sec-lede">{{CCNP_Q_COUNT}} original questions for {{CCNP_EXAM}}, picked in proportion to the blueprint weights. The bank grows with every lecture I publish.</p>
+    </div>
+  </header>
+
+  <section class="wrap ex-wrap" data-exam-app aria-label="Mock exam">
+    <noscript><p class="empty">The mock exam runs in your browser and needs JavaScript. The <a href="/ccnp-security/flashcards">flashcards</a> work without it.</p></noscript>
+
+    <form class="ex-setup" data-ex-setup hidden>
+      <fieldset class="ex-fs">
+        <legend>Mode</legend>
+        <label class="opt"><input type="radio" name="mode" value="exam" checked><span><b>Exam</b> <span class="mut">Cisco rules: one way, no going back, results at the end.</span></span></label>
+        <label class="opt"><input type="radio" name="mode" value="practice"><span><b>Practice</b> <span class="mut">Untimed. Check each answer and read the explanation straight away.</span></span></label>
+      </fieldset>
+      <fieldset class="ex-fs">
+        <legend>Length</legend>
+        <div class="ex-len">
+          <label class="pill"><input type="radio" name="len" value="10"><span>10</span></label>
+          <label class="pill"><input type="radio" name="len" value="25" checked><span>25</span></label>
+          <label class="pill"><input type="radio" name="len" value="50"><span>50</span></label>
+          <label class="pill"><input type="radio" name="len" value="100"><span>100</span></label>
+          <label class="pill"><input type="radio" name="len" value="all"><span>all</span></label>
+        </div>
+        <label class="opt"><input type="checkbox" name="timed" checked><span><b>Timed</b> <span class="mut">72 seconds per question, the pace of the real 120-minute exam.</span></span></label>
+      </fieldset>
+      <fieldset class="ex-fs">
+        <legend>Domains</legend>
+        {{CCNP_EXAM_DOMAINS}}
+      </fieldset>
+      <div class="ex-go">
+        <button type="submit" class="btn btn-pri" data-ex-start>start <span class="p">enter</span></button>
+        <p class="ex-plan" data-ex-plan aria-live="polite"></p>
+      </div>
+      <p class="empty" data-ex-err role="alert" hidden></p>
+    </form>
+
+    <div class="ex-run" data-ex-run hidden>
+      <div class="ex-bar">
+        <span data-ex-pos></span><span class="chip" data-ex-obj></span>
+        <span class="ex-timer" data-ex-timer hidden></span>
+      </div>
+      <div class="ex-progress" aria-hidden="true"><span data-ex-prog></span></div>
+      <fieldset class="ex-q" aria-labelledby="ex-stem">
+        <p class="ex-stem" id="ex-stem" tabindex="-1" data-ex-stem></p>
+        <p class="ex-hint" data-ex-hint></p>
+        <div class="ex-opts" data-ex-opts></div>
+      </fieldset>
+      <div class="ex-fb" data-ex-fb hidden>
+        <p class="ex-verdict" data-ex-verdict></p>
+        <p data-ex-expl></p>
+        <a href="/ccnp-security" data-ex-ref>review this in the notes</a>
+      </div>
+      <div class="ex-actions">
+        <button type="button" class="btn btn-pri" data-ex-check>check answer</button>
+        <button type="button" class="btn btn-pri" data-ex-next>next</button>
+        <button type="button" class="linkbtn" data-ex-end>end exam</button>
+      </div>
+    </div>
+
+    <div class="ex-result" data-ex-result hidden>
+      <h2 class="sub-h">Result</h2>
+      <p class="ex-score" data-ex-score tabindex="-1"></p>
+      <p class="ex-summary" data-ex-summary></p>
+      <ul class="ex-doms" data-ex-doms aria-label="Score by domain"></ul>
+      <div class="ex-again">
+        <button type="button" class="btn btn-pri" data-ex-new>new exam</button>
+        <button type="button" class="btn btn-sec" data-ex-again>retake these questions</button>
+        <label class="opt opt-inline"><input type="checkbox" data-ex-missed><span>show only questions I missed</span></label>
+      </div>
+      <ol class="ex-review" data-ex-review aria-label="Answer review"></ol>
+    </div>
+    <p class="sr-only" data-ex-live aria-live="polite"></p>
+  </section>
+</main>

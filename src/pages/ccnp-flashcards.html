@@ -1,0 +1,69 @@
+<!--meta
+{
+  "out": "ccnp-security/flashcards.html",
+  "path": "/ccnp-security/flashcards",
+  "nav": "",
+  "title": "CCNP Security Flashcards (SCOR 350-701 v2.0) | breakfixlearn",
+  "description": "Free spaced-repetition flashcards for CCNP Security SCOR 350-701 v2.0. Study in the browser, no account. Progress is saved on your device only.",
+  "og_title": "CCNP Security flashcards",
+  "og_description": "Spaced-repetition flashcards for SCOR 350-701 v2.0, each linked to the lecture section that explains it.",
+  "preload_display": true,
+  "scripts": ["flashcards"]
+}
+-->
+<main id="main">
+  <header class="page-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/ccnp-security">ccnp-security</a><span aria-hidden="true">/</span><span>flashcards</span></nav>
+      <span class="cli"><span class="h">edge#</span> <span class="v">show</span> <span class="a">flashcards</span></span>
+      <h1>Flashcards</h1>
+      <p class="sec-lede">{{CCNP_CARD_COUNT}} cards for {{CCNP_EXAM}}. Answer in your head, flip, then be honest: cards you miss come back today, cards you know wait longer each time.</p>
+    </div>
+  </header>
+
+  <section class="wrap fc-wrap" aria-label="Flashcard study">
+    <div class="fc-app" data-fc-app hidden>
+      <div class="toolbar">
+        <span class="tb-k" aria-hidden="true">deck</span>
+        <div class="filters" role="group" aria-label="Choose a deck by exam domain">
+          {{CCNP_CARD_FILTERS}}
+        </div>
+      </div>
+      <p class="fc-stats" data-fc-stats></p>
+      <ol class="fc-boxes" aria-label="Cards per Leitner box">
+        <li data-fc-box="0"><b>0</b> new</li><li data-fc-box="1"><b>0</b> box 1</li><li data-fc-box="2"><b>0</b> box 2</li><li data-fc-box="3"><b>0</b> box 3</li><li data-fc-box="4"><b>0</b> box 4</li><li data-fc-box="5"><b>0</b> box 5</li>
+      </ol>
+
+      <div class="fc-stage" data-fc-stage>
+        <div class="fc-card" data-fc-card>
+          <p class="fc-meta" data-fc-meta></p>
+          <p class="fc-q" data-fc-q></p>
+          <div class="fc-a" data-fc-a hidden></div>
+        </div>
+        <div class="fc-actions">
+          <button type="button" class="btn btn-pri" data-fc-flip>show answer <span class="p">space</span></button>
+          <div class="fc-rate" data-fc-rate role="group" aria-label="How well did you know it?" hidden>
+            <button type="button" class="btn btn-sec g-again" data-grade="again">again <span class="p">1 &middot; <span data-int>today</span></span></button>
+            <button type="button" class="btn btn-sec g-good" data-grade="good">good <span class="p">2 &middot; <span data-int>1 day</span></span></button>
+            <button type="button" class="btn btn-sec g-easy" data-grade="easy">easy <span class="p">3 &middot; <span data-int>3 days</span></span></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="fc-done empty" data-fc-done hidden>
+        <p data-fc-done-msg></p>
+        <button type="button" class="btn btn-sec" data-fc-cram>review every card in this deck anyway</button>
+      </div>
+
+      <div class="fc-foot">
+        <p><span class="mono">space</span> flips the card, <span class="mono">1 2 3</span> grade it. Progress is saved in this browser only (local storage, never sent anywhere). <span data-fc-note></span></p>
+        <button type="button" class="linkbtn" data-fc-reset>reset progress</button>
+      </div>
+      <p class="sr-only" data-fc-live aria-live="polite"></p>
+    </div>
+
+    <h2 class="sub-h mt-2" id="all-cards">All cards</h2>
+    <p class="hub-p">Browse the whole deck. Select a card to see the answer and a link to the notes.</p>
+    {{CCNP_CARD_LIST}}
+  </section>
+</main>

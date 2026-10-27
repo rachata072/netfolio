@@ -1,0 +1,272 @@
+{
+  "exam": {
+    "code": "350-701",
+    "name": "SCOR",
+    "title": "Implementing and Operating Cisco Security Core Technologies v2.0",
+    "version": "2.0",
+    "live_since": "2026-08-27",
+    "duration_min": 120,
+    "blueprint_url": "https://learningcontent.cisco.com/documents/marketing/exam-topics/350-701-SCOR-v2.0.pdf"
+  },
+  "domains": [
+    {
+      "id": "1",
+      "name": "Security Concepts",
+      "weight": 20,
+      "objectives": [
+        {
+          "id": "1.1",
+          "text": "Explain attack threats against on-premises, hybrid, and cloud environments such as viruses, trojans, DoS/DDoS, phishing, rootkits, man-in-the middle, malware, data breaches, insecure APIs, compromised credentials, PQC, and AI"
+        },
+        {
+          "id": "1.2",
+          "text": "Describe security vulnerabilities and exploits such as software bugs, weak and/or hardcoded passwords, OWASP top ten, missing encryption ciphers, buffer overflow, path traversal, cross-site scripting/forgery, SQL injection, and identification and prioritization using CVEs and CVSS scores"
+        },
+        {
+          "id": "1.3",
+          "text": "Describe vulnerabilities in AI/LLM models such as prompt injection, system prompt leakage, vector and embedding weaknesses, and supply chain"
+        },
+        {
+          "id": "1.4",
+          "text": "Describe the controls used to protect against phishing and social engineering attacks"
+        },
+        {
+          "id": "1.5",
+          "text": "Describe cryptography security components such as hashing, encryption, PKI, SSL, TLS, QUIC, MASQUE, IPsec, NAT-T IPv4 for IPsec, preshared key, certificate-based authorization, and post-quantum cryptography"
+        },
+        {
+          "id": "1.6",
+          "text": "Describe site-to-site and remote access VPN deployment types such as virtual tunnel interfaces, standards-based IPsec, SSL VPN, DMVPN, FlexVPN, and GETVPN"
+        },
+        {
+          "id": "1.7",
+          "text": "Describe security intelligence authoring, sharing, and consumption"
+        },
+        {
+          "id": "1.8",
+          "text": "Describe zero trust architecture"
+        },
+        {
+          "id": "1.9",
+          "text": "Describe defense in depth strategy such as Secure Architecture for Everyone (SAFE)"
+        },
+        {
+          "id": "1.10",
+          "text": "Interpret scripts used to call security appliances APIs in a language such as Python"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Network Security",
+      "weight": 25,
+      "objectives": [
+        {
+          "id": "2.1",
+          "text": "Describe network security solutions and deployment models that provide intrusion prevention and firewall capabilities"
+        },
+        {
+          "id": "2.2",
+          "text": "Describe security monitoring and telemetry technologies"
+        },
+        {
+          "id": "2.3",
+          "text": "Configure network infrastructure security methods (network segmentation using VLANs or SGTs; Layer 2 and port security; DHCP snooping; Dynamic ARP inspection; storm control; and defenses against MAC, ARP, VLAN hopping, STP, and DHCP rogue attacks)"
+        },
+        {
+          "id": "2.4",
+          "text": "Select management options for network security solutions (single vs. multidevice manager, in-band vs. out-of-band, on-premises vs. cloud with Cisco Security Cloud Control)"
+        },
+        {
+          "id": "2.5",
+          "text": "Describe CIS benchmarks for hardening devices such as Cisco Secure Firewall (FTD) and Cisco IOS XE"
+        },
+        {
+          "id": "2.6",
+          "text": "Troubleshoot AAA for device and network access such as TACACS+ and RADIUS"
+        },
+        {
+          "id": "2.7",
+          "text": "Configure secure network management of perimeter security and infrastructure devices such as SNMPv3, NetConf, RestConf, APIs, secure syslog, and NTP with authentication"
+        },
+        {
+          "id": "2.8",
+          "text": "Implement access control policies, AVC, URL filtering, malware protection, and intrusion prevention using Cisco Secure Firewall (FTD)"
+        },
+        {
+          "id": "2.9",
+          "text": "Configure site-to-site and remote access VPN using Cisco Secure Firewall (FTD) and Cisco Secure Client"
+        },
+        {
+          "id": "2.10",
+          "text": "Troubleshoot VPN tunnel establishment on Cisco Secure Firewall (FTD)"
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Cloud Security",
+      "weight": 15,
+      "objectives": [
+        {
+          "id": "3.1",
+          "text": "Describe security responsibility within common Cloud Shared Responsibility Models"
+        },
+        {
+          "id": "3.2",
+          "text": "Select security capabilities, deployment models, cloud security frameworks, and policy management to secure the cloud"
+        },
+        {
+          "id": "3.3",
+          "text": "Select security solutions for cloud environments (public; private; hybrid; community cloud; NIST 800-145 SaaS, PaaS, and IaaS; and Cloud Access Security Broker)"
+        },
+        {
+          "id": "3.4",
+          "text": "Describe network, application, and data security in cloud environments with solutions such as Cisco Multicloud Defense and Cisco Secure Workload"
+        },
+        {
+          "id": "3.5",
+          "text": "Configure Splunk to ingest cloud logging and monitoring data from other security solutions"
+        },
+        {
+          "id": "3.6",
+          "text": "Describe application and workload security concepts including eBPF"
+        },
+        {
+          "id": "3.7",
+          "text": "Describe DevSecOps (Infrastructure as Code security, CI/CD pipeline, container orchestration, and secure software development)"
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "name": "Secure Service Edge",
+      "weight": 10,
+      "objectives": [
+        {
+          "id": "4.1",
+          "text": "Describe Security Service Edge (SSE) and Secure Access Service Edge (SASE)"
+        },
+        {
+          "id": "4.2",
+          "text": "Configure Cisco Secure Access Secure Internet Access"
+        },
+        {
+          "id": "4.3",
+          "text": "Configure Cisco Secure Access Secure Private Access"
+        },
+        {
+          "id": "4.4",
+          "text": "Configure data loss prevention and AI guardrails for secure internet access"
+        },
+        {
+          "id": "4.5",
+          "text": "Interpret Cisco Secure Access Investigate scores and indicators"
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "name": "Endpoint Protection and Detection",
+      "weight": 15,
+      "objectives": [
+        {
+          "id": "5.1",
+          "text": "Describe Endpoint Protection Platforms (EPP) and Endpoint Detection and Response (EDR) solutions"
+        },
+        {
+          "id": "5.2",
+          "text": "Describe endpoint device management and asset inventory systems such as MDM"
+        },
+        {
+          "id": "5.3",
+          "text": "Describe endpoint posture assessment solutions to ensure endpoint security"
+        },
+        {
+          "id": "5.4",
+          "text": "Describe endpoint protection and detection security with solutions such as Cisco Secure Client and Cisco Secure Malware Analytics"
+        },
+        {
+          "id": "5.5",
+          "text": "Configure endpoint antimalware protection using Cisco Secure Endpoint"
+        },
+        {
+          "id": "5.6",
+          "text": "Interpret Cisco Secure Endpoint malware detection events"
+        },
+        {
+          "id": "5.7",
+          "text": "Configure email security features with Cisco Security Email Threat Defense"
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "name": "Network Access, Visibility, and Enforcement",
+      "weight": 15,
+      "objectives": [
+        {
+          "id": "6.1",
+          "text": "Describe identity management and secure network access concepts such as guest services, profiling, posture assessment, and BYOD"
+        },
+        {
+          "id": "6.2",
+          "text": "Describe device compliance and application control"
+        },
+        {
+          "id": "6.3",
+          "text": "Configure network access control mechanisms such as 802.1X and MAB with Cisco Identity Services Engine"
+        },
+        {
+          "id": "6.4",
+          "text": "Configure network access with CoA"
+        },
+        {
+          "id": "6.5",
+          "text": "Explain exfiltration techniques such as DNS tunneling, HTTPS, email, FTP/SSH/SCP/SFTP, ICMP, Messenger, IRC, NTP, and cloud storage"
+        },
+        {
+          "id": "6.6",
+          "text": "Describe network visibility and enforcement using telemetry and native AI/ML capabilities with XDR and SIEM/SOAR platforms such as Splunk and Cisco XDR"
+        },
+        {
+          "id": "6.7",
+          "text": "Describe Cisco Duo in a zero-trust security architecture (Trust Monitor, MFA, Device Trust, health checks, Adaptive Access policies, SSO, and CII)"
+        },
+        {
+          "id": "6.8",
+          "text": "Describe managing, orchestrating, and automating security information and events with Splunk"
+        }
+      ]
+    }
+  ],
+  "lectures": [
+    {
+      "slug": "network-security-firewall-ips-visibility",
+      "module": "02",
+      "file": "02_network-security-firewall-ips-and-visibility.md",
+      "title": "Network Security: Firewalls, IPS, and Visibility",
+      "seo_title": "SCOR 2.1 and 2.2: Firewalls, IPS and Security Telemetry (CCNP Security notes)",
+      "description": "CCNP Security SCOR v2.0 notes for 2.1 and 2.2: firewall and IPS solutions, FTD deployment modes, NetFlow, SNMPv3, telemetry and NDR.",
+      "dek": "What enforces, where it goes, and how you see what got past it: firewall and IPS solutions and deployment models (2.1) and security monitoring and telemetry (2.2).",
+      "objectives": [
+        "2.1",
+        "2.2"
+      ],
+      "supports": [
+        "2.3",
+        "2.4",
+        "2.5",
+        "2.6",
+        "2.7",
+        "2.8",
+        "3.4",
+        "6.5",
+        "6.6",
+        "6.8"
+      ],
+      "date": "2026-10-26",
+      "order": 20
+    }
+  ]
+}

@@ -156,7 +156,9 @@
     "id": "ccnp-notes",
     "name": "CCNP-Security-Notes",
     "cat": "security",
-    "status": "admin",
+    "status": "prog",
+    "link": "/ccnp-security",
+    "link_label": "open the study hub",
     "blurb": "Lecture notes in blueprint order, Packet Tracer labs (walkthroughs plus downloadable baseline files), web flashcards, and mock exams for CCNP Security (SCOR 350-701 v2.0).",
     "tags": ["CCNP Security", "SCOR 350-701", "Packet Tracer"]
   }

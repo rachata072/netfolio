@@ -1,0 +1,611 @@
+{
+ "questions": [
+  {
+   "id": "q2.1-001",
+   "obj": "2.1",
+   "type": "single",
+   "stem": "A security team connects a new sensor to a switch SPAN port and configures it to drop exploit traffic. Attacks still reach the servers. What is the cause?",
+   "options": [
+    "The sensor needs Snort 3 instead of Snort 2",
+    "A SPAN-fed sensor only receives a copy of traffic, so it can alert but never block",
+    "SPAN ports cannot carry encrypted traffic",
+    "The intrusion policy is set to Balanced Security and Connectivity"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Only an inline device can drop the original packet. A sensor on a SPAN port gets a copy after the real packet has already been forwarded, so it behaves as an IDS no matter how its policy is set.",
+   "ref": "network-security-firewall-ips-visibility#deployment-model-1-inline-vs-passive"
+  },
+  {
+   "id": "q2.1-002",
+   "obj": "2.1",
+   "type": "single",
+   "stem": "An engineer wants to evaluate a new FTD intrusion policy on a production link and see what it would block, with zero risk of dropping traffic. Which interface configuration fits?",
+   "options": [
+    "Routed interfaces with the policy in Maximum Detection",
+    "Passive ERSPAN interface",
+    "Inline set with tap mode enabled",
+    "Transparent mode bridge group"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "An inline set in tap mode sits physically in the path but only copies traffic to Snort, so it can never drop anything. After tuning, tap mode is turned off and the same inline set starts blocking.",
+   "ref": "network-security-firewall-ips-visibility#deployment-model-2-firewall-mode-and-interface-mode"
+  },
+  {
+   "id": "q2.1-003",
+   "obj": "2.1",
+   "type": "single",
+   "stem": "NGFW inspection must be added between a server VLAN and its existing default gateway. Server and router IP addresses cannot change. Which firewall mode meets the requirement?",
+   "options": [
+    "Routed mode",
+    "Transparent mode",
+    "Multiple context mode",
+    "Passive mode"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Transparent mode makes the firewall a Layer 2 bump in the wire: interfaces join a bridge group and the management IP lives on the BVI. Hosts keep their gateway, yet full access control and IPS still apply.",
+   "ref": "network-security-firewall-ips-visibility#deployment-model-2-firewall-mode-and-interface-mode"
+  },
+  {
+   "id": "q2.1-004",
+   "obj": "2.1",
+   "type": "multi",
+   "stem": "Which two statements about Cisco Secure Firewall Threat Defense high availability are true?",
+   "options": [
+    "FTD supports active/standby failover",
+    "FTD supports active/active failover with failover groups",
+    "FTD clustering lets several units act as one logical firewall",
+    "FTD high availability requires multiple context mode",
+    "FTD failover requires the units to run different software versions"
+   ],
+   "answer": [
+    0,
+    2
+   ],
+   "explanation": "FTD failover is active/standby only, and clustering combines units into one logical device for scale and resiliency. Active/active failover is an ASA feature that depends on multiple context mode.",
+   "ref": "network-security-firewall-ips-visibility#deployment-model-3-resilience-and-scale"
+  },
+  {
+   "id": "q2.1-005",
+   "obj": "2.1",
+   "type": "single",
+   "stem": "Which capability is built into FTD but was never native to the classic ASA software?",
+   "options": [
+    "Stateful inspection",
+    "Site-to-site IPsec VPN",
+    "Snort-based intrusion prevention",
+    "Network address translation"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "ASA is a stateful firewall with NAT and VPN. Snort IPS, application visibility, URL filtering and malware defense are built into FTD. On ASA they needed the old FirePOWER add-on module, which is end-of-life.",
+   "ref": "network-security-firewall-ips-visibility#cisco-solutions-that-provide-firewall-and-ips"
+  },
+  {
+   "id": "q2.1-006",
+   "obj": "2.1",
+   "type": "single",
+   "stem": "A company needs to manage forty FTD devices from one console and wants that console delivered as SaaS. Which option fits best?",
+   "options": [
+    "Firewall Device Manager",
+    "ASDM",
+    "Cloud-delivered Firewall Management Center in Security Cloud Control",
+    "A local FMCv on every site"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "FDM manages a single FTD and ASDM manages a single ASA. Cloud-delivered FMC, part of Cisco Security Cloud Control (formerly CDO), manages many FTDs from the cloud.",
+   "ref": "network-security-firewall-ips-visibility#cisco-solutions-that-provide-firewall-and-ips"
+  },
+  {
+   "id": "q2.1-007",
+   "obj": "2.1",
+   "type": "single",
+   "stem": "Remote employees work from home and cafes without VPN. Security wants firewall and IPS policy applied to their internet traffic with no hardware involved. Which Cisco solution fits?",
+   "options": [
+    "Cisco Secure Access",
+    "FTDv in a private data center",
+    "Meraki MX",
+    "IOS XE Zone-Based Firewall"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "Cisco Secure Access is the cloud-delivered SSE platform. Its cloud firewall with IPS, SWG and DNS-layer security follow the user wherever they connect, with traffic steered by Cisco Secure Client.",
+   "ref": "network-security-firewall-ips-visibility#deployment-model-4-where-it-runs-on-prem-virtual-cloud-hybri"
+  },
+  {
+   "id": "q2.1-008",
+   "obj": "2.1",
+   "type": "single",
+   "stem": "Workloads run in AWS and Azure. The team wants cloud-native, SaaS-managed gateways to control ingress, egress and east-west traffic across both clouds. Which product is designed for this?",
+   "options": [
+    "Cisco Secure Network Analytics",
+    "Cisco Multicloud Defense",
+    "Cisco Secure Email Threat Defense",
+    "Cisco Umbrella DNS-layer security"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Multicloud Defense deploys SaaS-managed gateways inside customer cloud accounts for ingress, egress and east-west protection. Secure Network Analytics is NDR (visibility), not enforcement.",
+   "ref": "network-security-firewall-ips-visibility#cisco-solutions-that-provide-firewall-and-ips"
+  },
+  {
+   "id": "q2.1-009",
+   "obj": "2.1",
+   "type": "single",
+   "stem": "On an IOS XE router, interfaces G0/0 (zone INSIDE) and G0/1 (zone OUTSIDE) have a zone-pair with an inspect policy. G0/2 was never assigned to a zone. What happens to traffic from G0/2 to G0/0?",
+   "options": [
+    "It is permitted because G0/2 has no policy",
+    "It is inspected by the INSIDE-OUTSIDE zone-pair",
+    "It is dropped because traffic between a zone member and a non-zone interface is never allowed",
+    "It is passed statelessly"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "With ZBFW, an interface in a zone cannot exchange traffic with an interface that is in no zone. Assign G0/2 to a zone and create a zone-pair to allow it.",
+   "ref": "network-security-firewall-ips-visibility#next-generation-firewalls-ngfw"
+  },
+  {
+   "id": "q2.1-010",
+   "obj": "2.1",
+   "type": "single",
+   "stem": "A ZBFW policy uses the pass action from INSIDE to DMZ. Users report that requests reach the DMZ server but replies never come back. Why?",
+   "options": [
+    "pass drops packets after the first one",
+    "pass is stateless and one-way, so a mirror rule from DMZ to INSIDE is needed for return traffic",
+    "pass requires a self zone-pair",
+    "pass only works with UDP"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "inspect is stateful and allows return traffic automatically. pass is stateless and unidirectional, so return traffic needs its own rule or the action should be inspect.",
+   "ref": "network-security-firewall-ips-visibility#next-generation-firewalls-ngfw"
+  },
+  {
+   "id": "q2.1-011",
+   "obj": "2.1",
+   "type": "multi",
+   "stem": "Which two methods let an NGFW detect threats inside TLS-encrypted sessions?",
+   "options": [
+    "Decryption policy with Decrypt-Resign for outbound traffic",
+    "Encrypted Visibility Engine fingerprinting of the TLS handshake",
+    "Increasing the Snort rule update frequency",
+    "Moving the sensor to a SPAN port",
+    "Disabling Security Intelligence"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "Decryption gives full payload visibility at a performance and privacy cost. The Encrypted Visibility Engine identifies applications and malware from the TLS ClientHello without decrypting. Rule updates and SPAN placement do nothing for encrypted payloads.",
+   "ref": "network-security-firewall-ips-visibility#next-generation-firewalls-ngfw"
+  },
+  {
+   "id": "q2.1-012",
+   "obj": "2.1",
+   "type": "single",
+   "stem": "Which FTD base intrusion policy is the recommended starting point for most production deployments?",
+   "options": [
+    "Connectivity Over Security",
+    "Balanced Security and Connectivity",
+    "Security Over Connectivity",
+    "Maximum Detection"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Balanced Security and Connectivity is Cisco's recommended default. Maximum Detection enables nearly everything and is meant for testing, not production.",
+   "ref": "network-security-firewall-ips-visibility#ips-and-ids"
+  },
+  {
+   "id": "q2.1-013",
+   "obj": "2.1",
+   "type": "single",
+   "stem": "An IPS blocks a legitimate payroll application every month-end. What is this event called?",
+   "options": [
+    "True positive",
+    "False negative",
+    "False positive",
+    "True negative"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "A false positive is the IPS firing on benign traffic. Here it causes an outage. A false negative is the opposite: an attack the IPS misses.",
+   "ref": "network-security-firewall-ips-visibility#ips-and-ids"
+  },
+  {
+   "id": "q2.1-014",
+   "obj": "2.1",
+   "type": "single",
+   "stem": "Which detection method blocks traffic to a known command-and-control IP before deep packet inspection takes place on FTD?",
+   "options": [
+    "Anomaly-based detection",
+    "Security Intelligence (reputation)",
+    "Signature matching in the network analysis policy",
+    "File policy sandboxing"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Security Intelligence uses Talos reputation feeds and is evaluated early, before deep inspection, so known-bad IPs, URLs and domains are dropped cheaply.",
+   "ref": "network-security-firewall-ips-visibility#ips-and-ids"
+  },
+  {
+   "id": "q2.1-015",
+   "obj": "2.1",
+   "type": "multi",
+   "stem": "A branch has no room or budget for a separate firewall. Which two Cisco options provide firewall and IPS functions at the branch?",
+   "options": [
+    "IOS XE Zone-Based Firewall with Snort IPS on the branch router",
+    "Meraki MX appliance",
+    "Secure Network Analytics Flow Sensor",
+    "Cisco Telemetry Broker",
+    "SNMPv3 with authPriv"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "IOS XE routers can run ZBFW plus Snort IPS in a UTD container, and Meraki MX is a cloud-managed branch firewall with Snort-based IDS/IPS. Flow Sensor and Telemetry Broker are visibility tools; SNMPv3 is management.",
+   "ref": "network-security-firewall-ips-visibility#cisco-solutions-that-provide-firewall-and-ips"
+  },
+  {
+   "id": "q2.1-016",
+   "obj": "2.1",
+   "type": "single",
+   "stem": "Management insists that the internet link must stay up even if the inline IPS engine crashes. Which behaviour should be configured?",
+   "options": [
+    "Fail-closed",
+    "Fail-open, for example Snort fail-open or hardware bypass",
+    "Passive mode",
+    "Transparent mode"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Fail-open keeps forwarding traffic uninspected when inspection fails, favouring availability. Fail-closed stops traffic, favouring security. It is a business choice.",
+   "ref": "network-security-firewall-ips-visibility#deployment-model-3-resilience-and-scale"
+  },
+  {
+   "id": "q2.2-001",
+   "obj": "2.2",
+   "type": "single",
+   "stem": "A router is configured with `logging trap 4`. Which messages are sent to the syslog server?",
+   "options": [
+    "Only severity 4",
+    "Severities 4 through 7",
+    "Severities 0 through 4",
+    "Severities 0 through 3"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "The configured level includes itself and every more severe level, and lower numbers are more severe. Level 4 (warnings) therefore sends 0 through 4.",
+   "ref": "network-security-firewall-ips-visibility#syslog"
+  },
+  {
+   "id": "q2.2-002",
+   "obj": "2.2",
+   "type": "single",
+   "stem": "Auditors require that syslog messages cannot be read or modified in transit. What should be used?",
+   "options": [
+    "Syslog over UDP 514 with a higher severity level",
+    "Syslog over TLS on TCP 6514",
+    "SNMPv2c traps",
+    "NetFlow v5"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Classic syslog on UDP 514 is cleartext. Secure syslog runs over TLS, normally on TCP 6514, giving confidentiality and integrity.",
+   "ref": "network-security-firewall-ips-visibility#syslog"
+  },
+  {
+   "id": "q2.2-003",
+   "obj": "2.2",
+   "type": "single",
+   "stem": "Which SNMPv3 security level provides both authentication and encryption?",
+   "options": [
+    "noAuthNoPriv",
+    "authNoPriv",
+    "authPriv",
+    "privNoAuth"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "authPriv uses HMAC (SHA) for authentication and AES or 3DES for privacy. authNoPriv authenticates but leaves the payload readable.",
+   "ref": "network-security-firewall-ips-visibility#snmpv3"
+  },
+  {
+   "id": "q2.2-004",
+   "obj": "2.2",
+   "type": "single",
+   "stem": "The NMS team must be sure every critical device notification is received, even across a lossy WAN. Which SNMP mechanism should they use?",
+   "options": [
+    "Traps",
+    "Informs",
+    "GetBulk requests",
+    "Community strings"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Informs are acknowledged by the manager and retransmitted until confirmed. Traps are fire-and-forget.",
+   "ref": "network-security-firewall-ips-visibility#snmpv3"
+  },
+  {
+   "id": "q2.2-005",
+   "obj": "2.2",
+   "type": "multi",
+   "stem": "Which two statements about NetFlow and IPFIX are correct?",
+   "options": [
+    "NetFlow v9 is template-based",
+    "IPFIX is the IETF standard derived from NetFlow v9",
+    "NetFlow v5 supports IPv6 flow records",
+    "NetFlow records include the full packet payload",
+    "IPFIX requires TCP 6514"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "NetFlow v9 introduced templates, which made it extensible, and IPFIX standardised that design (default UDP 4739). v5 is fixed and IPv4-only, and no NetFlow version carries payload.",
+   "ref": "network-security-firewall-ips-visibility#netflow-ipfix-and-nsel-conversation-metadata"
+  },
+  {
+   "id": "q2.2-006",
+   "obj": "2.2",
+   "type": "single",
+   "stem": "In Flexible NetFlow, which component defines the key fields that decide which packets belong to the same flow?",
+   "options": [
+    "Flow exporter",
+    "Flow monitor",
+    "Flow record",
+    "Flow sampler"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "The flow record holds match statements (key fields) and collect statements (non-key fields). The exporter says where to send, and the monitor ties a record to an exporter and is applied to an interface.",
+   "ref": "network-security-firewall-ips-visibility#netflow-ipfix-and-nsel-conversation-metadata"
+  },
+  {
+   "id": "q2.2-007",
+   "obj": "2.2",
+   "type": "single",
+   "stem": "Which technology lets an ASA or FTD report flow-create, flow-teardown and flow-denied events, including NAT translations, as NetFlow v9 records?",
+   "options": [
+    "eStreamer",
+    "NSEL",
+    "ERSPAN",
+    "pxGrid"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "NetFlow Secure Event Logging (NSEL) exports firewall connection events as NetFlow v9. eStreamer streams FMC events, ERSPAN mirrors packets, and pxGrid shares identity context.",
+   "ref": "network-security-firewall-ips-visibility#netflow-ipfix-and-nsel-conversation-metadata"
+  },
+  {
+   "id": "q2.2-008",
+   "obj": "2.2",
+   "type": "single",
+   "stem": "An IDS sensor sits in the data center, three routed hops away from the access switch whose traffic must be monitored. Which mirroring method should be used?",
+   "options": [
+    "Local SPAN",
+    "RSPAN",
+    "ERSPAN",
+    "Port security"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "ERSPAN GRE-encapsulates mirrored traffic so it can cross a Layer 3 network. RSPAN only spans Layer 2 switches using an RSPAN VLAN.",
+   "ref": "network-security-firewall-ips-visibility#packet-capture-and-traffic-mirroring"
+  },
+  {
+   "id": "q2.2-009",
+   "obj": "2.2",
+   "type": "single",
+   "stem": "An operations team wants interface counters from 500 switches every 10 seconds, with less device CPU load than today's SNMP polling. What should they deploy?",
+   "options": [
+    "NetFlow v5",
+    "Model-driven streaming telemetry",
+    "SNMPv3 traps",
+    "Syslog at level 7"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Streaming telemetry pushes structured YANG data periodically or on change. It scales far better than polling and costs the device less CPU.",
+   "ref": "network-security-firewall-ips-visibility#streaming-telemetry-model-driven-telemetry"
+  },
+  {
+   "id": "q2.2-010",
+   "obj": "2.2",
+   "type": "single",
+   "stem": "In model-driven telemetry, what is a dial-out subscription?",
+   "options": [
+    "The collector connects to the device and subscribes with NETCONF",
+    "The device initiates the session and streams data to a configured receiver",
+    "The device sends SNMP traps on change",
+    "The collector polls the device over gNMI"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Dial-out means the device opens the connection, typically gRPC, to the receiver. Dial-in means the collector connects and subscribes, for example with NETCONF or gNMI.",
+   "ref": "network-security-firewall-ips-visibility#streaming-telemetry-model-driven-telemetry"
+  },
+  {
+   "id": "q2.2-011",
+   "obj": "2.2",
+   "type": "single",
+   "stem": "A segment has old switches that cannot export NetFlow, but the team needs flow visibility for it in Secure Network Analytics. What should be added?",
+   "options": [
+    "A Flow Collector",
+    "A Flow Sensor connected to a SPAN or TAP",
+    "A second Manager",
+    "An SNMPv3 view"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The Flow Sensor generates flow records, with application detail, from mirrored traffic. The Flow Collector only receives and stores records that something else exported.",
+   "ref": "network-security-firewall-ips-visibility#ndr-cisco-secure-network-analytics"
+  },
+  {
+   "id": "q2.2-012",
+   "obj": "2.2",
+   "type": "single",
+   "stem": "Which capability allows Secure Network Analytics to detect malware in encrypted traffic without decrypting it?",
+   "options": [
+    "Encrypted Traffic Analytics",
+    "TLS Decrypt-Resign",
+    "SNMPv3 authPriv",
+    "RSPAN"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "ETA adds handshake-derived fields, such as the initial data packet and the sequence of packet lengths and times, to flow records. Analytics then classify the traffic without decryption.",
+   "ref": "network-security-firewall-ips-visibility#ndr-cisco-secure-network-analytics"
+  },
+  {
+   "id": "q2.2-013",
+   "obj": "2.2",
+   "type": "multi",
+   "stem": "A SIEM confirms that an endpoint is beaconing to a known C2 server. Which two components let the SIEM automatically quarantine that endpoint on the network?",
+   "options": [
+    "pxGrid",
+    "ISE Adaptive Network Control with CoA",
+    "NetFlow v9 templates",
+    "SNMP informs",
+    "Syslog severity 0"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "The SIEM signals ISE over pxGrid. ISE applies an Adaptive Network Control policy and uses Change of Authorization to restrict the session. This is Rapid Threat Containment.",
+   "ref": "network-security-firewall-ips-visibility#ise-and-pxgrid-adding-who-and-what"
+  },
+  {
+   "id": "q2.2-014",
+   "obj": "2.2",
+   "type": "single",
+   "stem": "What is the role of pxGrid in the Cisco security ecosystem?",
+   "options": [
+    "It collects posture data from endpoints",
+    "It is the publish/subscribe fabric that shares ISE context with other products",
+    "It exports NetFlow records to collectors",
+    "It replaces RADIUS for 802.1X"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "ISE is the context broker that knows user, device, posture and location. pxGrid is the certificate-authenticated publish/subscribe fabric that shares that context with FMC, Secure Network Analytics, SIEM and others.",
+   "ref": "network-security-firewall-ips-visibility#ise-and-pxgrid-adding-who-and-what"
+  },
+  {
+   "id": "q2.2-015",
+   "obj": "2.2",
+   "type": "single",
+   "stem": "Which statement best describes the difference between a SIEM and a SOAR platform?",
+   "options": [
+    "A SIEM blocks traffic inline; a SOAR stores logs",
+    "A SIEM correlates events and alerts; a SOAR automates the response with playbooks",
+    "They are two names for the same product",
+    "A SOAR collects NetFlow; a SIEM collects syslog"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "SIEM ingests, normalises and correlates data to raise alerts. SOAR acts on those alerts with automated playbooks such as blocking an IP or quarantining a host.",
+   "ref": "network-security-firewall-ips-visibility#siem-soar-and-xdr"
+  },
+  {
+   "id": "q2.2-016",
+   "obj": "2.2",
+   "type": "single",
+   "stem": "An analyst must find which internal hosts sent the most traffic to the internet yesterday. Which data source answers this most directly?",
+   "options": [
+    "Streaming telemetry",
+    "NetFlow / IPFIX",
+    "SNMP traps",
+    "Syslog at level 2"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Top talkers and traffic patterns are conversation questions, which is exactly what flow records answer. Telemetry is about live device state.",
+   "ref": "network-security-firewall-ips-visibility#netflow-vs-telemetry-the-decision-table"
+  },
+  {
+   "id": "q2.2-017",
+   "obj": "2.2",
+   "type": "single",
+   "stem": "NetFlow shows one internal host sending nearly 10 MB over UDP/53 to a single external IP in five minutes. What is the most likely explanation?",
+   "options": [
+    "Normal DNS caching",
+    "DNS tunneling used for data exfiltration",
+    "An NTP misconfiguration",
+    "SNMP polling over the wrong port"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "DNS queries are small. A sustained, high-volume UDP/53 conversation to one external host is a classic sign of data being tunneled out over DNS, which objective 6.5 covers.",
+   "ref": "network-security-firewall-ips-visibility#netflow-ipfix-and-nsel-conversation-metadata"
+  },
+  {
+   "id": "q2.2-018",
+   "obj": "2.2",
+   "type": "multi",
+   "stem": "Which two FMC event types would you check first to see whether FTD blocked an exploit and a malicious download?",
+   "options": [
+    "Intrusion events",
+    "File and malware events",
+    "SNMP inform events",
+    "NTP events",
+    "Telemetry subscriptions"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "Intrusion events record Snort rule hits such as exploits. File and malware events record file dispositions and malware blocks. Connection and Security Intelligence events are the other two main types.",
+   "ref": "network-security-firewall-ips-visibility#firewall-and-ips-events-ftd-fmc"
+  },
+  {
+   "id": "q2.2-019",
+   "obj": "2.2",
+   "type": "single",
+   "stem": "Why is authenticated NTP considered a security monitoring control?",
+   "options": [
+    "It encrypts syslog messages",
+    "It keeps timestamps trustworthy so events from different devices can be correlated",
+    "It prevents SNMP brute force",
+    "It replaces SIEM correlation"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Correlation depends on aligned clocks. If an attacker could skew device time, logs would no longer line up, and certificate checks could fail. Authenticated NTP prevents that.",
+   "ref": "network-security-firewall-ips-visibility#the-foundation-inventory-time-and-logs"
+  }
+ ]
+}

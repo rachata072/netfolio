@@ -1,0 +1,424 @@
+{
+ "cards": [
+  {
+   "id": "c2.1-001",
+   "obj": "2.1",
+   "front": "What is the one deciding question for whether a security device can block traffic?",
+   "back": "Is it **inline**? Only a device the real packet passes through can drop it. Passive (SPAN, TAP, ERSPAN) and inline tap mode can only alert.",
+   "ref": "network-security-firewall-ips-visibility#deployment-model-1-inline-vs-passive"
+  },
+  {
+   "id": "c2.1-002",
+   "obj": "2.1",
+   "front": "IPS vs. IDS in one line each.",
+   "back": "**IPS** detects and blocks (must be inline). **IDS** detects and alerts only (usually passive, fed by SPAN or TAP).",
+   "ref": "network-security-firewall-ips-visibility#ips-and-ids"
+  },
+  {
+   "id": "c2.1-003",
+   "obj": "2.1",
+   "front": "How does a stateful firewall let return traffic in without an ACL for it?",
+   "back": "It records each session (e.g. SYN, SYN-ACK, ACK) in its **state table** and permits packets that match a session your side started. UDP and ICMP get pseudo-state via idle timeouts.",
+   "ref": "network-security-firewall-ips-visibility#what-a-firewall-does"
+  },
+  {
+   "id": "c2.1-004",
+   "obj": "2.1",
+   "front": "Stateless ACL vs. stateful firewall?",
+   "back": "A stateless ACL judges each packet alone. A stateful firewall judges each packet in the context of its conversation.",
+   "ref": "network-security-firewall-ips-visibility#what-a-firewall-does"
+  },
+  {
+   "id": "c2.1-005",
+   "obj": "2.1",
+   "front": "What does an NGFW add on top of a stateful firewall?",
+   "back": "Integrated **IPS**, **AVC** (application visibility and control), **URL filtering**, **malware defense** with sandboxing, **user identity** (ISE or AD) and **Security Intelligence** reputation blocking.",
+   "ref": "network-security-firewall-ips-visibility#next-generation-firewalls-ngfw"
+  },
+  {
+   "id": "c2.1-006",
+   "obj": "2.1",
+   "front": "Name the four IPS detection approaches.",
+   "back": "**Signature** (known patterns), **anomaly/behavior** (deviation from baseline), **reputation** (bad IPs, URLs, files), and **policy** (anything that violates a rule, e.g. SMBv1).",
+   "ref": "network-security-firewall-ips-visibility#ips-and-ids"
+  },
+  {
+   "id": "c2.1-007",
+   "obj": "2.1",
+   "front": "Why does signature-based IPS miss zero-day attacks?",
+   "back": "It only matches patterns that already have a signature. Until Talos writes and publishes a rule, a brand-new attack has nothing to match.",
+   "ref": "network-security-firewall-ips-visibility#ips-and-ids"
+  },
+  {
+   "id": "c2.1-008",
+   "obj": "2.1",
+   "front": "False positive vs. false negative on an IPS: which one is the outage and which is the breach?",
+   "back": "**False positive** = legitimate traffic dropped (business outage). **False negative** = an attack gets through (breach).",
+   "ref": "network-security-firewall-ips-visibility#ips-and-ids"
+  },
+  {
+   "id": "c2.1-009",
+   "obj": "2.1",
+   "front": "List the FTD base intrusion policies from least to most aggressive.",
+   "back": "Connectivity Over Security, **Balanced Security and Connectivity** (recommended start), Security Over Connectivity, Maximum Detection (testing only).",
+   "ref": "network-security-firewall-ips-visibility#ips-and-ids"
+  },
+  {
+   "id": "c2.1-010",
+   "obj": "2.1",
+   "front": "What engine provides IPS on Cisco Secure Firewall, and who writes its rules?",
+   "back": "**Snort** (Snort 3 on current FTD). Rules come from **Cisco Talos**.",
+   "ref": "network-security-firewall-ips-visibility#ips-and-ids"
+  },
+  {
+   "id": "c2.1-011",
+   "obj": "2.1",
+   "front": "Where does Security Intelligence sit in FTD processing, and why does that matter?",
+   "back": "It's evaluated **before** deep inspection, so known-bad IPs, URLs and domains are blocked cheaply and early.",
+   "ref": "network-security-firewall-ips-visibility#ips-and-ids"
+  },
+  {
+   "id": "c2.1-012",
+   "obj": "2.1",
+   "front": "Routed vs. transparent firewall mode?",
+   "back": "**Routed**: a Layer 3 hop, an IP per interface, hosts use it as gateway. **Transparent**: a Layer 2 bump in the wire using bridge groups (management IP on the **BVI**), inserted without re-addressing.",
+   "ref": "network-security-firewall-ips-visibility#deployment-model-2-firewall-mode-and-interface-mode"
+  },
+  {
+   "id": "c2.1-013",
+   "obj": "2.1",
+   "front": "Which FTD IPS interface mode is physically inline but can never block?",
+   "back": "**Inline set in tap mode.** Snort gets a copy and the original packet is forwarded untouched. Use it to tune before going truly inline.",
+   "ref": "network-security-firewall-ips-visibility#deployment-model-2-firewall-mode-and-interface-mode"
+  },
+  {
+   "id": "c2.1-014",
+   "obj": "2.1",
+   "front": "What is an FTD inline set?",
+   "back": "Two interfaces bound together as a pair. Traffic enters one and leaves the other, so Snort can drop bad packets: a true inline IPS. It supports fail-open options and hardware bypass on supported modules.",
+   "ref": "network-security-firewall-ips-visibility#deployment-model-2-firewall-mode-and-interface-mode"
+  },
+  {
+   "id": "c2.1-015",
+   "obj": "2.1",
+   "front": "When would you use passive ERSPAN instead of passive (SPAN)?",
+   "back": "When the sensor is **routed hops away**. ERSPAN GRE-encapsulates the mirrored traffic so it can cross Layer 3. It's routed mode only and still alert-only.",
+   "ref": "network-security-firewall-ips-visibility#deployment-model-2-firewall-mode-and-interface-mode"
+  },
+  {
+   "id": "c2.1-016",
+   "obj": "2.1",
+   "front": "TAP vs. SPAN?",
+   "back": "A **TAP** is hardware that copies every frame and never oversubscribes. A **SPAN** session is free and flexible but can drop frames when busy.",
+   "ref": "network-security-firewall-ips-visibility#deployment-model-1-inline-vs-passive"
+  },
+  {
+   "id": "c2.1-017",
+   "obj": "2.1",
+   "front": "What HA modes does FTD support, and which ASA-only mode is the trap answer?",
+   "back": "FTD: **active/standby failover** and **clustering**. **Active/active failover** exists only on **ASA** in multiple context mode.",
+   "ref": "network-security-firewall-ips-visibility#deployment-model-3-resilience-and-scale"
+  },
+  {
+   "id": "c2.1-018",
+   "obj": "2.1",
+   "front": "FTD multi-instance is the counterpart of which ASA feature?",
+   "back": "ASA **multiple context mode**. Both split one box into independent virtual firewalls.",
+   "ref": "network-security-firewall-ips-visibility#deployment-model-3-resilience-and-scale"
+  },
+  {
+   "id": "c2.1-019",
+   "obj": "2.1",
+   "front": "Fail-open vs. fail-closed?",
+   "back": "**Fail-open** keeps forwarding uninspected traffic when the engine fails (availability wins). **Fail-closed** stops forwarding (security wins). It's a business decision.",
+   "ref": "network-security-firewall-ips-visibility#deployment-model-3-resilience-and-scale"
+  },
+  {
+   "id": "c2.1-020",
+   "obj": "2.1",
+   "front": "ASA vs. FTD: where do IPS, AVC, URL and malware features live?",
+   "back": "Built into **FTD**. ASA is stateful firewall + NAT + VPN; its old FirePOWER add-on module is end-of-life.",
+   "ref": "network-security-firewall-ips-visibility#cisco-solutions-that-provide-firewall-and-ips"
+  },
+  {
+   "id": "c2.1-021",
+   "obj": "2.1",
+   "front": "FMC vs. FDM vs. Security Cloud Control?",
+   "back": "**FMC**: many FTDs (on-prem or virtual; also cloud-delivered FMC). **FDM**: one FTD, on-box. **Security Cloud Control** (formerly CDO): SaaS management across ASA, FTD, Multicloud Defense and more.",
+   "ref": "network-security-firewall-ips-visibility#cisco-solutions-that-provide-firewall-and-ips"
+  },
+  {
+   "id": "c2.1-022",
+   "obj": "2.1",
+   "front": "Which Cisco product is the cloud-native firewall/IPS for public cloud workloads?",
+   "back": "**Cisco Multicloud Defense**: SaaS-managed gateways for ingress, egress and east-west traffic across clouds.",
+   "ref": "network-security-firewall-ips-visibility#cisco-solutions-that-provide-firewall-and-ips"
+  },
+  {
+   "id": "c2.1-023",
+   "obj": "2.1",
+   "front": "Which Cisco product delivers firewall + IPS to remote users from the cloud?",
+   "back": "**Cisco Secure Access** (SSE): cloud-delivered firewall with IPS, SWG, DNS-layer security, CASB and ZTNA.",
+   "ref": "network-security-firewall-ips-visibility#deployment-model-4-where-it-runs-on-prem-virtual-cloud-hybri"
+  },
+  {
+   "id": "c2.1-024",
+   "obj": "2.1",
+   "front": "How do you get firewall and IPS in a branch without an extra appliance?",
+   "back": "On the IOS XE router: **Zone-Based Firewall** plus **Snort IPS** (UTD container). Meraki MX is the cloud-managed alternative.",
+   "ref": "network-security-firewall-ips-visibility#cisco-solutions-that-provide-firewall-and-ips"
+  },
+  {
+   "id": "c2.1-025",
+   "obj": "2.1",
+   "front": "What is a hybrid mesh firewall?",
+   "back": "Many enforcement points of different form factors (appliance, virtual, cloud-native, cloud-delivered, router-embedded) managed as **one policy**.",
+   "ref": "network-security-firewall-ips-visibility#cisco-solutions-that-provide-firewall-and-ips"
+  },
+  {
+   "id": "c2.1-026",
+   "obj": "2.1",
+   "front": "ZBFW: can an interface in a zone talk to an interface that is in no zone?",
+   "back": "**No.** Zone to no-zone traffic is always dropped. Different zones need a zone-pair policy; the same zone is allowed by default.",
+   "ref": "network-security-firewall-ips-visibility#next-generation-firewalls-ngfw"
+  },
+  {
+   "id": "c2.1-027",
+   "obj": "2.1",
+   "front": "ZBFW actions: inspect vs. pass vs. drop?",
+   "back": "**inspect** is stateful (return traffic allowed automatically). **pass** is stateless and one-way (needs a mirror rule). **drop** discards.",
+   "ref": "network-security-firewall-ips-visibility#next-generation-firewalls-ngfw"
+  },
+  {
+   "id": "c2.1-028",
+   "obj": "2.1",
+   "front": "Two ways an NGFW handles malware hidden in TLS?",
+   "back": "**Decryption policy** (Decrypt-Resign outbound, Decrypt-Known Key for your own servers) or the **Encrypted Visibility Engine**, which fingerprints the TLS handshake without decrypting.",
+   "ref": "network-security-firewall-ips-visibility#next-generation-firewalls-ngfw"
+  },
+  {
+   "id": "c2.1-029",
+   "obj": "2.1",
+   "front": "Where does a firewall do east-west work?",
+   "back": "In the **data center** (and campus): segmentation between app tiers or user groups, stopping lateral movement.",
+   "ref": "network-security-firewall-ips-visibility#deployment-model-4-where-it-runs-on-prem-virtual-cloud-hybri"
+  },
+  {
+   "id": "c2.2-001",
+   "obj": "2.2",
+   "front": "Why ship logs off the device?",
+   "back": "Local logs **rotate and overwrite**, and attackers **delete** them to hide. A central, access-controlled copy survives both.",
+   "ref": "network-security-firewall-ips-visibility#the-foundation-inventory-time-and-logs"
+  },
+  {
+   "id": "c2.2-002",
+   "obj": "2.2",
+   "front": "Why does NTP matter to security monitoring?",
+   "back": "Correlating firewall, switch and server logs needs matching timestamps. **Authenticate NTP** so an attacker can't skew time.",
+   "ref": "network-security-firewall-ips-visibility#the-foundation-inventory-time-and-logs"
+  },
+  {
+   "id": "c2.2-003",
+   "obj": "2.2",
+   "front": "Syslog severities 0 to 7?",
+   "back": "0 Emergency, 1 Alert, 2 Critical, 3 Error, 4 Warning, 5 Notice, 6 Informational, 7 Debugging. Lower number = more severe.",
+   "ref": "network-security-firewall-ips-visibility#syslog"
+  },
+  {
+   "id": "c2.2-004",
+   "obj": "2.2",
+   "front": "`logging trap 4` sends which severities?",
+   "back": "**0 through 4**: the configured level and everything more severe.",
+   "ref": "network-security-firewall-ips-visibility#syslog"
+  },
+  {
+   "id": "c2.2-005",
+   "obj": "2.2",
+   "front": "Classic syslog transport vs. secure syslog?",
+   "back": "Classic: **UDP 514**, cleartext and unreliable. Secure: **TLS on TCP 6514**.",
+   "ref": "network-security-firewall-ips-visibility#syslog"
+  },
+  {
+   "id": "c2.2-006",
+   "obj": "2.2",
+   "front": "SNMPv3 security levels, and which one to use?",
+   "back": "`noAuthNoPriv`, `authNoPriv`, `authPriv`. Use **authPriv**: authentication (SHA) plus encryption (AES).",
+   "ref": "network-security-firewall-ips-visibility#snmpv3"
+  },
+  {
+   "id": "c2.2-007",
+   "obj": "2.2",
+   "front": "SNMP trap vs. inform?",
+   "back": "A **trap** is fire-and-forget. An **inform** is acknowledged and retransmitted until confirmed.",
+   "ref": "network-security-firewall-ips-visibility#snmpv3"
+  },
+  {
+   "id": "c2.2-008",
+   "obj": "2.2",
+   "front": "MIB vs. OID?",
+   "back": "The **MIB** is the tree (database) of everything a device exposes. An **OID** is the exact address of one item, e.g. `1.3.6.1.2.1.1.1.0` = sysDescr.",
+   "ref": "network-security-firewall-ips-visibility#snmpv3"
+  },
+  {
+   "id": "c2.2-009",
+   "obj": "2.2",
+   "front": "SNMP ports?",
+   "back": "Polls to the agent on **UDP 161**. Traps and informs to the manager on **UDP 162**.",
+   "ref": "network-security-firewall-ips-visibility#snmpv3"
+  },
+  {
+   "id": "c2.2-010",
+   "obj": "2.2",
+   "front": "Is NetFlow a packet capture?",
+   "back": "**No.** It's conversation metadata: key fields (5-tuple, ingress interface, ToS) plus counters (bytes, packets, time). No payload.",
+   "ref": "network-security-firewall-ips-visibility#netflow-ipfix-and-nsel-conversation-metadata"
+  },
+  {
+   "id": "c2.2-011",
+   "obj": "2.2",
+   "front": "NetFlow v5 vs. v9 vs. IPFIX?",
+   "back": "**v5**: fixed format, IPv4 only. **v9**: template-based, extensible. **IPFIX**: the IETF standard based on v9 (\"v10\"), UDP 4739.",
+   "ref": "network-security-firewall-ips-visibility#netflow-ipfix-and-nsel-conversation-metadata"
+  },
+  {
+   "id": "c2.2-012",
+   "obj": "2.2",
+   "front": "Flexible NetFlow building blocks?",
+   "back": "**Flow record** (match = key fields, collect = non-key), **flow exporter** (where to send), **flow monitor** (record + exporter + cache), applied to an interface.",
+   "ref": "network-security-firewall-ips-visibility#netflow-ipfix-and-nsel-conversation-metadata"
+  },
+  {
+   "id": "c2.2-013",
+   "obj": "2.2",
+   "front": "What is NSEL?",
+   "back": "**NetFlow Secure Event Logging**: ASA/FTD export firewall connection events (flow-create, flow-teardown, flow-denied) as NetFlow v9.",
+   "ref": "network-security-firewall-ips-visibility#netflow-ipfix-and-nsel-conversation-metadata"
+  },
+  {
+   "id": "c2.2-014",
+   "obj": "2.2",
+   "front": "SPAN vs. RSPAN vs. ERSPAN?",
+   "back": "**SPAN**: same switch. **RSPAN**: across L2 switches via an RSPAN VLAN. **ERSPAN**: GRE-encapsulated across an L3 network.",
+   "ref": "network-security-firewall-ips-visibility#packet-capture-and-traffic-mirroring"
+  },
+  {
+   "id": "c2.2-015",
+   "obj": "2.2",
+   "front": "Model-driven telemetry: dial-in vs. dial-out?",
+   "back": "**Dial-in**: the collector connects and subscribes (NETCONF, gNMI). **Dial-out**: the device initiates the stream to a receiver (gRPC).",
+   "ref": "network-security-firewall-ips-visibility#streaming-telemetry-model-driven-telemetry"
+  },
+  {
+   "id": "c2.2-016",
+   "obj": "2.2",
+   "front": "Why is streaming telemetry better than SNMP polling at scale?",
+   "back": "Devices **push** structured YANG data periodically or on change: near-real-time, no MIB parsing, more data points, lower device CPU.",
+   "ref": "network-security-firewall-ips-visibility#streaming-telemetry-model-driven-telemetry"
+  },
+  {
+   "id": "c2.2-017",
+   "obj": "2.2",
+   "front": "Four FMC event types?",
+   "back": "**Connection**, **Security Intelligence**, **intrusion**, and **file & malware** events.",
+   "ref": "network-security-firewall-ips-visibility#firewall-and-ips-events-ftd-fmc"
+  },
+  {
+   "id": "c2.2-018",
+   "obj": "2.2",
+   "front": "How do FMC events reach a SIEM?",
+   "back": "Syslog, SNMP traps, **eStreamer** (high-volume event streaming, used by the Splunk integration) or Cisco Security Analytics and Logging.",
+   "ref": "network-security-firewall-ips-visibility#firewall-and-ips-events-ftd-fmc"
+  },
+  {
+   "id": "c2.2-019",
+   "obj": "2.2",
+   "front": "What was Stealthwatch renamed to, and what kind of tool is it?",
+   "back": "**Cisco Secure Network Analytics**: on-prem **NDR** that turns NetFlow/IPFIX into behavioral detections.",
+   "ref": "network-security-firewall-ips-visibility#ndr-cisco-secure-network-analytics"
+  },
+  {
+   "id": "c2.2-020",
+   "obj": "2.2",
+   "front": "Secure Network Analytics: Flow Collector vs. Flow Sensor?",
+   "back": "**Flow Collector** receives and stores flow records. **Flow Sensor** *generates* flow records from a SPAN/TAP where devices can't export NetFlow.",
+   "ref": "network-security-firewall-ips-visibility#ndr-cisco-secure-network-analytics"
+  },
+  {
+   "id": "c2.2-021",
+   "obj": "2.2",
+   "front": "What does UDP Director / Cisco Telemetry Broker do?",
+   "back": "Receives telemetry once and **replicates** it to many consumers (SNA, SIEM, others).",
+   "ref": "network-security-firewall-ips-visibility#ndr-cisco-secure-network-analytics"
+  },
+  {
+   "id": "c2.2-022",
+   "obj": "2.2",
+   "front": "What does Encrypted Traffic Analytics (ETA) do?",
+   "back": "Adds handshake-derived fields to flow records so Secure Network Analytics can spot **malware in encrypted traffic without decrypting it**, and audit crypto in use.",
+   "ref": "network-security-firewall-ips-visibility#ndr-cisco-secure-network-analytics"
+  },
+  {
+   "id": "c2.2-023",
+   "obj": "2.2",
+   "front": "What extra context does Secure Client NVM add to flow data?",
+   "back": "The **user, process and device** behind each flow, even off-network.",
+   "ref": "network-security-firewall-ips-visibility#ndr-cisco-secure-network-analytics"
+  },
+  {
+   "id": "c2.2-024",
+   "obj": "2.2",
+   "front": "Where did Secure Cloud Analytics go?",
+   "back": "It became **part of Cisco XDR**.",
+   "ref": "network-security-firewall-ips-visibility#ndr-cisco-secure-network-analytics"
+  },
+  {
+   "id": "c2.2-025",
+   "obj": "2.2",
+   "front": "ISE vs. pxGrid?",
+   "back": "**ISE** is the context broker (it knows user, device, posture, location). **pxGrid** is the publish/subscribe fabric that shares that context.",
+   "ref": "network-security-firewall-ips-visibility#ise-and-pxgrid-adding-who-and-what"
+  },
+  {
+   "id": "c2.2-026",
+   "obj": "2.2",
+   "front": "What is Rapid Threat Containment?",
+   "back": "A SIEM, NDR or firewall detects a compromised host and tells ISE over pxGrid; ISE applies an **ANC** policy via **CoA** to quarantine it.",
+   "ref": "network-security-firewall-ips-visibility#ise-and-pxgrid-adding-who-and-what"
+  },
+  {
+   "id": "c2.2-027",
+   "obj": "2.2",
+   "front": "SIEM vs. SOAR?",
+   "back": "**SIEM** ingests, correlates and alerts (the brain). **SOAR** automates the response with playbooks (the hands).",
+   "ref": "network-security-firewall-ips-visibility#siem-soar-and-xdr"
+  },
+  {
+   "id": "c2.2-028",
+   "obj": "2.2",
+   "front": "EDR vs. NDR vs. XDR?",
+   "back": "Endpoint vs. network vs. **cross-domain** detection and response. Cisco XDR stitches them into one incident.",
+   "ref": "network-security-firewall-ips-visibility#siem-soar-and-xdr"
+  },
+  {
+   "id": "c2.2-029",
+   "obj": "2.2",
+   "front": "Exam stem says \"top talkers\" or \"traffic patterns\". NetFlow or telemetry?",
+   "back": "**NetFlow**: it's a record of conversations.",
+   "ref": "network-security-firewall-ips-visibility#netflow-vs-telemetry-the-decision-table"
+  },
+  {
+   "id": "c2.2-030",
+   "obj": "2.2",
+   "front": "Exam stem says \"real-time, continuous device statistics\". NetFlow or telemetry?",
+   "back": "**Streaming telemetry.**",
+   "ref": "network-security-firewall-ips-visibility#netflow-vs-telemetry-the-decision-table"
+  },
+  {
+   "id": "c2.2-031",
+   "obj": "2.2",
+   "front": "Sustained, high-volume UDP/53 flow to one external host: what is it likely to be?",
+   "back": "**DNS tunneling exfiltration** (objective 6.5). NetFlow shows it even though it carries no payload.",
+   "ref": "network-security-firewall-ips-visibility#netflow-ipfix-and-nsel-conversation-metadata"
+  }
+ ]
+}

@@ -1,0 +1,58 @@
+<!--meta
+{
+  "out": "ccnp-security.html",
+  "path": "/ccnp-security",
+  "nav": "",
+  "title": "CCNP Security SCOR 350-701 v2.0 Study Notes, Flashcards & Mock Exam",
+  "description": "Free CCNP Security study hub for SCOR 350-701 v2.0: lecture notes mapped to every exam topic, spaced-repetition flashcards and a timed mock exam.",
+  "og_title": "CCNP Security study hub (SCOR 350-701 v2.0)",
+  "og_description": "Lecture notes mapped to the v2.0 blueprint, flashcards that remember what you know, and a mock exam that runs in your browser.",
+  "preload_display": true,
+  "scripts": []
+}
+-->
+<main id="main">
+  <header class="page-head">
+    <div class="wrap">
+      <span class="cli"><span class="h">edge#</span> <span class="v">show</span> <span class="a">ccnp-security</span></span>
+      <h1>CCNP Security</h1>
+      <p class="sec-lede">
+        My study notes for {{CCNP_EXAM}}, the core exam for CCNP and CCIE Security, written
+        while I prepare for it. Every lecture is mapped to Cisco's published exam topics,
+        and every flashcard and practice question links back to the paragraph that explains it.
+      </p>
+      <dl class="ccnp-stats">{{CCNP_STATS}}</dl>
+    </div>
+  </header>
+
+  <div class="wrap ccnp-hub">
+    <nav class="tools3" aria-label="Study tools">
+      <a class="tool" href="#lectures"><span class="tk">01 &middot; read</span><b>Lectures</b><span>Notes in study order, with diagrams, exam traps and self-checks.</span></a>
+      <a class="tool" href="/ccnp-security/flashcards"><span class="tk">02 &middot; remember</span><b>Flashcards</b><span>Spaced repetition. Progress stays in your browser, nothing to sign up for.</span></a>
+      <a class="tool" href="/ccnp-security/mock-exam"><span class="tk">03 &middot; test</span><b>Mock exam</b><span>Timed, one-way like the real exam, or practice mode with instant feedback.</span></a>
+    </nav>
+
+    <section aria-labelledby="lectures">
+      <h2 class="sub-h" id="lectures">Lectures in study order</h2>
+      {{CCNP_LECTURES}}
+    </section>
+
+    <section aria-labelledby="blueprint">
+      <h2 class="sub-h" id="blueprint">Exam blueprint coverage</h2>
+      <p class="hub-p">The six domains of the v2.0 exam with their weights. Topics marked <span class="st st-up">notes</span> have a lecture; the rest are on the way. Last update {{CCNP_UPDATED}}.</p>
+      <div class="doms">
+      {{CCNP_DOMAINS}}
+      </div>
+    </section>
+
+    <section aria-labelledby="labs">
+      <h2 class="sub-h" id="labs">Packet Tracer labs</h2>
+      <p class="hub-p">Coming next: showcase walkthroughs with topology, configs and verification output, plus baseline <span class="mono">.pkt</span> files to download (each with a SHA-256 hash) so you can build the lab yourself. Topics Packet Tracer can't simulate, such as FTD, ISE and Secure Access, stay conceptual or move to CML.</p>
+    </section>
+
+    <aside class="ccnp-note" aria-labelledby="note-h">
+      <h2 id="note-h" class="sub-h">About this material</h2>
+      <p>Independent study notes, not affiliated with or endorsed by Cisco. CCNP, CCIE and SCOR are Cisco trademarks. Every question here is written from the public exam topics and product documentation. There are no exam dumps on this site and there never will be: they break Cisco's candidate agreement and teach you nothing.</p>
+    </aside>
+  </div>
+</main>
