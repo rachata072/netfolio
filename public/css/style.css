@@ -2001,3 +2001,23 @@ a, button, summary { -webkit-tap-highlight-color: rgba(0, 188, 235, 0.18); }
   .pill span { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
   .fc-item summary { min-height: 44px; }
 }
+
+/* CCNP SEO additions: guide call-out, hub FAQ, crawlable sample questions */
+.guide-cta { margin: 0; padding: 0.9rem 1.1rem; border: 1px solid var(--line-2); border-radius: var(--r-lg); background: var(--panel); color: var(--text-2); font-size: 0.95rem; }
+.guide-cta .st { margin-right: 0.5rem; }
+.hub-faq, .sample { display: grid; gap: 0.6rem; }
+.sample { margin-top: clamp(2.5rem, 6vw, 3.5rem); max-width: 50rem; }
+.hub-faq details.qa, .sample details.qa { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--panel); }
+.hub-faq details.qa summary, .sample details.qa summary { padding: 0.75rem 1rem; cursor: pointer; font-weight: 600; color: var(--text); line-height: 1.5; }
+.hub-faq details.qa summary::marker, .sample details.qa summary::marker { color: var(--blue-hi); }
+.hub-faq details.qa p, .sample details.qa p { margin: 0; padding: 0 1rem 0.9rem; color: var(--text-2); font-size: 0.95rem; }
+.hub-faq details.qa[open] summary, .sample details.qa[open] summary { padding-bottom: 0.5rem; }
+.sqs { margin: 0; padding: 0; list-style: none; display: grid; gap: 1rem; counter-reset: sq; }
+.sq { counter-increment: sq; padding: 1rem 1.1rem; border: 1px solid var(--line); border-left: 2px solid var(--blue); border-radius: var(--r-lg); background: rgba(11, 28, 51, 0.6); }
+.sq-stem { margin: 0 0 0.6rem; font-weight: 600; color: var(--text); line-height: 1.55; }
+.sq-stem::before { content: "Q" counter(sq) "  "; content: "Q" counter(sq) "  " / ""; font-family: var(--f-mono); font-weight: 400; color: var(--text-3); }
+.sq-opts { margin: 0 0 0.8rem; padding-left: 1.6rem; list-style: upper-alpha; color: var(--text-2); font-size: 0.95rem; }
+.sq-opts li + li { margin-top: 0.25rem; }
+.sq-opts li::marker { font-family: var(--f-mono); color: var(--text-3); }
+.sq details.qa { background: var(--bg-2); }
+.sq code, .hub-faq code { padding: 0.05em 0.35em; border: 1px solid var(--line); border-radius: 3px; background: var(--bg-2); font-family: var(--f-mono); font-size: 0.86em; }

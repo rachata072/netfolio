@@ -15,7 +15,8 @@
     1
    ],
    "explanation": "Only an inline device can drop the original packet. A sensor on a SPAN port gets a copy after the real packet has already been forwarded, so it behaves as an IDS no matter how its policy is set.",
-   "ref": "network-security-firewall-ips-visibility#deployment-model-1-inline-vs-passive"
+   "ref": "network-security-firewall-ips-visibility#deployment-model-1-inline-vs-passive",
+   "sample": true
   },
   {
    "id": "q2.1-002",
@@ -49,7 +50,8 @@
     1
    ],
    "explanation": "Transparent mode makes the firewall a Layer 2 bump in the wire: interfaces join a bridge group and the management IP lives on the BVI. Hosts keep their gateway, yet full access control and IPS still apply.",
-   "ref": "network-security-firewall-ips-visibility#deployment-model-2-firewall-mode-and-interface-mode"
+   "ref": "network-security-firewall-ips-visibility#deployment-model-2-firewall-mode-and-interface-mode",
+   "sample": true
   },
   {
    "id": "q2.1-004",
@@ -68,7 +70,8 @@
     2
    ],
    "explanation": "FTD failover is active/standby only, and clustering combines units into one logical device for scale and resiliency. Active/active failover is an ASA feature that depends on multiple context mode.",
-   "ref": "network-security-firewall-ips-visibility#deployment-model-3-resilience-and-scale"
+   "ref": "network-security-firewall-ips-visibility#deployment-model-3-resilience-and-scale",
+   "sample": true
   },
   {
    "id": "q2.1-005",
@@ -153,7 +156,8 @@
     2
    ],
    "explanation": "With ZBFW, an interface in a zone cannot exchange traffic with an interface that is in no zone. Assign G0/2 to a zone and create a zone-pair to allow it.",
-   "ref": "network-security-firewall-ips-visibility#next-generation-firewalls-ngfw"
+   "ref": "network-security-firewall-ips-visibility#next-generation-firewalls-ngfw",
+   "sample": true
   },
   {
    "id": "q2.1-010",
@@ -293,7 +297,8 @@
     2
    ],
    "explanation": "The configured level includes itself and every more severe level, and lower numbers are more severe. Level 4 (warnings) therefore sends 0 through 4.",
-   "ref": "network-security-firewall-ips-visibility#syslog"
+   "ref": "network-security-firewall-ips-visibility#syslog",
+   "sample": true
   },
   {
    "id": "q2.2-002",
@@ -344,7 +349,8 @@
     1
    ],
    "explanation": "Informs are acknowledged by the manager and retransmitted until confirmed. Traps are fire-and-forget.",
-   "ref": "network-security-firewall-ips-visibility#snmpv3"
+   "ref": "network-security-firewall-ips-visibility#snmpv3",
+   "sample": true
   },
   {
    "id": "q2.2-005",
@@ -431,7 +437,8 @@
     1
    ],
    "explanation": "Streaming telemetry pushes structured YANG data periodically or on change. It scales far better than polling and costs the device less CPU.",
-   "ref": "network-security-firewall-ips-visibility#streaming-telemetry-model-driven-telemetry"
+   "ref": "network-security-firewall-ips-visibility#streaming-telemetry-model-driven-telemetry",
+   "sample": true
   },
   {
    "id": "q2.2-010",
@@ -501,7 +508,8 @@
     1
    ],
    "explanation": "The SIEM signals ISE over pxGrid. ISE applies an Adaptive Network Control policy and uses Change of Authorization to restrict the session. This is Rapid Threat Containment.",
-   "ref": "network-security-firewall-ips-visibility#ise-and-pxgrid-adding-who-and-what"
+   "ref": "network-security-firewall-ips-visibility#ise-and-pxgrid-adding-who-and-what",
+   "sample": true
   },
   {
    "id": "q2.2-014",

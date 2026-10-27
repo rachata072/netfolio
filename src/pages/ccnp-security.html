@@ -3,23 +3,26 @@
   "out": "ccnp-security.html",
   "path": "/ccnp-security",
   "nav": "",
-  "title": "CCNP Security SCOR 350-701 v2.0 Study Notes, Flashcards & Mock Exam",
-  "description": "Free CCNP Security study hub for SCOR 350-701 v2.0: lecture notes mapped to every exam topic, spaced-repetition flashcards and a timed mock exam.",
+  "title": "Free CCNP Security Study Guide (SCOR 350-701 v2.0)",
+  "description": "Free CCNP Security study guide for SCOR 350-701 v2.0: notes mapped to all 47 exam topics, spaced-repetition flashcards and a practice exam. No sign-up.",
   "og_title": "CCNP Security study hub (SCOR 350-701 v2.0)",
   "og_description": "Lecture notes mapped to the v2.0 blueprint, flashcards that remember what you know, and a mock exam that runs in your browser.",
   "preload_display": true,
-  "scripts": []
+  "scripts": [],
+  "breadcrumbs": [["CCNP Security", ""]],
+  "learning": "Study guide"
 }
 -->
 <main id="main">
   <header class="page-head">
     <div class="wrap">
       <span class="cli"><span class="h">edge#</span> <span class="v">show</span> <span class="a">ccnp-security</span></span>
-      <h1>CCNP Security</h1>
+      <h1>CCNP Security study guide</h1>
       <p class="sec-lede">
-        My study notes for {{CCNP_EXAM}}, the core exam for CCNP and CCIE Security, written
-        while I prepare for it. Every lecture is mapped to Cisco's published exam topics,
-        and every flashcard and practice question links back to the paragraph that explains it.
+        A free study guide for {{CCNP_EXAM}}, the core exam for CCNP Security and CCIE Security.
+        Notes mapped to Cisco's published v2.0 exam topics, spaced-repetition flashcards and a
+        practice exam, written while I study for it myself. Every flashcard and practice question
+        links back to the paragraph that explains it. No account, no paywall, no ads.
       </p>
       <dl class="ccnp-stats">{{CCNP_STATS}}</dl>
     </div>
@@ -31,6 +34,8 @@
       <a class="tool" href="/ccnp-security/flashcards"><span class="tk">02 &middot; remember</span><b>Flashcards</b><span>Spaced repetition. Progress stays in your browser, nothing to sign up for.</span></a>
       <a class="tool" href="/ccnp-security/mock-exam"><span class="tk">03 &middot; test</span><b>Mock exam</b><span>Timed, one-way like the real exam, or practice mode with instant feedback.</span></a>
     </nav>
+
+    <p class="guide-cta"><span class="st st-prog">new</span> Studying from a v1.1 book? Read <a href="/ccnp-security/scor-350-701-v2-changes">SCOR 350-701 v2.0 vs v1.1: every change explained</a>: new weights, objectives added and dropped, and the retired SVPN, SESA and SWSA exams.</p>
 
     <section aria-labelledby="lectures">
       <h2 class="sub-h" id="lectures">Lectures in study order</h2>
@@ -48,6 +53,15 @@
     <section aria-labelledby="labs">
       <h2 class="sub-h" id="labs">Packet Tracer labs</h2>
       <p class="hub-p">Coming next: showcase walkthroughs with topology, configs and verification output, plus baseline <span class="mono">.pkt</span> files to download (each with a SHA-256 hash) so you can build the lab yourself. Topics Packet Tracer can't simulate, such as FTD, ISE and Secure Access, stay conceptual or move to CML.</p>
+    </section>
+
+    <section aria-labelledby="faq-h" class="hub-faq">
+      <h2 class="sub-h" id="faq-h">Questions</h2>
+      <details class="qa"><summary>Is this CCNP Security material really free?</summary><p>Yes. The notes, flashcards and practice exam are free to use with no account. Flashcard progress is saved in your own browser, and nothing about you is sent anywhere.</p></details>
+      <details class="qa"><summary>Is it updated for SCOR 350-701 v2.0?</summary><p>Yes. Everything here follows the v2.0 exam topics that Cisco has tested since 27 August 2026. The <a href="/ccnp-security/scor-350-701-v2-changes">v2.0 changes guide</a> lists everything that moved from v1.1.</p></details>
+      <details class="qa"><summary>Are these real exam questions?</summary><p>No. Every question is written from the public exam topics and Cisco documentation. Real exam questions (dumps) break Cisco's candidate agreement and can cost you your certification.</p></details>
+      <details class="qa"><summary>What's the best way to use these tools?</summary><p>Read a lecture, then do its flashcards the same day and again when they come due. Once a domain feels solid, take the mock exam in practice mode, then in timed exam mode. Use the per-domain score to choose what to reread.</p></details>
+      <details class="qa"><summary>How is the exam weighted?</summary><p>Network Security 25%, Security Concepts 20%, Cloud Security 15%, Endpoint Protection and Detection 15%, Network Access, Visibility, and Enforcement 15%, and Secure Service Edge 10%. The mock exam picks questions in the same proportions.</p></details>
     </section>
 
     <aside class="ccnp-note" aria-labelledby="note-h">

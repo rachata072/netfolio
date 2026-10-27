@@ -896,6 +896,32 @@ def main():
                 "@context": "https://schema.org", "@type": "WebSite",
                 "name": site["name"], "url": site["url"] + "/",
             }]
+        if meta.get("breadcrumbs"):  # [[name, path], ...]; last item may have an empty path
+            items = [{"@type": "ListItem", "position": 1, "name": "Home", "item": site["url"] + "/"}]
+            for i, (name, pth) in enumerate(meta["breadcrumbs"], 2):
+                it = {"@type": "ListItem", "position": i, "name": name}
+                if pth:
+                    it["item"] = site["url"] + pth
+                items.append(it)
+            jsonld.append({"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": items})
+        if meta.get("article"):  # hand-written guide pages
+            jsonld.append({
+                "@context": "https://schema.org", "@type": "Article",
+                "headline": meta.get("og_title", meta["title"])[:110], "description": meta["description"],
+                "datePublished": meta["article"]["date"], "dateModified": meta["article"].get("updated", meta["article"]["date"]),
+                "author": {"@type": "Person", "name": site["author"], "url": site["url"] + "/"},
+                "mainEntityOfPage": site["url"] + meta["path"],
+                "image": site["url"] + f'/assets/og/{f.stem}.webp',
+            })
+        if meta.get("learning"):  # study tools: free, no account
+            jsonld.append({
+                "@context": "https://schema.org", "@type": "LearningResource",
+                "name": meta.get("og_title", meta["title"]), "description": meta["description"],
+                "url": site["url"] + meta["path"], "learningResourceType": meta["learning"],
+                "educationalLevel": "Professional", "inLanguage": "en", "isAccessibleForFree": True,
+                "about": "Cisco CCNP Security SCOR 350-701 v2.0",
+                "author": {"@type": "Person", "name": site["author"], "url": site["url"] + "/"},
+            })
         og = f'/assets/og/{f.stem}.webp'
         write(meta["out"], page(
             site, hashes, last_change, nav=meta.get("nav", ""), body=body,

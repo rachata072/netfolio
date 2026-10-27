@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Free CCNP Security Mock Exam (SCOR 350-701 v2.0) | breakfixlearn</title>
-<meta name="description" content="Free SCOR 350-701 v2.0 practice exam: original questions weighted like the real blueprint, a timed exam mode, and explanations that link to the notes.">
+<title>Free SCOR 350-701 v2.0 Practice Test | CCNP Security</title>
+<meta name="description" content="Free SCOR 350-701 v2.0 practice test: original questions weighted like the real blueprint, a timed exam mode, and explanations that link to the notes.">
 <link rel="canonical" href="https://breakfixlearn.com/ccnp-security/mock-exam">
 <meta name="theme-color" content="#050D18">
 <meta name="color-scheme" content="dark">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/style.css?v=0e2b59246d">
+<link rel="stylesheet" href="/css/style.css?v=935fac7ed1">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
 <meta property="og:type" content="website">
@@ -19,12 +19,14 @@
 <meta property="og:title" content="CCNP Security mock exam">
 <meta property="og:description" content="Original SCOR 350-701 v2.0 practice questions, weighted like the blueprint. Timed exam mode or instant-feedback practice mode.">
 <meta property="og:url" content="https://breakfixlearn.com/ccnp-security/mock-exam">
-<meta property="og:image" content="https://breakfixlearn.com/assets/og/default.webp">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/ccnp-mock-exam.webp">
 <meta property="og:image:type" content="image/webp">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="CCNP Security mock exam">
 <meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"CCNP Security","item":"https://breakfixlearn.com/ccnp-security"},{"@type":"ListItem","position":3,"name":"Practice exam"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"CCNP Security mock exam","description":"Free SCOR 350-701 v2.0 practice test: original questions weighted like the real blueprint, a timed exam mode, and explanations that link to the notes.","url":"https://breakfixlearn.com/ccnp-security/mock-exam","learningResourceType":"Practice exam","educationalLevel":"Professional","inLanguage":"en","isAccessibleForFree":true,"about":"Cisco CCNP Security SCOR 350-701 v2.0","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"}}</script>
 <script src="/js/main.js?v=598c9ba6d2" defer></script>
 <script src="/js/exam.js?v=e43bb2d39b" defer></script>
 </head>
@@ -49,7 +51,7 @@
     <div class="wrap">
       <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/ccnp-security">ccnp-security</a><span aria-hidden="true">/</span><span>mock-exam</span></nav>
       <span class="cli"><span class="h">edge#</span> <span class="v">test</span> <span class="a">scor-350-701</span></span>
-      <h1>Mock exam</h1>
+      <h1>SCOR practice exam</h1>
       <p class="sec-lede">35 original questions for SCOR 350-701 v2.0, picked in proportion to the blueprint weights. The bank grows with every lecture I publish.</p>
     </div>
   </header>
@@ -126,6 +128,12 @@
       <ol class="ex-review" data-ex-review aria-label="Answer review"></ol>
     </div>
     <p class="sr-only" data-ex-live aria-live="polite"></p>
+
+    <section class="sample" aria-labelledby="sample-h">
+      <h2 class="sub-h" id="sample-h">8 free sample questions</h2>
+      <p class="hub-p">A preview of the question style, readable without starting an exam. These are original questions, not exam dumps. The full bank above draws from 35 questions and grows with every lecture.</p>
+      <ol class="sqs"><li class="sq"><p class="sq-stem">A security team connects a new sensor to a switch SPAN port and configures it to drop exploit traffic. Attacks still reach the servers. What is the cause? <span class="mut">Choose one.</span></p><ol class="sq-opts"><li>The sensor needs Snort 3 instead of Snort 2</li><li>A SPAN-fed sensor only receives a copy of traffic, so it can alert but never block</li><li>SPAN ports cannot carry encrypted traffic</li><li>The intrusion policy is set to Balanced Security and Connectivity</li></ol><details class="qa"><summary>Show answer</summary><p><strong>Answer: B.</strong> Only an inline device can drop the original packet. A sensor on a SPAN port gets a copy after the real packet has already been forwarded, so it behaves as an IDS no matter how its policy is set. <a href="/ccnp-security/network-security-firewall-ips-visibility#deployment-model-1-inline-vs-passive">Review topic 2.1 in the notes &rarr;</a></p></details></li><li class="sq"><p class="sq-stem">NGFW inspection must be added between a server VLAN and its existing default gateway. Server and router IP addresses cannot change. Which firewall mode meets the requirement? <span class="mut">Choose one.</span></p><ol class="sq-opts"><li>Routed mode</li><li>Transparent mode</li><li>Multiple context mode</li><li>Passive mode</li></ol><details class="qa"><summary>Show answer</summary><p><strong>Answer: B.</strong> Transparent mode makes the firewall a Layer 2 bump in the wire: interfaces join a bridge group and the management IP lives on the BVI. Hosts keep their gateway, yet full access control and IPS still apply. <a href="/ccnp-security/network-security-firewall-ips-visibility#deployment-model-2-firewall-mode-and-interface-mode">Review topic 2.1 in the notes &rarr;</a></p></details></li><li class="sq"><p class="sq-stem">Which two statements about Cisco Secure Firewall Threat Defense high availability are true? <span class="mut">Choose 2.</span></p><ol class="sq-opts"><li>FTD supports active/standby failover</li><li>FTD supports active/active failover with failover groups</li><li>FTD clustering lets several units act as one logical firewall</li><li>FTD high availability requires multiple context mode</li><li>FTD failover requires the units to run different software versions</li></ol><details class="qa"><summary>Show answer</summary><p><strong>Answer: A, C.</strong> FTD failover is active/standby only, and clustering combines units into one logical device for scale and resiliency. Active/active failover is an ASA feature that depends on multiple context mode. <a href="/ccnp-security/network-security-firewall-ips-visibility#deployment-model-3-resilience-and-scale">Review topic 2.1 in the notes &rarr;</a></p></details></li><li class="sq"><p class="sq-stem">On an IOS XE router, interfaces G0/0 (zone INSIDE) and G0/1 (zone OUTSIDE) have a zone-pair with an inspect policy. G0/2 was never assigned to a zone. What happens to traffic from G0/2 to G0/0? <span class="mut">Choose one.</span></p><ol class="sq-opts"><li>It is permitted because G0/2 has no policy</li><li>It is inspected by the INSIDE-OUTSIDE zone-pair</li><li>It is dropped because traffic between a zone member and a non-zone interface is never allowed</li><li>It is passed statelessly</li></ol><details class="qa"><summary>Show answer</summary><p><strong>Answer: C.</strong> With ZBFW, an interface in a zone cannot exchange traffic with an interface that is in no zone. Assign G0/2 to a zone and create a zone-pair to allow it. <a href="/ccnp-security/network-security-firewall-ips-visibility#next-generation-firewalls-ngfw">Review topic 2.1 in the notes &rarr;</a></p></details></li><li class="sq"><p class="sq-stem">A router is configured with <code translate="no">logging trap 4</code>. Which messages are sent to the syslog server? <span class="mut">Choose one.</span></p><ol class="sq-opts"><li>Only severity 4</li><li>Severities 4 through 7</li><li>Severities 0 through 4</li><li>Severities 0 through 3</li></ol><details class="qa"><summary>Show answer</summary><p><strong>Answer: C.</strong> The configured level includes itself and every more severe level, and lower numbers are more severe. Level 4 (warnings) therefore sends 0 through 4. <a href="/ccnp-security/network-security-firewall-ips-visibility#syslog">Review topic 2.2 in the notes &rarr;</a></p></details></li><li class="sq"><p class="sq-stem">The NMS team must be sure every critical device notification is received, even across a lossy WAN. Which SNMP mechanism should they use? <span class="mut">Choose one.</span></p><ol class="sq-opts"><li>Traps</li><li>Informs</li><li>GetBulk requests</li><li>Community strings</li></ol><details class="qa"><summary>Show answer</summary><p><strong>Answer: B.</strong> Informs are acknowledged by the manager and retransmitted until confirmed. Traps are fire-and-forget. <a href="/ccnp-security/network-security-firewall-ips-visibility#snmpv3">Review topic 2.2 in the notes &rarr;</a></p></details></li><li class="sq"><p class="sq-stem">An operations team wants interface counters from 500 switches every 10 seconds, with less device CPU load than today&#x27;s SNMP polling. What should they deploy? <span class="mut">Choose one.</span></p><ol class="sq-opts"><li>NetFlow v5</li><li>Model-driven streaming telemetry</li><li>SNMPv3 traps</li><li>Syslog at level 7</li></ol><details class="qa"><summary>Show answer</summary><p><strong>Answer: B.</strong> Streaming telemetry pushes structured YANG data periodically or on change. It scales far better than polling and costs the device less CPU. <a href="/ccnp-security/network-security-firewall-ips-visibility#streaming-telemetry-model-driven-telemetry">Review topic 2.2 in the notes &rarr;</a></p></details></li><li class="sq"><p class="sq-stem">A SIEM confirms that an endpoint is beaconing to a known C2 server. Which two components let the SIEM automatically quarantine that endpoint on the network? <span class="mut">Choose 2.</span></p><ol class="sq-opts"><li>pxGrid</li><li>ISE Adaptive Network Control with CoA</li><li>NetFlow v9 templates</li><li>SNMP informs</li><li>Syslog severity 0</li></ol><details class="qa"><summary>Show answer</summary><p><strong>Answer: A, B.</strong> The SIEM signals ISE over pxGrid. ISE applies an Adaptive Network Control policy and uses Change of Authorization to restrict the session. This is Rapid Threat Containment. <a href="/ccnp-security/network-security-firewall-ips-visibility#ise-and-pxgrid-adding-who-and-what">Review topic 2.2 in the notes &rarr;</a></p></details></li></ol>
+    </section>
   </section>
 </main>
 <footer class="ftr">

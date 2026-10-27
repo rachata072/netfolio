@@ -246,8 +246,8 @@
       "module": "02",
       "file": "02_network-security-firewall-ips-and-visibility.md",
       "title": "Network Security: Firewalls, IPS, and Visibility",
-      "seo_title": "SCOR 2.1 and 2.2: Firewalls, IPS and Security Telemetry (CCNP Security notes)",
-      "description": "CCNP Security SCOR v2.0 notes for 2.1 and 2.2: firewall and IPS solutions, FTD deployment modes, NetFlow, SNMPv3, telemetry and NDR.",
+      "seo_title": "SCOR 350-701 Network Security Notes: Firewall, IPS & Telemetry",
+      "description": "Free CCNP Security notes for SCOR 350-701 v2.0 topics 2.1 and 2.2: firewall and IPS deployment models, FTD modes, NetFlow, SNMPv3 and telemetry.",
       "dek": "What enforces, where it goes, and how you see what got past it: firewall and IPS solutions and deployment models (2.1) and security monitoring and telemetry (2.2).",
       "objectives": [
         "2.1",

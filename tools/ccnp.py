@@ -224,9 +224,12 @@ def render_lecture(site, hashes, last_change, course, lec, counts):
             {"@type": "ListItem", "position": 3, "name": lec["title"]},
         ],
     }]
+    og = f'/assets/og/ccnp-{lec["slug"]}.webp'
     return B.page(site, hashes, last_change, nav="", body=main, progress=True,
                   title=lec["seo_title"], description=lec["description"], path=lec["path"],
-                  og_title=lec["title"], og_description=lec["dek"], og_type="article", jsonld=jsonld)
+                  og_title=lec["title"], og_description=lec["dek"], og_type="article", jsonld=jsonld,
+                  og_image=og if (B.PUB / og.lstrip("/")).exists() else None,
+                  og_image_alt=f'{lec["title"]}: CCNP Security SCOR 350-701 v2.0 notes')
 
 
 # ----------------------------------------------------------------- practice data
@@ -370,6 +373,21 @@ def block_card_list(course, cards):
     return '<ol class="fc-list">' + "".join(items) + "</ol>"
 
 
+def block_sample_questions(course, qs):
+    """Crawlable sample questions (answers behind <details>) so search engines see real content."""
+    items = []
+    for q in [x for x in qs if x.get("sample")]:
+        opts = "".join(f"<li>{inline(o)}</li>" for o in q["options"])
+        letters = ", ".join(chr(65 + a) for a in sorted(q["answer"]))
+        hint = "Choose one." if q["type"] == "single" else f"Choose {len(q['answer'])}."
+        items.append(
+            f'<li class="sq"><p class="sq-stem">{inline(q["stem"])} <span class="mut">{hint}</span></p>'
+            f'<ol class="sq-opts">{opts}</ol>'
+            f'<details class="qa"><summary>Show answer</summary><p><strong>Answer: {letters}.</strong> {inline(q["explanation"])} '
+            f'<a href="{esc(q["url"])}">Review topic {esc(q["obj"])} in the notes &rarr;</a></p></details></li>')
+    return '<ol class="sqs">' + "".join(items) + "</ol>"
+
+
 def block_exam_domains(course, qs):
     rows = []
     for d in course["domains"]:
@@ -407,10 +425,13 @@ def build(site, hashes, last_change):
         "CCNP_CARD_COUNT": str(len(cards)),
         "CCNP_EXAM_DOMAINS": block_exam_domains(course, qs),
         "CCNP_Q_COUNT": str(len(qs)),
+        "CCNP_SAMPLE_QS": block_sample_questions(course, qs),
+        "CCNP_SAMPLE_COUNT": str(sum(1 for q in qs if q.get("sample"))),
         "CCNP_EXAM": f'{esc(course["exam"]["name"])} {esc(course["exam"]["code"])} v{esc(course["exam"]["version"])}',
         "CCNP_UPDATED": B.fmt_date(newest),
     }
-    pages = [(BASE, newest), (f"{BASE}/flashcards", newest), (f"{BASE}/mock-exam", newest)]
+    pages = [(BASE, newest), (f"{BASE}/flashcards", newest), (f"{BASE}/mock-exam", newest),
+             (f"{BASE}/scor-350-701-v2-changes", "2026-10-27")]
     pages += [(lec["path"], lec.get("updated", lec["date"])) for lec in course["lectures"]]
     print(f"  ccnp: {len(course['lectures'])} lectures, {len(cards)} cards, {len(qs)} questions")
     return tokens, pages

@@ -3,12 +3,14 @@
   "out": "ccnp-security/mock-exam.html",
   "path": "/ccnp-security/mock-exam",
   "nav": "",
-  "title": "Free CCNP Security Mock Exam (SCOR 350-701 v2.0) | breakfixlearn",
-  "description": "Free SCOR 350-701 v2.0 practice exam: original questions weighted like the real blueprint, a timed exam mode, and explanations that link to the notes.",
+  "title": "Free SCOR 350-701 v2.0 Practice Test | CCNP Security",
+  "description": "Free SCOR 350-701 v2.0 practice test: original questions weighted like the real blueprint, a timed exam mode, and explanations that link to the notes.",
   "og_title": "CCNP Security mock exam",
   "og_description": "Original SCOR 350-701 v2.0 practice questions, weighted like the blueprint. Timed exam mode or instant-feedback practice mode.",
   "preload_display": true,
-  "scripts": ["exam"]
+  "scripts": ["exam"],
+  "breadcrumbs": [["CCNP Security", "/ccnp-security"], ["Practice exam", ""]],
+  "learning": "Practice exam"
 }
 -->
 <main id="main">
@@ -16,7 +18,7 @@
     <div class="wrap">
       <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/ccnp-security">ccnp-security</a><span aria-hidden="true">/</span><span>mock-exam</span></nav>
       <span class="cli"><span class="h">edge#</span> <span class="v">test</span> <span class="a">scor-350-701</span></span>
-      <h1>Mock exam</h1>
+      <h1>SCOR practice exam</h1>
       <p class="sec-lede">{{CCNP_Q_COUNT}} original questions for {{CCNP_EXAM}}, picked in proportion to the blueprint weights. The bank grows with every lecture I publish.</p>
     </div>
   </header>
@@ -88,5 +90,11 @@
       <ol class="ex-review" data-ex-review aria-label="Answer review"></ol>
     </div>
     <p class="sr-only" data-ex-live aria-live="polite"></p>
+
+    <section class="sample" aria-labelledby="sample-h">
+      <h2 class="sub-h" id="sample-h">{{CCNP_SAMPLE_COUNT}} free sample questions</h2>
+      <p class="hub-p">A preview of the question style, readable without starting an exam. These are original questions, not exam dumps. The full bank above draws from {{CCNP_Q_COUNT}} questions and grows with every lecture.</p>
+      {{CCNP_SAMPLE_QS}}
+    </section>
   </section>
 </main>

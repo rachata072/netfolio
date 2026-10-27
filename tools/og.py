@@ -129,4 +129,15 @@ def make_all(site, posts, outdir):
     page_image(site, outdir / "blog.webp", "edge# show logging", f"{len(posts)} LAB LOGS\n& WRITE-UPS", sub)
     page_image(site, outdir / "projects.webp", "edge# show interfaces status", "PROJECTS:\nNET + SEC LABS", sub)
     page_image(site, outdir / "cheat-sheets.webp", "edge# show cheat-sheets", "CHEAT SHEETS:\nPRINT-READY", sub)
-    print(f"  og images: {len(posts) + 5} written to {outdir}")
+    # CCNP Security study hub (file names follow the page stems used by build.py / ccnp.py)
+    ccnp = [
+        ("ccnp-security", "edge# show ccnp-security", "CCNP SECURITY\nFREE STUDY GUIDE"),
+        ("ccnp-flashcards", "edge# show flashcards", "SCOR 350-701\nFLASHCARDS"),
+        ("ccnp-mock-exam", "edge# test scor-350-701", "SCOR v2.0\nPRACTICE EXAM"),
+        ("ccnp-scor-v2-changes", "edge# show scor | diff v1.1 v2.0", "SCOR v2.0:\nWHAT CHANGED"),
+        ("ccnp-network-security-firewall-ips-visibility", "edge# show scor 2.1 2.2", "FIREWALL, IPS\n& TELEMETRY"),
+    ]
+    ccnp_sub = "SCOR 350-701 v2.0  /  notes, flashcards, practice exam  /  free"
+    for stem, kicker, title in ccnp:
+        page_image(site, outdir / f"{stem}.webp", kicker, title, ccnp_sub)
+    print(f"  og images: {len(posts) + 5 + len(ccnp)} written to {outdir}")
