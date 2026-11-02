@@ -76,25 +76,28 @@ def _copy(src, dst):
         print(f"  copied {dst.relative_to(B.PUB)}")
 
 
-def _figure_hook(lec):
+def _figure_hook(item, src_root=None, pub_prefix="ccnp"):
+    """Markdown block image -> <figure>. src_root: folder holding img/; pub_prefix: under /assets/img/."""
+    src_root = src_root or (SRC_C / "lectures")
+
     def hook(src, alt):
         m = re.fullmatch(r"img/([a-z0-9-]+)/([a-z0-9-]+)\.webp", src)
         if not m:
-            sys.exit(f"{lec['file']}: image {src!r} must be img/<module>/<name>.webp")
+            sys.exit(f"{item['file']}: image {src!r} must be img/<folder>/<name>.webp")
         folder, name = m.groups()
-        f = SRC_C / "lectures" / "img" / folder / f"{name}.webp"
+        f = src_root / "img" / folder / f"{name}.webp"
         if not f.is_file():
-            sys.exit(f"{lec['file']}: missing image {f.relative_to(B.ROOT)}")
-        pub_dir = B.PUB / "assets" / "img" / "ccnp" / folder
+            sys.exit(f"{item['file']}: missing image {f.relative_to(B.ROOT)}")
+        pub_dir = B.PUB / "assets" / "img" / pub_prefix / folder
         _copy(f, pub_dir / f.name)
         w, h = B.webp_size(f)
-        url = f"/assets/img/ccnp/{folder}/{name}.webp"
+        url = f"/assets/img/{pub_prefix}/{folder}/{name}.webp"
         srcset = ""
         small = f.with_name(f"{name}-800.webp")
         if small.is_file():
             _copy(small, pub_dir / small.name)
             sw, _ = B.webp_size(small)
-            srcset = (f' srcset="/assets/img/ccnp/{folder}/{small.name} {sw}w, {url} {w}w"'
+            srcset = (f' srcset="/assets/img/{pub_prefix}/{folder}/{small.name} {sw}w, {url} {w}w"'
                       f' sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem"')
         a = esc(alt)
         return (f'<figure class="post-figure"><a href="{url}" aria-label="Open full-size image: {a}">'
@@ -118,20 +121,162 @@ def _add_ids(body):
     return re.sub(r"<h([23])>(.*?)</h\1>", repl, body, flags=re.S), toc, seen
 
 
+def _render_md(item, folder, pub_prefix):
+    md = (SRC_C / folder / item["file"]).read_text(encoding="utf-8")
+    # the file's own title + intro block are replaced by the page header
+    m = re.search(r"^-{3,}\s*$", md, re.M)
+    if md.lstrip().startswith("# ") and m:
+        md = md[m.end():]
+    body, _ = convert(md, image_hook=_figure_hook(item, SRC_C / folder, pub_prefix), heading_shift=1)
+    body, toc, ids = _add_ids(body)
+    item["body"] = B.no_translate(body)
+    item["toc"] = toc
+    item["anchors"] = ids
+    words = len(re.findall(r"\w+", B.strip_tags(body)))
+    item["read_min"] = max(1, round(words / WORDS_PER_MIN))
+
+
 def load_lectures(course):
     for lec in course["lectures"]:
-        md = (SRC_C / "lectures" / lec["file"]).read_text(encoding="utf-8")
-        # the file's own title + objective block are replaced by the page header
-        m = re.search(r"^-{3,}\s*$", md, re.M)
-        if md.lstrip().startswith("# ") and m:
-            md = md[m.end():]
-        body, _ = convert(md, image_hook=_figure_hook(lec), heading_shift=1)
-        body, toc, ids = _add_ids(body)
-        lec["body"] = B.no_translate(body)
-        lec["toc"] = toc
-        lec["anchors"] = ids
-        words = len(re.findall(r"\w+", B.strip_tags(body)))
-        lec["read_min"] = max(1, round(words / WORDS_PER_MIN))
+        _render_md(lec, "lectures", "ccnp")
+
+
+# ------------------------------------------------------------------------- labs
+LAB_FILES = f"{BASE}/labs/files"
+FILE_KIND = {".pkt": "PKT", ".pka": "PKA", ".zip": "ZIP", ".txt": "TXT"}
+
+
+def load_labs(course):
+    labs = course.get("labs", [])
+    seen = set()
+    for lab in labs:
+        if lab["slug"] in seen or not re.fullmatch(r"[a-z0-9-]+", lab["slug"]):
+            sys.exit(f"course.json: bad or duplicate lab slug {lab['slug']!r}")
+        seen.add(lab["slug"])
+        if not 50 <= len(lab["description"]) <= 170:
+            sys.exit(f"course.json: lab {lab['slug']} description is {len(lab['description'])} chars (50-170)")
+        for o in lab["objectives"]:
+            if o not in course["obj"]:
+                sys.exit(f"course.json: lab {lab['slug']} lists unknown objective {o}")
+        lab["lec"] = next((x for x in course["lectures"] if x["slug"] == lab["lecture"]), None)
+        if not lab["lec"]:
+            sys.exit(f"course.json: lab {lab['slug']} points at unknown lecture {lab['lecture']!r}")
+        lab["path"] = f"{BASE}/labs/{lab['slug']}"
+        _render_md(lab, "labs", "ccnp/labs")
+        lab["files"] = []
+        for d in lab["downloads"]:
+            if not re.fullmatch(r"[a-z0-9-]+\.(pkt|pka|zip|txt)", d["file"]):
+                sys.exit(f"lab {lab['slug']}: download name {d['file']!r} not allowed")
+            f = SRC_C / "labs" / "files" / d["file"]
+            if not f.is_file():
+                sys.exit(f"lab {lab['slug']}: missing download {f.relative_to(B.ROOT)}")
+            raw = f.read_bytes()
+            _copy(f, B.PUB / "ccnp-security" / "labs" / "files" / d["file"])
+            lab["files"].append({**d, "url": f'{LAB_FILES}/{d["file"]}', "bytes": len(raw),
+                                 "sha256": B.hashlib.sha256(raw).hexdigest(),
+                                 "kind": FILE_KIND[f.suffix]})
+    return labs
+
+
+def render_lab(site, hashes, last_change, course, lab):
+    toc_items = "".join(f'<li><a href="#{hid}">{esc(t)}</a></li>' for hid, t in lab["toc"])
+    toc_aside = (f'<aside class="toc" aria-label="On this page"><span class="toc-title">'
+                 f'<span class="h">#</span> show ip route | toc</span><ol>{toc_items}</ol></aside>')
+    toc_mobile = (f'<details class="toc-mobile"><summary>show ip route | toc ({len(lab["toc"])} sections)</summary>'
+                  f'<ol>{toc_items}</ol></details>\n')
+    tiles, sums = [], []
+    for i, f in enumerate(lab["files"]):
+        tiles.append(
+            f'<li><a class="dl{" dl-pri" if i == 0 else ""}" href="{f["url"]}" download>'
+            f'<span class="dl-k">{f["kind"]}</span><span class="dl-t"><b>{esc(f["label"])}</b>'
+            f'<span class="dl-m">{esc(f["note"])} &middot; {B.human_size(f["bytes"])}</span></span>'
+            f'<svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg>'
+            f'<span class="sr-only">, download</span></a></li>')
+        sums.append(f'<tr><td translate="no">{esc(f["file"])}</td><td translate="no">{f["sha256"]}</td></tr>')
+    objs = " ".join(obj_chip(o, course) for o in lab["objectives"])
+    d0 = lab["objectives"][0].split(".")[0]
+    lec = lab["lec"]
+    main = f'''<main id="main">
+<article class="lecture lab">
+  <header class="post-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="{BASE}">ccnp-security</a><span aria-hidden="true">/</span><a href="{BASE}#labs">labs</a><span aria-hidden="true">/</span><span>{esc(lab["slug"])}</span></nav>
+      <p class="scard-meta"><span class="sid">Packet Tracer lab</span><span>Domain {esc(d0)} {esc(course["domains"][int(d0)-1]["name"])} &middot; topics {esc(", ".join(lab["objectives"]))}</span></p>
+      <h1 class="mt-2">{esc(lab["title"])}</h1>
+      <p class="post-dek">{esc(lab["dek"])}</p>
+      <div class="post-meta"><time datetime="{lab["date"]}">updated {B.fmt_date(lab.get("updated", lab["date"]))}</time><span class="sep">/</span><span>{esc(lab["time"])}</span><span class="sep">/</span><span>{esc(lab["tool"])}</span><span class="sep">/</span><span>by {esc(site["author"])}</span></div>
+    </div>
+  </header>
+  <div class="wrap post-layout">
+    <div class="post-main">
+      <section class="labdl" aria-labelledby="dl-h">
+        <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">copy</span> <span class="a">{esc(lab["slug"])} flash:</span></span>
+        <h2 id="dl-h" class="sub-h">Download the lab</h2>
+        <ul class="dl-list">{"".join(tiles)}</ul>
+        <details class="sums">
+          <summary>Verify your download (SHA-256)</summary>
+          <div class="tbl"><table class="sheet-files"><thead><tr><th scope="col">File</th><th scope="col">SHA-256</th></tr></thead><tbody>{"".join(sums)}</tbody></table></div>
+          <p>Compare with <code translate="no">Get-FileHash .\\file.pkt -Algorithm SHA256</code> (PowerShell) or <code translate="no">sha256sum file.pkt</code>. Different hash, different file: delete it.</p>
+        </details>
+        <p class="side-note">Read the <a href="{lec["path"]}">{esc(lec["title"])}</a> notes first. Topics: {objs}</p>
+      </section>
+{toc_mobile}<div class="prose">
+{lab["body"].rstrip()}
+</div>
+      <footer class="post-end">
+        <section class="practice" aria-labelledby="practice-h">
+          <div><h2 id="practice-h" class="sub-h">Lock it in</h2>
+          <p>Lab done? Drill the commands and the attack-to-defense mapping until they're automatic.</p></div>
+          <p class="practice-links"><a class="btn btn-pri" href="{BASE}/flashcards#d{d0}">flashcards <span class="p">d{d0}</span></a><a class="btn btn-sec" href="{BASE}/mock-exam#d{d0}">mock exam <span class="p">d{d0}</span></a><a class="btn btn-sec" href="{lec["path"]}">notes</a></p>
+        </section>
+      </footer>
+    </div>
+    {toc_aside}
+  </div>
+</article>
+</main>
+'''
+    url = site["url"] + lab["path"]
+    jsonld = [{
+        "@context": "https://schema.org", "@type": "LearningResource",
+        "name": lab["title"], "description": lab["description"], "url": url,
+        "learningResourceType": "Lab exercise", "educationalLevel": "Professional",
+        "inLanguage": "en", "isAccessibleForFree": True,
+        "datePublished": lab["date"], "dateModified": lab.get("updated", lab["date"]),
+        "teaches": [course["obj"][o][1]["text"] for o in lab["objectives"]],
+        "author": {"@type": "Person", "name": site["author"], "url": site["url"] + "/"},
+        "encoding": [{"@type": "MediaObject", "name": f["label"], "contentUrl": site["url"] + f["url"],
+                      "encodingFormat": "application/octet-stream", "contentSize": B.human_size(f["bytes"]),
+                      "sha256": f["sha256"]} for f in lab["files"]],
+    }, {
+        "@context": "https://schema.org", "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": site["url"] + "/"},
+            {"@type": "ListItem", "position": 2, "name": "CCNP Security", "item": site["url"] + BASE},
+            {"@type": "ListItem", "position": 3, "name": lab["title"]},
+        ],
+    }]
+    og = f'/assets/og/ccnp-lab-{lab["slug"]}.webp'
+    return B.page(site, hashes, last_change, nav="", body=main, progress=True,
+                  title=lab["seo_title"], description=lab["description"], path=lab["path"],
+                  og_title=lab["title"], og_description=lab["dek"], og_type="article", jsonld=jsonld,
+                  og_image=og if (B.PUB / og.lstrip("/")).exists() else None,
+                  og_image_alt=f'{lab["title"]}: free Packet Tracer lab')
+
+
+def block_labs(course):
+    labs = course.get("labs", [])
+    if not labs:
+        return '<p class="hub-p">Coming next: Packet Tracer labs with downloadable baselines.</p>'
+    items = []
+    for lab in labs:
+        chips = "".join(obj_chip(o, course) for o in lab["objectives"])
+        kinds = " + ".join(f'.{f["file"].rsplit(".", 1)[1]}' for f in lab["files"])
+        items.append(
+            f'<li><a class="lec" href="{lab["path"]}"><span class="mod">PT</span>'
+            f'<span class="lt"><b>{esc(lab["title"])}</b><span class="ld">{esc(lab["dek"])}</span>'
+            f'<span class="lc">{chips}<span class="lm">{esc(lab["time"])} &middot; download {esc(kinds)}</span></span></span></a></li>')
+    return '<ol class="lecs">' + "".join(items) + "</ol>"
 
 
 def obj_chip(o, course, link=False):
@@ -160,6 +305,8 @@ def render_lecture(site, hashes, last_change, course, lec, counts):
     if i + 1 < len(lecs):
         hop.append(f'<a class="next" href="{lecs[i+1]["path"]}"><span class="k">next lecture &rarr;</span>{esc(lecs[i+1]["title"])}</a>')
     nexthop = f'<nav class="nexthop" aria-label="More lectures">{"".join(hop)}</nav>' if hop else ""
+    lab = next((x for x in course.get("labs", []) if x["lecture"] == lec["slug"]), None)
+    lab_btn = f'<a class="btn btn-pri" href="{lab["path"]}">Packet Tracer lab <span class="p">.pkt</span></a>' if lab else ""
 
     main = f'''<main id="main">
 <article class="lecture">
@@ -186,7 +333,7 @@ def render_lecture(site, hashes, last_change, course, lec, counts):
         <section class="practice" aria-labelledby="practice-h">
           <div><h2 id="practice-h" class="sub-h">Practice this module</h2>
           <p>{n_cards} flashcards and {n_qs} mock exam questions cover {", ".join(esc(o) for o in lec["objectives"])}. Every answer links back to the section above that explains it.</p></div>
-          <p class="practice-links"><a class="btn btn-pri" href="{BASE}/flashcards#d{d0}">flashcards <span class="p">d{d0}</span></a><a class="btn btn-sec" href="{BASE}/mock-exam#d{d0}">mock exam <span class="p">d{d0}</span></a></p>
+          <p class="practice-links">{lab_btn}<a class="btn btn-pri" href="{BASE}/flashcards#d{d0}">flashcards <span class="p">d{d0}</span></a><a class="btn btn-sec" href="{BASE}/mock-exam#d{d0}">mock exam <span class="p">d{d0}</span></a></p>
         </section>
         {nexthop}
       </footer>
@@ -403,6 +550,7 @@ def block_exam_domains(course, qs):
 def build(site, hashes, last_change):
     course = load_course()
     load_lectures(course)
+    labs = load_labs(course)
     cards = load_cards(course)
     qs = load_questions(course)
     counts = {"cards": {}, "questions": {}}
@@ -413,6 +561,8 @@ def build(site, hashes, last_change):
 
     for lec in course["lectures"]:
         B.write(f'ccnp-security/{lec["slug"]}.html', render_lecture(site, hashes, last_change, course, lec, counts))
+    for lab in labs:
+        B.write(f'ccnp-security/labs/{lab["slug"]}.html', render_lab(site, hashes, last_change, course, lab))
     B.write("ccnp-security/data/questions.json", exam_json(course, qs) + "\n")
 
     newest = max(lec.get("updated", lec["date"]) for lec in course["lectures"])
@@ -420,6 +570,7 @@ def build(site, hashes, last_change):
         "CCNP_STATS": block_stats(course, cards, qs),
         "CCNP_DOMAINS": block_domains(course, cards, qs),
         "CCNP_LECTURES": block_lectures(course),
+        "CCNP_LABS": block_labs(course),
         "CCNP_CARD_FILTERS": block_card_filters(course, cards),
         "CCNP_CARD_LIST": block_card_list(course, cards),
         "CCNP_CARD_COUNT": str(len(cards)),
@@ -433,5 +584,6 @@ def build(site, hashes, last_change):
     pages = [(BASE, newest), (f"{BASE}/flashcards", newest), (f"{BASE}/mock-exam", newest),
              (f"{BASE}/scor-350-701-v2-changes", "2026-10-27")]
     pages += [(lec["path"], lec.get("updated", lec["date"])) for lec in course["lectures"]]
-    print(f"  ccnp: {len(course['lectures'])} lectures, {len(cards)} cards, {len(qs)} questions")
+    pages += [(lab["path"], lab.get("updated", lab["date"])) for lab in labs]
+    print(f"  ccnp: {len(course['lectures'])} lectures, {len(labs)} labs, {len(cards)} cards, {len(qs)} questions")
     return tokens, pages

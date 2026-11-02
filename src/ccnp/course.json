@@ -267,6 +267,56 @@
       ],
       "date": "2026-10-26",
       "order": 20
+    },
+    {
+      "slug": "segmentation-layer-2-hardening",
+      "module": "03",
+      "file": "03_segmentation-and-l2-hardening.md",
+      "title": "Segmentation & Layer 2 Hardening",
+      "seo_title": "SCOR 2.3 Layer 2 Security: VLAN Hopping, DHCP Snooping, DAI",
+      "description": "Free CCNP Security notes for SCOR 350-701 v2.0 topic 2.3: VLAN hopping, port security, BPDU Guard, DHCP snooping, DAI, storm control, PVLANs and SGTs.",
+      "dek": "How to think about Layer 2 trust, then every switch defense in SCOR 2.3: VLANs and SGTs, trunk hardening, port security, STP guards, DHCP snooping, DAI and storm control.",
+      "objectives": [
+        "2.3"
+      ],
+      "supports": [
+        "2.4",
+        "2.5",
+        "2.7",
+        "6.1",
+        "6.3"
+      ],
+      "date": "2026-11-01",
+      "order": 10
+    }
+  ],
+  "labs": [
+    {
+      "slug": "segmentation-l2-hardening-packet-tracer",
+      "file": "l2-hardening.md",
+      "lecture": "segmentation-layer-2-hardening",
+      "title": "Segmentation & Layer 2 Hardening Lab",
+      "seo_title": "Free Packet Tracer Lab: Layer 2 Switch Hardening (CCNP SCOR 2.3)",
+      "description": "Free Packet Tracer lab for CCNP Security SCOR 2.3: harden a 2960 switch with dead VLANs, trunk lockdown, port security, BPDU Guard and protected ports.",
+      "dek": "Download a working but insecure switched network and harden it step by step: management baseline, VLANs, trunks, port security, BPDU Guard, protected ports and unused-port lockdown.",
+      "objectives": [
+        "2.3"
+      ],
+      "date": "2026-11-01",
+      "time": "60 to 90 min",
+      "tool": "Packet Tracer 9.0+",
+      "downloads": [
+        {
+          "file": "l2-hardening-baseline.pkt",
+          "label": "Baseline lab (.pkt)",
+          "note": "start here"
+        },
+        {
+          "file": "l2-hardening-graded.pka",
+          "label": "Graded activity (.pka)",
+          "note": "Activity Wizard version"
+        }
+      ]
     }
   ]
 }

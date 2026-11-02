@@ -35,3 +35,8 @@
   ! Content-Security-Policy
   Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data: blob:; object-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'
   Cache-Control: public, max-age=86400
+
+# CCNP Packet Tracer lab downloads: always save, never render.
+/ccnp-security/labs/files/*
+  Content-Disposition: attachment
+  Cache-Control: public, max-age=86400

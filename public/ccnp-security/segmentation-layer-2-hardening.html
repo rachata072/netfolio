@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SCOR 2.3 Layer 2 Security: VLAN Hopping, DHCP Snooping, DAI</title>
+<meta name="description" content="Free CCNP Security notes for SCOR 350-701 v2.0 topic 2.3: VLAN hopping, port security, BPDU Guard, DHCP snooping, DAI, storm control, PVLANs and SGTs.">
+<link rel="canonical" href="https://breakfixlearn.com/ccnp-security/segmentation-layer-2-hardening">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=38c400936f">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="Segmentation &amp; Layer 2 Hardening">
+<meta property="og:description" content="How to think about Layer 2 trust, then every switch defense in SCOR 2.3: VLANs and SGTs, trunk hardening, port security, STP guards, DHCP snooping, DAI and storm control.">
+<meta property="og:url" content="https://breakfixlearn.com/ccnp-security/segmentation-layer-2-hardening">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/ccnp-segmentation-layer-2-hardening.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Segmentation &amp; Layer 2 Hardening: CCNP Security SCOR 350-701 v2.0 notes">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Segmentation & Layer 2 Hardening","description":"Free CCNP Security notes for SCOR 350-701 v2.0 topic 2.3: VLAN hopping, port security, BPDU Guard, DHCP snooping, DAI, storm control, PVLANs and SGTs.","url":"https://breakfixlearn.com/ccnp-security/segmentation-layer-2-hardening","learningResourceType":"Lecture notes","educationalLevel":"Professional","inLanguage":"en","isAccessibleForFree":true,"datePublished":"2026-11-01","dateModified":"2026-11-01","timeRequired":"PT37M","teaches":["Configure network infrastructure security methods (network segmentation using VLANs or SGTs; Layer 2 and port security; DHCP snooping; Dynamic ARP inspection; storm control; and defenses against MAC, ARP, VLAN hopping, STP, and DHCP rogue attacks)"],"educationalAlignment":[{"@type":"AlignmentObject","alignmentType":"assesses","educationalFramework":"Cisco SCOR 350-701 v2.0","targetName":"2.3 Configure network infrastructure security methods (network segmentation using VLANs or SGTs; Layer 2 and port security; DHCP snooping; Dynamic ARP inspection; storm control; and defenses against MAC, ARP, VLAN hopping, STP, and DHCP rogue attacks)"}],"author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"CCNP Security","item":"https://breakfixlearn.com/ccnp-security"},{"@type":"ListItem","position":3,"name":"Segmentation & Layer 2 Hardening"}]}</script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article class="lecture">
+  <header class="post-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/ccnp-security">ccnp-security</a><span aria-hidden="true">/</span><span>2.3</span></nav>
+      <p class="scard-meta"><span class="sid">SCOR 350-701 v2.0</span><span>Domain 2 Network Security &middot; topics 2.3</span></p>
+      <h1 class="mt-2">Segmentation &amp; Layer 2 Hardening</h1>
+      <p class="post-dek">How to think about Layer 2 trust, then every switch defense in SCOR 2.3: VLANs and SGTs, trunk hardening, port security, STP guards, DHCP snooping, DAI and storm control.</p>
+      <div class="post-meta"><time datetime="2026-11-01">updated Nov 1, 2026</time><span class="sep">/</span><span>37 min read</span><span class="sep">/</span><span>by Trey</span></div>
+    </div>
+  </header>
+  <div class="wrap post-layout">
+    <div class="post-main">
+      <section class="objbox" aria-labelledby="objbox-h">
+        <h2 id="objbox-h" class="objbox-h">Exam topics in this module</h2>
+        <ul class="objlist"><li><span class="chip obj d2" title="Configure network infrastructure security methods (network segmentation using VLANs or SGTs; Layer 2 and port security; DHCP snooping; Dynamic ARP inspection; storm control; and defenses against MAC, ARP, VLAN hopping, STP, and DHCP rogue attacks)">2.3</span><span>Configure network infrastructure security methods (network segmentation using VLANs or SGTs; Layer 2 and port security; DHCP snooping; Dynamic ARP inspection; storm control; and defenses against MAC, ARP, VLAN hopping, STP, and DHCP rogue attacks)</span></li></ul>
+        <p class="objsup"><span>Also touches</span> <span class="chip obj d2" title="Select management options for network security solutions (single vs. multidevice manager, in-band vs. out-of-band, on-premises vs. cloud with Cisco Security Cloud Control)">2.4</span> <span class="chip obj d2" title="Describe CIS benchmarks for hardening devices such as Cisco Secure Firewall (FTD) and Cisco IOS XE">2.5</span> <span class="chip obj d2" title="Configure secure network management of perimeter security and infrastructure devices such as SNMPv3, NetConf, RestConf, APIs, secure syslog, and NTP with authentication">2.7</span> <span class="chip obj d6" title="Describe identity management and secure network access concepts such as guest services, profiling, posture assessment, and BYOD">6.1</span> <span class="chip obj d6" title="Configure network access control mechanisms such as 802.1X and MAB with Cisco Identity Services Engine">6.3</span></p>
+      </section>
+<details class="toc-mobile"><summary>show ip route | toc (17 sections)</summary><ol><li><a href="#how-to-think-about-layer-2-security">How to think about Layer 2 security</a></li><li><a href="#why-layer-2-is-where-containment-begins">Why Layer 2 is where containment begins</a></li><li><a href="#vlan-segmentation-as-a-blast-radius-control">VLAN segmentation as a blast-radius control</a></li><li><a href="#access-ports-trunks-and-the-native-vlan">Access ports, trunks and the native VLAN</a></li><li><a href="#port-security-containing-the-endpoint">Port security: containing the endpoint</a></li><li><a href="#spanning-tree-protection">Spanning tree protection</a></li><li><a href="#dhcp-snooping">DHCP snooping</a></li><li><a href="#dynamic-arp-inspection-and-ip-source-guard">Dynamic ARP Inspection and IP Source Guard</a></li><li><a href="#storm-control">Storm control</a></li><li><a href="#unused-ports-vtp-cdp-and-the-management-plane">Unused ports, VTP, CDP and the management plane</a></li><li><a href="#micro-segmentation-private-vlans-protected-ports-and-sgts">Micro-segmentation: private VLANs, protected ports and SGTs</a></li><li><a href="#putting-it-together-golden-port-templates">Putting it together: golden port templates</a></li><li><a href="#validation-re-run-every-attack">Validation: re-run every attack</a></li><li><a href="#exam-traps">Exam traps</a></li><li><a href="#self-check">Self-check</a></li><li><a href="#coverage-checklist-scor-v2-0-2-3">Coverage checklist: SCOR v2.0 2.3</a></li><li><a href="#lab-for-this-module">Lab for this module</a></li></ol></details>
+<div class="prose">
+<h2 id="how-to-think-about-layer-2-security">How to think about Layer 2 security</h2>
+<p>Before any command, get the mindset right. Almost every Layer 2 attack on the exam, and in real networks, follows the same pattern. Once you see the pattern, you stop memorizing features and start <em>deriving</em> them.</p>
+<h3 id="layer-2-trusts-everyone">Layer 2 trusts everyone</h3>
+<p>The protocols that make a switched network work were designed for a friendly room: <strong>ARP, DHCP, STP, DTP, CDP/LLDP and VTP have no authentication by default.</strong> A switch believes whatever frame arrives on a port:</p>
+<ul><li>A frame says &quot;I am MAC <code translate="no">aaaa.bbbb.cccc</code>&quot;. The switch writes it into the <strong>CAM table</strong>.</li><li>An ARP reply says &quot;10.40.0.1 is at my MAC&quot;. Every host updates its <strong>ARP cache</strong>.</li><li>A DHCP offer says &quot;your gateway is 10.40.0.66&quot;. The client <strong>believes it</strong>.</li><li>A BPDU says &quot;I am the best root bridge&quot;. The whole VLAN <strong>rebuilds its spanning tree</strong> around the sender.</li><li>A DTP frame says &quot;let&#x27;s trunk&quot;. A port in a dynamic mode <strong>becomes a trunk</strong>.</li></ul>
+<p>So the attacker&#x27;s playbook is short:</p>
+<blockquote><p><strong>Forge a control message → the network updates a table → traffic goes where the attacker wants.</strong></p></blockquote>
+<p>Every defense in this module breaks that chain in one of four ways:</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Defense move</th><th scope="col">Meaning</th><th scope="col">Examples</th></tr></thead><tbody><tr><td><strong>Remove</strong></td><td>Turn the protocol off where it isn&#x27;t needed</td><td><code translate="no">switchport nonegotiate</code> (DTP), <code translate="no">no cdp enable</code>, VTP transparent, shut unused ports</td></tr><tr><td><strong>Limit</strong></td><td>Allow it, but cap how much</td><td>Port security (MAC count), DHCP snooping and DAI rate limits, storm control</td></tr><tr><td><strong>Validate</strong></td><td>Check the message against something trusted</td><td>DHCP snooping (trusted ports), DAI (binding table), IP Source Guard, BPDU Guard, Root Guard</td></tr><tr><td><strong>Contain</strong></td><td>Accept that something will get through and shrink how far it reaches</td><td>VLANs, private VLANs, protected ports, SGTs</td></tr></tbody></table></div>
+<figure class="post-figure"><a href="/assets/img/ccnp/03/fig-02-l2-trust-map.webp" aria-label="Open full-size image: Layer 2 trust map: each table the switch keeps, the forged message that poisons it, and the feature that validates or limits it"><img src="/assets/img/ccnp/03/fig-02-l2-trust-map.webp" srcset="/assets/img/ccnp/03/fig-02-l2-trust-map-800.webp 800w, /assets/img/ccnp/03/fig-02-l2-trust-map.webp 1600w" sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem" width="1600" height="1000" alt="Layer 2 trust map: each table the switch keeps, the forged message that poisons it, and the feature that validates or limits it" loading="lazy" decoding="async"></a><figcaption>Layer 2 trust map: each table the switch keeps, the forged message that poisons it, and the feature that validates or limits it. Select the image to open it full size.</figcaption></figure>
+<h3 id="the-three-questions-for-every-port">The three questions for every port</h3>
+<p>When you design or audit a switch, walk every port and ask:</p>
+<ol><li><strong>Who should be on the other end?</strong> A user PC, an IP phone, a server, another switch, nobody?</li><li><strong>What is it allowed to say?</strong> Should this port ever send BPDUs, DHCP offers, DTP, more than a few MACs, ARP for addresses it doesn&#x27;t own?</li><li><strong>If it lies, how far does the lie travel, and how will I know?</strong> That&#x27;s the blast radius (VLAN, private VLAN, SGT) and the detection (err-disable logs, SNMP traps, counters).</li></ol>
+<p>A user port answers: <em>a PC (maybe a phone), never BPDUs or DHCP offers or DTP, a handful of MACs, only ARP for its own DHCP lease.</em> That answer <strong>is</strong> the configuration: access mode, nonegotiate, BPDU Guard, untrusted for DHCP snooping and DAI, port security max 2 to 5, storm control. You just wrote the access-port template from first principles.</p>
+<h3 id="trusted-vs-untrusted-the-boundary-is-the-access-edge">Trusted vs. untrusted: the boundary is the access edge</h3>
+<p>Almost every validating feature has the same idea: <strong>ports facing users are untrusted; ports facing infrastructure you control are trusted.</strong> DHCP snooping trusts the uplink toward the real DHCP server, DAI trusts uplinks, BPDU Guard lives on edge ports, Root Guard sits on ports where the root must never appear. If you can draw the trust boundary on a topology, you can place every feature correctly. That is also how exam scenario questions are built: &quot;which port should be trusted?&quot;</p>
+<h3 id="defaults-are-built-for-plug-and-play-not-security">Defaults are built for plug-and-play, not security</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Default</th><th scope="col">Why it exists</th><th scope="col">Why it&#x27;s a risk</th></tr></thead><tbody><tr><td>Ports in <code translate="no">dynamic auto</code> (on many switches)</td><td>Trunks form automatically</td><td>Switch-spoofing VLAN hopping</td></tr><tr><td>Native VLAN 1, untagged</td><td>Backward compatibility</td><td>Double-tagging VLAN hopping</td></tr><tr><td>Trunks allow VLANs 1-4094</td><td>Nothing breaks</td><td>Every VLAN reaches every switch</td></tr><tr><td>Every port in VLAN 1 and up</td><td>Plug in and it works</td><td>Walk-up access from any jack</td></tr><tr><td>Unlimited MACs per port</td><td>Hubs, VMs, phones</td><td>MAC flooding, CAM overflow</td></tr><tr><td>CDP/LLDP on everywhere</td><td>Neighbor discovery</td><td>Free reconnaissance for an attacker</td></tr><tr><td>VTP server mode</td><td>VLANs sync automatically</td><td>One bad switch can wipe the VLAN database</td></tr></tbody></table></div>
+<p>Hardening a switch is mostly the act of <strong>replacing each default with a deliberate choice.</strong></p>
+<h3 id="a-design-method-you-can-reuse">A design method you can reuse</h3>
+<ol><li><strong>Segment first.</strong> Group devices by trust and function into VLANs, one subnet each. This limits blast radius before anything else.</li><li><strong>Classify every port</strong>: access edge, infrastructure uplink, or unused. Each class gets one template.</li><li><strong>Remove</strong> what each class doesn&#x27;t need (DTP, CDP, VLAN 1, native VLAN 1, unused VLANs on trunks).</li><li><strong>Limit and validate</strong> the protocols you must keep (port security, BPDU Guard, DHCP snooping, DAI, IPSG, storm control).</li><li><strong>Contain inside the segment</strong> where hosts shouldn&#x27;t talk (private VLANs, protected ports, SGTs).</li><li><strong>Prove it</strong>: re-run each attack and confirm it fails, then check the logs fired.</li></ol>
+<p>The rest of this module follows exactly that order.</p>
+<h3 id="where-this-sits-in-scor-v2-0">Where this sits in SCOR v2.0</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Objective</th><th scope="col">How this module covers it</th></tr></thead><tbody><tr><td><strong>2.3</strong> Configure network infrastructure security methods</td><td><strong>The whole module</strong>: VLANs and SGTs, port security, DHCP snooping, DAI, storm control, and defenses against MAC, ARP, VLAN hopping, STP and rogue DHCP attacks</td></tr><tr><td>2.4 Management options (in-band vs. out-of-band)</td><td>Management VLAN, shutting the VLAN 1 SVI</td></tr><tr><td>2.5 CIS benchmarks for IOS XE</td><td>The &quot;remove the defaults&quot; mindset; the management baseline in the lab</td></tr><tr><td>2.7 Secure network management</td><td>SSH v2, local AAA, exec-timeout, banners in the lab baseline</td></tr><tr><td>6.1 / 6.3 Identity and 802.1X with ISE</td><td>How SGTs get assigned, and why 802.1X beats port security against MAC spoofing</td></tr></tbody></table></div>
+<blockquote><p>2.3 starts with the verb <strong>Configure</strong>, unlike the &quot;Describe&quot; objectives around it. Expect to recognize the exact commands, the show output, and what happens when each feature triggers.</p></blockquote>
+<h2 id="why-layer-2-is-where-containment-begins">Why Layer 2 is where containment begins</h2>
+<p>When engineers think about network security they jump to firewalls, VPNs and IPS, all Layer 3 and above. What gets overlooked is how much containment lives down at <strong>Layer 2</strong>, on the switches themselves. Long before traffic reaches a firewall, the way you carve up the switched network decides <em>how far a problem can spread</em>. The theme of this module: <strong>use Layer 2 to limit the blast radius.</strong></p>
+<figure class="post-figure"><a href="/assets/img/ccnp/03/fig-01-blast-radius.webp" aria-label="Open full-size image: Blast radius at Layer 2: a flat network where one host reaches everyone, VLAN segmentation that walls off rooms, and micro-segmentation that isolates single hosts"><img src="/assets/img/ccnp/03/fig-01-blast-radius.webp" srcset="/assets/img/ccnp/03/fig-01-blast-radius-800.webp 800w, /assets/img/ccnp/03/fig-01-blast-radius.webp 1600w" sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem" width="1600" height="855" alt="Blast radius at Layer 2: a flat network where one host reaches everyone, VLAN segmentation that walls off rooms, and micro-segmentation that isolates single hosts" loading="lazy" decoding="async"></a><figcaption>Blast radius at Layer 2: a flat network where one host reaches everyone, VLAN segmentation that walls off rooms, and micro-segmentation that isolates single hosts. Select the image to open it full size.</figcaption></figure>
+<h3 id="the-blast-radius-analogy">The blast-radius analogy</h3>
+<p>Picture one open office floor with no interior walls. If one person starts shouting and setting off alarms, <em>everyone</em> on the floor is affected immediately.</p>
+<p>A flat network is that open floor. One big <strong>Layer 2 broadcast domain</strong> means every device can reach every other device directly, and a single compromised host can touch them all. A worm, an ARP-spoofing attacker, a broadcast storm: in a flat design, the whole floor is the blast zone.</p>
+<p>Now add interior walls. If someone goes rogue in one room, the damage stays <strong>in that room</strong>. Those walls are <strong>VLANs</strong>. A Layer 2 attack that erupts in one VLAN (ARP poisoning, MAC flooding, a broadcast storm) stays inside that VLAN.</p>
+<blockquote><p><strong>The principle:</strong> segmentation isn&#x27;t about making the network complicated. It&#x27;s about making sure that <em>when</em> something goes wrong, it stays contained.</p></blockquote>
+<h3 id="vlans-and-subnets-one-to-one">VLANs and subnets: one to one</h3>
+<p>In a clean design there&#x27;s a <strong>1:1 relationship between a VLAN (broadcast domain) and an IP subnet</strong>:</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">VLAN</th><th scope="col">Purpose</th><th scope="col">Subnet</th></tr></thead><tbody><tr><td><strong>40</strong> users</td><td>User hosts</td><td><code translate="no">10.40.0.0/24</code></td></tr><tr><td><strong>50</strong> servers</td><td>Servers</td><td><code translate="no">10.50.0.0/24</code></td></tr><tr><td><strong>99</strong> mgmt</td><td>Switch management</td><td><code translate="no">10.99.0.0/24</code></td></tr></tbody></table></div>
+<p>Layer 2 builds the walls; Layer 3 addressing rides on top. Traffic <em>between</em> VLANs must be routed, and that routed boundary is where firewalls and ACLs enforce policy (see <a href="/ccnp-security/network-security-firewall-ips-visibility#firewall-ips-solutions-and-deployment-models">firewall and IPS deployment</a>). This module focuses on what the switches themselves can do before routing enters the picture.</p>
+<h3 id="where-layer-2-sits">Where Layer 2 sits</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Layer</th><th scope="col">PDU</th><th scope="col">Device</th><th scope="col">This module&#x27;s concern</th></tr></thead><tbody><tr><td>3 Network</td><td>Packet</td><td>Router / L3 switch</td><td>The inter-VLAN boundary (noted, not the focus)</td></tr><tr><td><strong>2 Data link</strong></td><td><strong>Frame</strong></td><td><strong>Switch</strong></td><td><strong>VLANs, trunks, CAM table, STP, DHCP/ARP validation</strong></td></tr><tr><td>1 Physical</td><td>Bits</td><td>Cabling, jacks</td><td>Where an attacker plugs in (unused ports)</td></tr></tbody></table></div>
+<h3 id="the-threats-this-module-defends-against">The threats this module defends against</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Attack</th><th scope="col">What the attacker does</th><th scope="col">Defense</th></tr></thead><tbody><tr><td><strong>MAC flooding / CAM overflow</strong></td><td>Floods random source MACs until the CAM table fills; the switch floods unknown unicast out every port, so the attacker can sniff</td><td><a href="#port-security-containing-the-endpoint">Port security</a></td></tr><tr><td><strong>MAC spoofing</strong></td><td>Clones a legitimate host&#x27;s MAC to steal its traffic or its port</td><td>Sticky/static port security; 802.1X for real identity</td></tr><tr><td><strong>VLAN hopping: switch spoofing</strong></td><td>Negotiates a trunk with DTP and reaches every VLAN</td><td><a href="#access-ports-trunks-and-the-native-vlan">Access/trunk hardening</a></td></tr><tr><td><strong>VLAN hopping: double tagging</strong></td><td>Stacks two 802.1Q tags to jump from the native VLAN into another</td><td>Native VLAN hardening</td></tr><tr><td><strong>STP manipulation</strong></td><td>Sends superior BPDUs to become root: man-in-the-middle or a topology DoS</td><td><a href="#spanning-tree-protection">BPDU Guard, Root Guard</a></td></tr><tr><td><strong>Rogue DHCP server</strong></td><td>Hands out its own gateway/DNS to become the man in the middle</td><td><a href="#dhcp-snooping">DHCP snooping</a></td></tr><tr><td><strong>DHCP starvation</strong></td><td>Exhausts the pool with thousands of fake requests</td><td>DHCP snooping rate limit + port security</td></tr><tr><td><strong>ARP spoofing / poisoning</strong></td><td>Forges ARP replies to intercept traffic in the VLAN</td><td><a href="#dynamic-arp-inspection-and-ip-source-guard">Dynamic ARP Inspection</a></td></tr><tr><td><strong>IP spoofing</strong></td><td>Uses an IP address it wasn&#x27;t given</td><td>IP Source Guard</td></tr><tr><td><strong>Broadcast / multicast storm</strong></td><td>A loop or a flood saturates the segment</td><td><a href="#storm-control">Storm control</a></td></tr><tr><td><strong>VTP database overwrite</strong></td><td>A switch with a higher revision wipes the VLANs</td><td>VTP transparent / VTPv3 / no VTP</td></tr><tr><td><strong>Walk-up access</strong></td><td>Plugs into a live, unused jack</td><td>Shut unused ports + dead VLAN</td></tr><tr><td><strong>Lateral movement in a subnet</strong></td><td>Pivots host to host in the same VLAN</td><td>Private VLANs, protected ports, SGTs</td></tr></tbody></table></div>
+<h3 id="the-reference-topology">The reference topology</h3>
+<p>The demonstrations use two switches trunked together and endpoints split across two VLANs:</p>
+<ul><li><strong>SW-1 ── trunk ── SW-2</strong></li><li><strong>VLAN 50</strong> <code translate="no">10.50.0.0/24</code>: a server</li><li><strong>VLAN 40</strong> <code translate="no">10.40.0.0/24</code>: PC-3 and a Kali Linux host (the attacker)</li></ul>
+<p>The attack demos (Yersinia, macof) were run on virtual IOS switches, so interfaces read <code translate="no">Gi0/x</code> and <code translate="no">Gi1/x</code>. The <a href="/ccnp-security/labs/segmentation-l2-hardening-packet-tracer">downloadable Packet Tracer lab</a> uses Catalyst 2960 switches, where user ports are <code translate="no">Fa0/1</code> to <code translate="no">Fa0/24</code>. The logic is identical.</p>
+<h2 id="vlan-segmentation-as-a-blast-radius-control">VLAN segmentation as a blast-radius control</h2>
+<p>This part builds the segmentation with <strong>basic CCNA-level commands only, not hardened best practice.</strong> That&#x27;s deliberate: configuring it the minimal way exposes exactly the gaps the next parts close. Lay the foundation, then walk the building and find every unlocked door.</p>
+<h3 id="start-from-the-baseline">Start from the baseline</h3>
+<p>Both switches start at defaults: no custom VLANs, every port in VLAN 1.</p>
+<pre translate="no"><code translate="no">SW-2# show vlan brief
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Gi0/0, Gi0/1, Gi0/2, Gi0/3
+                                                Gi1/0, Gi1/1, Gi1/2, Gi1/3
+1002 fddi-default                     act/unsup
+1003 trcrf-default                    act/unsup
+1004 fddinet-default                  act/unsup
+1005 trbrf-default                    act/unsup</code></pre>
+<p>Everything in VLAN 1 is the open floor.</p>
+<h3 id="create-and-name-the-vlans">Create and name the VLANs</h3>
+<p>Names are documentation that saves the next engineer (and you, during an incident):</p>
+<pre translate="no"><code translate="no">SW-2# configure terminal
+SW-2(config)# vlan 40
+SW-2(config-vlan)# name users
+SW-2(config-vlan)# vlan 50
+SW-2(config-vlan)# name servers
+SW-2(config-vlan)# end</code></pre>
+<h3 id="assign-access-ports">Assign access ports</h3>
+<pre translate="no"><code translate="no">SW-2(config)# interface gig 1/0
+SW-2(config-if)# description to Server
+SW-2(config-if)# switchport access vlan 50
+SW-2(config-if)# interface range gig 1/1 - 2
+SW-2(config-if-range)# switchport access vlan 40</code></pre>
+<pre translate="no"><code translate="no">SW-2# show interface status
+Port    Name        Status      Vlan   Duplex  Speed Type
+Gi1/0   to Server   connected   50     a-full  auto  RJ45
+Gi1/1   to PC-3     connected   40     a-full  auto  RJ45
+Gi1/2   to Linux    connected   40     a-full  auto  RJ45</code></pre>
+<blockquote><p><strong>The containment payoff:</strong> a Layer 2 attack launched from PC-3 (VLAN 40) now stays inside VLAN 40. The server in VLAN 50 is behind a wall, from VLAN assignment alone.</p></blockquote>
+<h3 id="bring-up-the-trunk-the-basic-way">Bring up the trunk (the basic way)</h3>
+<p>Look at the inter-switch port&#x27;s default state first and notice two red flags:</p>
+<pre translate="no"><code translate="no">SW-2# show interface gig 0/2 switchport
+Name: Gi0/2
+Switchport: Enabled
+Administrative Mode: dynamic auto            &lt;-- red flag 1: DTP
+Operational Mode: static access
+Negotiation of Trunking: On                  &lt;-- red flag 1: DTP
+Access Mode VLAN: 1 (default)
+Trunking Native Mode VLAN: 1 (default)       &lt;-- red flag 2: native VLAN 1</code></pre>
+<pre translate="no"><code translate="no">SW-2(config)# interface gig 0/2
+SW-2(config-if)# switchport trunk encapsulation dot1q
+SW-2(config-if)# switchport mode trunk</code></pre>
+<p><code translate="no">switchport trunk encapsulation dot1q</code> is only needed on switches that also support ISL (and some virtual switches); a Catalyst 2960 is 802.1Q-only and rejects it.</p>
+<pre translate="no"><code translate="no">SW-2# show interface trunk
+Port    Mode  Encapsulation  Status    Native vlan
+Gi0/2   on    802.1q         trunking  1
+
+Port    Vlans allowed on trunk
+Gi0/2   1-4094
+
+Port    Vlans allowed and active in management domain
+Gi0/2   1,40,50</code></pre>
+<h3 id="the-security-debt-this-leaves-behind">The security debt this leaves behind</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Red flag</th><th scope="col">Why it&#x27;s dangerous</th><th scope="col">Fixed in</th></tr></thead><tbody><tr><td><strong>DTP on</strong> (<code translate="no">dynamic auto</code>, &quot;Negotiation of Trunking: On&quot;)</td><td>An attacker&#x27;s device can negotiate a trunk and reach every VLAN: <strong>switch spoofing</strong></td><td><a href="#access-ports-trunks-and-the-native-vlan">Access ports and trunks</a></td></tr><tr><td><strong>Native VLAN 1</strong></td><td>Native frames cross the trunk untagged: the lever for <strong>double tagging</strong></td><td>Native VLAN hardening</td></tr><tr><td><strong>Trunk allows 1-4094</strong></td><td>Every VLAN goes everywhere, even where it isn&#x27;t needed</td><td>Trunk pruning</td></tr></tbody></table></div>
+<p>Both ends started as <code translate="no">dynamic auto</code>, so neither side initiated and no trunk formed until one side was forced. That&#x27;s luck, not security: with DTP on, a <em>malicious</em> device can be the side that initiates.</p>
+<h3 id="where-did-the-vlans-come-from-on-the-other-switch-vtp">Where did the VLANs come from on the other switch? VTP</h3>
+<p>When the trunk came up, SW-1 suddenly knew VLANs 40 and 50. <strong>VTP (VLAN Trunking Protocol)</strong> synchronizes the VLAN database across trunked switches in the same domain:</p>
+<pre translate="no"><code translate="no">SW-2# show vtp status
+VTP Operating Mode              : Server
+VTP Domain Name                 : OGIT
+Configuration Revision          : 16</code></pre>
+<p>Create VLAN 999 on SW-2 and it appears on SW-1 seconds later.</p>
+<blockquote><p><strong>Why this matters:</strong> a switch inserted with the same domain and a <strong>higher configuration revision</strong> can overwrite the whole domain&#x27;s VLAN database, deleting production VLANs and black-holing traffic. This is the <strong>VTP bomb</strong>. Mitigations: <strong>VTP transparent mode</strong> (the switch keeps its own VLANs and only relays VTP), <strong>VTPv3</strong> (only the designated <em>primary server</em> can change the database, plus a password), or <strong>VTP off</strong>. Remember: <em>highest revision wins</em>.</p></blockquote>
+<h3 id="prove-the-segment-works">Prove the segment works</h3>
+<pre translate="no"><code translate="no">PC-3&gt; ip dhcp
+DORA IP 10.40.0.56/24 GW 10.40.0.1</code></pre>
+<p>PC-3&#x27;s frames enter on an access port in VLAN 40, cross the trunk <strong>tagged 40</strong>, and reach the DHCP server. The 1:1 VLAN-to-subnet design holds.</p>
+<h2 id="access-ports-trunks-and-the-native-vlan">Access ports, trunks and the native VLAN</h2>
+<p>Now attack the gaps from an endpoint, then harden the switch so the same attack fails.</p>
+<figure class="post-figure"><a href="/assets/img/ccnp/03/fig-03-vlan-hopping.webp" aria-label="Open full-size image: VLAN hopping: switch spoofing with DTP and double tagging through the native VLAN, and the configuration that stops each"><img src="/assets/img/ccnp/03/fig-03-vlan-hopping.webp" srcset="/assets/img/ccnp/03/fig-03-vlan-hopping-800.webp 800w, /assets/img/ccnp/03/fig-03-vlan-hopping.webp 1600w" sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem" width="1600" height="918" alt="VLAN hopping: switch spoofing with DTP and double tagging through the native VLAN, and the configuration that stops each" loading="lazy" decoding="async"></a><figcaption>VLAN hopping: switch spoofing with DTP and double tagging through the native VLAN, and the configuration that stops each. Select the image to open it full size.</figcaption></figure>
+<h3 id="the-vulnerability-seen-from-the-switch">The vulnerability, seen from the switch</h3>
+<p>The Kali host sits on access port <code translate="no">Gi1/2</code> in VLAN 40:</p>
+<pre translate="no"><code translate="no">SW-2# show interface gig 1/2 switchport
+Administrative Mode: dynamic auto
+Operational Mode: static access
+Negotiation of Trunking: On            &lt;-- the hole
+Access Mode VLAN: 40 (users)</code></pre>
+<p>It <em>operates</em> as an access port, but &quot;Negotiation of Trunking: On&quot; means it still speaks <strong>DTP</strong>. It&#x27;s willing to become a trunk if something asks.</p>
+<h3 id="dtp-modes-which-combinations-form-a-trunk">DTP modes: which combinations form a trunk</h3>
+<p>Know this matrix; the exam loves it.</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Side A \ Side B</th><th scope="col">access</th><th scope="col">dynamic auto</th><th scope="col">dynamic desirable</th><th scope="col">trunk</th></tr></thead><tbody><tr><td><strong>access</strong></td><td>access</td><td>access</td><td>access</td><td><em>mismatch</em></td></tr><tr><td><strong>dynamic auto</strong></td><td>access</td><td><strong>access</strong></td><td>trunk</td><td>trunk</td></tr><tr><td><strong>dynamic desirable</strong></td><td>access</td><td>trunk</td><td>trunk</td><td>trunk</td></tr><tr><td><strong>trunk</strong></td><td><em>mismatch</em></td><td>trunk</td><td>trunk</td><td>trunk</td></tr></tbody></table></div>
+<ul><li><code translate="no">dynamic auto</code> waits to be asked; <code translate="no">dynamic desirable</code> actively asks. An attacker who sends &quot;desirable&quot; DTP frames to an <code translate="no">auto</code> port gets a trunk.</li><li><code translate="no">switchport nonegotiate</code> stops sending DTP. It only works with a hard-coded mode (<code translate="no">access</code> or <code translate="no">trunk</code>); a nonegotiate trunk needs the other end hard-coded to <code translate="no">trunk</code> as well.</li></ul>
+<h3 id="the-attack-switch-spoofing-vlan-hopping">The attack: switch-spoofing VLAN hopping</h3>
+<p>On Kali, <code translate="no">ifconfig</code> shows a normal VLAN 40 host (<code translate="no">10.40.0.55</code>). The attacker launches <strong>Yersinia</strong>, a classic Layer 2 attack tool, in graphical mode (<code translate="no">yersinia -g</code>). It immediately lists the protocols the switch leaks: CDP, DTP, 802.1Q, STP. One menu action sends DTP &quot;let&#x27;s trunk&quot; frames:</p>
+<pre translate="no"><code translate="no">SW-2# show interface trunk
+Port    Mode  Encapsulation  Status    Native vlan
+Gi0/2   on    802.1q         trunking  1
+Gi1/2   on    802.1q         trunking  1        &lt;-- the attacker&#x27;s port is now a TRUNK</code></pre>
+<p><strong>The wall just fell.</strong> <code translate="no">Gi1/2</code> carries every VLAN. The attacker can tag frames for VLAN 50, VLAN 1 or any other VLAN and talk directly to those segments. No firewall, router ACL or inter-VLAN control is in the path.</p>
+<blockquote><p>Every segmentation control assumes the attacker is stuck in one VLAN. Switch spoofing removes that assumption in one click against a port left in its default mode. &quot;It works&quot; is not the same as &quot;it&#x27;s secure.&quot;</p></blockquote>
+<h3 id="fix-1-hard-code-access-ports-kill-dtp">Fix 1: hard-code access ports (kill DTP)</h3>
+<pre translate="no"><code translate="no">SW-2(config)# interface gig 1/2
+SW-2(config-if)# switchport mode access
+SW-2(config-if)# switchport nonegotiate</code></pre>
+<p>Or use the macro on every access port:</p>
+<pre translate="no"><code translate="no">SW-2(config)# interface range gig 1/0 - 2
+SW-2(config-if-range)# switchport host</code></pre>
+<p><code translate="no">switchport host</code> = <code translate="no">switchport mode access</code> + <code translate="no">spanning-tree portfast</code> + <code translate="no">no channel-group</code>. Great for access ports; never use it on an uplink. Static access mode already stops DTP negotiation; add <code translate="no">switchport nonegotiate</code> if you want DTP frames gone entirely.</p>
+<pre translate="no"><code translate="no">SW-2# show interface gig 1/2 switchport
+Administrative Mode: static access
+Negotiation of Trunking: Off            &lt;-- fixed</code></pre>
+<p>Re-run the Yersinia DTP attack: nothing happens, and <code translate="no">Gi1/2</code> never appears in <code translate="no">show interface trunk</code>.</p>
+<h3 id="fix-2-harden-the-trunk-itself">Fix 2: harden the trunk itself</h3>
+<p>Trunks to switches you control should also be hard-coded:</p>
+<pre translate="no"><code translate="no">SW-2(config)# interface gig 0/2
+SW-2(config-if)# switchport mode trunk
+SW-2(config-if)# switchport nonegotiate
+SW-2(config-if)# switchport trunk allowed vlan 40,50,99</code></pre>
+<p>The allowed list is <strong>pruning by policy</strong>: only VLANs that must cross this link are carried. A VLAN that never reaches a switch can&#x27;t be attacked from that switch.</p>
+<h3 id="fix-3-the-native-vlan-kill-double-tagging">Fix 3: the native VLAN (kill double tagging)</h3>
+<p>Frames in the <strong>native VLAN</strong> cross an 802.1Q trunk <strong>untagged</strong>. That&#x27;s the lever for the second VLAN-hopping technique.</p>
+<p><strong>How double tagging works:</strong> the attacker sits in the native VLAN (VLAN 1 by default) and sends a frame with <strong>two</strong> 802.1Q tags: outer = native VLAN, inner = victim VLAN. The first switch sees the outer tag matches the native VLAN, strips it and sends the frame onto the trunk, which now carries the <em>inner</em> tag. The next switch reads the inner tag and delivers the frame into the victim VLAN. It&#x27;s <strong>one-way</strong> (replies don&#x27;t come back the same way), which still works for spoofed attacks and some DoS.</p>
+<p>It needs two conditions: <strong>the attacker&#x27;s access port is in the native VLAN</strong>, and <strong>the native VLAN is untagged on the trunk</strong>. Break both:</p>
+<pre translate="no"><code translate="no">SW-2(config)# vlan 999
+SW-2(config-vlan)# name Native-T
+SW-2(config-vlan)# exit
+SW-2(config)# interface gig 0/2
+SW-2(config-if)# switchport trunk native vlan 999</code></pre>
+<p>Until both ends match you&#x27;ll see:</p>
+<pre translate="no"><code translate="no">%SPANTREE-2-RECV_PVID_ERR: Received BPDU with inconsistent peer vlan id 1 on Gi0/2 VLAN999.
+%CDP-4-NATIVE_VLAN_MISMATCH: Native VLAN mismatch discovered on GigabitEthernet0/2 ...</code></pre>
+<p>Set <code translate="no">switchport trunk native vlan 999</code> on SW-1&#x27;s end too and the errors clear. No host port ever lives in VLAN 999, so nobody can stand in the native VLAN.</p>
+<p><strong>Tag the native VLAN as well.</strong> On Catalyst switches the global command <code translate="no">vlan dot1q tag native</code> makes the switch tag native-VLAN frames on trunks, which defeats double tagging outright (some platforms offer a per-interface version). Packet Tracer doesn&#x27;t model it.</p>
+<blockquote><p>Some environments use the native VLAN for management or fallback and can&#x27;t change it freely. The principle still holds: if you must keep native VLAN 1, tag it, keep hosts out of it, and prune it where you can.</p></blockquote>
+<h3 id="the-rules-to-memorize">The rules to memorize</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Port type</th><th scope="col">Rule</th><th scope="col">Commands</th></tr></thead><tbody><tr><td><strong>Access</strong></td><td>Hard-code access, no DTP</td><td><code translate="no">switchport mode access</code> + <code translate="no">switchport nonegotiate</code> (or <code translate="no">switchport host</code>)</td></tr><tr><td><strong>Trunk</strong></td><td>Hard-code trunk, no DTP, prune</td><td><code translate="no">switchport mode trunk</code> + <code translate="no">nonegotiate</code> + <code translate="no">switchport trunk allowed vlan ...</code></td></tr><tr><td><strong>Native VLAN</strong></td><td>Dead VLAN, tagged, no hosts</td><td><code translate="no">switchport trunk native vlan 999</code> + <code translate="no">vlan dot1q tag native</code></td></tr><tr><td><strong>Unused</strong></td><td>Down and parked</td><td><code translate="no">shutdown</code> + <code translate="no">switchport access vlan 777</code></td></tr></tbody></table></div>
+<h2 id="port-security-containing-the-endpoint">Port security: containing the endpoint</h2>
+<p>The ports can&#x27;t be talked into trunking any more, but a device can still abuse the port it legitimately has, by attacking the switch&#x27;s <strong>CAM table</strong>.</p>
+<figure class="post-figure"><a href="/assets/img/ccnp/03/fig-04-port-security.webp" aria-label="Open full-size image: CAM overflow and port security: how a MAC flood turns a switch into a hub, and the protect, restrict and shutdown violation modes"><img src="/assets/img/ccnp/03/fig-04-port-security.webp" srcset="/assets/img/ccnp/03/fig-04-port-security-800.webp 800w, /assets/img/ccnp/03/fig-04-port-security.webp 1600w" sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem" width="1600" height="843" alt="CAM overflow and port security: how a MAC flood turns a switch into a hub, and the protect, restrict and shutdown violation modes" loading="lazy" decoding="async"></a><figcaption>CAM overflow and port security: how a MAC flood turns a switch into a hub, and the protect, restrict and shutdown violation modes. Select the image to open it full size.</figcaption></figure>
+<h3 id="the-threat-cam-overflow-mac-flooding">The threat: CAM overflow / MAC flooding</h3>
+<p>A switch learns source MACs into the <strong>CAM table</strong>, one entry per (VLAN, MAC) → port. The table is finite. Flood it with thousands of random source MACs and two things happen: the table fills, and legitimate entries age out without room to be relearned. For a destination it no longer knows, the switch <strong>floods the frame out every port in the VLAN</strong>, like a hub. The attacker, in the same VLAN, now <strong>receives traffic that was never addressed to it</strong>.</p>
+<p>Baseline on VLAN 40:</p>
+<pre translate="no"><code translate="no">SW-2# show mac address-table count vlan 40
+Mac Entries for Vlan 40:
+Dynamic Address Count : 5</code></pre>
+<p>On Kali, <code translate="no">sudo macof -i eth0</code> for under two seconds:</p>
+<pre translate="no"><code translate="no">SW-2# show mac address-table count vlan 40
+Mac Entries for Vlan 40:
+Dynamic Address Count : 3309        &lt;-- from 5, in about 2 seconds</code></pre>
+<p>Left running, it fills the table and the switch starts flooding. The same tool also makes a decent <strong>DHCP starvation</strong> precursor, since every fake MAC can ask for a lease.</p>
+<h3 id="the-fix-port-security">The fix: port security</h3>
+<p>Port security limits <strong>how many</strong> source MACs a port accepts and <strong>what happens</strong> when the limit is exceeded:</p>
+<pre translate="no"><code translate="no">SW-2(config)# interface gig 1/2
+SW-2(config-if)# switchport mode access
+SW-2(config-if)# switchport port-security maximum 5
+SW-2(config-if)# switchport port-security violation shutdown
+SW-2(config-if)# switchport port-security</code></pre>
+<ul><li>Port security only works on a <strong>static</strong> access (or trunk) port, not a dynamic one. Hard-code the mode first.</li><li>The default maximum is <strong>1</strong>. Pick a number that fits the port&#x27;s real role: a PC alone = 1 or 2, an IP phone with a PC behind it = 2 or 3 (the phone&#x27;s MAC can be learned in both the voice and data VLAN), a small VM host = more.</li><li><strong>The number one mistake:</strong> configuring <code translate="no">maximum</code> and <code translate="no">violation</code> but forgetting the bare <code translate="no">switchport port-security</code> line that actually <strong>enables</strong> the feature.</li></ul>
+<h3 id="the-three-violation-modes">The three violation modes</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Mode</th><th scope="col">Drops the offending frames?</th><th scope="col">Log + SNMP trap?</th><th scope="col">Violation counter?</th><th scope="col">Port err-disabled?</th></tr></thead><tbody><tr><td><strong>protect</strong></td><td>Yes</td><td>No</td><td>No</td><td>No</td></tr><tr><td><strong>restrict</strong></td><td>Yes</td><td><strong>Yes</strong></td><td><strong>Yes</strong></td><td>No</td></tr><tr><td><strong>shutdown</strong> (default)</td><td>Yes, the whole port goes down</td><td><strong>Yes</strong></td><td><strong>Yes</strong></td><td><strong>Yes</strong></td></tr></tbody></table></div>
+<ul><li><strong>protect</strong> silently drops traffic from new MACs. No visibility, so it&#x27;s poor for detection.</li><li><strong>restrict</strong> drops and tells you. Useful where uptime matters (a shared conference-room port).</li><li><strong>shutdown</strong> err-disables the port: every frame stops, including legitimate ones. The strongest containment and the default.</li></ul>
+<pre translate="no"><code translate="no">SW-2# show port-security interface gig 1/2
+Port Security              : Enabled
+Port Status                : Secure-up
+Violation Mode             : Shutdown
+Maximum MAC Addresses      : 5
+Total MAC Addresses        : 1
+Security Violation Count   : 0</code></pre>
+<h3 id="triggering-a-violation">Triggering a violation</h3>
+<p>Re-run <code translate="no">macof</code>:</p>
+<pre translate="no"><code translate="no">%PM-4-ERR_DISABLE: psecure-violation error detected on Gi1/2, putting Gi1/2 in err-disable state
+
+SW-2# show interface status err-disabled
+Port    Name       Status        Reason
+Gi1/2   to Linux   err-disabled  psecure-violation</code></pre>
+<p><code translate="no">Secure-shutdown</code> + <code translate="no">err-disabled (psecure-violation)</code> is port security doing its job.</p>
+<h3 id="recovering-the-port">Recovering the port</h3>
+<p><strong>Manually:</strong> <code translate="no">shutdown</code> then <code translate="no">no shutdown</code> on the interface.</p>
+<p><strong>Automatically:</strong> err-disable recovery is off by default (interval 300 seconds once enabled):</p>
+<pre translate="no"><code translate="no">SW-2(config)# errdisable recovery cause psecure-violation
+SW-2(config)# errdisable recovery interval 60</code></pre>
+<pre translate="no"><code translate="no">SW-2# show errdisable recovery
+ErrDisable Reason      Timer Status
+psecure-violation      Enabled
+Interfaces that will be enabled at the next timeout:
+Interface   Errdisable reason    Time left(sec)
+Gi1/2       psecure-violation    18</code></pre>
+<p>If the attack is still running when the port recovers, it exceeds 5 MACs instantly and err-disables again. The attacker only ever gets tiny windows, while an honest accident heals itself.</p>
+<h3 id="choosing-which-macs-are-allowed">Choosing which MACs are allowed</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Method</th><th scope="col">Command</th><th scope="col">Behavior</th></tr></thead><tbody><tr><td><strong>Dynamic</strong></td><td>(default)</td><td>Learns up to the maximum; forgotten on reload</td></tr><tr><td><strong>Sticky</strong></td><td><code translate="no">switchport port-security mac-address sticky</code></td><td>Learns, then writes the MACs into the running config; <code translate="no">copy run start</code> makes them permanent</td></tr><tr><td><strong>Static</strong></td><td><code translate="no">switchport port-security mac-address 0050.7966.6804</code></td><td>You type the allowed MAC</td></tr></tbody></table></div>
+<p><strong>Aging</strong> frees entries so a port can accept a new device later: <code translate="no">switchport port-security aging time 10</code> and <code translate="no">aging type inactivity</code> (remove after 10 minutes of silence) or <code translate="no">absolute</code>.</p>
+<h3 id="what-port-security-does-not-do">What port security does not do</h3>
+<ul><li>It doesn&#x27;t stop <strong>VLAN hopping</strong> (that&#x27;s DTP and native VLAN hardening).</li><li>It doesn&#x27;t stop <strong>ARP spoofing</strong> (that&#x27;s DAI).</li><li>It doesn&#x27;t prove <strong>identity</strong>. An attacker who unplugs a printer and clones the printer&#x27;s MAC passes sticky port security. Real identity at the port is <strong>802.1X</strong> (or MAB as a fallback) with ISE, which is SCOR objective 6.3.</li></ul>
+<h2 id="spanning-tree-protection">Spanning tree protection</h2>
+<p>STP prevents loops by electing a <strong>root bridge</strong> and blocking redundant links. The election trusts BPDUs blindly: the bridge advertising the lowest bridge ID (priority + MAC) wins.</p>
+<h3 id="the-attack">The attack</h3>
+<p>An attacker (or an employee with a cheap switch) connects to an access port and sends <strong>superior BPDUs</strong> with priority 0. The VLAN re-elects the attacker as root:</p>
+<ul><li><strong>Man in the middle:</strong> traffic between switches now flows toward and through the attacker&#x27;s position.</li><li><strong>Denial of service:</strong> every re-election blocks ports for up to 30 to 50 seconds with classic STP, and repeated BPDU floods keep the topology churning.</li></ul>
+<h3 id="the-defenses">The defenses</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Feature</th><th scope="col">Where</th><th scope="col">What it does when triggered</th></tr></thead><tbody><tr><td><strong>PortFast</strong></td><td>Access (edge) ports</td><td>Skips listening/learning so hosts come up fast; not a security feature by itself</td></tr><tr><td><strong>BPDU Guard</strong></td><td>PortFast edge ports</td><td>Any BPDU received → port <strong>err-disabled</strong> (<code translate="no">bpduguard</code>)</td></tr><tr><td><strong>Root Guard</strong></td><td>Designated ports where the root must never appear (distribution ports facing access switches)</td><td>Superior BPDU → port goes <strong>root-inconsistent</strong> (blocking); recovers on its own when the superior BPDUs stop</td></tr><tr><td><strong>Loop Guard</strong></td><td>Non-designated (root and alternate) ports on links between switches</td><td>Stops a blocked port from becoming forwarding when BPDUs stop arriving (unidirectional link) → <strong>loop-inconsistent</strong></td></tr><tr><td><strong>BPDU Filter</strong></td><td>Rarely, carefully</td><td>Stops sending/receiving BPDUs: effectively <strong>disables STP</strong> on the port. Dangerous; a loop through that port is not detected</td></tr></tbody></table></div>
+<pre translate="no"><code translate="no">! per port
+SW-2(config)# interface range gig 1/0 - 2
+SW-2(config-if-range)# spanning-tree portfast
+SW-2(config-if-range)# spanning-tree bpduguard enable
+
+! or globally: BPDU Guard on every PortFast port
+SW-2(config)# spanning-tree portfast bpduguard default
+
+! on a distribution switch, ports facing access switches
+DSW(config-if)# spanning-tree guard root</code></pre>
+<p>Newer IOS uses <code translate="no">spanning-tree portfast edge</code> and <code translate="no">spanning-tree portfast edge bpduguard default</code>. Same idea.</p>
+<p><strong>Place the root deliberately.</strong> Root Guard only helps if the root is where you intend: <code translate="no">spanning-tree vlan 40,50 root primary</code> (or <code translate="no">priority 4096</code>) on the core/distribution switch.</p>
+<pre translate="no"><code translate="no">%SPANTREE-2-BLOCK_BPDUGUARD: Received BPDU on port Gi1/2 with BPDU Guard enabled. Disabling port.
+%PM-4-ERR_DISABLE: bpduguard error detected on Gi1/2, putting Gi1/2 in err-disable state</code></pre>
+<blockquote><p><strong>Exam pairing:</strong> BPDU Guard = <em>edge ports, err-disable</em>. Root Guard = <em>ports where the root must never be, root-inconsistent, self-recovering</em>. Mixing these up is a classic wrong answer.</p></blockquote>
+<h2 id="dhcp-snooping">DHCP snooping</h2>
+<p>DHCP has no authentication. The first offer a client receives usually wins.</p>
+<h3 id="two-attacks">Two attacks</h3>
+<ul><li><strong>Rogue DHCP server (spoofing):</strong> the attacker answers DHCP requests faster than the real server and hands out <em>its own IP as the default gateway</em> (or DNS). Every client that accepts sends its traffic through the attacker: a man-in-the-middle with no further effort.</li><li><strong>DHCP starvation:</strong> the attacker sends thousands of DISCOVERs from random MACs until the real pool is empty. Legitimate clients get nothing (DoS), and a rogue server is often brought up right after to fill the gap.</li></ul>
+<h3 id="how-dhcp-snooping-thinks">How DHCP snooping thinks</h3>
+<p>DHCP snooping divides ports into <strong>trusted</strong> (toward the real DHCP server or the relay/uplink) and <strong>untrusted</strong> (everything else, the default):</p>
+<ul><li><strong>Server messages</strong> (OFFER, ACK, NAK) arriving on an <strong>untrusted</strong> port are <strong>dropped</strong>. A rogue server on a user port is silenced.</li><li>Client messages on untrusted ports are checked; by default the switch verifies the frame&#x27;s source MAC matches the client hardware address inside the DHCP packet (<code translate="no">ip dhcp snooping verify mac-address</code>).</li><li>Every successful lease builds an entry in the <strong>DHCP snooping binding table</strong>: MAC, IP, lease, VLAN, port. This table is the <strong>source of truth</strong> that DAI and IP Source Guard later use.</li></ul>
+<figure class="post-figure"><a href="/assets/img/ccnp/03/fig-05-snooping-dai-ipsg.webp" aria-label="Open full-size image: DHCP snooping builds a binding table from trusted DHCP exchanges; Dynamic ARP Inspection and IP Source Guard validate traffic against it"><img src="/assets/img/ccnp/03/fig-05-snooping-dai-ipsg.webp" srcset="/assets/img/ccnp/03/fig-05-snooping-dai-ipsg-800.webp 800w, /assets/img/ccnp/03/fig-05-snooping-dai-ipsg.webp 1600w" sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem" width="1600" height="948" alt="DHCP snooping builds a binding table from trusted DHCP exchanges; Dynamic ARP Inspection and IP Source Guard validate traffic against it" loading="lazy" decoding="async"></a><figcaption>DHCP snooping builds a binding table from trusted DHCP exchanges; Dynamic ARP Inspection and IP Source Guard validate traffic against it. Select the image to open it full size.</figcaption></figure>
+<h3 id="configuration">Configuration</h3>
+<pre translate="no"><code translate="no">SW-2(config)# ip dhcp snooping
+SW-2(config)# ip dhcp snooping vlan 40,50
+SW-2(config)# interface gig 0/2
+SW-2(config-if)# ip dhcp snooping trust              ! uplink toward the real server
+SW-2(config-if)# interface range gig 1/0 - 2
+SW-2(config-if-range)# ip dhcp snooping limit rate 10 ! DHCP packets per second on user ports</code></pre>
+<ul><li>Both the global command <strong>and</strong> the per-VLAN command are required. Forgetting <code translate="no">ip dhcp snooping vlan</code> is the usual mistake.</li><li>Exceeding the rate limit <strong>err-disables</strong> the port (<code translate="no">dhcp-rate-limit</code>). Combined with port security&#x27;s MAC cap, this kills starvation.</li><li><strong>Option 82:</strong> by default the switch inserts option 82 (relay agent information) into client requests. If the switch isn&#x27;t the relay, an upstream router or DHCP server may drop those packets, and clients stop getting addresses. Fix with <code translate="no">no ip dhcp snooping information option</code> on the switch (or trust option 82 on the relay). A very common real-world &quot;DHCP broke after I enabled snooping&quot; cause.</li></ul>
+<h3 id="verification">Verification</h3>
+<pre translate="no"><code translate="no">SW-2# show ip dhcp snooping
+Switch DHCP snooping is enabled
+DHCP snooping is configured on following VLANs:
+40,50
+Interface                  Trusted    Allow option    Rate limit (pps)
+GigabitEthernet0/2         yes        yes             unlimited
+GigabitEthernet1/2         no         no              10
+
+SW-2# show ip dhcp snooping binding
+MacAddress          IpAddress     Lease(sec)  Type           VLAN  Interface
+00:50:79:66:68:04   10.40.0.56    86017       dhcp-snooping  40    GigabitEthernet1/1</code></pre>
+<h2 id="dynamic-arp-inspection-and-ip-source-guard">Dynamic ARP Inspection and IP Source Guard</h2>
+<h3 id="arp-spoofing">ARP spoofing</h3>
+<p>ARP maps IP to MAC with no authentication, and hosts accept <strong>unsolicited (gratuitous) replies</strong>. The attacker tells PC-3 &quot;10.40.0.1 (the gateway) is at my MAC&quot; and tells the gateway &quot;10.40.0.56 is at my MAC&quot;. Both now send through the attacker: a classic man in the middle inside one VLAN. VLANs <strong>contain</strong> it to one segment; DAI <strong>stops</strong> it.</p>
+<h3 id="how-dai-thinks">How DAI thinks</h3>
+<p>On <strong>untrusted</strong> ports, <strong>Dynamic ARP Inspection</strong> intercepts every ARP request and reply and checks the sender&#x27;s IP-to-MAC pair against the <strong>DHCP snooping binding table</strong>. No matching binding, no forwarding: the ARP is dropped and logged. <strong>Trusted</strong> ports (uplinks) skip the check.</p>
+<pre translate="no"><code translate="no">SW-2(config)# ip arp inspection vlan 40,50
+SW-2(config)# interface gig 0/2
+SW-2(config-if)# ip arp inspection trust
+SW-2(config-if)# exit
+SW-2(config)# ip arp inspection validate src-mac dst-mac ip   ! optional extra checks</code></pre>
+<p>Key behaviors:</p>
+<ul><li><strong>Depends on DHCP snooping.</strong> Without bindings, DAI drops legitimate ARP. Enable snooping first.</li><li><strong>Static IP hosts</strong> (servers, printers) have no DHCP binding. Give DAI an <strong>ARP ACL</strong>, or their ARP gets dropped:</li></ul>
+<pre translate="no"><code translate="no">SW-2(config)# arp access-list STATIC-HOSTS
+SW-2(config-arp-nacl)# permit ip host 10.50.0.10 mac host 0050.7966.6800
+SW-2(config)# ip arp inspection filter STATIC-HOSTS vlan 50</code></pre>
+<ul><li><strong>Rate limit:</strong> untrusted ports allow <strong>15 ARP packets per second</strong> by default; exceeding it <strong>err-disables</strong> the port (<code translate="no">arp-inspection</code>). ARP floods are contained too.</li><li><code translate="no">validate src-mac dst-mac ip</code> adds checks: Ethernet source MAC = ARP sender MAC, destination MAC consistency, and no invalid IPs (0.0.0.0, broadcast, multicast).</li></ul>
+<pre translate="no"><code translate="no">%SW_DAI-4-DHCP_SNOOPING_DENY: 1 Invalid ARPs (Res) on Gi1/2, vlan 40.([5000.0003.0000/10.40.0.1/...])
+SW-2# show ip arp inspection statistics vlan 40</code></pre>
+<h3 id="ip-source-guard">IP Source Guard</h3>
+<p>DAI validates ARP. <strong>IP Source Guard (IPSG)</strong> validates <strong>every IP packet</strong> on an untrusted port: the source IP (and optionally source MAC) must match the binding for that port. A host that statically configures someone else&#x27;s address is filtered.</p>
+<pre translate="no"><code translate="no">SW-2(config)# interface range gig 1/1 - 2
+SW-2(config-if-range)# ip verify source                  ! source IP check
+SW-2(config-if-range)# ip verify source port-security    ! source IP + MAC (with port security)
+! static host without DHCP:
+SW-2(config)# ip source binding 0050.7966.6800 vlan 50 10.50.0.10 interface gig 1/0</code></pre>
+<p>Verify with <code translate="no">show ip verify source</code>. (Newer IOS XE versions express the MAC check as <code translate="no">ip verify source mac-check</code>.)</p>
+<blockquote><p><strong>The chain to remember:</strong> DHCP snooping <strong>builds</strong> the binding table → DAI uses it to validate <strong>ARP</strong> → IPSG uses it to validate <strong>IP source addresses</strong>. Snooping first, always.</p></blockquote>
+<h2 id="storm-control">Storm control</h2>
+<p>A loop, a broken NIC or an attacker can flood a segment with broadcast, multicast or unknown-unicast frames until links and switch CPUs saturate. <strong>Storm control</strong> measures that traffic per port and acts when it crosses a threshold:</p>
+<pre translate="no"><code translate="no">SW-2(config)# interface range gig 1/0 - 2
+SW-2(config-if-range)# storm-control broadcast level 20.00 10.00   ! rising 20%, falling 10% of bandwidth
+SW-2(config-if-range)# storm-control multicast level 30.00
+SW-2(config-if-range)# storm-control action trap                  ! or: shutdown</code></pre>
+<ul><li>Thresholds can be a <strong>percentage</strong> of bandwidth, <strong>bps</strong> or <strong>pps</strong>.</li><li>Default action: the switch <strong>drops</strong> the excess traffic of that type until the rate falls below the falling threshold. Add <code translate="no">action trap</code> to send an SNMP trap and log, or <code translate="no">action shutdown</code> to err-disable the port.</li><li>Verify with <code translate="no">show storm-control</code> (and per type, e.g. <code translate="no">show storm-control gig 1/2 broadcast</code>).</li></ul>
+<p>Storm control is your blast-radius tool <strong>within</strong> a VLAN when the problem is volume rather than forgery.</p>
+<h2 id="unused-ports-vtp-cdp-and-the-management-plane">Unused ports, VTP, CDP and the management plane</h2>
+<h3 id="unused-ports-down-and-parked">Unused ports: down and parked</h3>
+<p>A port left at defaults is in VLAN 1 and up. Anyone who plugs into a lobby jack lands on the network.</p>
+<pre translate="no"><code translate="no">SW-2(config)# vlan 777
+SW-2(config-vlan)# name Nowhere
+SW-2(config)# interface range gig 0/0 - 1 , gig 0/3 , gig 1/3
+SW-2(config-if-range)# switchport mode access
+SW-2(config-if-range)# switchport access vlan 777
+SW-2(config-if-range)# shutdown</code></pre>
+<p><strong>Both</strong> actions, every time: shut it, and park it in a dead VLAN that isn&#x27;t routed or trunked anywhere. If someone later re-enables the port by mistake, it still goes nowhere.</p>
+<h3 id="vtp">VTP</h3>
+<p>Covered above: use <strong>transparent mode</strong>, <strong>VTPv3</strong> with a primary server and password, or no VTP. Never insert a switch from a lab into production without resetting its revision (changing the domain name or setting transparent mode resets it to 0).</p>
+<h3 id="cdp-and-lldp">CDP and LLDP</h3>
+<p>CDP/LLDP advertise the switch model, IOS version, management IP, native VLAN and port: free reconnaissance for an attacker on a user port (Yersinia shows it immediately). Disable them on user-facing ports:</p>
+<pre translate="no"><code translate="no">SW-2(config-if)# no cdp enable
+SW-2(config-if)# no lldp transmit
+SW-2(config-if)# no lldp receive</code></pre>
+<p>Keep them on infrastructure links if your IP phones or operations depend on them. That&#x27;s the &quot;remove what the port doesn&#x27;t need&quot; rule again.</p>
+<h3 id="the-management-plane">The management plane</h3>
+<ul><li><strong>Management VLAN, not VLAN 1:</strong> put the switch SVI in a dedicated VLAN (99 in the lab) and <code translate="no">shutdown</code> the VLAN 1 SVI. Carry VLAN 99 only on trunks that need it.</li><li><strong>SSH only</strong> (<code translate="no">transport input ssh</code>, SSH v2), local or AAA users, <code translate="no">exec-timeout</code>, a login banner, <code translate="no">service password-encryption</code>, and <code translate="no">no ip http server</code> where the web UI isn&#x27;t used.</li><li>These are exactly the kind of checks the <strong>CIS benchmark for Cisco IOS / IOS XE</strong> lists (objective 2.5): a published, checkable baseline. The lab applies this baseline before any Layer 2 work, because a switch whose management plane is open doesn&#x27;t need to be VLAN-hopped.</li></ul>
+<h2 id="micro-segmentation-private-vlans-protected-ports-and-sgts">Micro-segmentation: private VLANs, protected ports and SGTs</h2>
+<p>VLANs build walls <em>between</em> subnets. Sometimes hosts in the <strong>same</strong> VLAN and subnet must not talk: tenants on one hosting segment, printers, guest devices, IoT. Three tools, from local to enterprise-wide.</p>
+<figure class="post-figure"><a href="/assets/img/ccnp/03/fig-06-pvlan-sgt.webp" aria-label="Open full-size image: Private VLAN port types and their reachability, compared with Security Group Tags that follow the device"><img src="/assets/img/ccnp/03/fig-06-pvlan-sgt.webp" srcset="/assets/img/ccnp/03/fig-06-pvlan-sgt-800.webp 800w, /assets/img/ccnp/03/fig-06-pvlan-sgt.webp 1600w" sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem" width="1600" height="993" alt="Private VLAN port types and their reachability, compared with Security Group Tags that follow the device" loading="lazy" decoding="async"></a><figcaption>Private VLAN port types and their reachability, compared with Security Group Tags that follow the device. Select the image to open it full size.</figcaption></figure>
+<h3 id="private-vlans">Private VLANs</h3>
+<p>A <strong>private VLAN</strong> keeps one subnet and one gateway but splits the VLAN into port types:</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Component</th><th scope="col">Port type</th><th scope="col">Can talk to</th></tr></thead><tbody><tr><td><strong>Primary VLAN</strong></td><td><strong>Promiscuous</strong> (router, firewall, gateway)</td><td>Everyone in the private VLAN</td></tr><tr><td><strong>Community</strong> (secondary)</td><td>Community</td><td>Its own community + promiscuous</td></tr><tr><td><strong>Isolated</strong> (secondary)</td><td>Isolated</td><td><strong>Only</strong> promiscuous. Not even other isolated ports</td></tr></tbody></table></div>
+<p>A primary VLAN can have several community VLANs but <strong>only one isolated VLAN</strong>. Example, one subnet <code translate="no">10.30.0.0/24</code> with gateway <code translate="no">10.30.0.1</code>:</p>
+<pre translate="no"><code translate="no">SW(config)# vtp mode transparent                 ! VTPv1/v2 can&#x27;t carry PVLANs
+SW(config)# vlan 301
+SW(config-vlan)# private-vlan isolated
+SW(config)# vlan 302
+SW(config-vlan)# private-vlan community
+SW(config)# vlan 300
+SW(config-vlan)# private-vlan primary
+SW(config-vlan)# private-vlan association 301,302
+
+SW(config)# interface gig 1/1                    ! isolated host
+SW(config-if)# switchport mode private-vlan host
+SW(config-if)# switchport private-vlan host-association 300 301
+
+SW(config)# interface gig 1/0                    ! router / firewall
+SW(config-if)# switchport mode private-vlan promiscuous
+SW(config-if)# switchport private-vlan mapping 300 301,302</code></pre>
+<p>(On a Layer 3 switch the SVI for VLAN 300 uses <code translate="no">private-vlan mapping 301,302</code> instead of a promiscuous port.) Verify with <code translate="no">show vlan private-vlan</code> and <code translate="no">show interface gig 1/1 switchport</code>.</p>
+<blockquote><p><strong>Use case:</strong> &quot;Several devices share a subnet, and none of them may reach each other.&quot; Put them in the isolated VLAN: same subnet, same switch, zero host-to-host reachability. The blast radius shrinks to one host.</p></blockquote>
+<h3 id="protected-ports-pvlan-edge">Protected ports (PVLAN edge)</h3>
+<p><code translate="no">switchport protected</code> is the lightweight version: <strong>protected ports can&#x27;t forward unicast, broadcast or multicast to other protected ports on the same switch</strong>; they can still reach unprotected ports (the uplink). It&#x27;s <strong>locally significant only</strong>: it doesn&#x27;t extend across switches. Packet Tracer supports it, which is why the lab uses it as the stand-in for private VLANs.</p>
+<h3 id="vlan-acls-vacls">VLAN ACLs (VACLs)</h3>
+<p>Another intra-VLAN tool: a <strong>VACL</strong> (<code translate="no">vlan access-map</code> + <code translate="no">vlan filter</code>) filters traffic <em>within</em> a VLAN, including bridged traffic that never reaches a router. Useful when you need policy finer than &quot;isolated or not&quot;.</p>
+<h3 id="security-group-tags-cisco-trustsec">Security Group Tags (Cisco TrustSec)</h3>
+<p>Private VLANs are tied to <strong>ports and location</strong>. <strong>SGTs</strong> segment by <strong>who or what the device is</strong>:</p>
+<ol><li><strong>Classify.</strong> When a device connects, it&#x27;s assigned a <strong>Security Group Tag</strong>, a 16-bit number for its role (Employees, HR Servers, Cameras). Dynamically via <strong>802.1X or MAB with ISE</strong>, or statically by IP-to-SGT, subnet-to-SGT, VLAN-to-SGT or port mappings.</li><li><strong>Propagate.</strong> The tag travels with the traffic: <strong>inline tagging</strong> (the SGT is carried in a Cisco Meta Data field in the Ethernet frame between capable devices) or <strong>SXP</strong>, the SGT Exchange Protocol, which shares IP-to-SGT mappings over TCP with devices that can&#x27;t tag in hardware.</li><li><strong>Enforce.</strong> A policy matrix of source tag × destination tag, typically <strong>applied at egress</strong> with <strong>SGACLs</strong> (or by a firewall that understands SGTs). &quot;Employees may not talk to HR Servers&quot; holds wherever either one connects.</li></ol>
+<p>Policies and the matrix are defined centrally in <strong>Cisco ISE</strong> and pushed to the network. The payoff is <strong>location independence</strong>: move the HR server to another data center and the rule still applies, with no ACL rewrites.</p>
+<h3 id="which-tool-when">Which tool when</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col"></th><th scope="col">Private VLAN</th><th scope="col">Protected port</th><th scope="col">SGT (TrustSec)</th></tr></thead><tbody><tr><td>Segments by</td><td>Port type</td><td>Port flag</td><td>Identity / role</td></tr><tr><td>Scope</td><td>Switch / VLAN (can span trunks)</td><td>One switch only</td><td>Whole TrustSec domain</td></tr><tr><td>Follows the device?</td><td>No</td><td>No</td><td><strong>Yes</strong></td></tr><tr><td>Enforcement</td><td>Port forwarding rules</td><td>Port forwarding rules</td><td>SGACL policy matrix</td></tr><tr><td>Managed by</td><td>Switch config</td><td>Switch config</td><td><strong>ISE</strong>, centrally</td></tr><tr><td>Best for</td><td>&quot;Same subnet, these hosts mustn&#x27;t talk&quot;</td><td>Quick isolation on one switch</td><td>Scalable, role-based, location-independent policy</td></tr></tbody></table></div>
+<h2 id="putting-it-together-golden-port-templates">Putting it together: golden port templates</h2>
+<p>This is the &quot;classify every port, one template per class&quot; step from the design method, written as real IOS configuration.</p>
+<h3 id="global">Global</h3>
+<pre translate="no"><code translate="no">vtp mode transparent
+vlan 40
+ name users
+vlan 50
+ name servers
+vlan 99
+ name mgmt
+vlan 777
+ name Nowhere
+vlan 999
+ name Native-T
+vlan dot1q tag native
+ip dhcp snooping
+ip dhcp snooping vlan 40,50
+no ip dhcp snooping information option
+ip arp inspection vlan 40,50
+spanning-tree portfast bpduguard default
+errdisable recovery cause psecure-violation
+errdisable recovery cause bpduguard
+errdisable recovery cause dhcp-rate-limit
+errdisable recovery cause arp-inspection
+errdisable recovery interval 300
+interface vlan 1
+ shutdown</code></pre>
+<h3 id="access-edge-user">Access edge (user)</h3>
+<pre translate="no"><code translate="no">interface range gig 1/1 - 2
+ description Users
+ switchport mode access
+ switchport access vlan 40
+ switchport nonegotiate
+ switchport port-security maximum 3
+ switchport port-security violation restrict
+ switchport port-security aging time 10
+ switchport port-security
+ spanning-tree portfast
+ ip dhcp snooping limit rate 10
+ ip verify source
+ storm-control broadcast level 20.00 10.00
+ storm-control action trap
+ no cdp enable</code></pre>
+<h3 id="infrastructure-uplink-trunk">Infrastructure uplink (trunk)</h3>
+<pre translate="no"><code translate="no">interface gig 0/2
+ description trunk to SW-1
+ switchport mode trunk
+ switchport nonegotiate
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 40,50,99
+ ip dhcp snooping trust
+ ip arp inspection trust</code></pre>
+<h3 id="unused">Unused</h3>
+<pre translate="no"><code translate="no">interface range gig 0/0 - 1 , gig 0/3 , gig 1/3
+ switchport mode access
+ switchport access vlan 777
+ shutdown</code></pre>
+<p>Choices like <code translate="no">restrict</code> vs. <code translate="no">shutdown</code>, or the exact storm-control levels, depend on the site. What doesn&#x27;t change is the shape: <strong>every port has a class, and every class has a reason for each line.</strong></p>
+<h2 id="validation-re-run-every-attack">Validation: re-run every attack</h2>
+<p>Hardening isn&#x27;t done until you&#x27;ve tried to break it. For each control, attack, observe the expected failure, and confirm the switch told you.</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Attack</th><th scope="col">Expected result after hardening</th><th scope="col">Where you see it</th></tr></thead><tbody><tr><td>Yersinia DTP &quot;enable trunking&quot;</td><td>No trunk forms</td><td><code translate="no">show interface trunk</code> (attacker port absent), <code translate="no">show interface x switchport</code> = Negotiation Off</td></tr><tr><td>Double-tagged frame from a user port</td><td>Nothing reaches the victim VLAN; user ports aren&#x27;t in the native VLAN</td><td><code translate="no">show interface trunk</code> native 999; <code translate="no">show vlan brief</code> (999 has no ports)</td></tr><tr><td><code translate="no">macof</code> MAC flood</td><td>Port err-disabled (shutdown) or drops + counter (restrict)</td><td><code translate="no">%PM-4-ERR_DISABLE ... psecure-violation</code>, <code translate="no">show port-security</code></td></tr><tr><td>Rogue switch sends BPDUs</td><td>Port err-disabled</td><td><code translate="no">%SPANTREE-2-BLOCK_BPDUGUARD</code>, <code translate="no">show interface status err-disabled</code></td></tr><tr><td>Rogue DHCP server on a user port</td><td>Clients still get leases from the real server</td><td><code translate="no">show ip dhcp snooping</code>, <code translate="no">show ip dhcp snooping binding</code></td></tr><tr><td>DHCP starvation</td><td>Port err-disabled by the rate limit; MAC cap stops random MACs</td><td><code translate="no">dhcp-rate-limit</code> err-disable reason</td></tr><tr><td>ARP spoofing the gateway</td><td>Forged ARPs dropped and logged</td><td><code translate="no">%SW_DAI-4-DHCP_SNOOPING_DENY</code>, <code translate="no">show ip arp inspection statistics</code></td></tr><tr><td>Static spoofed source IP</td><td>Packets filtered</td><td><code translate="no">show ip verify source</code></td></tr><tr><td>Plug into an unused jack</td><td>No link, no VLAN</td><td><code translate="no">show interface status</code> = disabled, VLAN 777</td></tr><tr><td>PC to PC in an isolated/protected segment</td><td>Ping fails; gateway still reachable</td><td>Ping tests</td></tr></tbody></table></div>
+<p>Then check that each event produced a <strong>log entry or trap</strong>. A control you can&#x27;t see firing is a control you can&#x27;t trust in an incident.</p>
+<h2 id="exam-traps">Exam traps</h2>
+<ul><li><strong>SCOR v2.0 numbering:</strong> this is objective <strong>2.3</strong> (&quot;Configure network infrastructure security methods&quot;). In v1.1 the same material was 2.4 and 2.5; don&#x27;t let old books confuse you.</li><li><strong>Two VLAN-hopping types:</strong> <em>switch spoofing</em> abuses <strong>DTP</strong> (fix: <code translate="no">switchport mode access</code> + <code translate="no">nonegotiate</code>); <em>double tagging</em> abuses the <strong>untagged native VLAN</strong> (fix: dead native VLAN, no hosts in it, <code translate="no">vlan dot1q tag native</code>). Double tagging is <strong>one-way</strong>.</li><li><strong>DTP matrix:</strong> auto + auto = <strong>access</strong>. auto + desirable = trunk. <code translate="no">nonegotiate</code> needs a hard-coded mode.</li><li><strong>Port security</strong> needs a static mode and the bare <code translate="no">switchport port-security</code>; default max <strong>1</strong>; default violation <strong>shutdown</strong>; protect = silent, restrict = log + count, shutdown = err-disable + log + count.</li><li><strong>Sticky</strong> learns and saves to running config; <strong>static</strong> is typed; neither proves identity (MAC spoofing → 802.1X).</li><li><strong>Err-disable recovery</strong> is off by default; the interval defaults to <strong>300 seconds</strong>.</li><li><strong>BPDU Guard</strong> = edge ports, err-disable. <strong>Root Guard</strong> = root-inconsistent, auto-recovers. <strong>Loop Guard</strong> = loop-inconsistent. <strong>BPDU Filter</strong> can silently disable STP.</li><li><strong>DHCP snooping:</strong> trusted = toward the real server; server messages dropped on untrusted ports; needs <strong>global + per-VLAN</strong> commands; option 82 can break relayed DHCP.</li><li><strong>DAI</strong> relies on the <strong>snooping binding table</strong>; static hosts need an <strong>ARP ACL</strong>; default <strong>15 pps</strong> on untrusted ports, then err-disable.</li><li><strong>IPSG</strong> validates source IP (and MAC with <code translate="no">port-security</code>) against the binding table.</li><li><strong>Storm control</strong> default action drops excess; <code translate="no">trap</code> or <code translate="no">shutdown</code> add alerting or err-disable.</li><li><strong>VTP:</strong> highest revision wins; transparent, VTPv3 or off. Private VLANs need transparent mode with VTPv1/v2.</li><li><strong>Private VLANs:</strong> isolated can&#x27;t reach other isolated ports; community reaches its community; both reach promiscuous. One isolated VLAN per primary.</li><li><strong>Protected ports</strong> are local to one switch.</li><li><strong>SGT:</strong> 16-bit tag, assigned by 802.1X/MAB/static mapping, propagated inline or by <strong>SXP</strong>, enforced by <strong>SGACL</strong> (egress), managed in <strong>ISE</strong>.</li></ul>
+<h2 id="self-check">Self-check</h2>
+<details class="qa"><summary>1. A user port shows &quot;Administrative Mode: dynamic auto&quot; and &quot;Negotiation of Trunking: On&quot;. What attack is possible, and which two commands close it?</summary>
+<p><strong>Switch-spoofing VLAN hopping</strong>: a device sends DTP and the port becomes a trunk carrying every VLAN. Fix with <code translate="no">switchport mode access</code> and <code translate="no">switchport nonegotiate</code> (or <code translate="no">switchport host</code>).</p>
+</details>
+<details class="qa"><summary>2. Both ends of a link are left at dynamic auto. Does a trunk form, and is that secure?</summary>
+<p>No trunk forms (auto + auto = access), but it isn&#x27;t secure: an attacker&#x27;s device can send desirable DTP and form a trunk with either port. Hard-code the mode.</p>
+</details>
+<details class="qa"><summary>3. Why does a double-tagging attack need the attacker to be in the native VLAN, and why is it one-way?</summary>
+<p>The first switch only strips the outer tag because it matches the trunk&#x27;s native VLAN, which is sent untagged; the inner tag then steers the frame into the victim VLAN. Replies from the victim are tagged normally and never come back through the same trick, so the attacker gets no return path.</p>
+</details>
+<details class="qa"><summary>4. A conference-room port must stay up for meetings, but you still want to know when someone connects a hub. Which port-security violation mode?</summary>
+<p><strong>restrict</strong>: it drops traffic from MACs beyond the limit, logs, sends a trap and increments the counter, without err-disabling the port.</p>
+</details>
+<details class="qa"><summary>5. After enabling DHCP snooping on an access switch, no clients get addresses. The DHCP server is behind a router acting as relay. What&#x27;s the likely cause and fix?</summary>
+<p>The switch is inserting <strong>option 82</strong> with a zero giaddr, and the relay or server drops those packets. Disable insertion with <code translate="no">no ip dhcp snooping information option</code> (or configure the relay to trust option 82). Also confirm the uplink is <code translate="no">ip dhcp snooping trust</code> and the VLAN is listed in <code translate="no">ip dhcp snooping vlan</code>.</p>
+</details>
+<details class="qa"><summary>6. You enable DAI on VLAN 50 and the file server with a static IP drops off the network. Why, and what fixes it?</summary>
+<p>DAI validates ARP against the DHCP snooping binding table, and a static host has no binding, so its ARP is dropped. Add an <strong>ARP ACL</strong> permitting its IP/MAC pair and apply it with <code translate="no">ip arp inspection filter NAME vlan 50</code> (or trust the port if appropriate).</p>
+</details>
+<details class="qa"><summary>7. A distribution switch should never accept a new root from the access layer, but the access-layer uplinks must keep running STP. Which feature, and on which ports?</summary>
+<p><strong>Root Guard</strong> (<code translate="no">spanning-tree guard root</code>) on the distribution ports facing the access switches. A superior BPDU puts the port in root-inconsistent state until it stops; normal BPDUs keep working.</p>
+</details>
+<details class="qa"><summary>8. Several cameras share one subnet and must reach only the NVR server and gateway, never each other. Which design?</summary>
+<p>A <strong>private VLAN</strong>: cameras on <strong>isolated</strong> ports, the gateway (and the NVR, if it must be reachable by all) on <strong>promiscuous</strong> ports. On a single small switch, protected ports could approximate it.</p>
+</details>
+<details class="qa"><summary>9. An attacker unplugs a printer and plugs in a laptop that clones the printer&#x27;s MAC. Sticky port security doesn&#x27;t trigger. What would stop this?</summary>
+<p><strong>802.1X</strong> (or MAB plus ISE profiling) to authenticate the device, not just its MAC. Port security counts and pins MACs, but a cloned MAC looks legitimate.</p>
+</details>
+<details class="qa"><summary>10. Policy says contractors may never reach finance servers, wherever either connects, across three campuses. VLANs, private VLANs or SGTs?</summary>
+<p><strong>SGTs (Cisco TrustSec)</strong>: classify contractors and finance servers by role through ISE, propagate the tags inline or with SXP, and enforce with an SGACL. The rule follows identity, not location.</p>
+</details>
+<h2 id="coverage-checklist-scor-v2-0-2-3">Coverage checklist: SCOR v2.0 2.3</h2>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Part of 2.3</th><th scope="col">Section</th></tr></thead><tbody><tr><td>Network segmentation using VLANs</td><td><a href="#vlan-segmentation-as-a-blast-radius-control">VLAN segmentation</a></td></tr><tr><td>Network segmentation using SGTs</td><td><a href="#micro-segmentation-private-vlans-protected-ports-and-sgts">Micro-segmentation</a></td></tr><tr><td>Layer 2 and port security</td><td><a href="#access-ports-trunks-and-the-native-vlan">Access ports and trunks</a>, <a href="#port-security-containing-the-endpoint">Port security</a></td></tr><tr><td>DHCP snooping</td><td><a href="#dhcp-snooping">DHCP snooping</a></td></tr><tr><td>Dynamic ARP inspection</td><td><a href="#dynamic-arp-inspection-and-ip-source-guard">DAI and IPSG</a></td></tr><tr><td>Storm control</td><td><a href="#storm-control">Storm control</a></td></tr><tr><td>Defense against MAC attacks</td><td><a href="#port-security-containing-the-endpoint">Port security</a></td></tr><tr><td>Defense against ARP attacks</td><td><a href="#dynamic-arp-inspection-and-ip-source-guard">DAI and IPSG</a></td></tr><tr><td>Defense against VLAN hopping</td><td><a href="#access-ports-trunks-and-the-native-vlan">Access ports and trunks</a></td></tr><tr><td>Defense against STP attacks</td><td><a href="#spanning-tree-protection">Spanning tree protection</a></td></tr><tr><td>Defense against rogue DHCP</td><td><a href="#dhcp-snooping">DHCP snooping</a></td></tr></tbody></table></div>
+<h2 id="lab-for-this-module">Lab for this module</h2>
+<p>Put it into practice in the <a href="/ccnp-security/labs/segmentation-l2-hardening-packet-tracer">Segmentation &amp; Layer 2 Hardening lab</a>: a downloadable Packet Tracer baseline where you add the dead VLANs, lock down access ports and the trunk, apply port security, PortFast and BPDU Guard, park unused ports, and isolate hosts with protected ports. Packet Tracer can&#x27;t run Yersinia or macof, so the lab is about building and verifying the defenses; the attacks above show why each one matters.</p>
+</div>
+      <footer class="post-end">
+        <section class="practice" aria-labelledby="practice-h">
+          <div><h2 id="practice-h" class="sub-h">Practice this module</h2>
+          <p>62 flashcards and 33 mock exam questions cover 2.3. Every answer links back to the section above that explains it.</p></div>
+          <p class="practice-links"><a class="btn btn-pri" href="/ccnp-security/labs/segmentation-l2-hardening-packet-tracer">Packet Tracer lab <span class="p">.pkt</span></a><a class="btn btn-pri" href="/ccnp-security/flashcards#d2">flashcards <span class="p">d2</span></a><a class="btn btn-sec" href="/ccnp-security/mock-exam#d2">mock exam <span class="p">d2</span></a></p>
+        </section>
+        <nav class="nexthop" aria-label="More lectures"><a class="next" href="/ccnp-security/network-security-firewall-ips-visibility"><span class="k">next lecture &rarr;</span>Network Security: Firewalls, IPS, and Visibility</a></nav>
+      </footer>
+    </div>
+    <aside class="toc" aria-label="On this page"><span class="toc-title"><span class="h">#</span> show ip route | toc</span><ol><li><a href="#how-to-think-about-layer-2-security">How to think about Layer 2 security</a></li><li><a href="#why-layer-2-is-where-containment-begins">Why Layer 2 is where containment begins</a></li><li><a href="#vlan-segmentation-as-a-blast-radius-control">VLAN segmentation as a blast-radius control</a></li><li><a href="#access-ports-trunks-and-the-native-vlan">Access ports, trunks and the native VLAN</a></li><li><a href="#port-security-containing-the-endpoint">Port security: containing the endpoint</a></li><li><a href="#spanning-tree-protection">Spanning tree protection</a></li><li><a href="#dhcp-snooping">DHCP snooping</a></li><li><a href="#dynamic-arp-inspection-and-ip-source-guard">Dynamic ARP Inspection and IP Source Guard</a></li><li><a href="#storm-control">Storm control</a></li><li><a href="#unused-ports-vtp-cdp-and-the-management-plane">Unused ports, VTP, CDP and the management plane</a></li><li><a href="#micro-segmentation-private-vlans-protected-ports-and-sgts">Micro-segmentation: private VLANs, protected ports and SGTs</a></li><li><a href="#putting-it-together-golden-port-templates">Putting it together: golden port templates</a></li><li><a href="#validation-re-run-every-attack">Validation: re-run every attack</a></li><li><a href="#exam-traps">Exam traps</a></li><li><a href="#self-check">Self-check</a></li><li><a href="#coverage-checklist-scor-v2-0-2-3">Coverage checklist: SCOR v2.0 2.3</a></li><li><a href="#lab-for-this-module">Lab for this module</a></li></ol></aside>
+  </div>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/ccnp-security">ccnp security</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Oct 22, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

@@ -2021,3 +2021,10 @@ a, button, summary { -webkit-tap-highlight-color: rgba(0, 188, 235, 0.18); }
 .sq-opts li::marker { font-family: var(--f-mono); color: var(--text-3); }
 .sq details.qa { background: var(--bg-2); }
 .sq code, .hub-faq code { padding: 0.05em 0.35em; border: 1px solid var(--line); border-radius: 3px; background: var(--bg-2); font-family: var(--f-mono); font-size: 0.86em; }
+
+/* CCNP labs: download panel at the top of a lab page */
+.labdl { margin-bottom: 2rem; padding: 1.1rem 1.2rem 1.2rem; border: 1px solid var(--line-2); border-top: 2px solid var(--blue); border-radius: var(--r-lg); background: var(--panel); }
+.labdl .sub-h { margin-bottom: 0.8rem; }
+.labdl .dl-list { grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); }
+.labdl .sums { margin-top: 0.9rem; }
+.labdl .side-note { margin: 0.9rem 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; color: var(--text-2); font-size: 0.9rem; }

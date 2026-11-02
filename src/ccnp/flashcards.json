@@ -419,6 +419,440 @@
    "front": "Sustained, high-volume UDP/53 flow to one external host: what is it likely to be?",
    "back": "**DNS tunneling exfiltration** (objective 6.5). NetFlow shows it even though it carries no payload.",
    "ref": "network-security-firewall-ips-visibility#netflow-ipfix-and-nsel-conversation-metadata"
+  },
+  {
+   "id": "c2.3-001",
+   "obj": "2.3",
+   "front": "What do ARP, DHCP, STP, DTP, CDP and VTP have in common from a security point of view?",
+   "back": "None of them authenticate by default. The switch and the hosts believe whatever frame arrives, so the attack pattern is: **forge a control message, poison a table, redirect traffic**.",
+   "ref": "segmentation-layer-2-hardening#layer-2-trusts-everyone"
+  },
+  {
+   "id": "c2.3-002",
+   "obj": "2.3",
+   "front": "Name the four defense moves for Layer 2 attacks.",
+   "back": "**Remove** (turn the protocol off where unneeded), **limit** (cap how much), **validate** (check against trusted data) and **contain** (shrink the blast radius).",
+   "ref": "segmentation-layer-2-hardening#layer-2-trusts-everyone"
+  },
+  {
+   "id": "c2.3-003",
+   "obj": "2.3",
+   "front": "The three questions to ask about every switch port?",
+   "back": "Who should be on the other end? What is it allowed to say? If it lies, how far does the lie travel, and how will I know?",
+   "ref": "segmentation-layer-2-hardening#the-three-questions-for-every-port"
+  },
+  {
+   "id": "c2.3-004",
+   "obj": "2.3",
+   "front": "Where is the trust boundary for DHCP snooping, DAI and BPDU Guard?",
+   "back": "At the **access edge**: user-facing ports are untrusted; uplinks toward infrastructure you control are trusted.",
+   "ref": "segmentation-layer-2-hardening#trusted-vs-untrusted-the-boundary-is-the-access-edge"
+  },
+  {
+   "id": "c2.3-005",
+   "obj": "2.3",
+   "front": "Why is VLAN segmentation called a blast-radius control?",
+   "back": "A Layer 2 attack (ARP spoofing, MAC flood, broadcast storm) stays inside its VLAN. Crossing VLANs requires routing, where firewalls and ACLs enforce policy.",
+   "ref": "segmentation-layer-2-hardening#the-blast-radius-analogy"
+  },
+  {
+   "id": "c2.3-006",
+   "obj": "2.3",
+   "front": "Ideal relationship between VLANs and IP subnets?",
+   "back": "**One to one**: each VLAN (broadcast domain) carries exactly one subnet.",
+   "ref": "segmentation-layer-2-hardening#vlans-and-subnets-one-to-one"
+  },
+  {
+   "id": "c2.3-007",
+   "obj": "2.3",
+   "front": "What does \"Negotiation of Trunking: On\" on an access port mean?",
+   "back": "The port still runs **DTP** and can become a trunk if a device asks: the hole that enables switch-spoofing VLAN hopping.",
+   "ref": "segmentation-layer-2-hardening#the-vulnerability-seen-from-the-switch"
+  },
+  {
+   "id": "c2.3-008",
+   "obj": "2.3",
+   "front": "DTP: dynamic auto + dynamic auto forms what?",
+   "back": "An **access** link. Neither side initiates. It's luck, not security: an attacker sending desirable DTP still gets a trunk.",
+   "ref": "segmentation-layer-2-hardening#dtp-modes-which-combinations-form-a-trunk"
+  },
+  {
+   "id": "c2.3-009",
+   "obj": "2.3",
+   "front": "DTP: dynamic auto + dynamic desirable forms what?",
+   "back": "A **trunk**. Desirable actively asks; auto agrees.",
+   "ref": "segmentation-layer-2-hardening#dtp-modes-which-combinations-form-a-trunk"
+  },
+  {
+   "id": "c2.3-010",
+   "obj": "2.3",
+   "front": "What does `switchport nonegotiate` do, and what does it need?",
+   "back": "Stops the port sending DTP. It requires a hard-coded mode (`access` or `trunk`); a nonegotiate trunk needs the far end hard-coded to trunk too.",
+   "ref": "segmentation-layer-2-hardening#dtp-modes-which-combinations-form-a-trunk"
+  },
+  {
+   "id": "c2.3-011",
+   "obj": "2.3",
+   "front": "Switch-spoofing VLAN hopping: how does it work and how do you stop it?",
+   "back": "The attacker sends DTP and the port becomes a trunk carrying every VLAN. Stop it with `switchport mode access` + `switchport nonegotiate` on every access port.",
+   "ref": "segmentation-layer-2-hardening#fix-1-hard-code-access-ports-kill-dtp"
+  },
+  {
+   "id": "c2.3-012",
+   "obj": "2.3",
+   "front": "What does the `switchport host` macro configure?",
+   "back": "`switchport mode access`, `spanning-tree portfast` and `no channel-group`. Access ports only, never uplinks.",
+   "ref": "segmentation-layer-2-hardening#fix-1-hard-code-access-ports-kill-dtp"
+  },
+  {
+   "id": "c2.3-013",
+   "obj": "2.3",
+   "front": "Double-tagging VLAN hopping: the two conditions it needs?",
+   "back": "The attacker's access port is in the **native VLAN**, and the native VLAN crosses the trunk **untagged**.",
+   "ref": "segmentation-layer-2-hardening#fix-3-the-native-vlan-kill-double-tagging"
+  },
+  {
+   "id": "c2.3-014",
+   "obj": "2.3",
+   "front": "Why is double tagging a one-way attack?",
+   "back": "Only the attacker's frames get the stripped-outer-tag trick. Replies from the victim are tagged normally and have no path back.",
+   "ref": "segmentation-layer-2-hardening#fix-3-the-native-vlan-kill-double-tagging"
+  },
+  {
+   "id": "c2.3-015",
+   "obj": "2.3",
+   "front": "Three fixes for double tagging?",
+   "back": "Native VLAN = an unused dead VLAN with **no hosts** (e.g. 999), tag the native VLAN (`vlan dot1q tag native`), and prune it where possible.",
+   "ref": "segmentation-layer-2-hardening#fix-3-the-native-vlan-kill-double-tagging"
+  },
+  {
+   "id": "c2.3-016",
+   "obj": "2.3",
+   "front": "What log appears when native VLANs differ on a trunk?",
+   "back": "`%CDP-4-NATIVE_VLAN_MISMATCH` (and STP `RECV_PVID_ERR`). Both ends must match.",
+   "ref": "segmentation-layer-2-hardening#fix-3-the-native-vlan-kill-double-tagging"
+  },
+  {
+   "id": "c2.3-017",
+   "obj": "2.3",
+   "front": "Default allowed VLANs on a trunk, and the fix?",
+   "back": "**1-4094**. Use `switchport trunk allowed vlan 40,50,99` so only needed VLANs cross the link.",
+   "ref": "segmentation-layer-2-hardening#fix-2-harden-the-trunk-itself"
+  },
+  {
+   "id": "c2.3-018",
+   "obj": "2.3",
+   "front": "How does VTP decide which VLAN database wins?",
+   "back": "The **highest configuration revision** in the domain wins, which is why a stray switch can wipe production VLANs (the VTP bomb).",
+   "ref": "segmentation-layer-2-hardening#where-did-the-vlans-come-from-on-the-other-switch-vtp"
+  },
+  {
+   "id": "c2.3-019",
+   "obj": "2.3",
+   "front": "Three ways to contain the VTP risk?",
+   "back": "**VTP transparent mode**, **VTPv3** (only the primary server can change the database, plus a password), or run no VTP.",
+   "ref": "segmentation-layer-2-hardening#where-did-the-vlans-come-from-on-the-other-switch-vtp"
+  },
+  {
+   "id": "c2.3-020",
+   "obj": "2.3",
+   "front": "What does a MAC flooding attack achieve?",
+   "back": "It fills the **CAM table**, so the switch floods unknown unicast out every port in the VLAN, letting the attacker **sniff** traffic meant for others.",
+   "ref": "segmentation-layer-2-hardening#the-threat-cam-overflow-mac-flooding"
+  },
+  {
+   "id": "c2.3-021",
+   "obj": "2.3",
+   "front": "The command that is easiest to forget when configuring port security?",
+   "back": "The bare `switchport port-security`, which actually **enables** the feature.",
+   "ref": "segmentation-layer-2-hardening#the-fix-port-security"
+  },
+  {
+   "id": "c2.3-022",
+   "obj": "2.3",
+   "front": "Port security default maximum MACs and default violation mode?",
+   "back": "Maximum **1**; violation **shutdown**.",
+   "ref": "segmentation-layer-2-hardening#the-fix-port-security"
+  },
+  {
+   "id": "c2.3-023",
+   "obj": "2.3",
+   "front": "Port security on a port in dynamic auto?",
+   "back": "Rejected: \"Command rejected: ... is a dynamic port.\" Hard-code `switchport mode access` first.",
+   "ref": "segmentation-layer-2-hardening#the-fix-port-security"
+  },
+  {
+   "id": "c2.3-024",
+   "obj": "2.3",
+   "front": "protect vs. restrict vs. shutdown?",
+   "back": "**protect**: drop silently. **restrict**: drop + log/trap + counter. **shutdown**: err-disable the port + log/trap + counter.",
+   "ref": "segmentation-layer-2-hardening#the-three-violation-modes"
+  },
+  {
+   "id": "c2.3-025",
+   "obj": "2.3",
+   "front": "Which violation mode keeps the port up but still tells you about the violation?",
+   "back": "**restrict**.",
+   "ref": "segmentation-layer-2-hardening#the-three-violation-modes"
+  },
+  {
+   "id": "c2.3-026",
+   "obj": "2.3",
+   "front": "Status strings after a port-security shutdown violation?",
+   "back": "`Secure-shutdown` and `err-disabled` with reason `psecure-violation`.",
+   "ref": "segmentation-layer-2-hardening#triggering-a-violation"
+  },
+  {
+   "id": "c2.3-027",
+   "obj": "2.3",
+   "front": "Automatic recovery from a port-security err-disable?",
+   "back": "`errdisable recovery cause psecure-violation` + `errdisable recovery interval <sec>`. Off by default; default interval 300 s.",
+   "ref": "segmentation-layer-2-hardening#recovering-the-port"
+  },
+  {
+   "id": "c2.3-028",
+   "obj": "2.3",
+   "front": "Sticky vs. static secure MACs?",
+   "back": "**Sticky** learns the MAC and writes it into the running config (save it). **Static** is typed in manually.",
+   "ref": "segmentation-layer-2-hardening#choosing-which-macs-are-allowed"
+  },
+  {
+   "id": "c2.3-029",
+   "obj": "2.3",
+   "front": "Port security max for a port with an IP phone and a PC behind it?",
+   "back": "Usually **2 or 3**: the PC and the phone (the phone's MAC can be learned in both the voice and data VLAN).",
+   "ref": "segmentation-layer-2-hardening#the-fix-port-security"
+  },
+  {
+   "id": "c2.3-030",
+   "obj": "2.3",
+   "front": "What port security cannot stop?",
+   "back": "VLAN hopping, ARP spoofing, and **MAC spoofing** of an allowed address. Real identity needs **802.1X** or MAB with ISE.",
+   "ref": "segmentation-layer-2-hardening#what-port-security-does-not-do"
+  },
+  {
+   "id": "c2.3-031",
+   "obj": "2.3",
+   "front": "STP manipulation attack?",
+   "back": "Sending **superior BPDUs** to become root bridge: traffic flows through the attacker (MITM), or constant re-elections cause DoS.",
+   "ref": "segmentation-layer-2-hardening#spanning-tree-protection"
+  },
+  {
+   "id": "c2.3-032",
+   "obj": "2.3",
+   "front": "BPDU Guard?",
+   "back": "On PortFast edge ports: any BPDU received → port **err-disabled**. Global: `spanning-tree portfast bpduguard default`.",
+   "ref": "segmentation-layer-2-hardening#the-defenses"
+  },
+  {
+   "id": "c2.3-033",
+   "obj": "2.3",
+   "front": "Root Guard?",
+   "back": "On ports where the root must never appear: a superior BPDU puts the port in **root-inconsistent** (blocking); it recovers automatically when they stop.",
+   "ref": "segmentation-layer-2-hardening#the-defenses"
+  },
+  {
+   "id": "c2.3-034",
+   "obj": "2.3",
+   "front": "Loop Guard?",
+   "back": "On root/alternate ports between switches: if BPDUs stop arriving (unidirectional link) the port goes **loop-inconsistent** instead of forwarding.",
+   "ref": "segmentation-layer-2-hardening#the-defenses"
+  },
+  {
+   "id": "c2.3-035",
+   "obj": "2.3",
+   "front": "Why is BPDU Filter dangerous?",
+   "back": "It stops sending and receiving BPDUs, effectively **disabling STP** on the port, so a loop through it isn't detected.",
+   "ref": "segmentation-layer-2-hardening#the-defenses"
+  },
+  {
+   "id": "c2.3-036",
+   "obj": "2.3",
+   "front": "Two DHCP attacks DHCP snooping addresses?",
+   "back": "**Rogue DHCP server** (hands out its own gateway/DNS: MITM) and **DHCP starvation** (exhausts the pool).",
+   "ref": "segmentation-layer-2-hardening#two-attacks"
+  },
+  {
+   "id": "c2.3-037",
+   "obj": "2.3",
+   "front": "What does DHCP snooping do with an OFFER or ACK on an untrusted port?",
+   "back": "**Drops** it. Server messages are only accepted on trusted ports.",
+   "ref": "segmentation-layer-2-hardening#how-dhcp-snooping-thinks"
+  },
+  {
+   "id": "c2.3-038",
+   "obj": "2.3",
+   "front": "Which DHCP snooping port is trusted?",
+   "back": "The uplink toward the **real DHCP server** or relay (`ip dhcp snooping trust`). Everything else stays untrusted (the default).",
+   "ref": "segmentation-layer-2-hardening#how-dhcp-snooping-thinks"
+  },
+  {
+   "id": "c2.3-039",
+   "obj": "2.3",
+   "front": "Two global commands DHCP snooping needs?",
+   "back": "`ip dhcp snooping` **and** `ip dhcp snooping vlan <list>`.",
+   "ref": "segmentation-layer-2-hardening#configuration"
+  },
+  {
+   "id": "c2.3-040",
+   "obj": "2.3",
+   "front": "What does the DHCP snooping binding table contain?",
+   "back": "MAC, IP, lease, VLAN and port for each lease. DAI and IP Source Guard validate against it.",
+   "ref": "segmentation-layer-2-hardening#how-dhcp-snooping-thinks"
+  },
+  {
+   "id": "c2.3-041",
+   "obj": "2.3",
+   "front": "DHCP stops working after enabling snooping with a relay upstream. Likely cause?",
+   "back": "**Option 82** inserted by the switch. Fix: `no ip dhcp snooping information option` (or trust option 82 on the relay).",
+   "ref": "segmentation-layer-2-hardening#configuration"
+  },
+  {
+   "id": "c2.3-042",
+   "obj": "2.3",
+   "front": "How do you defeat DHCP starvation?",
+   "back": "`ip dhcp snooping limit rate` on user ports (err-disables floods) plus port security to cap MACs.",
+   "ref": "segmentation-layer-2-hardening#configuration"
+  },
+  {
+   "id": "c2.3-043",
+   "obj": "2.3",
+   "front": "What does DAI validate, and against what?",
+   "back": "ARP packets on untrusted ports, checking the sender IP-to-MAC pair against the **DHCP snooping binding table**.",
+   "ref": "segmentation-layer-2-hardening#how-dai-thinks"
+  },
+  {
+   "id": "c2.3-044",
+   "obj": "2.3",
+   "front": "DAI drops ARP from a server with a static IP. Fix?",
+   "back": "Create an **ARP ACL** for its IP/MAC and apply `ip arp inspection filter NAME vlan X` (no DHCP binding exists for static hosts).",
+   "ref": "segmentation-layer-2-hardening#how-dai-thinks"
+  },
+  {
+   "id": "c2.3-045",
+   "obj": "2.3",
+   "front": "DAI default rate limit on untrusted ports?",
+   "back": "**15 ARP packets per second**; exceeding it err-disables the port.",
+   "ref": "segmentation-layer-2-hardening#how-dai-thinks"
+  },
+  {
+   "id": "c2.3-046",
+   "obj": "2.3",
+   "front": "What does `ip arp inspection validate src-mac dst-mac ip` add?",
+   "back": "Checks that Ethernet and ARP MACs match and rejects invalid IPs (0.0.0.0, broadcast, multicast).",
+   "ref": "segmentation-layer-2-hardening#how-dai-thinks"
+  },
+  {
+   "id": "c2.3-047",
+   "obj": "2.3",
+   "front": "IP Source Guard?",
+   "back": "Filters every IP packet on an untrusted port whose source IP (and MAC with `ip verify source port-security`) doesn't match the binding table.",
+   "ref": "segmentation-layer-2-hardening#ip-source-guard"
+  },
+  {
+   "id": "c2.3-048",
+   "obj": "2.3",
+   "front": "Order of dependency: DHCP snooping, DAI, IPSG?",
+   "back": "**Snooping first** (builds the table) → DAI validates ARP → IPSG validates IP.",
+   "ref": "segmentation-layer-2-hardening#ip-source-guard"
+  },
+  {
+   "id": "c2.3-049",
+   "obj": "2.3",
+   "front": "Storm control default action and alternatives?",
+   "back": "Drops excess broadcast/multicast/unicast above the threshold. `storm-control action trap` alerts; `action shutdown` err-disables.",
+   "ref": "segmentation-layer-2-hardening#storm-control"
+  },
+  {
+   "id": "c2.3-050",
+   "obj": "2.3",
+   "front": "`storm-control broadcast level 20.00 10.00` means?",
+   "back": "Start dropping broadcast above **20%** of bandwidth (rising) and stop when it falls below **10%** (falling).",
+   "ref": "segmentation-layer-2-hardening#storm-control"
+  },
+  {
+   "id": "c2.3-051",
+   "obj": "2.3",
+   "front": "Two steps for every unused port?",
+   "back": "**Shut it down** and **park it in a dead VLAN** (e.g. 777) that isn't routed or trunked.",
+   "ref": "segmentation-layer-2-hardening#unused-ports-down-and-parked"
+  },
+  {
+   "id": "c2.3-052",
+   "obj": "2.3",
+   "front": "Why disable CDP/LLDP on user ports?",
+   "back": "They leak switch model, IOS version, management IP and native VLAN: free reconnaissance.",
+   "ref": "segmentation-layer-2-hardening#cdp-and-lldp"
+  },
+  {
+   "id": "c2.3-053",
+   "obj": "2.3",
+   "front": "Private VLAN port types and who they reach?",
+   "back": "**Promiscuous**: everyone. **Community**: its community + promiscuous. **Isolated**: only promiscuous, not even other isolated ports.",
+   "ref": "segmentation-layer-2-hardening#private-vlans"
+  },
+  {
+   "id": "c2.3-054",
+   "obj": "2.3",
+   "front": "Private VLAN prerequisite with VTPv1/v2?",
+   "back": "**VTP transparent mode**.",
+   "ref": "segmentation-layer-2-hardening#private-vlans"
+  },
+  {
+   "id": "c2.3-055",
+   "obj": "2.3",
+   "front": "How many isolated VLANs per primary VLAN?",
+   "back": "**One** (but multiple community VLANs).",
+   "ref": "segmentation-layer-2-hardening#private-vlans"
+  },
+  {
+   "id": "c2.3-056",
+   "obj": "2.3",
+   "front": "`switchport protected`?",
+   "back": "Protected ports can't forward to other protected ports **on the same switch**. A lightweight PVLAN edge with local significance only.",
+   "ref": "segmentation-layer-2-hardening#protected-ports-pvlan-edge"
+  },
+  {
+   "id": "c2.3-057",
+   "obj": "2.3",
+   "front": "What is an SGT and how big is it?",
+   "back": "A **16-bit Security Group Tag** for a device's role in Cisco TrustSec.",
+   "ref": "segmentation-layer-2-hardening#security-group-tags-cisco-trustsec"
+  },
+  {
+   "id": "c2.3-058",
+   "obj": "2.3",
+   "front": "How do devices get SGTs?",
+   "back": "Dynamically via **802.1X or MAB with ISE**, or statically by IP, subnet, VLAN or port mapping.",
+   "ref": "segmentation-layer-2-hardening#security-group-tags-cisco-trustsec"
+  },
+  {
+   "id": "c2.3-059",
+   "obj": "2.3",
+   "front": "Two ways SGTs propagate?",
+   "back": "**Inline tagging** (Cisco Meta Data in the frame) or **SXP**, which shares IP-to-SGT mappings over TCP.",
+   "ref": "segmentation-layer-2-hardening#security-group-tags-cisco-trustsec"
+  },
+  {
+   "id": "c2.3-060",
+   "obj": "2.3",
+   "front": "Where are SGT policies enforced?",
+   "back": "By **SGACLs** (typically at egress) or SGT-aware firewalls, defined centrally in **ISE**.",
+   "ref": "segmentation-layer-2-hardening#security-group-tags-cisco-trustsec"
+  },
+  {
+   "id": "c2.3-061",
+   "obj": "2.3",
+   "front": "PVLAN vs. SGT: the key difference?",
+   "back": "PVLANs are tied to **ports and location**; SGTs follow the **device's identity** anywhere in the TrustSec domain.",
+   "ref": "segmentation-layer-2-hardening#which-tool-when"
+  },
+  {
+   "id": "c2.3-062",
+   "obj": "2.3",
+   "front": "Which SCOR v2.0 objective covers VLAN hopping, port security, DHCP snooping, DAI and storm control?",
+   "back": "**2.3**: Configure network infrastructure security methods. (In v1.1 this material was 2.4/2.5.)",
+   "ref": "segmentation-layer-2-hardening#where-this-sits-in-scor-v2-0"
   }
  ]
 }

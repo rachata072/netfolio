@@ -203,3 +203,12 @@ To add a lecture: drop the .md into `src/ccnp/lectures/`, add it to `course.json
 add cards/questions, then `python tools/build.py`, `python tools/qa.py`, `python tools/serve.py`.
 Flashcard progress is stored in the visitor's browser only (key `bfl-ccnp-cards`); the
 mock exam stores nothing.
+
+### CCNP labs (Packet Tracer)
+
+Lab pages live at `/ccnp-security/labs/<slug>` and are listed in `course.json` under `"labs"`
+(slug, file, lecture, title, seo_title, description, dek, objectives, date, time, tool, downloads).
+- Guide: `src/ccnp/labs/<file>.md`; screenshots: `src/ccnp/labs/img/<folder>/<name>.webp`
+- Downloads: `src/ccnp/labs/files/<name>.pkt|.pka` (lowercase names). The build copies them to
+  `public/ccnp-security/labs/files/`, shows size + SHA-256 on the page, and `_headers` forces
+  `Content-Disposition: attachment` for that folder.

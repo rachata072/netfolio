@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Packet Tracer Lab: Layer 2 Switch Hardening (CCNP SCOR 2.3)</title>
+<meta name="description" content="Free Packet Tracer lab for CCNP Security SCOR 2.3: harden a 2960 switch with dead VLANs, trunk lockdown, port security, BPDU Guard and protected ports.">
+<link rel="canonical" href="https://breakfixlearn.com/ccnp-security/labs/segmentation-l2-hardening-packet-tracer">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=38c400936f">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="Segmentation &amp; Layer 2 Hardening Lab">
+<meta property="og:description" content="Download a working but insecure switched network and harden it step by step: management baseline, VLANs, trunks, port security, BPDU Guard, protected ports and unused-port lockdown.">
+<meta property="og:url" content="https://breakfixlearn.com/ccnp-security/labs/segmentation-l2-hardening-packet-tracer">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/ccnp-lab-segmentation-l2-hardening-packet-tracer.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Segmentation &amp; Layer 2 Hardening Lab: free Packet Tracer lab">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Segmentation & Layer 2 Hardening Lab","description":"Free Packet Tracer lab for CCNP Security SCOR 2.3: harden a 2960 switch with dead VLANs, trunk lockdown, port security, BPDU Guard and protected ports.","url":"https://breakfixlearn.com/ccnp-security/labs/segmentation-l2-hardening-packet-tracer","learningResourceType":"Lab exercise","educationalLevel":"Professional","inLanguage":"en","isAccessibleForFree":true,"datePublished":"2026-11-01","dateModified":"2026-11-01","teaches":["Configure network infrastructure security methods (network segmentation using VLANs or SGTs; Layer 2 and port security; DHCP snooping; Dynamic ARP inspection; storm control; and defenses against MAC, ARP, VLAN hopping, STP, and DHCP rogue attacks)"],"author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"encoding":[{"@type":"MediaObject","name":"Baseline lab (.pkt)","contentUrl":"https://breakfixlearn.com/ccnp-security/labs/files/l2-hardening-baseline.pkt","encodingFormat":"application/octet-stream","contentSize":"64 KB","sha256":"ed71e17c8123d3ba8a2250be38a2f597a65a1ac14525bd53b7f62fdff397487e"},{"@type":"MediaObject","name":"Graded activity (.pka)","contentUrl":"https://breakfixlearn.com/ccnp-security/labs/files/l2-hardening-graded.pka","encodingFormat":"application/octet-stream","contentSize":"270 KB","sha256":"c1784a4eca82c6563f02eec1a90e990eca06749212d0a311046f807a20af8ae6"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"CCNP Security","item":"https://breakfixlearn.com/ccnp-security"},{"@type":"ListItem","position":3,"name":"Segmentation & Layer 2 Hardening Lab"}]}</script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article class="lecture lab">
+  <header class="post-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/ccnp-security">ccnp-security</a><span aria-hidden="true">/</span><a href="/ccnp-security#labs">labs</a><span aria-hidden="true">/</span><span>segmentation-l2-hardening-packet-tracer</span></nav>
+      <p class="scard-meta"><span class="sid">Packet Tracer lab</span><span>Domain 2 Network Security &middot; topics 2.3</span></p>
+      <h1 class="mt-2">Segmentation &amp; Layer 2 Hardening Lab</h1>
+      <p class="post-dek">Download a working but insecure switched network and harden it step by step: management baseline, VLANs, trunks, port security, BPDU Guard, protected ports and unused-port lockdown.</p>
+      <div class="post-meta"><time datetime="2026-11-01">updated Nov 1, 2026</time><span class="sep">/</span><span>60 to 90 min</span><span class="sep">/</span><span>Packet Tracer 9.0+</span><span class="sep">/</span><span>by Trey</span></div>
+    </div>
+  </header>
+  <div class="wrap post-layout">
+    <div class="post-main">
+      <section class="labdl" aria-labelledby="dl-h">
+        <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">copy</span> <span class="a">segmentation-l2-hardening-packet-tracer flash:</span></span>
+        <h2 id="dl-h" class="sub-h">Download the lab</h2>
+        <ul class="dl-list"><li><a class="dl dl-pri" href="/ccnp-security/labs/files/l2-hardening-baseline.pkt" download><span class="dl-k">PKT</span><span class="dl-t"><b>Baseline lab (.pkt)</b><span class="dl-m">start here &middot; 64 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/ccnp-security/labs/files/l2-hardening-graded.pka" download><span class="dl-k">PKA</span><span class="dl-t"><b>Graded activity (.pka)</b><span class="dl-m">Activity Wizard version &middot; 270 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li></ul>
+        <details class="sums">
+          <summary>Verify your download (SHA-256)</summary>
+          <div class="tbl"><table class="sheet-files"><thead><tr><th scope="col">File</th><th scope="col">SHA-256</th></tr></thead><tbody><tr><td translate="no">l2-hardening-baseline.pkt</td><td translate="no">ed71e17c8123d3ba8a2250be38a2f597a65a1ac14525bd53b7f62fdff397487e</td></tr><tr><td translate="no">l2-hardening-graded.pka</td><td translate="no">c1784a4eca82c6563f02eec1a90e990eca06749212d0a311046f807a20af8ae6</td></tr></tbody></table></div>
+          <p>Compare with <code translate="no">Get-FileHash .\file.pkt -Algorithm SHA256</code> (PowerShell) or <code translate="no">sha256sum file.pkt</code>. Different hash, different file: delete it.</p>
+        </details>
+        <p class="side-note">Read the <a href="/ccnp-security/segmentation-layer-2-hardening">Segmentation &amp; Layer 2 Hardening</a> notes first. Topics: <span class="chip obj d2" title="Configure network infrastructure security methods (network segmentation using VLANs or SGTs; Layer 2 and port security; DHCP snooping; Dynamic ARP inspection; storm control; and defenses against MAC, ARP, VLAN hopping, STP, and DHCP rogue attacks)">2.3</span></p>
+      </section>
+<details class="toc-mobile"><summary>show ip route | toc (12 sections)</summary><ol><li><a href="#what-you-ll-build">What you&#x27;ll build</a></li><li><a href="#topology-and-addressing">Topology and addressing</a></li><li><a href="#part-a-management-plane-baseline-both-switches">Part A: management-plane baseline (both switches)</a></li><li><a href="#exercise-1-see-the-segmentation-you-already-have">Exercise 1: see the segmentation you already have</a></li><li><a href="#exercise-2-lock-down-access-ports-and-the-trunk">Exercise 2: lock down access ports and the trunk</a></li><li><a href="#exercise-3-stop-a-host-from-flooding-the-mac-table-b4">Exercise 3: stop a host from flooding the MAC table (B4)</a></li><li><a href="#exercise-4-portfast-bpdu-guard-and-host-isolation">Exercise 4: PortFast, BPDU Guard and host isolation</a></li><li><a href="#exercise-5-lock-unused-ports-then-verify-everything">Exercise 5: lock unused ports, then verify everything</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#answer-configs">Answer configs</a></li><li><a href="#what-packet-tracer-can-t-do-and-how-to-go-further">What Packet Tracer can&#x27;t do, and how to go further</a></li><li><a href="#exam-mapping">Exam mapping</a></li></ol></details>
+<div class="prose">
+<h2 id="what-you-ll-build">What you&#x27;ll build</h2>
+<p>You get a small switched network that <em>works</em> but was configured the lazy way: DTP on, native VLAN 1, every unused port live in VLAN 1, no port security, an open management plane. Your job is to harden switch <strong>SW-2</strong> (and the trunk end on <strong>SW-1</strong>) until every Layer 2 weakness from the notes is closed, and to prove it with <code translate="no">show</code> commands and ping tests.</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Item</th><th scope="col">Detail</th></tr></thead><tbody><tr><td><strong>Tool</strong></td><td>Cisco Packet Tracer 9.0 or later, two Catalyst 2960 switches</td></tr><tr><td><strong>Time</strong></td><td>60 to 90 minutes</td></tr><tr><td><strong>You&#x27;ll practice</strong></td><td>Management-plane baseline, VLANs and dead VLANs, access and trunk hardening, native VLAN, port security, PortFast and BPDU Guard, protected ports, unused-port lockdown</td></tr><tr><td><strong>Exam topics</strong></td><td>2.3 (core), 2.5 CIS-style baseline, 2.7 secure management</td></tr><tr><td><strong>Read first</strong></td><td><a href="/ccnp-security/segmentation-layer-2-hardening">Segmentation &amp; Layer 2 Hardening notes</a></td></tr></tbody></table></div>
+<h3 id="how-to-approach-it-like-a-security-engineer">How to approach it like a security engineer</h3>
+<p>Don&#x27;t type the commands as a checklist. For every port, ask the three questions from the notes: <strong>who should be on the other end, what is it allowed to say, and if it lies, how far can the lie travel?</strong> Write your answer next to each port in the port table below <em>before</em> you configure anything. Then the configuration is just your answers translated into IOS.</p>
+<p>Each exercise follows the same rhythm:</p>
+<ul><li><strong>Do</strong>: the commands to type.</li><li><strong>See</strong>: the output you should get.</li><li><strong>Why</strong>: the attack this closes, and why it matters on the exam.</li><li><strong>Checkpoint</strong>: prove it worked before moving on.</li></ul>
+<h2 id="topology-and-addressing">Topology and addressing</h2>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-hardening/topology.webp" aria-label="Open full-size image: Packet Tracer topology: SW-1 trunked to SW-2; the Server, PC-3 and the Kali host connect to SW-2"><img src="/assets/img/ccnp/labs/l2-hardening/topology.webp" width="553" height="456" alt="Packet Tracer topology: SW-1 trunked to SW-2; the Server, PC-3 and the Kali host connect to SW-2" loading="lazy" decoding="async"></a><figcaption>Packet Tracer topology: SW-1 trunked to SW-2; the Server, PC-3 and the Kali host connect to SW-2. Select the image to open it full size.</figcaption></figure>
+<p><strong>SW-2 is the switch under test.</strong> SW-1 only needs the management baseline and its end of the trunk. The inter-switch trunk uses the Gigabit uplinks (<strong>SW-2 Gi0/2 ↔ SW-1 Gi0/1</strong>); end devices use FastEthernet ports on SW-2.</p>
+<h3 id="vlan-plan">VLAN plan</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">VLAN</th><th scope="col">Name</th><th scope="col">Subnet</th><th scope="col">Purpose</th></tr></thead><tbody><tr><td>40</td><td>users</td><td>10.40.0.0/24</td><td>User hosts (PC-3, Kali)</td></tr><tr><td>50</td><td>servers</td><td>10.50.0.0/24</td><td>Protected server</td></tr><tr><td>99</td><td>mgmt</td><td>10.99.0.0/24</td><td>Switch management (SVIs)</td></tr><tr><td>777</td><td>Nowhere</td><td>none</td><td><strong>Dead VLAN</strong> for unused, shut ports</td></tr><tr><td>999</td><td>Native-T</td><td>none</td><td><strong>Dead VLAN</strong> used only as the trunk&#x27;s native VLAN</td></tr></tbody></table></div>
+<h3 id="addressing">Addressing</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Device</th><th scope="col">Interface</th><th scope="col">VLAN</th><th scope="col">IP address</th><th scope="col">Gateway</th></tr></thead><tbody><tr><td>Server</td><td>Fa0</td><td>50</td><td>10.50.0.10/24</td><td>10.50.0.1</td></tr><tr><td>PC-3</td><td>Fa0</td><td>40</td><td>10.40.0.11/24</td><td>10.40.0.1</td></tr><tr><td>Kali</td><td>Fa0</td><td>40</td><td>10.40.0.12/24</td><td>10.40.0.1</td></tr><tr><td>SW-1</td><td>VLAN 99 SVI</td><td>99</td><td>10.99.0.1/24</td><td>none</td></tr><tr><td>SW-2</td><td>VLAN 99 SVI</td><td>99</td><td>10.99.0.2/24</td><td>none</td></tr></tbody></table></div>
+<p>There is <strong>no router</strong> on purpose. This is a pure Layer 2 lab, so traffic from VLAN 40 to VLAN 50 must <strong>fail</strong>: that failure is the segmentation working. The gateways are configured on the hosts but nothing answers on them yet.</p>
+<h3 id="sw-2-ports-target-state">SW-2 ports: target state</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Port</th><th scope="col">Connects to</th><th scope="col">Mode</th><th scope="col">VLAN</th><th scope="col">Hardening</th></tr></thead><tbody><tr><td>Gi0/2</td><td>SW-1 (trunk)</td><td>trunk</td><td>native 999, allow 40,50,99</td><td>nonegotiate, native = dead VLAN, pruned</td></tr><tr><td>Fa0/1</td><td>Server</td><td>access</td><td>50</td><td>nonegotiate, port security, PortFast, BPDU Guard</td></tr><tr><td>Fa0/2</td><td>PC-3</td><td>access</td><td>40</td><td>nonegotiate, port security, PortFast, BPDU Guard, protected</td></tr><tr><td>Fa0/3</td><td>Kali</td><td>access</td><td>40</td><td>nonegotiate, port security, PortFast, BPDU Guard, protected</td></tr><tr><td>Fa0/4-24, Gi0/1</td><td>unused</td><td>access, shut</td><td>777</td><td><code translate="no">shutdown</code> + dead VLAN</td></tr></tbody></table></div>
+<h3 id="required-exact-values">Required exact values</h3>
+<p>Use these exactly; the graded activity and the answer configs expect them.</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Setting</th><th scope="col">Value</th></tr></thead><tbody><tr><td>Hostnames</td><td><code translate="no">SW-1</code>, <code translate="no">SW-2</code></td></tr><tr><td>Domain name</td><td><code translate="no">lab.breakfixlearn.com</code></td></tr><tr><td>Enable secret</td><td><code translate="no">Lab!Enable2026</code></td></tr><tr><td>Admin user / password</td><td><code translate="no">admin</code> / <code translate="no">Lab!Admin2026</code> (privilege 15)</td></tr><tr><td>SSH</td><td>version 2, RSA modulus 2048</td></tr><tr><td>Banner (motd)</td><td><code translate="no">Authorized access only. All activity is logged.</code></td></tr><tr><td>exec-timeout</td><td><code translate="no">5 0</code></td></tr><tr><td>Management IP SW-1 / SW-2 (VLAN 99)</td><td><code translate="no">10.99.0.1</code> / <code translate="no">10.99.0.2</code> (/24)</td></tr><tr><td>VLANs</td><td><code translate="no">40 users</code>, <code translate="no">50 servers</code>, <code translate="no">99 mgmt</code>, <code translate="no">777 Nowhere</code>, <code translate="no">999 Native-T</code></td></tr><tr><td>Port security</td><td><code translate="no">maximum 5</code>, <code translate="no">violation shutdown</code></td></tr><tr><td>Trunk</td><td>native <code translate="no">999</code>, allowed <code translate="no">40,50,99</code></td></tr></tbody></table></div>
+<p>These are lab passwords. Never reuse lab credentials on real equipment.</p>
+<h2 id="part-a-management-plane-baseline-both-switches">Part A: management-plane baseline (both switches)</h2>
+<p>Before any Layer 2 work, lock the front door. A switch whose management plane is open doesn&#x27;t need to be VLAN-hopped: the attacker just logs in. This baseline mirrors what the CIS benchmark for Cisco IOS checks (SCOR 2.5) and the secure management in SCOR 2.7.</p>
+<p><strong>Do</strong> (SW-2 shown; repeat on SW-1 with its own hostname and <code translate="no">10.99.0.1</code>):</p>
+<pre translate="no"><code translate="no">enable
+configure terminal
+ hostname SW-2
+ enable secret Lab!Enable2026
+ service password-encryption
+ username admin privilege 15 secret Lab!Admin2026
+ ip domain-name lab.breakfixlearn.com
+ crypto key generate rsa
+  2048
+ ip ssh version 2
+ banner motd #Authorized access only. All activity is logged.#
+ line console 0
+  login local
+  exec-timeout 5 0
+  logging synchronous
+ line vty 0 15
+  login local
+  transport input ssh
+  exec-timeout 5 0
+ exit
+ vlan 99
+  name mgmt
+ interface vlan 99
+  ip address 10.99.0.2 255.255.255.0
+  no shutdown
+ interface vlan 1
+  shutdown
+ end</code></pre>
+<p>The hostname and domain name must exist <strong>before</strong> <code translate="no">crypto key generate rsa</code>: the key is named after them. When prompted for the modulus, enter <code translate="no">2048</code> (SSH v2 needs at least 768; use 2048).</p>
+<p><strong>Why each line matters</strong></p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Line</th><th scope="col">Closes</th></tr></thead><tbody><tr><td><code translate="no">enable secret</code>, <code translate="no">service password-encryption</code></td><td>Cleartext or weakly hashed passwords in the config</td></tr><tr><td><code translate="no">username ... secret</code> + <code translate="no">login local</code></td><td>Shared line passwords with no accountability</td></tr><tr><td><code translate="no">transport input ssh</code>, <code translate="no">ip ssh version 2</code></td><td>Telnet&#x27;s cleartext sessions</td></tr><tr><td><code translate="no">exec-timeout 5 0</code></td><td>Forgotten open sessions</td></tr><tr><td>Banner</td><td>Legal notice for prosecution and policy</td></tr><tr><td>Management SVI in VLAN 99, VLAN 1 SVI shut</td><td>Management reachable from the default VLAN every unconfigured port sits in</td></tr></tbody></table></div>
+<p>Also turn off CDP toward hosts (A6). It advertises the switch model, IOS version and native VLAN to anyone listening:</p>
+<pre translate="no"><code translate="no">configure terminal
+ interface range fa0/1 - 3
+  no cdp enable
+ end</code></pre>
+<p><strong>Checkpoint</strong></p>
+<pre translate="no"><code translate="no">show ip ssh
+show running-config | section line vty
+show ip interface brief</code></pre>
+<p><code translate="no">SSH Enabled - version 2.0</code>; VTY lines show <code translate="no">transport input ssh</code>; <code translate="no">Vlan99</code> is up/up (once VLAN 99 crosses the trunk in Part B) and <code translate="no">Vlan1</code> is administratively down.</p>
+<h2 id="exercise-1-see-the-segmentation-you-already-have">Exercise 1: see the segmentation you already have</h2>
+<p><strong>Do</strong> on SW-2:</p>
+<pre translate="no"><code translate="no">show vlan brief
+show interface status</code></pre>
+<p><strong>See</strong></p>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-hardening/sw2-vlan-brief-start.webp" aria-label="Open full-size image: SW-2 show vlan brief at the start: VLAN 40 users on Fa0/2 and Fa0/3, VLAN 50 servers on Fa0/1, every other port still in VLAN 1"><img src="/assets/img/ccnp/labs/l2-hardening/sw2-vlan-brief-start.webp" width="731" height="242" alt="SW-2 show vlan brief at the start: VLAN 40 users on Fa0/2 and Fa0/3, VLAN 50 servers on Fa0/1, every other port still in VLAN 1" loading="lazy" decoding="async"></a><figcaption>SW-2 show vlan brief at the start: VLAN 40 users on Fa0/2 and Fa0/3, VLAN 50 servers on Fa0/1, every other port still in VLAN 1. Select the image to open it full size.</figcaption></figure>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-hardening/sw2-interface-status-start.webp" aria-label="Open full-size image: SW-2 show interface status at the start: three connected access ports, and Fa0/4 to Fa0/24 plus Gi0/1 sitting in VLAN 1 as notconnect"><img src="/assets/img/ccnp/labs/l2-hardening/sw2-interface-status-start.webp" width="713" height="426" alt="SW-2 show interface status at the start: three connected access ports, and Fa0/4 to Fa0/24 plus Gi0/1 sitting in VLAN 1 as notconnect" loading="lazy" decoding="async"></a><figcaption>SW-2 show interface status at the start: three connected access ports, and Fa0/4 to Fa0/24 plus Gi0/1 sitting in VLAN 1 as notconnect. Select the image to open it full size.</figcaption></figure>
+<p><strong>Why:</strong> PC-3 and Kali (VLAN 40) and the Server (VLAN 50) are in different broadcast domains. A Layer 2 attack in VLAN 40 (ARP spoofing, a MAC flood, a broadcast storm) cannot reach VLAN 50. That containment exists from VLAN assignment alone. But look at the rest: <strong>22 unused ports live in VLAN 1</strong> and are enabled. Any one of them is a walk-up network connection. Remember that for Exercise 5.</p>
+<p><strong>Checkpoint:</strong> check PC-3&#x27;s addressing (Desktop → IP Configuration):</p>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-hardening/pc3-ip-config.webp" aria-label="Open full-size image: PC-3 IP configuration: static 10.40.0.11, mask 255.255.255.0, gateway 10.40.0.1"><img src="/assets/img/ccnp/labs/l2-hardening/pc3-ip-config.webp" width="940" height="667" alt="PC-3 IP configuration: static 10.40.0.11, mask 255.255.255.0, gateway 10.40.0.1" loading="lazy" decoding="async"></a><figcaption>PC-3 IP configuration: static 10.40.0.11, mask 255.255.255.0, gateway 10.40.0.1. Select the image to open it full size.</figcaption></figure>
+<p>From PC-3: ping <strong>Kali</strong> <code translate="no">10.40.0.12</code> → <strong>succeeds</strong> (same VLAN). Ping the <strong>Server</strong> <code translate="no">10.50.0.10</code> → <strong>fails</strong> (different VLAN, no router).</p>
+<h2 id="exercise-2-lock-down-access-ports-and-the-trunk">Exercise 2: lock down access ports and the trunk</h2>
+<h3 id="the-weakness">The weakness</h3>
+<p><strong>Do</strong></p>
+<pre translate="no"><code translate="no">show interface fa0/3 switchport</code></pre>
+<p><strong>See</strong> two danger signs:</p>
+<pre translate="no"><code translate="no">Administrative Mode: dynamic auto
+Negotiation of Trunking: On          &lt;-- DTP is running
+Access Mode VLAN: 40 (users)
+Trunking Native Mode VLAN: 1 (default)</code></pre>
+<p><strong>Why:</strong> &quot;Negotiation of Trunking: On&quot; means the port speaks <strong>DTP</strong> and will become a trunk if a device asks. Kali sits on this port. If Kali sends DTP, it gets a trunk carrying every VLAN and can tag its way into VLAN 50, bypassing every inter-VLAN control. That&#x27;s <strong>switch-spoofing VLAN hopping</strong>.</p>
+<h3 id="add-the-dead-vlans-b1">Add the dead VLANs (B1)</h3>
+<p><strong>Do</strong></p>
+<pre translate="no"><code translate="no">configure terminal
+ vlan 777
+  name Nowhere
+ vlan 999
+  name Native-T
+ end
+show vlan brief</code></pre>
+<p>VLANs 40 and 50 already exist; just confirm their names are <code translate="no">users</code> and <code translate="no">servers</code>.</p>
+<h3 id="harden-the-access-ports-b2">Harden the access ports (B2)</h3>
+<p><strong>Do</strong></p>
+<pre translate="no"><code translate="no">configure terminal
+ interface fa0/1
+  description to Server
+ interface range fa0/2 - 3
+  description to Users
+ interface range fa0/1 - 3
+  switchport mode access
+  switchport nonegotiate
+ end
+show interface fa0/3 switchport</code></pre>
+<p><strong>See:</strong> <code translate="no">Administrative Mode: static access</code> and <code translate="no">Negotiation of Trunking: Off</code>.</p>
+<p><strong>Why:</strong> a hard-coded access port can&#x27;t be talked into trunking. Switch spoofing is dead on these ports.</p>
+<h3 id="harden-the-trunk-and-the-native-vlan-b5">Harden the trunk and the native VLAN (B5)</h3>
+<p><strong>Do</strong> on SW-2:</p>
+<pre translate="no"><code translate="no">configure terminal
+ interface gig0/2
+  description trunk to SW-1
+  switchport mode trunk
+  switchport nonegotiate
+  switchport trunk native vlan 999
+  switchport trunk allowed vlan 40,50,99
+ end</code></pre>
+<p><strong>See</strong> a native VLAN mismatch until the other side matches:</p>
+<pre translate="no"><code translate="no">%CDP-4-NATIVE_VLAN_MISMATCH: Native VLAN mismatch discovered on GigabitEthernet0/2 (999), with SW-1 GigabitEthernet0/1 (1).</code></pre>
+<p>That&#x27;s expected. <strong>Do</strong> on SW-1 (create VLANs 40, 50, 99 and 999 there too if they don&#x27;t exist):</p>
+<pre translate="no"><code translate="no">configure terminal
+ interface gig0/1
+  switchport mode trunk
+  switchport nonegotiate
+  switchport trunk native vlan 999
+  switchport trunk allowed vlan 40,50,99
+ end</code></pre>
+<p><strong>Checkpoint</strong></p>
+<pre translate="no"><code translate="no">show interface gig0/2 switchport
+show interface trunk</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-hardening/sw2-g02-switchport.webp" aria-label="Open full-size image: SW-2 show interface gig0/2 switchport after hardening: trunk mode, negotiation off, native VLAN 999 (Native-T), trunking VLANs 40, 50 and 99"><img src="/assets/img/ccnp/labs/l2-hardening/sw2-g02-switchport.webp" width="486" height="392" alt="SW-2 show interface gig0/2 switchport after hardening: trunk mode, negotiation off, native VLAN 999 (Native-T), trunking VLANs 40, 50 and 99" loading="lazy" decoding="async"></a><figcaption>SW-2 show interface gig0/2 switchport after hardening: trunk mode, negotiation off, native VLAN 999 (Native-T), trunking VLANs 40, 50 and 99. Select the image to open it full size.</figcaption></figure>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-hardening/sw2-interface-trunk.webp" aria-label="Open full-size image: SW-2 show interface trunk after hardening: Gi0/2 trunking with native VLAN 999 and only VLANs 40, 50 and 99 allowed"><img src="/assets/img/ccnp/labs/l2-hardening/sw2-interface-trunk.webp" width="590" height="192" alt="SW-2 show interface trunk after hardening: Gi0/2 trunking with native VLAN 999 and only VLANs 40, 50 and 99 allowed" loading="lazy" decoding="async"></a><figcaption>SW-2 show interface trunk after hardening: Gi0/2 trunking with native VLAN 999 and only VLANs 40, 50 and 99 allowed. Select the image to open it full size.</figcaption></figure>
+<p><strong>Why:</strong></p>
+<ul><li><code translate="no">nonegotiate</code> on the trunk stops DTP on infrastructure links too; both ends are hard-coded, so nothing needs negotiating.</li><li>The native VLAN is now <strong>999</strong>, a VLAN with no hosts in it. Nobody can stand in the native VLAN, so <strong>double tagging</strong> has nothing to start from.</li><li>The allowed list carries only 40, 50 and 99. VLAN 1 no longer crosses the trunk, and future VLANs won&#x27;t spread unless you add them.</li><li>With VLAN 99 on the trunk, the management SVIs can now reach each other: from SW-2, <code translate="no">ping 10.99.0.1</code> should succeed.</li></ul>
+<blockquote><p>On real Catalyst switches you&#x27;d also add <code translate="no">vlan dot1q tag native</code> so even native-VLAN frames are tagged. Packet Tracer doesn&#x27;t model it.</p></blockquote>
+<h2 id="exercise-3-stop-a-host-from-flooding-the-mac-table-b4">Exercise 3: stop a host from flooding the MAC table (B4)</h2>
+<p><strong>Why first:</strong> the CAM table is finite. A MAC flood (the notes show <code translate="no">macof</code> adding 3,300 entries in two seconds) fills it, and the switch floods unknown unicast out every port like a hub, so the attacker can sniff. Port security caps how many MACs each port may use.</p>
+<p><strong>Do</strong></p>
+<pre translate="no"><code translate="no">configure terminal
+ interface range fa0/1 - 3
+  switchport port-security
+  switchport port-security maximum 5
+  switchport port-security violation shutdown
+ end
+show port-security</code></pre>
+<p><strong>See</strong></p>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-hardening/sw2-port-security.webp" aria-label="Open full-size image: SW-2 show port-security: Fa0/1, Fa0/2 and Fa0/3 each with a maximum of 5 secure addresses and the Shutdown action"><img src="/assets/img/ccnp/labs/l2-hardening/sw2-port-security.webp" width="623" height="120" alt="SW-2 show port-security: Fa0/1, Fa0/2 and Fa0/3 each with a maximum of 5 secure addresses and the Shutdown action" loading="lazy" decoding="async"></a><figcaption>SW-2 show port-security: Fa0/1, Fa0/2 and Fa0/3 each with a maximum of 5 secure addresses and the Shutdown action. Select the image to open it full size.</figcaption></figure>
+<p><code translate="no">CurrentAddr</code> reads 0 until a host sends a frame. Ping from PC-3 and the Server, then run <code translate="no">show port-security</code> again: each active port learns one address.</p>
+<p><strong>The number one mistake:</strong> typing <code translate="no">maximum</code> and <code translate="no">violation</code> but not the bare <code translate="no">switchport port-security</code>. Without it the feature is off: <code translate="no">show port-security interface fa0/2</code> says <code translate="no">Port Security : Disabled</code>.</p>
+<p><strong>Recovering a tripped port.</strong> If a port goes err-disabled (<code translate="no">show interface status</code> shows <code translate="no">err-disabled</code>), bounce it:</p>
+<pre translate="no"><code translate="no">configure terminal
+ interface fa0/2
+  shutdown
+  no shutdown
+ end</code></pre>
+<p>Automatic recovery (<code translate="no">errdisable recovery cause psecure-violation</code>) is real-IOS only and not modeled in Packet Tracer.</p>
+<p><strong>Checkpoint:</strong> <code translate="no">show port-security interface fa0/3</code> → <code translate="no">Port Security : Enabled</code>, <code translate="no">Port Status : Secure-up</code>, <code translate="no">Maximum MAC Addresses : 5</code>.</p>
+<h2 id="exercise-4-portfast-bpdu-guard-and-host-isolation">Exercise 4: PortFast, BPDU Guard and host isolation</h2>
+<h3 id="portfast-bpdu-guard-b3">PortFast + BPDU Guard (B3)</h3>
+<p><strong>Do</strong></p>
+<pre translate="no"><code translate="no">configure terminal
+ interface range fa0/1 - 3
+  spanning-tree portfast
+  spanning-tree bpduguard enable
+ end
+show running-config interface fa0/2</code></pre>
+<p><strong>Why:</strong> PortFast lets hosts come up without the 30-second STP delay. <strong>BPDU Guard</strong> err-disables a port the moment it receives a BPDU, so a rogue switch (or an attacker sending superior BPDUs to become root) on a user port is cut off instead of rebuilding your spanning tree around itself.</p>
+<p><strong>Try it:</strong> connect a spare 2960 to one of these ports and watch it go err-disabled (<code translate="no">%SPANTREE-2-BLOCK_BPDUGUARD</code>). Recover it with <code translate="no">shutdown</code> / <code translate="no">no shutdown</code> after you remove the switch.</p>
+<h3 id="protected-ports-c1-stretch">Protected ports (C1, stretch)</h3>
+<p><strong>Do</strong></p>
+<pre translate="no"><code translate="no">configure terminal
+ interface range fa0/2 - 3
+  switchport protected
+ end</code></pre>
+<p><strong>Checkpoint (C2):</strong> from PC-3, ping Kali <code translate="no">10.40.0.12</code> → now <strong>fails</strong>, even though both are in VLAN 40 and the same subnet. PC-3 → Server still fails (different VLAN).</p>
+<p><strong>Why:</strong> protected ports can&#x27;t forward any traffic to other protected ports on the same switch. It&#x27;s Packet Tracer&#x27;s stand-in for <strong>private VLAN isolated ports</strong>: the blast radius of a compromised host shrinks to that host. Kali is now alone on its segment even though it shares the subnet. Protected ports are local to one switch; private VLANs and SGTs scale beyond it (see the notes).</p>
+<h2 id="exercise-5-lock-unused-ports-then-verify-everything">Exercise 5: lock unused ports, then verify everything</h2>
+<h3 id="unused-ports-to-the-dead-vlan-b6">Unused ports to the dead VLAN (B6)</h3>
+<p><strong>Do</strong></p>
+<pre translate="no"><code translate="no">configure terminal
+ interface range fa0/4 - 24 , gig0/1
+  switchport mode access
+  switchport access vlan 777
+  shutdown
+ end
+show interface status</code></pre>
+<p><strong>See:</strong> Fa0/4 to Fa0/24 and Gi0/1 show <strong>disabled</strong> in VLAN <strong>777</strong>.</p>
+<p><strong>Why:</strong> a port at defaults is in VLAN 1 and enabled, so whoever plugs into a lobby jack is on your network. <strong>Both</strong> steps: shut it, and park it in a VLAN that isn&#x27;t routed or trunked anywhere, so an accidental <code translate="no">no shutdown</code> still leads nowhere.</p>
+<h3 id="final-verification">Final verification</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Check</th><th scope="col">Command or test</th><th scope="col">Expected</th></tr></thead><tbody><tr><td>Access ports can&#x27;t trunk</td><td><code translate="no">show interface fa0/3 switchport</code></td><td><code translate="no">static access</code>, Negotiation <strong>Off</strong>, VLAN 40</td></tr><tr><td>Trunk hardened</td><td><code translate="no">show interface trunk</code></td><td>native <strong>999</strong>, allowed <strong>40,50,99</strong></td></tr><tr><td>Port security on</td><td><code translate="no">show port-security</code></td><td>Fa0/1-3, max 5, Shutdown</td></tr><tr><td>Edge protection</td><td><code translate="no">show running-config interface fa0/2</code></td><td>portfast, bpduguard, protected, no cdp</td></tr><tr><td>Unused ports</td><td><code translate="no">show interface status</code></td><td>Fa0/4-24, Gi0/1 <strong>disabled</strong>, VLAN <strong>777</strong></td></tr><tr><td>Management</td><td><code translate="no">show ip interface brief</code></td><td>Vlan99 up/up, Vlan1 administratively down</td></tr><tr><td>Management path</td><td>SW-2: <code translate="no">ping 10.99.0.1</code></td><td>succeeds</td></tr><tr><td>SSH only</td><td><code translate="no">show running-config</code> (line vty section)</td><td><code translate="no">transport input ssh</code>, <code translate="no">login local</code></td></tr><tr><td>Isolation in VLAN 40</td><td>PC-3 → Kali</td><td>fails (protected ports)</td></tr><tr><td>Segmentation</td><td>PC-3 → Server</td><td>fails (no routing between VLANs)</td></tr></tbody></table></div>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Symptom</th><th scope="col">Likely cause</th><th scope="col">Fix</th></tr></thead><tbody><tr><td><code translate="no">% Invalid input</code> on <code translate="no">switchport trunk encapsulation dot1q</code></td><td>The 2960 is 802.1Q-only</td><td>Skip the command on a 2960</td></tr><tr><td>Native VLAN mismatch messages keep appearing</td><td>Only one side changed</td><td>Set <code translate="no">switchport trunk native vlan 999</code> on SW-1 Gi0/1 too</td></tr><tr><td><code translate="no">ping 10.99.0.1</code> from SW-2 fails</td><td>VLAN 99 missing on one switch, not allowed on the trunk, or the SVI is shut</td><td><code translate="no">show vlan brief</code>, <code translate="no">show interface trunk</code>, <code translate="no">show ip interface brief</code> on both</td></tr><tr><td><code translate="no">show port-security</code> lists nothing</td><td>The bare <code translate="no">switchport port-security</code> is missing</td><td>Add it on Fa0/1-3</td></tr><tr><td><code translate="no">Command rejected: ... is a dynamic port</code></td><td>Port security on a port still in dynamic mode</td><td><code translate="no">switchport mode access</code> first</td></tr><tr><td>A port shows <code translate="no">err-disabled</code></td><td>Port security or BPDU Guard fired</td><td>Remove the cause, then <code translate="no">shutdown</code> / <code translate="no">no shutdown</code></td></tr><tr><td><code translate="no">crypto key generate rsa</code> fails</td><td>No hostname or domain name yet</td><td>Set both, then generate</td></tr><tr><td>Trunk drops after <code translate="no">nonegotiate</code></td><td>Far end still dynamic</td><td>Hard-code <code translate="no">switchport mode trunk</code> on both ends</td></tr><tr><td>PC-3 → Kali still works after C1</td><td><code translate="no">switchport protected</code> on only one port</td><td>Both ports must be protected</td></tr></tbody></table></div>
+<h2 id="answer-configs">Answer configs</h2>
+<p>Try the whole lab before opening these.</p>
+<details class="qa"><summary>Show the full SW-2 answer config</summary>
+<pre translate="no"><code translate="no">hostname SW-2
+enable secret Lab!Enable2026
+service password-encryption
+username admin privilege 15 secret Lab!Admin2026
+ip domain-name lab.breakfixlearn.com
+! crypto key generate rsa  (modulus 2048, from exec/config prompt)
+ip ssh version 2
+banner motd #Authorized access only. All activity is logged.#
+line console 0
+ login local
+ exec-timeout 5 0
+ logging synchronous
+line vty 0 15
+ login local
+ transport input ssh
+ exec-timeout 5 0
+!
+vlan 40
+ name users
+vlan 50
+ name servers
+vlan 99
+ name mgmt
+vlan 777
+ name Nowhere
+vlan 999
+ name Native-T
+!
+interface vlan 99
+ ip address 10.99.0.2 255.255.255.0
+ no shutdown
+interface vlan 1
+ shutdown
+!
+interface fa0/1
+ description to Server
+ switchport mode access
+ switchport access vlan 50
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security maximum 5
+ switchport port-security violation shutdown
+ no cdp enable
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface range fa0/2 - 3
+ description to Users
+ switchport mode access
+ switchport access vlan 40
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security maximum 5
+ switchport port-security violation shutdown
+ switchport protected
+ no cdp enable
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface gig0/2
+ description trunk to SW-1
+ switchport mode trunk
+ switchport nonegotiate
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 40,50,99
+!
+interface range fa0/4 - 24 , gig0/1
+ switchport mode access
+ switchport access vlan 777
+ shutdown</code></pre>
+</details>
+<details class="qa"><summary>Show the SW-1 answer config</summary>
+<pre translate="no"><code translate="no">hostname SW-1
+enable secret Lab!Enable2026
+service password-encryption
+username admin privilege 15 secret Lab!Admin2026
+ip domain-name lab.breakfixlearn.com
+! crypto key generate rsa  (modulus 2048)
+ip ssh version 2
+banner motd #Authorized access only. All activity is logged.#
+line console 0
+ login local
+ exec-timeout 5 0
+ logging synchronous
+line vty 0 15
+ login local
+ transport input ssh
+ exec-timeout 5 0
+!
+vlan 40
+ name users
+vlan 50
+ name servers
+vlan 99
+ name mgmt
+vlan 999
+ name Native-T
+!
+interface vlan 99
+ ip address 10.99.0.1 255.255.255.0
+ no shutdown
+interface vlan 1
+ shutdown
+!
+interface range gig0/1 - 2
+ switchport mode trunk
+ switchport nonegotiate
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 40,50,99</code></pre>
+</details>
+<h2 id="what-packet-tracer-can-t-do-and-how-to-go-further">What Packet Tracer can&#x27;t do, and how to go further</h2>
+<p>Packet Tracer simulates IOS; it doesn&#x27;t run it. These are valid on real Cisco IOS but rejected or missing in the Packet Tracer 2960, so the lab leaves them out:</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Real IOS feature</th><th scope="col">In this lab</th></tr></thead><tbody><tr><td><code translate="no">errdisable recovery cause psecure-violation</code> / <code translate="no">interval 60</code></td><td>Recover manually with <code translate="no">shutdown</code> / <code translate="no">no shutdown</code></td></tr><tr><td><code translate="no">login block-for 60 attempts 3 within 30</code></td><td>Not modeled</td></tr><tr><td><code translate="no">no ip http server</code> / <code translate="no">no ip http secure-server</code></td><td>No HTTP server in the simulated 2960</td></tr><tr><td><code translate="no">vlan dot1q tag native</code></td><td>Not modeled; the dead, host-free native VLAN is the defense here</td></tr><tr><td>Full private VLANs</td><td><code translate="no">switchport protected</code> stands in</td></tr><tr><td>Attack tools (Yersinia, macof)</td><td>Not possible; the notes show each attack on virtual IOS switches</td></tr></tbody></table></div>
+<p>To practice the rest of SCOR 2.3, build the same topology in <strong>Cisco Modeling Labs</strong> (IOSvL2) or on real Catalyst switches, add a router for VLAN 40 and a Linux host, and try:</p>
+<pre translate="no"><code translate="no">! DHCP snooping + DAI (VLAN 40), trusting the uplink
+ip dhcp snooping
+ip dhcp snooping vlan 40
+no ip dhcp snooping information option
+ip arp inspection vlan 40
+interface gig0/2
+ ip dhcp snooping trust
+ ip arp inspection trust
+interface range gig1/1 - 2
+ ip dhcp snooping limit rate 10
+ ip verify source
+ storm-control broadcast level 20.00 10.00
+ storm-control action trap</code></pre>
+<p>Then attack it: run a rogue DHCP server on the Linux host, try ARP spoofing the gateway, and confirm the switch drops and logs each attempt. The <a href="/ccnp-security/segmentation-layer-2-hardening#validation-re-run-every-attack">notes</a> list the expected result and the log message for every attack.</p>
+<h2 id="exam-mapping">Exam mapping</h2>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">You configured</th><th scope="col">Attack it stops</th><th scope="col">SCOR v2.0</th></tr></thead><tbody><tr><td><code translate="no">switchport mode access</code> + <code translate="no">nonegotiate</code></td><td>VLAN hopping by switch spoofing (DTP)</td><td>2.3</td></tr><tr><td>Native VLAN 999, allowed list</td><td>VLAN hopping by double tagging; VLAN sprawl</td><td>2.3</td></tr><tr><td>Port security max 5, shutdown</td><td>MAC flooding / CAM overflow</td><td>2.3</td></tr><tr><td>PortFast + BPDU Guard</td><td>STP manipulation, rogue switches</td><td>2.3</td></tr><tr><td>Protected ports</td><td>Lateral movement inside a VLAN</td><td>2.3 (segmentation)</td></tr><tr><td>Unused ports shut + VLAN 777</td><td>Walk-up access</td><td>2.3</td></tr><tr><td>SSH v2, local users, timeouts, banner, mgmt VLAN</td><td>Management-plane takeover</td><td>2.5, 2.7, 2.4</td></tr></tbody></table></div>
+<p>If you can name the attack, the defense and the command for every row from memory, you have the Layer 2 half of SCOR Domain 2. Test yourself with the <a href="/ccnp-security/flashcards#d2">flashcards</a> and the <a href="/ccnp-security/mock-exam#d2">mock exam</a>.</p>
+</div>
+      <footer class="post-end">
+        <section class="practice" aria-labelledby="practice-h">
+          <div><h2 id="practice-h" class="sub-h">Lock it in</h2>
+          <p>Lab done? Drill the commands and the attack-to-defense mapping until they're automatic.</p></div>
+          <p class="practice-links"><a class="btn btn-pri" href="/ccnp-security/flashcards#d2">flashcards <span class="p">d2</span></a><a class="btn btn-sec" href="/ccnp-security/mock-exam#d2">mock exam <span class="p">d2</span></a><a class="btn btn-sec" href="/ccnp-security/segmentation-layer-2-hardening">notes</a></p>
+        </section>
+      </footer>
+    </div>
+    <aside class="toc" aria-label="On this page"><span class="toc-title"><span class="h">#</span> show ip route | toc</span><ol><li><a href="#what-you-ll-build">What you&#x27;ll build</a></li><li><a href="#topology-and-addressing">Topology and addressing</a></li><li><a href="#part-a-management-plane-baseline-both-switches">Part A: management-plane baseline (both switches)</a></li><li><a href="#exercise-1-see-the-segmentation-you-already-have">Exercise 1: see the segmentation you already have</a></li><li><a href="#exercise-2-lock-down-access-ports-and-the-trunk">Exercise 2: lock down access ports and the trunk</a></li><li><a href="#exercise-3-stop-a-host-from-flooding-the-mac-table-b4">Exercise 3: stop a host from flooding the MAC table (B4)</a></li><li><a href="#exercise-4-portfast-bpdu-guard-and-host-isolation">Exercise 4: PortFast, BPDU Guard and host isolation</a></li><li><a href="#exercise-5-lock-unused-ports-then-verify-everything">Exercise 5: lock unused ports, then verify everything</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#answer-configs">Answer configs</a></li><li><a href="#what-packet-tracer-can-t-do-and-how-to-go-further">What Packet Tracer can&#x27;t do, and how to go further</a></li><li><a href="#exam-mapping">Exam mapping</a></li></ol></aside>
+  </div>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/ccnp-security">ccnp security</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Oct 22, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

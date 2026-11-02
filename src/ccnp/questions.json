@@ -614,6 +614,582 @@
    ],
    "explanation": "Correlation depends on aligned clocks. If an attacker could skew device time, logs would no longer line up, and certificate checks could fail. Authenticated NTP prevents that.",
    "ref": "network-security-firewall-ips-visibility#the-foundation-inventory-time-and-logs"
+  },
+  {
+   "id": "q2.3-001",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "A security audit finds a user port showing \"Administrative Mode: dynamic auto\" and \"Negotiation of Trunking: On\". Which attack does this expose?",
+   "options": [
+    "Double-tagging VLAN hopping",
+    "Switch-spoofing VLAN hopping",
+    "CAM table overflow",
+    "DHCP starvation"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A port still running DTP can be negotiated into a trunk by an attacker, which then reaches every VLAN on the switch. That's switch spoofing. Double tagging abuses the native VLAN instead.",
+   "ref": "segmentation-layer-2-hardening#the-vulnerability-seen-from-the-switch",
+   "sample": true
+  },
+  {
+   "id": "q2.3-002",
+   "obj": "2.3",
+   "type": "multi",
+   "stem": "Which two commands stop switch-spoofing VLAN hopping on a user access port?",
+   "options": [
+    "switchport mode access",
+    "switchport nonegotiate",
+    "switchport trunk native vlan 999",
+    "switchport port-security",
+    "spanning-tree bpduguard enable"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "Hard-coding access mode and disabling DTP negotiation means the port can never become a trunk. The native VLAN, port security and BPDU Guard address other attacks.",
+   "ref": "segmentation-layer-2-hardening#fix-1-hard-code-access-ports-kill-dtp"
+  },
+  {
+   "id": "q2.3-003",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "Both ends of an inter-switch link are left in dynamic auto. What is the result?",
+   "options": [
+    "An 802.1Q trunk forms",
+    "An ISL trunk forms",
+    "The link operates as an access link",
+    "The ports go err-disabled"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "Dynamic auto only responds to DTP; it never initiates. Two auto ports never ask each other, so the link stays access. An attacker who sends desirable DTP to either port still gets a trunk.",
+   "ref": "segmentation-layer-2-hardening#dtp-modes-which-combinations-form-a-trunk"
+  },
+  {
+   "id": "q2.3-004",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "Which condition is required for a double-tagging VLAN hopping attack to succeed?",
+   "options": [
+    "The attacker's port runs DTP in desirable mode",
+    "The attacker's access port is in the trunk's native VLAN",
+    "Port security is set to protect",
+    "VTP is in server mode"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The first switch strips the outer tag only because it matches the native VLAN, which is sent untagged on the trunk. The inner tag then delivers the frame into the victim VLAN.",
+   "ref": "segmentation-layer-2-hardening#fix-3-the-native-vlan-kill-double-tagging"
+  },
+  {
+   "id": "q2.3-005",
+   "obj": "2.3",
+   "type": "multi",
+   "stem": "Which two measures defeat double-tagging attacks?",
+   "options": [
+    "Set the trunk native VLAN to an unused VLAN with no access ports",
+    "Enable vlan dot1q tag native",
+    "Enable DHCP snooping",
+    "Set port security maximum to 1",
+    "Enable storm control"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "If no host sits in the native VLAN, nobody can start the attack, and tagging the native VLAN removes the untagged behaviour it relies on.",
+   "ref": "segmentation-layer-2-hardening#fix-3-the-native-vlan-kill-double-tagging"
+  },
+  {
+   "id": "q2.3-006",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "An engineer changes the native VLAN on one end of a trunk to 999. Which message is expected until the other end is changed?",
+   "options": [
+    "%PM-4-ERR_DISABLE: psecure-violation",
+    "%CDP-4-NATIVE_VLAN_MISMATCH",
+    "%SW_DAI-4-DHCP_SNOOPING_DENY",
+    "%SPANTREE-2-BLOCK_BPDUGUARD"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "CDP compares native VLANs across the link and logs a mismatch (STP also reports inconsistent peer VLAN IDs). Both ends must use the same native VLAN.",
+   "ref": "segmentation-layer-2-hardening#fix-3-the-native-vlan-kill-double-tagging"
+  },
+  {
+   "id": "q2.3-007",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "A new switch from the lab is connected to production with the same VTP domain and a higher configuration revision. Shortly after, several VLANs disappear across the campus. What is the best preventive control?",
+   "options": [
+    "Enable BPDU Guard on trunks",
+    "Run VTP transparent mode or VTPv3 with a primary server",
+    "Enable DHCP snooping",
+    "Set switchport nonegotiate on trunks"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "VTP accepts the database with the highest revision. Transparent mode keeps each switch's VLANs local, and VTPv3 lets only the designated primary server make changes.",
+   "ref": "segmentation-layer-2-hardening#where-did-the-vlans-come-from-on-the-other-switch-vtp"
+  },
+  {
+   "id": "q2.3-008",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "An attacker runs macof on a user port. Within seconds the switch begins sending unicast traffic for other hosts to the attacker. Which mechanism is being abused?",
+   "options": [
+    "ARP cache",
+    "CAM table capacity",
+    "DHCP binding table",
+    "STP root election"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Flooding thousands of random source MACs fills the CAM table. For unknown destinations the switch floods frames out every port in the VLAN, so the attacker can sniff them.",
+   "ref": "segmentation-layer-2-hardening#the-threat-cam-overflow-mac-flooding",
+   "sample": true
+  },
+  {
+   "id": "q2.3-009",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "An engineer configures switchport port-security maximum 2 and violation restrict on a port, but show port-security interface reports Port Security: Disabled. What is missing?",
+   "options": [
+    "switchport port-security mac-address sticky",
+    "The bare switchport port-security command",
+    "errdisable recovery cause psecure-violation",
+    "spanning-tree portfast"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The maximum and violation commands only set parameters. The feature is enabled by the bare switchport port-security command.",
+   "ref": "segmentation-layer-2-hardening#the-fix-port-security"
+  },
+  {
+   "id": "q2.3-010",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "A conference room port must stay up during meetings, but security wants a log entry and SNMP trap when extra devices connect. Which violation mode?",
+   "options": [
+    "protect",
+    "restrict",
+    "shutdown",
+    "sticky"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "restrict drops frames from MACs beyond the limit, logs, sends a trap and increments the violation counter, without err-disabling the port. protect gives no visibility, and shutdown takes the port down.",
+   "ref": "segmentation-layer-2-hardening#the-three-violation-modes"
+  },
+  {
+   "id": "q2.3-011",
+   "obj": "2.3",
+   "type": "multi",
+   "stem": "Which two statements about port security violation mode shutdown are true?",
+   "options": [
+    "It is the default violation mode",
+    "It places the port in err-disabled state",
+    "It silently drops frames without logging",
+    "It only drops frames from the offending MAC and keeps the port up",
+    "It requires errdisable recovery to be configured to work"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "shutdown is the default and err-disables the whole port, logging and counting the violation. Recovery can be manual (shut/no shut) or automatic if errdisable recovery is configured.",
+   "ref": "segmentation-layer-2-hardening#the-three-violation-modes"
+  },
+  {
+   "id": "q2.3-012",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "Which configuration automatically re-enables a port 60 seconds after a port-security violation err-disabled it?",
+   "options": [
+    "errdisable recovery cause psecure-violation and errdisable recovery interval 60",
+    "switchport port-security aging time 60",
+    "spanning-tree portfast bpduguard default",
+    "switchport port-security violation restrict"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "Err-disable recovery is off by default. Enabling the psecure-violation cause with a 60-second interval brings the port back automatically; if the attack continues, it trips again immediately.",
+   "ref": "segmentation-layer-2-hardening#recovering-the-port"
+  },
+  {
+   "id": "q2.3-013",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "An attacker unplugs a printer and connects a laptop that clones the printer's MAC address. The port uses sticky port security. What happens, and what control would stop it?",
+   "options": [
+    "The port err-disables; no further control needed",
+    "Traffic is allowed; 802.1X or MAB with ISE would be needed to verify the device",
+    "DAI blocks the laptop",
+    "Storm control blocks the laptop"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Port security counts and pins MAC addresses, but a cloned MAC looks legitimate. Authenticating the device with 802.1X (or MAB plus profiling) addresses identity.",
+   "ref": "segmentation-layer-2-hardening#what-port-security-does-not-do"
+  },
+  {
+   "id": "q2.3-014",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "A user connects a small unmanaged-looking switch that sends BPDUs with priority 0 to an access port configured with PortFast. Which feature immediately err-disables that port?",
+   "options": [
+    "Root Guard",
+    "Loop Guard",
+    "BPDU Guard",
+    "BPDU Filter"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "BPDU Guard err-disables a PortFast edge port as soon as a BPDU arrives. Root Guard would put a port in root-inconsistent state instead of err-disable.",
+   "ref": "segmentation-layer-2-hardening#the-defenses"
+  },
+  {
+   "id": "q2.3-015",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "A distribution switch must never accept a new root bridge from the access layer, but STP must keep running on those links. Which feature belongs on the distribution ports facing the access switches?",
+   "options": [
+    "BPDU Guard",
+    "Root Guard",
+    "BPDU Filter",
+    "PortFast"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Root Guard blocks a port that receives superior BPDUs by placing it in root-inconsistent state, and recovers automatically when they stop. Normal STP operation continues.",
+   "ref": "segmentation-layer-2-hardening#the-defenses"
+  },
+  {
+   "id": "q2.3-016",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "Which STP feature should be avoided on ports that could form a loop because it effectively disables spanning tree on the port?",
+   "options": [
+    "BPDU Guard",
+    "Loop Guard",
+    "BPDU Filter",
+    "Root Guard"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "BPDU Filter stops sending and processing BPDUs, so a loop through that port is not detected. It is used only in narrow, deliberate cases.",
+   "ref": "segmentation-layer-2-hardening#the-defenses"
+  },
+  {
+   "id": "q2.3-017",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "Clients in VLAN 40 receive an IP lease with the default gateway 10.40.0.66, an address of a user workstation. Which feature prevents this attack?",
+   "options": [
+    "Port security",
+    "DHCP snooping",
+    "Storm control",
+    "Root Guard"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A rogue DHCP server is handing out its own gateway. DHCP snooping drops DHCP server messages (OFFER, ACK) that arrive on untrusted ports.",
+   "ref": "segmentation-layer-2-hardening#how-dhcp-snooping-thinks"
+  },
+  {
+   "id": "q2.3-018",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "With DHCP snooping enabled, which port should be configured with ip dhcp snooping trust?",
+   "options": [
+    "Every access port in the snooped VLAN",
+    "The uplink toward the legitimate DHCP server or relay",
+    "Only ports with port security",
+    "The port connected to the network administrator's PC"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Only the path toward the real DHCP server is trusted. All user ports remain untrusted, the default.",
+   "ref": "segmentation-layer-2-hardening#how-dhcp-snooping-thinks"
+  },
+  {
+   "id": "q2.3-019",
+   "obj": "2.3",
+   "type": "multi",
+   "stem": "An engineer enters ip dhcp snooping and ip dhcp snooping trust on the uplink, but no bindings appear. Which two things should be checked?",
+   "options": [
+    "ip dhcp snooping vlan includes the user VLAN",
+    "Option 82 insertion is not causing the relay or server to drop requests",
+    "BPDU Guard is enabled globally",
+    "The native VLAN is 1",
+    "CDP is enabled on access ports"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "Snooping needs the per-VLAN command as well as the global one. When the switch inserts option 82 and an upstream relay or server rejects it, clients get no leases, so no bindings are built.",
+   "ref": "segmentation-layer-2-hardening#configuration"
+  },
+  {
+   "id": "q2.3-020",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "Which configuration best mitigates a DHCP starvation attack from a single access port?",
+   "options": [
+    "ip dhcp snooping limit rate 10 on the access port plus port security",
+    "ip arp inspection trust on the access port",
+    "spanning-tree guard root on the access port",
+    "switchport trunk allowed vlan 40"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "Starvation sends many DHCP requests from random MACs. A snooping rate limit err-disables the port on a flood, and port security caps the number of MACs it can use.",
+   "ref": "segmentation-layer-2-hardening#configuration"
+  },
+  {
+   "id": "q2.3-021",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "An attacker sends gratuitous ARP replies claiming the gateway's IP address. Which feature drops these replies?",
+   "options": [
+    "IP Source Guard",
+    "Dynamic ARP Inspection",
+    "Storm control",
+    "Port security"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "DAI checks ARP on untrusted ports against the DHCP snooping binding table and drops replies whose IP-to-MAC pair doesn't match a binding.",
+   "ref": "segmentation-layer-2-hardening#how-dai-thinks",
+   "sample": true
+  },
+  {
+   "id": "q2.3-022",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "After enabling DAI on VLAN 50, a file server with a static IP address loses connectivity. What is the best fix?",
+   "options": [
+    "Disable DHCP snooping on VLAN 50",
+    "Configure an ARP ACL for the server and apply it with ip arp inspection filter",
+    "Set the server port to switchport protected",
+    "Increase the storm-control level"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Static hosts have no DHCP binding, so DAI drops their ARP. An ARP ACL permitting the server's IP and MAC, applied as a DAI filter, allows it.",
+   "ref": "segmentation-layer-2-hardening#how-dai-thinks"
+  },
+  {
+   "id": "q2.3-023",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "What happens by default when an untrusted port exceeds the DAI rate limit?",
+   "options": [
+    "ARP packets are queued",
+    "The port is err-disabled",
+    "The port is moved to the native VLAN",
+    "DAI is disabled for the VLAN"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Untrusted ports allow 15 ARP packets per second by default; exceeding it err-disables the port, which also contains ARP floods.",
+   "ref": "segmentation-layer-2-hardening#how-dai-thinks"
+  },
+  {
+   "id": "q2.3-024",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "A host manually configures another user's IP address. Which feature filters its IP packets based on the DHCP snooping binding for that port?",
+   "options": [
+    "Dynamic ARP Inspection",
+    "IP Source Guard",
+    "Root Guard",
+    "VTP pruning"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "IP Source Guard (ip verify source) permits only source IPs (and optionally MACs) that match the binding learned on that port.",
+   "ref": "segmentation-layer-2-hardening#ip-source-guard"
+  },
+  {
+   "id": "q2.3-025",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "Which statement describes the dependency between DHCP snooping, DAI and IP Source Guard?",
+   "options": [
+    "DAI builds the binding table that DHCP snooping uses",
+    "DHCP snooping builds the binding table that DAI and IP Source Guard validate against",
+    "IP Source Guard builds the table for DAI",
+    "They are independent features"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "DHCP snooping learns MAC, IP, VLAN and port from legitimate leases. DAI uses those bindings to validate ARP, and IPSG uses them to validate IP sources.",
+   "ref": "segmentation-layer-2-hardening#ip-source-guard"
+  },
+  {
+   "id": "q2.3-026",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "A switch port should drop broadcast traffic when it exceeds 20 percent of bandwidth and resume when it falls below 10 percent. Which command?",
+   "options": [
+    "storm-control broadcast level 20.00 10.00",
+    "storm-control broadcast level 10.00 20.00",
+    "switchport port-security maximum 20",
+    "ip dhcp snooping limit rate 20"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "The first value is the rising threshold and the second is the falling threshold. Above 20 percent the switch drops broadcast traffic until it falls below 10 percent.",
+   "ref": "segmentation-layer-2-hardening#storm-control"
+  },
+  {
+   "id": "q2.3-027",
+   "obj": "2.3",
+   "type": "multi",
+   "stem": "Which two actions should be applied to every unused switch port?",
+   "options": [
+    "shutdown",
+    "Assign it to an unused, unrouted VLAN",
+    "Enable PortFast",
+    "Set it as a trunk with native VLAN 1",
+    "Enable DHCP snooping trust"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "Shut the port and park it in a dead VLAN. If someone re-enables it by mistake, it still connects to nothing.",
+   "ref": "segmentation-layer-2-hardening#unused-ports-down-and-parked"
+  },
+  {
+   "id": "q2.3-028",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "In a private VLAN, which ports can an isolated port communicate with?",
+   "options": [
+    "All ports in the primary VLAN",
+    "Other isolated ports and promiscuous ports",
+    "Only promiscuous ports",
+    "Community ports and promiscuous ports"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "Isolated ports reach only promiscuous ports, typically the gateway or firewall. They cannot reach other isolated ports or community ports.",
+   "ref": "segmentation-layer-2-hardening#private-vlans"
+  },
+  {
+   "id": "q2.3-029",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "Several cameras share one subnet and must reach only the default gateway, never each other. Which design fits best on a switch that supports it?",
+   "options": [
+    "Place the cameras on community ports in one community VLAN",
+    "Place the cameras on isolated ports and the gateway on a promiscuous port",
+    "Put each camera in a separate VLAN and subnet",
+    "Enable storm control on the camera ports"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Isolated private VLAN ports keep a single subnet but prevent host-to-host traffic, while all hosts still reach the promiscuous gateway port.",
+   "ref": "segmentation-layer-2-hardening#private-vlans"
+  },
+  {
+   "id": "q2.3-030",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "What is a limitation of switchport protected compared with private VLANs?",
+   "options": [
+    "It only works on trunk ports",
+    "It only isolates protected ports on the same switch",
+    "It requires VTPv3",
+    "It blocks access to the default gateway"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Protected ports are locally significant: they stop traffic between protected ports on one switch but don't extend isolation across switches.",
+   "ref": "segmentation-layer-2-hardening#protected-ports-pvlan-edge"
+  },
+  {
+   "id": "q2.3-031",
+   "obj": "2.3",
+   "type": "multi",
+   "stem": "Which two statements about Cisco TrustSec Security Group Tags are correct?",
+   "options": [
+    "SGTs can be assigned dynamically through 802.1X or MAB with Cisco ISE",
+    "SXP shares IP-to-SGT mappings with devices that cannot tag inline",
+    "SGTs are 802.1Q VLAN IDs",
+    "SGT policy is tied to the switch port where the device connects",
+    "SGTs require private VLANs"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "SGTs are role tags assigned by ISE (or statically) and propagated inline or via SXP. Policy follows the role, not the port or VLAN, and is enforced with SGACLs.",
+   "ref": "segmentation-layer-2-hardening#security-group-tags-cisco-trustsec"
+  },
+  {
+   "id": "q2.3-032",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "Contractors must never reach finance servers anywhere across three campuses, regardless of where either connects. Which segmentation approach scales best?",
+   "options": [
+    "Private VLANs on every access switch",
+    "Security Group Tags with SGACL policy managed in ISE",
+    "Protected ports",
+    "Separate VTP domains"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Identity-based tags follow the device and are enforced by a central policy matrix, so the rule holds across locations without per-port or per-IP configuration.",
+   "ref": "segmentation-layer-2-hardening#which-tool-when"
+  },
+  {
+   "id": "q2.3-033",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "Why should CDP be disabled on user-facing ports?",
+   "options": [
+    "It causes native VLAN mismatches",
+    "It leaks device model, IOS version, management IP and native VLAN to anyone listening",
+    "It disables port security",
+    "It overrides DHCP snooping"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "CDP and LLDP give an attacker free reconnaissance. Keep them where operations need them (infrastructure links, IP phones) and turn them off toward hosts.",
+   "ref": "segmentation-layer-2-hardening#cdp-and-lldp"
   }
  ]
 }
