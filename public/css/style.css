@@ -2028,3 +2028,34 @@ a, button, summary { -webkit-tap-highlight-color: rgba(0, 188, 235, 0.18); }
 .labdl .dl-list { grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); }
 .labdl .sums { margin-top: 0.9rem; }
 .labdl .side-note { margin: 0.9rem 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; color: var(--text-2); font-size: 0.9rem; }
+
+/* CCNP labs discoverability: 4-up tools, lab call-out on lectures, lab chip */
+.tools4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 64rem) { .tools4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 36rem) { .tools4 { grid-template-columns: minmax(0, 1fr); } }
+.labcta {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  margin-bottom: 2rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--line-2);
+  border-left: 3px solid var(--up);
+  border-radius: var(--r-lg);
+  background: var(--panel);
+  color: var(--text);
+  transition: border-color 0.15s, background-color 0.15s;
+}
+.labcta:hover { border-color: var(--up); background: var(--panel-2); text-decoration: none; }
+.labcta .lk { font-family: var(--f-mono); font-size: 0.7rem; color: var(--up); text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap; }
+.labcta .lt { display: flex; flex-direction: column; min-width: 0; }
+.labcta .lt b { font-weight: 600; }
+.labcta .lt span { color: var(--text-2); font-size: 0.88rem; }
+.labcta .la { font-family: var(--f-mono); color: var(--up); font-size: 1.2rem; }
+@media (max-width: 36rem) { .labcta { grid-template-columns: minmax(0, 1fr) auto; } .labcta .lk { grid-column: 1 / -1; } }
+.chip.labchip { color: var(--up); border-color: rgba(108, 192, 74, 0.5); }
+.labhow { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem 1.6rem; max-width: 60rem; }
+@media (max-width: 48rem) { .labhow { grid-template-columns: minmax(0, 1fr); } }
+.labhow li { color: var(--text-2); font-size: 0.93rem; line-height: 1.6; }
+.labhow b { display: block; color: var(--text); font-weight: 600; }

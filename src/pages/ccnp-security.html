@@ -29,10 +29,11 @@
   </header>
 
   <div class="wrap ccnp-hub">
-    <nav class="tools3" aria-label="Study tools">
+    <nav class="tools3 tools4" aria-label="Study tools">
       <a class="tool" href="#lectures"><span class="tk">01 &middot; read</span><b>Lectures</b><span>Notes in study order, with diagrams, exam traps and self-checks.</span></a>
-      <a class="tool" href="/ccnp-security/flashcards"><span class="tk">02 &middot; remember</span><b>Flashcards</b><span>Spaced repetition. Progress stays in your browser, nothing to sign up for.</span></a>
-      <a class="tool" href="/ccnp-security/mock-exam"><span class="tk">03 &middot; test</span><b>Mock exam</b><span>Timed, one-way like the real exam, or practice mode with instant feedback.</span></a>
+      <a class="tool" href="/ccnp-security/labs"><span class="tk">02 &middot; build</span><b>Packet Tracer labs</b><span>Download a .pkt, harden it step by step, prove it with show commands.</span></a>
+      <a class="tool" href="/ccnp-security/flashcards"><span class="tk">03 &middot; remember</span><b>Flashcards</b><span>Spaced repetition. Progress stays in your browser, nothing to sign up for.</span></a>
+      <a class="tool" href="/ccnp-security/mock-exam"><span class="tk">04 &middot; test</span><b>Mock exam</b><span>Timed, one-way like the real exam, or practice mode with instant feedback.</span></a>
     </nav>
 
     <p class="guide-cta"><span class="st st-prog">new</span> Studying from a v1.1 book? Read <a href="/ccnp-security/scor-350-701-v2-changes">SCOR 350-701 v2.0 vs v1.1: every change explained</a>: new weights, objectives added and dropped, and the retired SVPN, SESA and SWSA exams.</p>
@@ -40,6 +41,13 @@
     <section aria-labelledby="lectures">
       <h2 class="sub-h" id="lectures">Lectures in study order</h2>
       {{CCNP_LECTURES}}
+    </section>
+
+    <section aria-labelledby="labs">
+      <h2 class="sub-h" id="labs">Packet Tracer labs</h2>
+      <p class="hub-p">Download a baseline <span class="mono">.pkt</span>, harden it step by step, and prove each control with show commands. Every file lists its SHA-256 hash. Topics Packet Tracer can't simulate, such as FTD, ISE and Secure Access, stay conceptual or move to CML.</p>
+      {{CCNP_LABS}}
+      <p class="hub-p"><a href="/ccnp-security/labs">All labs and how they work &rarr;</a></p>
     </section>
 
     <section aria-labelledby="blueprint">
@@ -50,11 +58,6 @@
       </div>
     </section>
 
-    <section aria-labelledby="labs">
-      <h2 class="sub-h" id="labs">Packet Tracer labs</h2>
-      <p class="hub-p">Download a baseline <span class="mono">.pkt</span>, harden it step by step, and prove each control with show commands. Every file lists its SHA-256 hash. Topics Packet Tracer can't simulate, such as FTD, ISE and Secure Access, stay conceptual or move to CML.</p>
-      {{CCNP_LABS}}
-    </section>
 
     <section aria-labelledby="faq-h" class="hub-faq">
       <h2 class="sub-h" id="faq-h">Questions</h2>

@@ -10,7 +10,7 @@
 <meta name="color-scheme" content="dark">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/style.css?v=38c400936f">
+<link rel="stylesheet" href="/css/style.css?v=edd6efa7cc">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
 <meta property="og:type" content="website">
@@ -56,22 +56,30 @@
         practice exam, written while I study for it myself. Every flashcard and practice question
         links back to the paragraph that explains it. No account, no paywall, no ads.
       </p>
-      <dl class="ccnp-stats"><div class="stat"><dt>lectures</dt><dd><b>2</b> published</dd></div><div class="stat"><dt>objectives</dt><dd><b>3/47</b> have notes</dd></div><div class="stat"><dt>flashcards</dt><dd><b>122</b> in the deck</dd></div><div class="stat"><dt>questions</dt><dd><b>68</b> in the exam bank</dd></div></dl>
+      <dl class="ccnp-stats"><div class="stat"><dt>lectures</dt><dd><b>2</b> published</dd></div><div class="stat"><dt>labs</dt><dd><b>1</b> Packet Tracer</dd></div><div class="stat"><dt>objectives</dt><dd><b>3/47</b> have notes</dd></div><div class="stat"><dt>flashcards</dt><dd><b>122</b> in the deck</dd></div><div class="stat"><dt>questions</dt><dd><b>68</b> in the exam bank</dd></div></dl>
     </div>
   </header>
 
   <div class="wrap ccnp-hub">
-    <nav class="tools3" aria-label="Study tools">
+    <nav class="tools3 tools4" aria-label="Study tools">
       <a class="tool" href="#lectures"><span class="tk">01 &middot; read</span><b>Lectures</b><span>Notes in study order, with diagrams, exam traps and self-checks.</span></a>
-      <a class="tool" href="/ccnp-security/flashcards"><span class="tk">02 &middot; remember</span><b>Flashcards</b><span>Spaced repetition. Progress stays in your browser, nothing to sign up for.</span></a>
-      <a class="tool" href="/ccnp-security/mock-exam"><span class="tk">03 &middot; test</span><b>Mock exam</b><span>Timed, one-way like the real exam, or practice mode with instant feedback.</span></a>
+      <a class="tool" href="/ccnp-security/labs"><span class="tk">02 &middot; build</span><b>Packet Tracer labs</b><span>Download a .pkt, harden it step by step, prove it with show commands.</span></a>
+      <a class="tool" href="/ccnp-security/flashcards"><span class="tk">03 &middot; remember</span><b>Flashcards</b><span>Spaced repetition. Progress stays in your browser, nothing to sign up for.</span></a>
+      <a class="tool" href="/ccnp-security/mock-exam"><span class="tk">04 &middot; test</span><b>Mock exam</b><span>Timed, one-way like the real exam, or practice mode with instant feedback.</span></a>
     </nav>
 
     <p class="guide-cta"><span class="st st-prog">new</span> Studying from a v1.1 book? Read <a href="/ccnp-security/scor-350-701-v2-changes">SCOR 350-701 v2.0 vs v1.1: every change explained</a>: new weights, objectives added and dropped, and the retired SVPN, SESA and SWSA exams.</p>
 
     <section aria-labelledby="lectures">
       <h2 class="sub-h" id="lectures">Lectures in study order</h2>
-      <ol class="lecs"><li><a class="lec" href="/ccnp-security/segmentation-layer-2-hardening"><span class="mod">D2</span><span class="lt"><b>Segmentation &amp; Layer 2 Hardening</b><span class="ld">How to think about Layer 2 trust, then every switch defense in SCOR 2.3: VLANs and SGTs, trunk hardening, port security, STP guards, DHCP snooping, DAI and storm control.</span><span class="lc"><span class="chip obj d2" title="Configure network infrastructure security methods (network segmentation using VLANs or SGTs; Layer 2 and port security; DHCP snooping; Dynamic ARP inspection; storm control; and defenses against MAC, ARP, VLAN hopping, STP, and DHCP rogue attacks)">2.3</span><span class="lm">37 min &middot; Nov 1, 2026</span></span></span></a></li><li><a class="lec" href="/ccnp-security/network-security-firewall-ips-visibility"><span class="mod">D2</span><span class="lt"><b>Network Security: Firewalls, IPS, and Visibility</b><span class="ld">What enforces, where it goes, and how you see what got past it: firewall and IPS solutions and deployment models (2.1) and security monitoring and telemetry (2.2).</span><span class="lc"><span class="chip obj d2" title="Describe network security solutions and deployment models that provide intrusion prevention and firewall capabilities">2.1</span><span class="chip obj d2" title="Describe security monitoring and telemetry technologies">2.2</span><span class="lm">38 min &middot; Oct 26, 2026</span></span></span></a></li></ol>
+      <ol class="lecs"><li><a class="lec" href="/ccnp-security/segmentation-layer-2-hardening"><span class="mod">D2</span><span class="lt"><b>Segmentation &amp; Layer 2 Hardening</b><span class="ld">How to think about Layer 2 trust, then every switch defense in SCOR 2.3: VLANs and SGTs, trunk hardening, port security, STP guards, DHCP snooping, DAI and storm control.</span><span class="lc"><span class="chip obj d2" title="Configure network infrastructure security methods (network segmentation using VLANs or SGTs; Layer 2 and port security; DHCP snooping; Dynamic ARP inspection; storm control; and defenses against MAC, ARP, VLAN hopping, STP, and DHCP rogue attacks)">2.3</span><span class="chip labchip">+ Packet Tracer lab</span><span class="lm">37 min &middot; Nov 1, 2026</span></span></span></a></li><li><a class="lec" href="/ccnp-security/network-security-firewall-ips-visibility"><span class="mod">D2</span><span class="lt"><b>Network Security: Firewalls, IPS, and Visibility</b><span class="ld">What enforces, where it goes, and how you see what got past it: firewall and IPS solutions and deployment models (2.1) and security monitoring and telemetry (2.2).</span><span class="lc"><span class="chip obj d2" title="Describe network security solutions and deployment models that provide intrusion prevention and firewall capabilities">2.1</span><span class="chip obj d2" title="Describe security monitoring and telemetry technologies">2.2</span><span class="lm">38 min &middot; Oct 26, 2026</span></span></span></a></li></ol>
+    </section>
+
+    <section aria-labelledby="labs">
+      <h2 class="sub-h" id="labs">Packet Tracer labs</h2>
+      <p class="hub-p">Download a baseline <span class="mono">.pkt</span>, harden it step by step, and prove each control with show commands. Every file lists its SHA-256 hash. Topics Packet Tracer can't simulate, such as FTD, ISE and Secure Access, stay conceptual or move to CML.</p>
+      <ol class="lecs"><li><a class="lec" href="/ccnp-security/labs/segmentation-l2-hardening-packet-tracer"><span class="mod">PT</span><span class="lt"><b>Segmentation &amp; Layer 2 Hardening Lab</b><span class="ld">Download a working but insecure switched network and harden it step by step: management baseline, VLANs, trunks, port security, BPDU Guard, protected ports and unused-port lockdown.</span><span class="lc"><span class="chip obj d2" title="Configure network infrastructure security methods (network segmentation using VLANs or SGTs; Layer 2 and port security; DHCP snooping; Dynamic ARP inspection; storm control; and defenses against MAC, ARP, VLAN hopping, STP, and DHCP rogue attacks)">2.3</span><span class="lm">60 to 90 min &middot; download .pkt + .pka</span></span></span></a></li></ol>
+      <p class="hub-p"><a href="/ccnp-security/labs">All labs and how they work &rarr;</a></p>
     </section>
 
     <section aria-labelledby="blueprint">
@@ -87,11 +95,6 @@
       </div>
     </section>
 
-    <section aria-labelledby="labs">
-      <h2 class="sub-h" id="labs">Packet Tracer labs</h2>
-      <p class="hub-p">Download a baseline <span class="mono">.pkt</span>, harden it step by step, and prove each control with show commands. Every file lists its SHA-256 hash. Topics Packet Tracer can't simulate, such as FTD, ISE and Secure Access, stay conceptual or move to CML.</p>
-      <ol class="lecs"><li><a class="lec" href="/ccnp-security/labs/segmentation-l2-hardening-packet-tracer"><span class="mod">PT</span><span class="lt"><b>Segmentation &amp; Layer 2 Hardening Lab</b><span class="ld">Download a working but insecure switched network and harden it step by step: management baseline, VLANs, trunks, port security, BPDU Guard, protected ports and unused-port lockdown.</span><span class="lc"><span class="chip obj d2" title="Configure network infrastructure security methods (network segmentation using VLANs or SGTs; Layer 2 and port security; DHCP snooping; Dynamic ARP inspection; storm control; and defenses against MAC, ARP, VLAN hopping, STP, and DHCP rogue attacks)">2.3</span><span class="lm">60 to 90 min &middot; download .pkt + .pka</span></span></span></a></li></ol>
-    </section>
 
     <section aria-labelledby="faq-h" class="hub-faq">
       <h2 class="sub-h" id="faq-h">Questions</h2>
@@ -121,6 +124,7 @@
         <li><a href="/blog">blog</a></li>
         <li><a href="/cheat-sheets">cheat sheets</a></li>
         <li><a href="/ccnp-security">ccnp security</a></li>
+        <li><a href="/ccnp-security/labs">packet tracer labs</a></li>
         <li><a href="/#about">about</a></li>
         <li><a href="/privacy">privacy</a></li>
         <li><a href="/feed.xml">rss feed</a></li>

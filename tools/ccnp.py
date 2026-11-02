@@ -200,7 +200,7 @@ def render_lab(site, hashes, last_change, course, lab):
 <article class="lecture lab">
   <header class="post-head">
     <div class="wrap">
-      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="{BASE}">ccnp-security</a><span aria-hidden="true">/</span><a href="{BASE}#labs">labs</a><span aria-hidden="true">/</span><span>{esc(lab["slug"])}</span></nav>
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="{BASE}">ccnp-security</a><span aria-hidden="true">/</span><a href="{BASE}/labs">labs</a><span aria-hidden="true">/</span><span>{esc(lab["slug"])}</span></nav>
       <p class="scard-meta"><span class="sid">Packet Tracer lab</span><span>Domain {esc(d0)} {esc(course["domains"][int(d0)-1]["name"])} &middot; topics {esc(", ".join(lab["objectives"]))}</span></p>
       <h1 class="mt-2">{esc(lab["title"])}</h1>
       <p class="post-dek">{esc(lab["dek"])}</p>
@@ -307,6 +307,9 @@ def render_lecture(site, hashes, last_change, course, lec, counts):
     nexthop = f'<nav class="nexthop" aria-label="More lectures">{"".join(hop)}</nav>' if hop else ""
     lab = next((x for x in course.get("labs", []) if x["lecture"] == lec["slug"]), None)
     lab_btn = f'<a class="btn btn-pri" href="{lab["path"]}">Packet Tracer lab <span class="p">.pkt</span></a>' if lab else ""
+    lab_cta = (f'<a class="labcta" href="{lab["path"]}"><span class="lk">hands-on lab</span>'
+               f'<span class="lt"><b>{esc(lab["title"])}</b><span>Download the Packet Tracer file and harden it step by step '
+               f'&middot; {esc(lab["time"])}</span></span><span class="la" aria-hidden="true">&rarr;</span></a>\n') if lab else ""
 
     main = f'''<main id="main">
 <article class="lecture">
@@ -326,7 +329,7 @@ def render_lecture(site, hashes, last_change, course, lec, counts):
         <ul class="objlist">{objs}</ul>
         <p class="objsup"><span>Also touches</span> {sup}</p>
       </section>
-{toc_mobile}<div class="prose">
+{lab_cta}{toc_mobile}<div class="prose">
 {lec["body"].rstrip()}
 </div>
       <footer class="post-end">
@@ -453,6 +456,7 @@ def block_stats(course, cards, qs):
     n_obj = len(course["obj"])
     rows = [
         ("lectures", len(course["lectures"]), "published"),
+        ("labs", len(course.get("labs", [])), "Packet Tracer"),
         ("objectives", f'{len(cov)}/{n_obj}', "have notes"),
         ("flashcards", len(cards), "in the deck"),
         ("questions", len(qs), "in the exam bank"),
@@ -491,10 +495,12 @@ def block_lectures(course):
     items = []
     for lec in course["lectures"]:
         chips = "".join(obj_chip(o, course) for o in lec["objectives"])
+        has_lab = any(x["lecture"] == lec["slug"] for x in course.get("labs", []))
+        lab_chip = '<span class="chip labchip">+ Packet Tracer lab</span>' if has_lab else ""
         items.append(
             f'<li><a class="lec" href="{lec["path"]}"><span class="mod">D{esc(lec["objectives"][0].split(".")[0])}</span>'
             f'<span class="lt"><b>{esc(lec["title"])}</b><span class="ld">{esc(lec["dek"])}</span>'
-            f'<span class="lc">{chips}<span class="lm">{lec["read_min"]} min &middot; {B.fmt_date(lec.get("updated", lec["date"]))}</span></span></span></a></li>')
+            f'<span class="lc">{chips}{lab_chip}<span class="lm">{lec["read_min"]} min &middot; {B.fmt_date(lec.get("updated", lec["date"]))}</span></span></span></a></li>')
     return '<ol class="lecs">' + "".join(items) + "</ol>"
 
 
@@ -571,6 +577,7 @@ def build(site, hashes, last_change):
         "CCNP_DOMAINS": block_domains(course, cards, qs),
         "CCNP_LECTURES": block_lectures(course),
         "CCNP_LABS": block_labs(course),
+        "CCNP_LAB_COUNT": str(len(labs)),
         "CCNP_CARD_FILTERS": block_card_filters(course, cards),
         "CCNP_CARD_LIST": block_card_list(course, cards),
         "CCNP_CARD_COUNT": str(len(cards)),
@@ -584,6 +591,8 @@ def build(site, hashes, last_change):
     pages = [(BASE, newest), (f"{BASE}/flashcards", newest), (f"{BASE}/mock-exam", newest),
              (f"{BASE}/scor-350-701-v2-changes", "2026-10-27")]
     pages += [(lec["path"], lec.get("updated", lec["date"])) for lec in course["lectures"]]
+    if labs:
+        pages.append((f"{BASE}/labs", max(lab.get("updated", lab["date"]) for lab in labs)))
     pages += [(lab["path"], lab.get("updated", lab["date"])) for lab in labs]
     print(f"  ccnp: {len(course['lectures'])} lectures, {len(labs)} labs, {len(cards)} cards, {len(qs)} questions")
     return tokens, pages

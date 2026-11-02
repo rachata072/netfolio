@@ -1,0 +1,47 @@
+<!--meta
+{
+  "out": "ccnp-security/labs.html",
+  "path": "/ccnp-security/labs",
+  "nav": "",
+  "title": "Free CCNP Security Packet Tracer Labs (SCOR 350-701 v2.0)",
+  "description": "Free Packet Tracer labs for CCNP Security SCOR 350-701 v2.0: download the .pkt, harden it step by step, and verify every control with show commands.",
+  "og_title": "CCNP Security Packet Tracer labs",
+  "og_description": "Download a working but insecure network, harden it step by step, and prove every control. Free .pkt files with SHA-256 hashes.",
+  "preload_display": true,
+  "scripts": [],
+  "breadcrumbs": [["CCNP Security", "/ccnp-security"], ["Packet Tracer labs", ""]],
+  "learning": "Lab exercise"
+}
+-->
+<main id="main">
+  <header class="page-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/ccnp-security">ccnp-security</a><span aria-hidden="true">/</span><span>labs</span></nav>
+      <span class="cli"><span class="h">edge#</span> <span class="v">show</span> <span class="a">labs | include packet-tracer</span></span>
+      <h1>Packet Tracer labs</h1>
+      <p class="sec-lede">Free hands-on labs for {{CCNP_EXAM}}. Each one gives you a network that works but was built the lazy way. You download it, harden it step by step, and prove every control with the same show commands you'd use on the job.</p>
+    </div>
+  </header>
+
+  <div class="wrap ccnp-hub">
+    <section aria-labelledby="labs-h">
+      <h2 class="sub-h" id="labs-h">Available labs ({{CCNP_LAB_COUNT}})</h2>
+      {{CCNP_LABS}}
+    </section>
+
+    <section aria-labelledby="how-h">
+      <h2 class="sub-h" id="how-h">How every lab works</h2>
+      <ul class="labhow">
+        <li><b>Read the notes first.</b> Each lab belongs to a lecture that explains the attacks and why each defense exists.</li>
+        <li><b>Download the baseline.</b> A <span class="mono">.pkt</span> file for Cisco Packet Tracer (free with a Cisco Networking Academy account). Some labs add a graded <span class="mono">.pka</span> activity. Every file lists its SHA-256 hash.</li>
+        <li><b>Do, See, Why, Checkpoint.</b> Every step tells you what to type, what output to expect, which attack it stops, and how to prove it worked.</li>
+        <li><b>Answer configs are hidden</b> until you open them, so try it yourself first.</li>
+      </ul>
+    </section>
+
+    <aside class="ccnp-note" aria-labelledby="pt-h">
+      <h2 id="pt-h" class="sub-h">What Packet Tracer can't do</h2>
+      <p>Packet Tracer simulates IOS, so a few real-IOS commands, attack tools like Yersinia and macof, and products such as FTD, ISE and Secure Access aren't available. Each lab lists what's missing and how to practice it in Cisco Modeling Labs or on real gear.</p>
+    </aside>
+  </div>
+</main>
