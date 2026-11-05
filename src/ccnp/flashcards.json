@@ -853,6 +853,62 @@
    "front": "Which SCOR v2.0 objective covers VLAN hopping, port security, DHCP snooping, DAI and storm control?",
    "back": "**2.3**: Configure network infrastructure security methods. (In v1.1 this material was 2.4/2.5.)",
    "ref": "segmentation-layer-2-hardening#where-this-sits-in-scor-v2-0"
+  },
+  {
+   "id": "c2.3-063",
+   "obj": "2.3",
+   "front": "BPDU Guard vs. Root Guard: what state does the port go into, and how does it recover?",
+   "back": "**BPDU Guard**: any BPDU puts the port in **err-disabled**; remove the cause, then `shutdown` / `no shutdown` (or an errdisable recovery timer). **Root Guard**: a superior BPDU puts it **root-inconsistent** (blocking); it recovers **on its own** once the superior BPDUs stop.",
+   "ref": "segmentation-layer-2-hardening#spanning-tree-protection"
+  },
+  {
+   "id": "c2.3-064",
+   "obj": "2.3",
+   "front": "Why must Root Guard never go on an access switch's uplink toward the root?",
+   "back": "That port **faces the root**, so it receives superior BPDUs all the time. Root Guard would block your own uplink. Put Root Guard on the root's **downlinks**, the ports where a better root should never appear.",
+   "ref": "segmentation-layer-2-hardening#spanning-tree-protection"
+  },
+  {
+   "id": "c2.3-065",
+   "obj": "2.3",
+   "front": "Root Guard and Loop Guard on the same port?",
+   "back": "**Not allowed**: they're mutually exclusive. On a distribution-to-access trunk: **Root Guard** on the distribution (root) side, **Loop Guard** on the access side's root port.",
+   "ref": "segmentation-layer-2-hardening#spanning-tree-protection"
+  },
+  {
+   "id": "c2.3-066",
+   "obj": "2.3",
+   "front": "Clients lose DHCP right after snooping is enabled; the IOS DHCP server is on the same VLAN and the uplink is trusted. Why?",
+   "back": "By default snooping **inserts option 82 with giaddr 0.0.0.0**, and an IOS DHCP server drops those requests. Fix: `no ip dhcp snooping information option` on the switch, or `ip dhcp relay information trust-all` on the server.",
+   "ref": "segmentation-layer-2-hardening#dhcp-snooping"
+  },
+  {
+   "id": "c2.3-067",
+   "obj": "2.3",
+   "front": "DAI with an ARP ACL: which is checked first, and what does the `static` keyword change?",
+   "back": "The **ARP ACL is checked first**, then the DHCP snooping binding table. With `ip arp inspection filter NAME vlan X static`, the ACL becomes the **only** check, with an implicit deny at the end.",
+   "ref": "segmentation-layer-2-hardening#dynamic-arp-inspection-and-ip-source-guard"
+  },
+  {
+   "id": "c2.3-068",
+   "obj": "2.3",
+   "front": "Safe order to recover a port err-disabled by BPDU Guard?",
+   "back": "1. Find the reason (`show interfaces status err-disabled`). 2. **Remove the cause** (the rogue switch). 3. `shutdown` then `no shutdown`. Bring it up with the switch still attached and it err-disables again.",
+   "ref": "segmentation-layer-2-hardening#spanning-tree-protection"
+  },
+  {
+   "id": "c2.3-069",
+   "obj": "2.3",
+   "front": "`spanning-tree vlan 10 priority 4096` shows as what priority in VLAN 10, and why?",
+   "back": "**4106**. PVST+ and Rapid PVST+ add the VLAN ID (the **extended system ID**) to the configured priority, which is why priorities must be multiples of 4096.",
+   "ref": "segmentation-layer-2-hardening#spanning-tree-protection"
+  },
+  {
+   "id": "c2.3-070",
+   "obj": "2.3",
+   "front": "`storm-control broadcast level 20.00` with no falling value: when does forwarding resume?",
+   "back": "The falling threshold **defaults to the rising threshold**, so broadcast forwarding resumes once traffic drops below 20%.",
+   "ref": "segmentation-layer-2-hardening#storm-control"
   }
  ]
 }

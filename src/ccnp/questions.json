@@ -1190,6 +1190,93 @@
    ],
    "explanation": "CDP and LLDP give an attacker free reconnaissance. Keep them where operations need them (infrastructure links, IP phones) and turn them off toward hosts.",
    "ref": "segmentation-layer-2-hardening#cdp-and-lldp"
+  },
+  {
+   "id": "q2.3-034",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "An access port with PortFast and BPDU Guard goes err-disabled when a user connects a small switch. The switch has been removed. What restores the port?",
+   "options": [
+    "Nothing: the port recovers automatically when BPDUs stop",
+    "Enter shutdown and then no shutdown on the interface",
+    "Enter no spanning-tree bpduguard enable on the interface",
+    "Clear the MAC address table"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "BPDU Guard err-disables the port, and an err-disabled port stays down until it is bounced with shutdown and no shutdown (or an errdisable recovery timer fires). Removing BPDU Guard would just remove the protection.",
+   "ref": "segmentation-layer-2-hardening#spanning-tree-protection"
+  },
+  {
+   "id": "q2.3-035",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "A distribution switch is the root for VLAN 10 at priority 4096 and has Root Guard on its downlink Fa0/10. A switch with priority 0 is connected to Fa0/10. What happens?",
+   "options": [
+    "The new switch becomes root and Fa0/10 becomes a root port",
+    "Fa0/10 is err-disabled until an administrator bounces it",
+    "Fa0/10 is placed in root-inconsistent state and recovers by itself when the superior BPDUs stop",
+    "The distribution switch lowers its own priority to 0"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "Root Guard blocks the port as root-inconsistent while superior BPDUs arrive and returns it to forwarding automatically when they stop. It never err-disables the port, and STP never changes a configured priority by itself.",
+   "ref": "segmentation-layer-2-hardening#spanning-tree-protection"
+  },
+  {
+   "id": "q2.3-036",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "After DHCP snooping is enabled for VLAN 10, no client gets a lease. The uplink toward the IOS router acting as DHCP server is trusted, and the router is in the same VLAN. What is the most likely fix?",
+   "options": [
+    "Trust every access port",
+    "Enter no ip dhcp snooping information option on the switch",
+    "Disable ip dhcp snooping vlan 10 and enable it globally only",
+    "Configure ip arp inspection trust on the uplink"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The switch inserts option 82 with a giaddr of 0.0.0.0 by default, and an IOS DHCP server drops those requests. Stop the insertion on the switch, or configure ip dhcp relay information trust-all on the server. Trusting access ports would let rogue servers answer.",
+   "ref": "segmentation-layer-2-hardening#dhcp-snooping"
+  },
+  {
+   "id": "q2.3-037",
+   "obj": "2.3",
+   "type": "multi",
+   "stem": "A trunk connects a distribution switch (the STP root) to an access switch. Which two placements are correct?",
+   "options": [
+    "Root Guard on the distribution switch port facing the access switch",
+    "Root Guard on the access switch port facing the distribution switch",
+    "Loop Guard on the access switch root port facing the distribution switch",
+    "BPDU Guard on both ends of the trunk",
+    "Root Guard and Loop Guard together on the access switch uplink"
+   ],
+   "answer": [
+    0,
+    2
+   ],
+   "explanation": "Root Guard belongs on the root's downlinks, where a superior BPDU should never appear. Loop Guard protects a root or alternate port that could stop receiving BPDUs. The two can't share a port, and BPDU Guard on a trunk would shut the link down.",
+   "ref": "segmentation-layer-2-hardening#spanning-tree-protection"
+  },
+  {
+   "id": "q2.3-038",
+   "obj": "2.3",
+   "type": "single",
+   "stem": "An interface has storm-control broadcast level 1.00 0.50 and storm-control action shutdown. Broadcast traffic reaches 3 percent of bandwidth. What happens?",
+   "options": [
+    "Excess broadcast is dropped and the port stays up",
+    "The port is err-disabled",
+    "A trap is sent and all traffic is still forwarded",
+    "Broadcasts are rate-limited to 0.50 percent"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "With action shutdown, crossing the rising threshold err-disables the port. Without an action, excess traffic of that type is simply dropped until it falls below the falling threshold; action trap adds a log message and SNMP trap.",
+   "ref": "segmentation-layer-2-hardening#storm-control"
   }
  ]
 }

@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Packet Tracer Lab: DHCP Snooping, DAI, BPDU Guard (CCNP SCOR 2.3)</title>
+<meta name="description" content="Free CCNP Security Packet Tracer lab: stop rogue DHCP, ARP spoofing and rogue switches with DHCP snooping, DAI, BPDU Guard, Root Guard and storm control.">
+<link rel="canonical" href="https://breakfixlearn.com/ccnp-security/labs/l2-attack-prevention-packet-tracer">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=0b74c06ae9">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="Layer 2 Attack Prevention Lab">
+<meta property="og:description" content="Attack a small switched network, then defend it phase by phase with DHCP snooping, Dynamic ARP Inspection, BPDU Guard, Root Guard and storm control. Real Packet Tracer output explained line by line, with every real IOS vs. Packet Tracer difference called out.">
+<meta property="og:url" content="https://breakfixlearn.com/ccnp-security/labs/l2-attack-prevention-packet-tracer">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/ccnp-lab-l2-attack-prevention-packet-tracer.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Layer 2 Attack Prevention Lab: free Packet Tracer lab">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Layer 2 Attack Prevention Lab","description":"Free CCNP Security Packet Tracer lab: stop rogue DHCP, ARP spoofing and rogue switches with DHCP snooping, DAI, BPDU Guard, Root Guard and storm control.","url":"https://breakfixlearn.com/ccnp-security/labs/l2-attack-prevention-packet-tracer","learningResourceType":"Lab exercise","educationalLevel":"Professional","inLanguage":"en","isAccessibleForFree":true,"datePublished":"2026-11-04","dateModified":"2026-11-04","teaches":["Configure network infrastructure security methods (network segmentation using VLANs or SGTs; Layer 2 and port security; DHCP snooping; Dynamic ARP inspection; storm control; and defenses against MAC, ARP, VLAN hopping, STP, and DHCP rogue attacks)"],"author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"encoding":[{"@type":"MediaObject","name":"Baseline lab (.pkt)","contentUrl":"https://breakfixlearn.com/ccnp-security/labs/files/l2-attack-prevention-baseline.pkt","encodingFormat":"application/octet-stream","contentSize":"80 KB","sha256":"398c1dd3b99267e1bd04f9fd5746d9c03bdb0212c5dabc19750c03dfe7af11a4"},{"@type":"MediaObject","name":"Activity with instructions (.pka)","contentUrl":"https://breakfixlearn.com/ccnp-security/labs/files/l2-attack-prevention.pka","encodingFormat":"application/octet-stream","contentSize":"388 KB","sha256":"2a70049d8c0d2546af2f5056acb59767b9b760d276ff7d9415e7fefaa629b124"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"CCNP Security","item":"https://breakfixlearn.com/ccnp-security"},{"@type":"ListItem","position":3,"name":"Layer 2 Attack Prevention Lab"}]}</script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article class="lecture lab">
+  <header class="post-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/ccnp-security">ccnp-security</a><span aria-hidden="true">/</span><a href="/ccnp-security/labs">labs</a><span aria-hidden="true">/</span><span>l2-attack-prevention-packet-tracer</span></nav>
+      <p class="scard-meta"><span class="sid">Packet Tracer lab</span><span>Domain 2 Network Security &middot; topics 2.3</span></p>
+      <h1 class="mt-2">Layer 2 Attack Prevention Lab</h1>
+      <p class="post-dek">Attack a small switched network, then defend it phase by phase with DHCP snooping, Dynamic ARP Inspection, BPDU Guard, Root Guard and storm control. Real Packet Tracer output explained line by line, with every real IOS vs. Packet Tracer difference called out.</p>
+      <div class="post-meta"><time datetime="2026-11-04">updated Nov 4, 2026</time><span class="sep">/</span><span>2 to 3 hours</span><span class="sep">/</span><span>Packet Tracer 9.0+</span><span class="sep">/</span><span>by Trey</span></div>
+    </div>
+  </header>
+  <div class="wrap post-layout">
+    <div class="post-main">
+      <section class="labdl" aria-labelledby="dl-h">
+        <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">copy</span> <span class="a">l2-attack-prevention-packet-tracer flash:</span></span>
+        <h2 id="dl-h" class="sub-h">Download the lab</h2>
+        <ul class="dl-list"><li><a class="dl dl-pri" href="/ccnp-security/labs/files/l2-attack-prevention-baseline.pkt" download><span class="dl-k">PKT</span><span class="dl-t"><b>Baseline lab (.pkt)</b><span class="dl-m">start here &middot; 80 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/ccnp-security/labs/files/l2-attack-prevention.pka" download><span class="dl-k">PKA</span><span class="dl-t"><b>Activity with instructions (.pka)</b><span class="dl-m">ungraded &middot; 388 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li></ul>
+        <details class="sums">
+          <summary>Verify your download (SHA-256)</summary>
+          <div class="tbl"><table class="sheet-files"><thead><tr><th scope="col">File</th><th scope="col">SHA-256</th></tr></thead><tbody><tr><td translate="no">l2-attack-prevention-baseline.pkt</td><td translate="no">398c1dd3b99267e1bd04f9fd5746d9c03bdb0212c5dabc19750c03dfe7af11a4</td></tr><tr><td translate="no">l2-attack-prevention.pka</td><td translate="no">2a70049d8c0d2546af2f5056acb59767b9b760d276ff7d9415e7fefaa629b124</td></tr></tbody></table></div>
+          <p>Compare with <code translate="no">Get-FileHash .\file.pkt -Algorithm SHA256</code> (PowerShell) or <code translate="no">sha256sum file.pkt</code>. Different hash, different file: delete it.</p>
+        </details>
+        <p class="side-note">Read the <a href="/ccnp-security/segmentation-layer-2-hardening">Segmentation &amp; Layer 2 Hardening</a> notes first. Topics: <span class="chip obj d2" title="Configure network infrastructure security methods (network segmentation using VLANs or SGTs; Layer 2 and port security; DHCP snooping; Dynamic ARP inspection; storm control; and defenses against MAC, ARP, VLAN hopping, STP, and DHCP rogue attacks)">2.3</span></p>
+      </section>
+<details class="toc-mobile"><summary>show ip route | toc (13 sections)</summary><ol><li><a href="#what-you-ll-build">What you&#x27;ll build</a></li><li><a href="#real-ios-vs-packet-tracer-read-this-first">Real IOS vs. Packet Tracer: read this first</a></li><li><a href="#devices-and-topology">Devices and topology</a></li><li><a href="#phase-0-base-build-and-baseline-attacks">Phase 0: base build and baseline attacks</a></li><li><a href="#phase-1-dhcp-snooping">Phase 1: DHCP snooping</a></li><li><a href="#phase-2-dynamic-arp-inspection">Phase 2: Dynamic ARP Inspection</a></li><li><a href="#phase-3-stp-protection">Phase 3: STP protection</a></li><li><a href="#phase-4-storm-control">Phase 4: storm control</a></li><li><a href="#phase-5-validation">Phase 5: validation</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#answer-configs">Answer configs</a></li><li><a href="#go-further-in-cisco-modeling-labs">Go further in Cisco Modeling Labs</a></li><li><a href="#exam-mapping">Exam mapping</a></li></ol></details>
+<div class="prose">
+<h2 id="what-you-ll-build">What you&#x27;ll build</h2>
+<p>One small office network, attacked and then defended in five phases. Every phase runs the same loop: <strong>run the attack, apply the protection, prove the attack now fails.</strong> If you never see the attack succeed, a passing show command proves nothing, so Phase 0 starts with an unprotected network and attacks it first.</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Item</th><th scope="col">Detail</th></tr></thead><tbody><tr><td><strong>Tool</strong></td><td>Cisco Packet Tracer 9.0 or later</td></tr><tr><td><strong>Time</strong></td><td>2 to 3 hours</td></tr><tr><td><strong>Level</strong></td><td>CCNP Security. You should already be comfortable with VLANs, trunks and the switch CLI</td></tr><tr><td><strong>Devices</strong></td><td>3650 access switch, 3560 distribution switch, 2911 router, two rogue 2960 switches, a rogue DHCP server, an attacker laptop, a printer, two PCs</td></tr><tr><td><strong>You&#x27;ll practice</strong></td><td>DHCP snooping, Dynamic ARP Inspection, PortFast + BPDU Guard, Root Guard, storm control, trunk and unused-port hardening, and how to recover an err-disabled port</td></tr><tr><td><strong>Exam topic</strong></td><td>2.3 (core)</td></tr><tr><td><strong>Before this</strong></td><td><a href="/ccnp-security/segmentation-layer-2-hardening">Segmentation &amp; Layer 2 Hardening notes</a> and the <a href="/ccnp-security/labs/segmentation-l2-hardening-packet-tracer">Layer 2 Hardening lab</a></td></tr></tbody></table></div>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Phase</th><th scope="col">You configure</th><th scope="col">Attack you prove first</th><th scope="col">Result in Packet Tracer</th></tr></thead><tbody><tr><td>0 Baseline</td><td>Nothing new: read the base configs</td><td>Rogue DHCP hands PC1 a fake gateway; ARP goes unchecked</td><td>Attack works</td></tr><tr><td>1 DHCP snooping</td><td>Trusted uplink, untrusted host ports, rate limit, binding table</td><td>Rogue DHCP server</td><td><strong>Protection works</strong></td></tr><tr><td>2 Dynamic ARP Inspection</td><td>DAI on VLAN 10, trusted uplink, validation checks</td><td>Static-IP attacker sends ARP with no binding</td><td>Config and show output only</td></tr><tr><td>3 STP protection</td><td>PortFast + BPDU Guard, Root Guard</td><td>Rogue switch on a user port; rogue switch claims root</td><td><strong>Protection works</strong></td></tr><tr><td>4 Storm control</td><td>Broadcast thresholds</td><td>Broadcast flood</td><td>Config and show output only</td></tr><tr><td>5 Validation</td><td>Nothing new</td><td>Every attack again</td><td>Checklist</td></tr></tbody></table></div>
+<h3 id="the-files">The files</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">File</th><th scope="col">What it is</th><th scope="col">How to use it</th></tr></thead><tbody><tr><td><strong>Baseline lab (.pkt)</strong></td><td>The network with Phase 0 done: addressing, VLANs, trunk, DHCP on R1, the rogue server ready. No Layer 2 protection</td><td>Open it and start at the baseline attacks in Phase 0</td></tr><tr><td><strong>Activity (.pka)</strong></td><td>The same lab as a Packet Tracer activity with these instructions built in</td><td>Follow the steps inside Packet Tracer. It is <strong>not graded</strong>: the completion bar shows 100% from the start, so prove each phase with the show commands on this page instead</td></tr></tbody></table></div>
+<p>Both files are in the download box on this page. The SHA-256 checksums are listed at the bottom so you can confirm your download wasn&#x27;t changed.</p>
+<h3 id="think-like-the-defender-first">Think like the defender first</h3>
+<p>Before you type anything, look at the topology and answer two questions for every port on ASW1: <strong>who should be on the other end, and what is it allowed to send?</strong></p>
+<ul><li>A PC port should never send a DHCP OFFER, never ARP for an address it wasn&#x27;t given, never send a BPDU and never flood broadcasts.</li><li>The uplink toward DSW1 and R1 is the only place DHCP server replies and the gateway&#x27;s ARP may legitimately come from.</li></ul>
+<p>Every protection in this lab is one of those answers turned into a command. The access edge is <strong>untrusted</strong>, the uplink is <strong>trusted</strong>, and the switch enforces the difference. Keep that model in your head and the commands stop being a list to memorize.</p>
+<h2 id="real-ios-vs-packet-tracer-read-this-first">Real IOS vs. Packet Tracer: read this first</h2>
+<p>Packet Tracer <strong>simulates</strong> IOS; it doesn&#x27;t run it. Some commands are rejected outright, and some are <strong>accepted but not enforced</strong>, which is worse, because the configuration looks right and nothing happens. The exam tests real IOS, so every phase shows the <strong>real IOS commands first</strong>, then what to type in Packet Tracer when it differs.</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Feature or command</th><th scope="col">Real IOS</th><th scope="col">Packet Tracer 3650-24PS</th><th scope="col">What to do in this lab</th></tr></thead><tbody><tr><td>P0: Rogue DHCP race</td><td>Whichever server answers first wins</td><td>R1 always answers first, so the rogue never wins</td><td>Turn R1&#x27;s DHCP off with <code translate="no">no service dhcp</code> to run the attack</td></tr><tr><td>P1: <code translate="no">show ip dhcp snooping</code> operational line</td><td>Lists VLAN 10 as operational</td><td>Can show <code translate="no">none</code> even when snooping works</td><td>Judge by the trusted port, the rate limits and the leases</td></tr><tr><td>P1: Binding lease time</td><td>Counts down from the lease</td><td>Shows 0</td><td>Ignore it</td></tr><tr><td>P2: DAI enforcement</td><td>ARP without a binding is dropped and counted</td><td>Accepted, VLAN 10 shows Active, but nothing is dropped and Dropped stays 0</td><td>Config and show output only</td></tr><tr><td>P2: <code translate="no">ip arp inspection limit rate 15</code> (interface)</td><td>Sets the ARP rate limit</td><td>Rejected; only <code translate="no">trust</code> exists under the interface</td><td>Skip it. The 15 pps default still shows</td></tr><tr><td>P2: <code translate="no">arp access-list</code> + <code translate="no">ip arp inspection filter</code></td><td>Lets static hosts through DAI</td><td>Rejected</td><td>Move PRINTER to DHCP</td></tr><tr><td>P2: <code translate="no">ip source binding</code>, EXEC <code translate="no">ip dhcp snooping binding</code></td><td>Adds a static binding</td><td>Rejected</td><td>Move PRINTER to DHCP</td></tr><tr><td>P2: Printer-PT</td><td>n/a</td><td>No Desktop tab or command prompt</td><td>Test PRINTER by pinging it from PC1</td></tr><tr><td>P3: <code translate="no">spanning-tree guard loop</code>, <code translate="no">spanning-tree loopguard default</code></td><td>Loop Guard</td><td>Rejected; <code translate="no">spanning-tree guard ?</code> offers only <code translate="no">root</code></td><td>Learn it, skip it</td></tr><tr><td>P3: Root Guard state</td><td><code translate="no">BKN*</code> with <code translate="no">ROOT_Inc</code></td><td><code translate="no">BLK</code>, plus a ROOTGUARDBLOCK log</td><td>Same meaning</td></tr><tr><td>P3: err-disable recovery</td><td><code translate="no">errdisable recovery</code> timer, or manual</td><td>Use manual recovery</td><td><code translate="no">shutdown</code> then <code translate="no">no shutdown</code></td></tr><tr><td>P4: <code translate="no">storm-control multicast</code> / <code translate="no">unicast</code></td><td>Thresholds for those traffic types</td><td>Only <code translate="no">broadcast</code> exists</td><td>Broadcast only</td></tr><tr><td>P4: Falling threshold (<code translate="no">level 20.00 10.00</code>)</td><td>Rising and falling thresholds</td><td>Falling value rejected</td><td><code translate="no">level 20.0</code>; lower shows the same as upper</td></tr><tr><td>P4: <code translate="no">storm-control action trap</code> or <code translate="no">shutdown</code></td><td>Log/trap or err-disable the port</td><td>Rejected</td><td>Skip it. Excess broadcast is dropped and the port stays up</td></tr><tr><td>P4: Broadcast flood test</td><td>Port trips at the threshold</td><td>A broadcast ping is about 600 bps, far below 1% of 100 Mbps</td><td>Config and show output only</td></tr></tbody></table></div>
+<p><strong>Check before you type.</strong> Use <code translate="no">?</code> at the prompt (for example <code translate="no">ASW1(config-if)# storm-control ?</code>). Packet Tracer support changes between versions. If a command is rejected, write it down and carry on.</p>
+<p><strong>Simulation devices aren&#x27;t the whole answer either.</strong> In Cisco Modeling Labs, IOSvL2 switches run real IOS code and do enforce DHCP snooping and DAI, so that&#x27;s where to watch spoofed ARP actually get dropped. Features that depend on switch hardware, such as storm control, may still be accepted there without being enforced. Verify with <code translate="no">?</code> and the show commands on any virtual switch.</p>
+<h2 id="devices-and-topology">Devices and topology</h2>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-attack-prevention/topology.webp" aria-label="Open full-size image: Packet Tracer topology: R1 above DSW1, DSW1 trunked to ASW1; PC1, PC2, PRINTER, ROGUE-DHCP and ATTACKER on ASW1; ROGUE-SW1 on ASW1 and ROGUE-SW2 on DSW1"><img src="/assets/img/ccnp/labs/l2-attack-prevention/topology.webp" width="660" height="630" alt="Packet Tracer topology: R1 above DSW1, DSW1 trunked to ASW1; PC1, PC2, PRINTER, ROGUE-DHCP and ATTACKER on ASW1; ROGUE-SW1 on ASW1 and ROGUE-SW2 on DSW1" loading="lazy" decoding="async"></a><figcaption>Packet Tracer topology: R1 above DSW1, DSW1 trunked to ASW1; PC1, PC2, PRINTER, ROGUE-DHCP and ATTACKER on ASW1; ROGUE-SW1 on ASW1 and ROGUE-SW2 on DSW1. Select the image to open it full size.</figcaption></figure>
+<p>Every host and both rogue devices enter through <strong>ASW1&#x27;s access ports</strong>, so that&#x27;s where most protections go. DSW1 has one job to defend: staying the spanning-tree root. Everything sits in one user VLAN (10) so each attack is easy to see.</p>
+<h3 id="why-a-3650-for-the-access-switch">Why a 3650 for the access switch</h3>
+<p>ASW1 is a <strong>3650-24PS</strong>. It runs IOS XE, supports every feature in this lab on real hardware, and is the most complete switch Packet Tracer offers. Even so, it accepts more than it enforces in the simulator (see the table above).</p>
+<blockquote><p><strong>3650 gotcha:</strong> a new 3650-24PS has no power supply, so the CLI stays dark. Open it, go to the <strong>Physical</strong> tab, drag <strong>AC-POWER-SUPPLY</strong> into the empty slot, and it boots. The baseline file already has it.</p></blockquote>
+<h3 id="devices">Devices</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Hostname</th><th scope="col">Packet Tracer model</th><th scope="col">Role</th><th scope="col">Configured on it</th></tr></thead><tbody><tr><td>ASW1</td><td>3650-24PS</td><td>Access switch</td><td>DHCP snooping, DAI, PortFast, BPDU Guard, storm control, port hardening</td></tr><tr><td>DSW1</td><td>3560-24PS</td><td>Distribution switch, STP root</td><td>Root priority, Root Guard, trunk hardening</td></tr><tr><td>R1</td><td>2911</td><td>Gateway and legitimate DHCP server</td><td>DHCP pool for VLAN 10</td></tr><tr><td>ROGUE-SW1</td><td>2960-24TT</td><td>Attacker&#x27;s switch on a user port</td><td>Nothing. A switch sends BPDUs by default</td></tr><tr><td>ROGUE-SW2</td><td>2960-24TT</td><td>Attacker&#x27;s switch claiming root</td><td><code translate="no">spanning-tree vlan 10 priority 0</code></td></tr><tr><td>ROGUE-DHCP</td><td>Server-PT</td><td>Rogue DHCP server</td><td>DHCP service with a fake gateway</td></tr><tr><td>ATTACKER</td><td>Laptop-PT</td><td>Static-IP spoofer</td><td>Static IP, no DHCP binding</td></tr><tr><td>PRINTER</td><td>Printer-PT</td><td>Legitimate static host</td><td>Static IP, moved to DHCP in Phase 2</td></tr><tr><td>PC1, PC2</td><td>PC-PT</td><td>Legitimate users</td><td>DHCP</td></tr></tbody></table></div>
+<h3 id="cabling">Cabling</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Device A</th><th scope="col">Port</th><th scope="col">Device B</th><th scope="col">Port</th><th scope="col">Link</th><th scope="col">Cable</th></tr></thead><tbody><tr><td>R1</td><td>Gi0/0</td><td>DSW1</td><td>Fa0/1</td><td>Access VLAN 10</td><td>Straight-through</td></tr><tr><td>DSW1</td><td>Gi0/1</td><td>ASW1</td><td>Gi1/0/24</td><td>802.1Q trunk, native VLAN 99</td><td>Cross-over</td></tr><tr><td>ASW1</td><td>Gi1/0/1</td><td>PC1</td><td>Fa0</td><td>Access VLAN 10</td><td>Straight-through</td></tr><tr><td>ASW1</td><td>Gi1/0/2</td><td>PC2</td><td>Fa0</td><td>Access VLAN 10</td><td>Straight-through</td></tr><tr><td>ASW1</td><td>Gi1/0/3</td><td>ROGUE-DHCP</td><td>Fa0</td><td>Access VLAN 10</td><td>Straight-through</td></tr><tr><td>ASW1</td><td>Gi1/0/4</td><td>ATTACKER</td><td>Fa0</td><td>Access VLAN 10</td><td>Straight-through</td></tr><tr><td>ASW1</td><td>Gi1/0/5</td><td>PRINTER</td><td>Fa0</td><td>Access VLAN 10</td><td>Straight-through</td></tr><tr><td>ASW1</td><td>Gi1/0/10</td><td>ROGUE-SW1</td><td>Fa0/1</td><td>Access VLAN 10, Phase 3 test</td><td>Cross-over</td></tr><tr><td>DSW1</td><td>Fa0/10</td><td>ROGUE-SW2</td><td>Fa0/1</td><td>Trunk, Phase 3 test</td><td>Cross-over</td></tr></tbody></table></div>
+<h3 id="vlans-and-addressing">VLANs and addressing</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">VLAN</th><th scope="col">Name</th><th scope="col">Subnet</th><th scope="col">Purpose</th></tr></thead><tbody><tr><td>10</td><td>USERS</td><td>10.10.10.0/24</td><td>All hosts</td></tr><tr><td>99</td><td>NATIVE</td><td>none</td><td>Unused native VLAN on trunks</td></tr><tr><td>999</td><td>BLACKHOLE</td><td>none</td><td>Parking VLAN for unused, shut ports</td></tr></tbody></table></div>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Device</th><th scope="col">Interface</th><th scope="col">IP address</th><th scope="col">Gateway</th><th scope="col">How assigned</th></tr></thead><tbody><tr><td>R1</td><td>Gi0/0</td><td>10.10.10.1/24</td><td>n/a</td><td>Static</td></tr><tr><td>ASW1</td><td>Vlan10</td><td>10.10.10.2/24</td><td>10.10.10.1</td><td>Static (management)</td></tr><tr><td>DSW1</td><td>Vlan10</td><td>10.10.10.3/24</td><td>10.10.10.1</td><td>Static (management)</td></tr><tr><td>PRINTER</td><td>Fa0</td><td>10.10.10.15/24</td><td>10.10.10.1</td><td>Static in Phases 0 and 1, DHCP from Phase 2</td></tr><tr><td>ATTACKER</td><td>Fa0</td><td>10.10.10.50/24</td><td>10.10.10.1</td><td>Static, no binding on purpose</td></tr><tr><td>ROGUE-DHCP</td><td>Fa0</td><td>10.10.10.66/24</td><td>10.10.10.66</td><td>Static. Its pool hands out gateway .66</td></tr><tr><td>PC1, PC2</td><td>Fa0</td><td>from R1&#x27;s pool (.21 to .254)</td><td>10.10.10.1</td><td>DHCP from R1 (.1 to .20 excluded)</td></tr></tbody></table></div>
+<p>Management sits in VLAN 10 to keep the lab small. In production, put switch management in its own VLAN, as the <a href="/ccnp-security/labs/segmentation-l2-hardening-packet-tracer">Layer 2 Hardening lab</a> does.</p>
+<h2 id="phase-0-base-build-and-baseline-attacks">Phase 0: base build and baseline attacks</h2>
+<p>The baseline file already contains everything in this section. Read the configs so you know what you&#x27;re defending, then go straight to the baseline attacks. If you build from scratch, paste these in and set up the end devices as listed.</p>
+<h3 id="r1-gateway-and-legitimate-dhcp-server">R1: gateway and legitimate DHCP server</h3>
+<pre translate="no"><code translate="no">hostname R1
+no ip domain-lookup
+!
+interface GigabitEthernet0/0
+ ip address 10.10.10.1 255.255.255.0
+ no shutdown
+!
+ip dhcp excluded-address 10.10.10.1 10.10.10.20
+ip dhcp pool VLAN10
+ network 10.10.10.0 255.255.255.0
+ default-router 10.10.10.1
+ dns-server 10.10.10.1</code></pre>
+<p>The excluded range keeps .1 to .20 free for infrastructure and static hosts, so the first lease R1 hands out is 10.10.10.21.</p>
+<h3 id="dsw1-distribution-switch-and-stp-root">DSW1: distribution switch and STP root</h3>
+<pre translate="no"><code translate="no">hostname DSW1
+no ip domain-lookup
+!
+vlan 10
+ name USERS
+vlan 99
+ name NATIVE
+vlan 999
+ name BLACKHOLE
+!
+spanning-tree mode rapid-pvst
+spanning-tree vlan 10,99 priority 4096
+!
+interface FastEthernet0/1
+ description R1
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+!
+interface GigabitEthernet0/1
+ description TRUNK-ASW1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport trunk allowed vlan 10,99
+ switchport nonegotiate
+!
+interface range FastEthernet0/2 - 9 , FastEthernet0/11 - 24 , GigabitEthernet0/2
+ switchport mode access
+ switchport access vlan 999
+ shutdown
+!
+interface Vlan10
+ ip address 10.10.10.3 255.255.255.0
+ no shutdown
+ip default-gateway 10.10.10.1</code></pre>
+<ul><li><code translate="no">priority 4096</code> makes DSW1 the root on purpose. Never leave the root to chance: the lowest bridge ID wins, and on default priorities that&#x27;s the switch with the lowest MAC, often the oldest one.</li><li>The 3560 also supports ISL, so it needs <code translate="no">switchport trunk encapsulation dot1q</code> before <code translate="no">switchport mode trunk</code>.</li><li>Fa0/10 is left alone. Phase 3 turns it into the Root Guard test port.</li></ul>
+<h3 id="asw1-access-switch">ASW1: access switch</h3>
+<pre translate="no"><code translate="no">hostname ASW1
+no ip domain-lookup
+!
+vlan 10
+ name USERS
+vlan 99
+ name NATIVE
+vlan 999
+ name BLACKHOLE
+!
+spanning-tree mode rapid-pvst
+!
+interface GigabitEthernet1/0/24
+ description TRUNK-DSW1 (path to the real DHCP server)
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport trunk allowed vlan 10,99
+ switchport nonegotiate
+!
+interface range GigabitEthernet1/0/1 - 5
+ description USER-PORTS
+ switchport mode access
+ switchport access vlan 10
+ switchport nonegotiate
+ no shutdown
+!
+interface GigabitEthernet1/0/10
+ description ROGUE-SW1-TEST-PORT
+ switchport mode access
+ switchport access vlan 10
+ switchport nonegotiate
+!
+interface range GigabitEthernet1/0/6 - 9 , GigabitEthernet1/0/11 - 23 , GigabitEthernet1/1/1 - 4
+ switchport mode access
+ switchport access vlan 999
+ shutdown
+!
+interface Vlan10
+ ip address 10.10.10.2 255.255.255.0
+ no shutdown
+ip default-gateway 10.10.10.1</code></pre>
+<p>Trunk hardening (native VLAN 99, only VLANs 10 and 99 allowed, no DTP) and parking unused ports in VLAN 999 are already done here. They stop VLAN hopping and walk-up access, which the <a href="/ccnp-security/labs/segmentation-l2-hardening-packet-tracer">Layer 2 Hardening lab</a> covers step by step.</p>
+<h3 id="end-devices">End devices</h3>
+<ol><li><strong>PC1, PC2:</strong> Desktop → IP Configuration → <strong>DHCP</strong>.</li><li><strong>PRINTER:</strong> Config → FastEthernet0 → Static, 10.10.10.15 / 255.255.255.0, gateway 10.10.10.1 (Config → Settings).</li><li><strong>ATTACKER:</strong> Desktop → IP Configuration → Static, 10.10.10.50 / 255.255.255.0, gateway 10.10.10.1.</li><li><strong>ROGUE-DHCP:</strong> static 10.10.10.66 / 255.255.255.0. Then Services → DHCP: interface FastEthernet0, default gateway 10.10.10.66, DNS server 10.10.10.66, start IP address 10.10.10.100, subnet mask 255.255.255.0. Click <strong>Save</strong>, then set the service to <strong>On</strong>.</li></ol>
+<p><strong>Keep the rogue switches out of the way.</strong> If ROGUE-SW1 and ROGUE-SW2 are already cabled in your file, delete those two cables now and reconnect them in Phase 3. Cabled early, they fill ASW1&#x27;s console with CDP native VLAN mismatch messages and can trip BPDU Guard before you&#x27;ve configured it on purpose.</p>
+<h3 id="baseline-attack-1-the-rogue-dhcp-server-wins">Baseline attack 1: the rogue DHCP server wins</h3>
+<p>In real networks the first DHCP server to answer wins the client. Packet Tracer always lets R1 answer first, so take R1 out of the race:</p>
+<ol><li>On R1: <code translate="no">enable</code>, <code translate="no">configure terminal</code>, <code translate="no">no service dhcp</code>.</li><li>On PC1: Desktop → Command Prompt, then <code translate="no">ipconfig /release</code> and <code translate="no">ipconfig /renew</code>.</li><li>On R1: <code translate="no">service dhcp</code>.</li><li>On PC1: <code translate="no">ipconfig /release</code> and <code translate="no">ipconfig /renew</code> again.</li></ol>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-attack-prevention/p0-pc1-rogue-lease.webp" aria-label="Open full-size image: PC1 command prompt: the first renew gets 10.10.10.102 with default gateway and DNS 10.10.10.66 from the rogue server; after R1&#x27;s DHCP is back, the next renew gets gateway 10.10.10.1"><img src="/assets/img/ccnp/labs/l2-attack-prevention/p0-pc1-rogue-lease.webp" width="482" height="415" alt="PC1 command prompt: the first renew gets 10.10.10.102 with default gateway and DNS 10.10.10.66 from the rogue server; after R1&#x27;s DHCP is back, the next renew gets gateway 10.10.10.1" loading="lazy" decoding="async"></a><figcaption>PC1 command prompt: the first renew gets 10.10.10.102 with default gateway and DNS 10.10.10.66 from the rogue server; after R1&#x27;s DHCP is back, the next renew gets gateway 10.10.10.1. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li>First renew: <strong>default gateway 10.10.10.66</strong> and DNS 10.10.10.66. PC1 now sends everything that leaves the subnet, and every name lookup, to the attacker. That&#x27;s a man-in-the-middle position without touching a single cable.</li><li>The address .102 comes from the rogue pool (start .100), not from R1&#x27;s.</li><li>Second renew, after <code translate="no">service dhcp</code> on R1: gateway <strong>10.10.10.1</strong>. The network works again only because the rogue lost the race this time. Nothing stopped it.</li></ul>
+<h3 id="baseline-attack-2-arp-is-unchecked">Baseline attack 2: ARP is unchecked</h3>
+<p>From ATTACKER&#x27;s Command Prompt, <code translate="no">ping 10.10.10.1</code> and <code translate="no">ping 10.10.10.15</code>. Both succeed, although nobody approved ATTACKER&#x27;s static address. A switch with no DAI forwards any ARP from anyone, which is exactly what ARP spoofing relies on.</p>
+<h3 id="baseline-check-who-is-the-stp-root">Baseline check: who is the STP root?</h3>
+<p>On ASW1:</p>
+<pre translate="no"><code translate="no">show spanning-tree vlan 10</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-attack-prevention/p0-asw1-stp-root.webp" aria-label="Open full-size image: ASW1 show spanning-tree vlan 10 at baseline: root priority 4106 at address 000D.BD7A.A1B9, cost 4, root port Gi1/0/24; ASW1&#x27;s own priority is 32778 and all user ports are designated forwarding"><img src="/assets/img/ccnp/labs/l2-attack-prevention/p0-asw1-stp-root.webp" width="668" height="335" alt="ASW1 show spanning-tree vlan 10 at baseline: root priority 4106 at address 000D.BD7A.A1B9, cost 4, root port Gi1/0/24; ASW1&#x27;s own priority is 32778 and all user ports are designated forwarding" loading="lazy" decoding="async"></a><figcaption>ASW1 show spanning-tree vlan 10 at baseline: root priority 4106 at address 000D.BD7A.A1B9, cost 4, root port Gi1/0/24; ASW1&#x27;s own priority is 32778 and all user ports are designated forwarding. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong>Root ID priority 4106</strong> is DSW1: 4096 configured + 10, the VLAN number. Rapid PVST+ adds the VLAN ID (the <em>sys-id-ext</em>) to the priority, which is why 4096 shows as 4106.</li><li><strong>Root port 24 (Gi1/0/24)</strong>, cost 4: ASW1 reaches the root over the uplink. That&#x27;s the topology you want.</li><li><strong>Bridge ID priority 32778</strong> (32768 + 10) is ASW1 itself, on the default priority.</li><li>Every user port is <strong>Desg FWD</strong>. Remember this picture: Phase 3 defends it.</li></ul>
+<p><strong>Save</strong> with <code translate="no">copy running-config startup-config</code> on every switch and the router, then save the file (Ctrl+S).</p>
+<details class="qa"><summary>Think about it: why is the rogue DHCP attack so dangerous when it &quot;only&quot; changes a gateway?</summary>
+<p>The gateway is where every off-subnet packet goes. Whoever owns it can read, change or drop traffic, and with a fake DNS server can send users to fake sites. The attacker needs no password and no exploit, only a device on a user port that answers DHCP quickly. That&#x27;s why the fix belongs on the switch port: the switch is the only device that knows which port a DHCP reply came in on.</p>
+</details>
+<h2 id="phase-1-dhcp-snooping">Phase 1: DHCP snooping</h2>
+<p>DHCP snooping makes ASW1 <strong>drop DHCP server messages (OFFER, ACK, NAK) that arrive on untrusted ports</strong>. ROGUE-DHCP sits on an untrusted port, so it goes silent. Snooping also builds the <strong>binding table</strong> (MAC, IP, VLAN, port for every lease it watched), which DAI uses in Phase 2. Deeper theory: <a href="/ccnp-security/segmentation-layer-2-hardening#dhcp-snooping">DHCP snooping</a> in the notes.</p>
+<h3 id="configure-asw1">Configure ASW1</h3>
+<pre translate="no"><code translate="no">configure terminal
+ip dhcp snooping
+ip dhcp snooping vlan 10
+no ip dhcp snooping information option
+!
+interface GigabitEthernet1/0/24
+ ip dhcp snooping trust
+!
+interface range GigabitEthernet1/0/1 - 5 , GigabitEthernet1/0/10
+ ip dhcp snooping limit rate 10
+end</code></pre>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Command</th><th scope="col">Why it&#x27;s there</th></tr></thead><tbody><tr><td><code translate="no">ip dhcp snooping</code> + <code translate="no">ip dhcp snooping vlan 10</code></td><td>Both are required. The global command alone does nothing until a VLAN is listed</td></tr><tr><td><code translate="no">ip dhcp snooping trust</code> on Gi1/0/24</td><td>Only the uplink toward R1 may send OFFER and ACK. Every port is untrusted by default, and that&#x27;s the point</td></tr><tr><td><code translate="no">ip dhcp snooping limit rate 10</code></td><td>More than 10 DHCP packets per second err-disables the port. That stops DHCP starvation tools, which request thousands of leases to empty the pool</td></tr><tr><td><code translate="no">no ip dhcp snooping information option</code></td><td>By default the switch inserts option 82 with a relay address (giaddr) of 0.0.0.0. An IOS DHCP server such as R1 drops those requests, so nobody gets a lease. The other fix is <code translate="no">ip dhcp relay information trust-all</code> on R1</td></tr></tbody></table></div>
+<p><strong>Common mistake:</strong> trusting a user port &quot;to make DHCP work&quot;. If a PC can&#x27;t get a lease, the uplink isn&#x27;t trusted or option 82 is in the way. A host port is never the fix.</p>
+<h3 id="prove-it-the-configuration">Prove it: the configuration</h3>
+<pre translate="no"><code translate="no">show ip dhcp snooping</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-attack-prevention/p1-show-snooping.webp" aria-label="Open full-size image: ASW1 show ip dhcp snooping: snooping enabled and configured on VLAN 10, option 82 insertion disabled, Gi1/0/1 to 1/0/5 and 1/0/10 untrusted with rate limit 10, Gi1/0/24 trusted and unlimited"><img src="/assets/img/ccnp/labs/l2-attack-prevention/p1-show-snooping.webp" width="638" height="537" alt="ASW1 show ip dhcp snooping: snooping enabled and configured on VLAN 10, option 82 insertion disabled, Gi1/0/1 to 1/0/5 and 1/0/10 untrusted with rate limit 10, Gi1/0/24 trusted and unlimited" loading="lazy" decoding="async"></a><figcaption>ASW1 show ip dhcp snooping: snooping enabled and configured on VLAN 10, option 82 insertion disabled, Gi1/0/1 to 1/0/5 and 1/0/10 untrusted with rate limit 10, Gi1/0/24 trusted and unlimited. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong>Switch DHCP snooping is enabled</strong>, configured on VLAN <strong>10</strong>.</li><li><strong>Insertion of option 82 is disabled</strong>: the <code translate="no">no ip dhcp snooping information option</code> line took effect.</li><li><strong>Gi1/0/24: Trusted yes, unlimited.</strong> Every host port: <strong>Trusted no, rate limit 10</strong>.</li><li><strong>&quot;Operational on following VLANs: none&quot;</strong> is a Packet Tracer display quirk. The leases below prove snooping is running.</li></ul>
+<h3 id="prove-it-the-attack-fails">Prove it: the attack fails</h3>
+<p>On PC1 and PC2, <code translate="no">ipconfig /release</code> then <code translate="no">ipconfig /renew</code>, several times each.</p>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-attack-prevention/p1-pc1-good-lease.webp" aria-label="Open full-size image: PC1 after renewing with DHCP snooping on: 10.10.10.21 from R1&#x27;s pool, default gateway and DNS 10.10.10.1"><img src="/assets/img/ccnp/labs/l2-attack-prevention/p1-pc1-good-lease.webp" width="571" height="320" alt="PC1 after renewing with DHCP snooping on: 10.10.10.21 from R1&#x27;s pool, default gateway and DNS 10.10.10.1" loading="lazy" decoding="async"></a><figcaption>PC1 after renewing with DHCP snooping on: 10.10.10.21 from R1&#x27;s pool, default gateway and DNS 10.10.10.1. Select the image to open it full size.</figcaption></figure>
+<p>Every lease comes from R1&#x27;s pool (10.10.10.21 here, the first address after the excluded range) with gateway <strong>10.10.10.1</strong>. However many times you renew, ROGUE-DHCP never wins.</p>
+<p><strong>Watch the drop happen in Simulation mode.</strong> Switch to <strong>Simulation</strong> (bottom right, or Shift+S). Under Event List Filters, click <strong>Edit Filters</strong>, clear everything and tick <strong>DHCP</strong> only. On PC2 run <code translate="no">ipconfig /renew</code>, then press <strong>Play</strong> and watch the envelopes.</p>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-attack-prevention/p1-sim-rogue-offer-dropped.webp" aria-label="Open full-size image: Simulation mode with only DHCP events shown: the rogue server&#x27;s frame reaches ASW1 and is marked with a red X; the PDU details show Gi1/0/3 received the frame from ROGUE-DHCP"><img src="/assets/img/ccnp/labs/l2-attack-prevention/p1-sim-rogue-offer-dropped.webp" srcset="/assets/img/ccnp/labs/l2-attack-prevention/p1-sim-rogue-offer-dropped-800.webp 800w, /assets/img/ccnp/labs/l2-attack-prevention/p1-sim-rogue-offer-dropped.webp 1917w" sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem" width="1917" height="731" alt="Simulation mode with only DHCP events shown: the rogue server&#x27;s frame reaches ASW1 and is marked with a red X; the PDU details show Gi1/0/3 received the frame from ROGUE-DHCP" loading="lazy" decoding="async"></a><figcaption>Simulation mode with only DHCP events shown: the rogue server&#x27;s frame reaches ASW1 and is marked with a red X; the PDU details show Gi1/0/3 received the frame from ROGUE-DHCP. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> the event list shows PC2&#x27;s DISCOVER flooding out to every port, including ROGUE-DHCP. ROGUE-DHCP replies (last event, from ROGUE-DHCP at ASW1), and the envelope at ASW1 gets a <strong>red X</strong>. Click it: <em>GigabitEthernet1/0/3 receives the frame</em> and goes no further. The legitimate OFFER from R1 arrives on the trusted uplink and is forwarded.</p>
+<p><strong>The strongest proof: repeat the baseline attack.</strong> On R1, <code translate="no">no service dhcp</code>, then renew PC1. With snooping on, PC1 now gets <strong>no lease at all</strong> (&quot;DHCP request failed&quot; or a 169.254.x.x address). The only DHCP server left is the rogue, and its OFFER dies at Gi1/0/3. Failing safe is the correct result: no address beats an address with a malicious gateway. Then run <code translate="no">service dhcp</code> on R1 and renew PC1 again.</p>
+<blockquote><p><strong>Exam points:</strong> trust every uplink on the path to the legitimate server, never a host port. Snooping only works on the VLANs you list. The binding table it builds is the foundation for DAI and IP Source Guard.</p></blockquote>
+<details class="qa"><summary>Think about it: why does snooping need both trust and a rate limit?</summary>
+<p>Trust solves the <strong>rogue server</strong> problem: replies are only believed from the direction of the real server. The rate limit solves <strong>starvation</strong>: an attacker floods DISCOVERs with random MACs until R1&#x27;s pool is empty, then their own rogue server is the only one with addresses left. One feature, two attacks, two settings.</p>
+</details>
+<h2 id="phase-2-dynamic-arp-inspection">Phase 2: Dynamic ARP Inspection</h2>
+<p>ARP has no authentication: any host can claim to own any IP address. DAI makes the switch check every ARP packet on an untrusted port against the <strong>DHCP snooping binding table</strong>, and drop it if the sender&#x27;s IP and MAC don&#x27;t match a binding learned on that port. Phase 1 must be working first. Deeper theory: <a href="/ccnp-security/segmentation-layer-2-hardening#dynamic-arp-inspection-and-ip-source-guard">DAI and IP Source Guard</a>.</p>
+<blockquote><p><strong>Packet Tracer result:</strong> the 3650 accepts the DAI commands and shows VLAN 10 as Active, but ATTACKER can still ping and nothing is dropped. Do this phase for the configuration and the show output, and learn the real IOS behavior below for the exam.</p></blockquote>
+<h3 id="step-a-turn-on-dai">Step A: turn on DAI</h3>
+<p><strong>Real IOS:</strong></p>
+<pre translate="no"><code translate="no">configure terminal
+ip arp inspection vlan 10
+ip arp inspection validate src-mac dst-mac ip
+!
+interface GigabitEthernet1/0/24
+ ip arp inspection trust
+!
+interface range GigabitEthernet1/0/1 - 5 , GigabitEthernet1/0/10
+ ip arp inspection limit rate 15
+end</code></pre>
+<p><strong>Packet Tracer 3650:</strong> the same, without the <code translate="no">limit rate</code> line (rejected).</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Command</th><th scope="col">Why it&#x27;s there</th></tr></thead><tbody><tr><td><code translate="no">ip arp inspection vlan 10</code></td><td>Turns DAI on for the VLAN. All ports are untrusted by default</td></tr><tr><td><code translate="no">ip arp inspection trust</code> on Gi1/0/24</td><td>R1 has a static IP, so it has no binding. Left untrusted, its ARP replies would be dropped and the whole VLAN would lose its gateway</td></tr><tr><td><code translate="no">validate src-mac dst-mac ip</code></td><td>Extra checks: the Ethernet source MAC must equal the ARP sender MAC; on replies, the Ethernet destination MAC must equal the ARP target MAC; no 0.0.0.0, broadcast or multicast IPs</td></tr><tr><td><code translate="no">limit rate 15</code></td><td>15 ARP packets per second is already the default on untrusted ports. Going over err-disables the port. Full syntax: <code translate="no">ip arp inspection limit rate &lt;pps&gt; [burst interval &lt;seconds&gt;]</code></td></tr></tbody></table></div>
+<p><strong>Clear old ARP caches before testing</strong>, or cached entries hide the result: <code translate="no">arp -d</code> on each PC and on ATTACKER, <code translate="no">clear arp-cache</code> on R1.</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Test</th><th scope="col">Real IOS</th><th scope="col">Packet Tracer</th></tr></thead><tbody><tr><td>PC1 → <code translate="no">ping 10.10.10.1</code></td><td>Succeeds: PC1 has a binding</td><td>Succeeds</td></tr><tr><td>ATTACKER → <code translate="no">ping 10.10.10.1</code></td><td><strong>Fails</strong>. ASW1 logs a DAI deny for 10.10.10.50 on Gi1/0/4</td><td>Still succeeds</td></tr><tr><td>PC1 → <code translate="no">ping 10.10.10.15</code></td><td><strong>Fails</strong>. PRINTER is static, has no binding, so its ARP reply is dropped</td><td>Still succeeds</td></tr></tbody></table></div>
+<p>That last row is the real-world side effect of DAI: <strong>every static host breaks</strong> unless you plan for it. Step B fixes it.</p>
+<h3 id="step-b-let-the-legitimate-static-host-through">Step B: let the legitimate static host through</h3>
+<p><strong>Real IOS:</strong> permit the printer with an ARP ACL. Get its MAC from PRINTER → Config → FastEthernet0, or from <code translate="no">show mac address-table interface gi1/0/5</code>, and use it in place of <code translate="no">AAAA.BBBB.CCCC</code>:</p>
+<pre translate="no"><code translate="no">arp access-list STATIC-HOSTS
+ permit ip host 10.10.10.15 mac host AAAA.BBBB.CCCC
+!
+ip arp inspection filter STATIC-HOSTS vlan 10</code></pre>
+<p>The switch checks the ARP ACL first, then the binding table. Adding the <code translate="no">static</code> keyword to the filter command makes the ACL the only check, with an implicit deny at the end. Leave it off here.</p>
+<p><strong>Packet Tracer 3650:</strong> none of the ways to add a static exception exist. <code translate="no">arp access-list</code>, <code translate="no">ip source binding</code> and the EXEC command <code translate="no">ip dhcp snooping binding</code> are all rejected. Instead, move the printer to DHCP so snooping creates its binding:</p>
+<ol><li>PRINTER → Config → FastEthernet0 → <strong>DHCP</strong>.</li><li>Wait for it to get an address from R1&#x27;s pool. Printer-PT has no command prompt, so check its new address on the same FastEthernet0 screen.</li><li>On ASW1, <code translate="no">show ip dhcp snooping binding</code>.</li></ol>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-attack-prevention/p2-snooping-binding-printer.webp" aria-label="Open full-size image: ASW1 show ip dhcp snooping binding: three bindings, 10.10.10.21 on Gi1/0/1, 10.10.10.22 on Gi1/0/2 and 10.10.10.23 on Gi1/0/5 for the printer, all VLAN 10"><img src="/assets/img/ccnp/labs/l2-attack-prevention/p2-snooping-binding-printer.webp" width="791" height="106" alt="ASW1 show ip dhcp snooping binding: three bindings, 10.10.10.21 on Gi1/0/1, 10.10.10.22 on Gi1/0/2 and 10.10.10.23 on Gi1/0/5 for the printer, all VLAN 10" loading="lazy" decoding="async"></a><figcaption>ASW1 show ip dhcp snooping binding: three bindings, 10.10.10.21 on Gi1/0/1, 10.10.10.22 on Gi1/0/2 and 10.10.10.23 on Gi1/0/5 for the printer, all VLAN 10. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> three bindings, one per DHCP client. PC1 on <strong>Gi1/0/1</strong>, PC2 on <strong>Gi1/0/2</strong>, and now PRINTER (10.10.10.23) on <strong>Gi1/0/5</strong>. ATTACKER (static) and ROGUE-DHCP have no row, so on real IOS DAI would drop their ARP. Lease(sec) shows 0 in Packet Tracer; on real IOS it counts down. From PC1, ping the printer&#x27;s new address to confirm it&#x27;s reachable.</p>
+<h3 id="prove-it-the-show-commands">Prove it: the show commands</h3>
+<pre translate="no"><code translate="no">show ip arp inspection vlan 10
+show ip arp inspection interfaces
+show ip arp inspection statistics vlan 10</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-attack-prevention/p2-dai-vlan.webp" aria-label="Open full-size image: ASW1 show ip arp inspection vlan 10: source MAC, destination MAC and IP validation enabled; VLAN 10 configuration enabled, operation active; ACL logging deny, DHCP logging deny"><img src="/assets/img/ccnp/labs/l2-attack-prevention/p2-dai-vlan.webp" width="577" height="197" alt="ASW1 show ip arp inspection vlan 10: source MAC, destination MAC and IP validation enabled; VLAN 10 configuration enabled, operation active; ACL logging deny, DHCP logging deny" loading="lazy" decoding="async"></a><figcaption>ASW1 show ip arp inspection vlan 10: source MAC, destination MAC and IP validation enabled; VLAN 10 configuration enabled, operation active; ACL logging deny, DHCP logging deny. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> all three validation checks <strong>Enabled</strong>; VLAN 10 Configuration <strong>Enabled</strong>, Operation <strong>Active</strong>. ACL Match is empty because Packet Tracer has no ARP ACL; on real IOS it would show STATIC-HOSTS. DHCP Logging <strong>Deny</strong> means ARP packets denied by the binding check are logged.</p>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-attack-prevention/p2-dai-interfaces.webp" aria-label="Open full-size image: ASW1 show ip arp inspection interfaces: Gig1/0/24 trusted, every other port untrusted at 15 pps with a burst interval of 1"><img src="/assets/img/ccnp/labs/l2-attack-prevention/p2-dai-interfaces.webp" width="550" height="463" alt="ASW1 show ip arp inspection interfaces: Gig1/0/24 trusted, every other port untrusted at 15 pps with a burst interval of 1" loading="lazy" decoding="async"></a><figcaption>ASW1 show ip arp inspection interfaces: Gig1/0/24 trusted, every other port untrusted at 15 pps with a burst interval of 1. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> <strong>Gig1/0/24 Trusted</strong>, every other port <strong>Untrusted, 15 pps, burst interval 1</strong>. The 15 pps is the default, which is why it shows even though Packet Tracer rejected the <code translate="no">limit rate</code> command.</p>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-attack-prevention/p2-dai-statistics.webp" aria-label="Open full-size image: ASW1 show ip arp inspection statistics vlan 10 in Packet Tracer: 7 forwarded, 7 DHCP permits, 0 dropped, 0 DHCP drops, 0 ACL drops and no validation failures"><img src="/assets/img/ccnp/labs/l2-attack-prevention/p2-dai-statistics.webp" width="625" height="195" alt="ASW1 show ip arp inspection statistics vlan 10 in Packet Tracer: 7 forwarded, 7 DHCP permits, 0 dropped, 0 DHCP drops, 0 ACL drops and no validation failures" loading="lazy" decoding="async"></a><figcaption>ASW1 show ip arp inspection statistics vlan 10 in Packet Tracer: 7 forwarded, 7 DHCP permits, 0 dropped, 0 DHCP drops, 0 ACL drops and no validation failures. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> <strong>Forwarded 7, DHCP Permits 7</strong>: ARP from clients with bindings was checked and allowed. <strong>Dropped 0</strong> even after ATTACKER pinged. On real IOS, Dropped and DHCP Drops climb with every ATTACKER ping. That&#x27;s the simulator, not your configuration.</p>
+<p>To watch DAI actually drop spoofed ARP, rebuild this phase in Cisco Modeling Labs with IOSvL2 switches.</p>
+<details class="qa"><summary>Think about it: why does DAI trust the uplink instead of checking R1 against a binding?</summary>
+<p>DAI can only validate what DHCP snooping saw being leased. R1, servers and printers with static addresses never lease anything, so they have no binding. You either trust the port they arrive on (the uplink, where the gateway lives) or describe them in an ARP ACL. Trusting a host port would let anyone on that port spoof any address, so you only trust ports that face infrastructure.</p>
+</details>
+<h2 id="phase-3-stp-protection">Phase 3: STP protection</h2>
+<p>STP believes the best BPDU it hears. An attacker who plugs in a switch can either join the topology from a user port or announce a better priority and become root, pulling traffic through their own switch. Three guards stop this; Packet Tracer supports the first two. Deeper theory: <a href="/ccnp-security/segmentation-layer-2-hardening#spanning-tree-protection">Spanning tree protection</a>.</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Feature</th><th scope="col">Where</th><th scope="col">Trigger</th><th scope="col">Result</th><th scope="col">Recovery</th></tr></thead><tbody><tr><td>PortFast + BPDU Guard</td><td>ASW1 host ports</td><td>Any BPDU received</td><td>Port <strong>err-disabled</strong></td><td>Manual: <code translate="no">shutdown</code> then <code translate="no">no shutdown</code></td></tr><tr><td>Root Guard</td><td>DSW1 downlinks</td><td>A superior BPDU (better priority) received</td><td>Port <strong>root-inconsistent</strong> (blocking)</td><td>Automatic once superior BPDUs stop</td></tr><tr><td>Loop Guard</td><td>ASW1 uplink (root port)</td><td>BPDUs stop arriving</td><td>Port <strong>loop-inconsistent</strong> (blocking)</td><td>Automatic once BPDUs return</td></tr></tbody></table></div>
+<h3 id="asw1-portfast-and-bpdu-guard-on-the-user-ports">ASW1: PortFast and BPDU Guard on the user ports</h3>
+<pre translate="no"><code translate="no">configure terminal
+interface range GigabitEthernet1/0/1 - 5 , GigabitEthernet1/0/10
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+end</code></pre>
+<ul><li><strong>PortFast</strong> lets a host port forward straight away instead of waiting through STP states. It&#x27;s only safe where a host, never a switch, is connected.</li><li><strong>BPDU Guard</strong> enforces that promise: the moment a BPDU arrives, the port is err-disabled.</li><li>If the switch prompts for <code translate="no">spanning-tree portfast edge</code> (newer IOS XE syntax), use that form. The global alternative is <code translate="no">spanning-tree portfast default</code> plus <code translate="no">spanning-tree portfast bpduguard default</code>, which applies BPDU Guard to every PortFast port.</li></ul>
+<p><strong>Real IOS only, Loop Guard on the uplink:</strong></p>
+<pre translate="no"><code translate="no">interface GigabitEthernet1/0/24
+ spanning-tree guard loop</code></pre>
+<p>In Packet Tracer, <code translate="no">spanning-tree guard ?</code> under Gi1/0/24 offers only <code translate="no">root</code>. Skip Loop Guard here, but know it for the exam: if the uplink stops receiving BPDUs (a one-way fiber, for example), Loop Guard blocks it instead of letting it move to forwarding and create a loop.</p>
+<h3 id="dsw1-root-guard-on-the-downlinks">DSW1: Root Guard on the downlinks</h3>
+<pre translate="no"><code translate="no">configure terminal
+interface GigabitEthernet0/1
+ spanning-tree guard root
+!
+interface FastEthernet0/10
+ description ROGUE-SW2-TEST-DOWNLINK
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport trunk allowed vlan 10,99
+ spanning-tree guard root
+ no shutdown
+end</code></pre>
+<p><strong>Where Root Guard goes:</strong> on the root&#x27;s ports that face <em>away</em> from the root, where a better BPDU should never appear. <strong>Never on ASW1 Gi1/0/24</strong>: that port faces the root, so it receives the root&#x27;s superior BPDUs all the time, and Root Guard would block your own uplink. Root Guard and Loop Guard can&#x27;t run on the same port, which is why Root Guard sits on DSW1&#x27;s side of the trunk and Loop Guard on ASW1&#x27;s side.</p>
+<h3 id="attack-1-a-rogue-switch-on-a-user-port-bpdu-guard">Attack 1: a rogue switch on a user port (BPDU Guard)</h3>
+<ol><li>Add or reuse <strong>ROGUE-SW1</strong> (2960-24TT), with no configuration.</li><li>Cable its <strong>Fa0/1</strong> to <strong>ASW1 Gi1/0/10</strong> with a cross-over cable.</li><li>Watch ASW1&#x27;s console. On real IOS you&#x27;ll see <code translate="no">%SPANTREE-2-BLOCK_BPDUGUARD</code> followed by <code translate="no">%PM-4-ERR_DISABLE: bpduguard error detected on Gi1/0/10</code>. The link lights turn red.</li><li>Check the port:</li></ol>
+<pre translate="no"><code translate="no">show interfaces gigabitEthernet1/0/10 status</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-attack-prevention/p3-bpduguard-errdisable.webp" aria-label="Open full-size image: ASW1 show interface g1/0/10 status: port ROGUE-SW1-TEST-POR in VLAN 10 is err-disabled"><img src="/assets/img/ccnp/labs/l2-attack-prevention/p3-bpduguard-errdisable.webp" width="716" height="56" alt="ASW1 show interface g1/0/10 status: port ROGUE-SW1-TEST-POR in VLAN 10 is err-disabled" loading="lazy" decoding="async"></a><figcaption>ASW1 show interface g1/0/10 status: port ROGUE-SW1-TEST-POR in VLAN 10 is err-disabled. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> Gi1/0/10 is <strong>err-disabled</strong>. A default switch sent a BPDU, and BPDU Guard shut the port before the rogue switch could join the topology. On real IOS, <code translate="no">show interfaces status err-disabled</code> lists every err-disabled port with the reason, here <strong>bpduguard</strong>.</p>
+<p><strong>Recover the port manually.</strong> Delete the cable to ROGUE-SW1 first: if you bring the port up with the rogue switch still attached, it err-disables again straight away. Then, on ASW1:</p>
+<pre translate="no"><code translate="no">configure terminal
+interface GigabitEthernet1/0/10
+ shutdown
+ no shutdown
+end</code></pre>
+<ul><li><code translate="no">show interfaces gigabitEthernet1/0/10 status</code> now shows <strong>notconnect</strong>: the port is healthy and waiting.</li><li>Nothing legitimate lives on Gi1/0/10, so <strong>shut it again</strong>. A port with nothing to serve stays off. That&#x27;s why Gi1/0/10 shows <strong>disabled</strong> in Phase 5.</li></ul>
+<blockquote><p><strong>Exam note:</strong> real IOS can recover err-disabled ports on a timer (<code translate="no">errdisable recovery cause bpduguard</code> with <code translate="no">errdisable recovery interval</code>). Manual recovery is the safer habit for BPDU Guard: someone should find out why a switch appeared on a user port before the port comes back.</p></blockquote>
+<h3 id="attack-2-a-rogue-switch-claims-root-root-guard">Attack 2: a rogue switch claims root (Root Guard)</h3>
+<p>First, configure the attack on <strong>ROGUE-SW2</strong> (2960-24TT):</p>
+<pre translate="no"><code translate="no">enable
+configure terminal
+hostname ROGUE-SW2
+vlan 10
+vlan 99
+exit
+spanning-tree mode rapid-pvst
+spanning-tree vlan 10 priority 0
+interface FastEthernet0/1
+ switchport mode trunk
+ switchport trunk native vlan 99
+end</code></pre>
+<p>Then launch it:</p>
+<ol><li>Cable ROGUE-SW2 <strong>Fa0/1</strong> to <strong>DSW1 Fa0/10</strong> with a cross-over cable.</li><li>ROGUE-SW2 now sends BPDUs with priority 0 + 10 = <strong>10</strong>, better than DSW1&#x27;s 4106. Without Root Guard, it would become root and every switch would recalculate toward it.</li><li>On DSW1, watch the console, then run <code translate="no">show spanning-tree vlan 10</code>.</li></ol>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-attack-prevention/p3-rootguard-inconsistent.webp" aria-label="Open full-size image: DSW1 console: SPANTREE-2-ROOTGUARDBLOCK on port 0/10, moved to root-inconsistent state; show spanning-tree vlan 10 still says this bridge is the root at priority 4106, with Fa0/10 designated but blocking"><img src="/assets/img/ccnp/labs/l2-attack-prevention/p3-rootguard-inconsistent.webp" width="801" height="384" alt="DSW1 console: SPANTREE-2-ROOTGUARDBLOCK on port 0/10, moved to root-inconsistent state; show spanning-tree vlan 10 still says this bridge is the root at priority 4106, with Fa0/10 designated but blocking" loading="lazy" decoding="async"></a><figcaption>DSW1 console: SPANTREE-2-ROOTGUARDBLOCK on port 0/10, moved to root-inconsistent state; show spanning-tree vlan 10 still says this bridge is the root at priority 4106, with Fa0/10 designated but blocking. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><code translate="no">%SPANTREE-2-ROOTGUARDBLOCK ... Moved to root-inconsistent state</code>: Root Guard saw the superior BPDU on Fa0/10 and refused it.</li><li><strong>This bridge is the root</strong>, priority <strong>4106</strong>: DSW1 kept the role. The attack failed.</li><li><strong>Fa0/10: Desg BLK</strong>. The port is blocking, so no traffic passes to or from ROGUE-SW2. On real IOS this shows as <code translate="no">BKN*</code> with <code translate="no">ROOT_Inc</code>, and <code translate="no">show spanning-tree inconsistentports</code> lists it.</li><li>Gi0/1 (to ASW1) and Fa0/1 (to R1) stay <strong>FWD</strong>: the rest of the network never noticed.</li></ul>
+<p><strong>Remove the attack.</strong> On ROGUE-SW2: <code translate="no">configure terminal</code>, <code translate="no">spanning-tree vlan 10 priority 32768</code>, <code translate="no">end</code>. Wait a few seconds, then <code translate="no">show spanning-tree vlan 10</code> on DSW1 again.</p>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-attack-prevention/p3-rootguard-recovered.webp" aria-label="Open full-size image: DSW1 show spanning-tree vlan 10 after ROGUE-SW2 returns to the default priority: DSW1 is still the root and Fa0/10 is designated forwarding again"><img src="/assets/img/ccnp/labs/l2-attack-prevention/p3-rootguard-recovered.webp" width="801" height="278" alt="DSW1 show spanning-tree vlan 10 after ROGUE-SW2 returns to the default priority: DSW1 is still the root and Fa0/10 is designated forwarding again" loading="lazy" decoding="async"></a><figcaption>DSW1 show spanning-tree vlan 10 after ROGUE-SW2 returns to the default priority: DSW1 is still the root and Fa0/10 is designated forwarding again. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> Fa0/10 is back to <strong>Desg FWD</strong> on its own. No <code translate="no">shutdown</code> / <code translate="no">no shutdown</code> was needed. That&#x27;s the key difference from BPDU Guard: Root Guard blocks only while superior BPDUs keep arriving, because the neighbor might be a legitimate switch that was simply misconfigured.</p>
+<blockquote><p><strong>Exam note on BPDU Filter:</strong> <code translate="no">spanning-tree bpdufilter enable</code> on an interface stops it sending and receiving BPDUs, which disables STP there and can cause loops. The global <code translate="no">spanning-tree portfast bpdufilter default</code> is safer: a PortFast port that receives a BPDU loses PortFast and runs normal STP. Never combine BPDU Filter with BPDU Guard on a port: the filter wins and the guard never fires.</p></blockquote>
+<details class="qa"><summary>Think about it: BPDU Guard and Root Guard both react to BPDUs. Why do they behave so differently?</summary>
+<p>They answer different questions. <strong>BPDU Guard</strong> asks &quot;should <em>any</em> switch be here?&quot; On a user port the answer is no, so any BPDU is proof of a policy violation and the port is shut until a human looks. <strong>Root Guard</strong> asks &quot;should a <em>better root</em> appear here?&quot; A downstream switch on that port is fine; only a superior BPDU is wrong, so it blocks while the problem exists and recovers by itself. Pick the guard by asking what&#x27;s legitimately allowed on the port.</p>
+</details>
+<h2 id="phase-4-storm-control">Phase 4: storm control</h2>
+<p>A broadcast storm, from a loop or a flood tool, makes every switch forward the same frames to every port until links and CPUs saturate. Storm control measures broadcast, multicast or unicast traffic on a port over 1-second intervals and acts once it passes a <strong>rising</strong> threshold (percent of link bandwidth). Forwarding of that traffic type resumes when it drops below the <strong>falling</strong> threshold. Deeper theory: <a href="/ccnp-security/segmentation-layer-2-hardening#storm-control">Storm control</a>.</p>
+<p><strong>Real IOS:</strong></p>
+<pre translate="no"><code translate="no">interface range GigabitEthernet1/0/1 - 3 , GigabitEthernet1/0/5
+ storm-control broadcast level 20.00 10.00
+ storm-control multicast level 30.00 20.00
+ storm-control action trap
+!
+interface GigabitEthernet1/0/4
+ description ATTACKER - strict policy
+ storm-control broadcast level 1.00 0.50
+ storm-control action shutdown</code></pre>
+<p><strong>Packet Tracer 3650:</strong> only the broadcast level exists, without a falling level or an action. Run <code translate="no">storm-control ?</code> under an interface to see this for yourself, then configure:</p>
+<pre translate="no"><code translate="no">configure terminal
+interface range GigabitEthernet1/0/1 - 3 , GigabitEthernet1/0/5
+ storm-control broadcast level 20.0
+!
+interface GigabitEthernet1/0/4
+ description ATTACKER - strict policy
+ storm-control broadcast level 1.0
+end</code></pre>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Action</th><th scope="col">Over the threshold</th></tr></thead><tbody><tr><td>none (default)</td><td>Excess traffic of that type is dropped; the port stays up</td></tr><tr><td><code translate="no">trap</code></td><td>Excess is dropped, plus a log message and an SNMP trap</td></tr><tr><td><code translate="no">shutdown</code></td><td>The port goes err-disabled until recovered with <code translate="no">shutdown</code> / <code translate="no">no shutdown</code></td></tr></tbody></table></div>
+<p>Full syntax: <code translate="no">storm-control {broadcast | multicast | unicast} level {rising [falling] | bps ... | pps ...}</code>. With no falling level, the falling level equals the rising level.</p>
+<h3 id="prove-it">Prove it</h3>
+<pre translate="no"><code translate="no">show storm-control broadcast</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-attack-prevention/p4-show-storm-control.webp" aria-label="Open full-size image: ASW1 show storm-control broadcast: Gi1/0/1, 1/0/2, 1/0/3 and 1/0/5 link up with upper and lower 20 percent; Gi1/0/4 link up with upper and lower 1 percent; current 0 percent on all"><img src="/assets/img/ccnp/labs/l2-attack-prevention/p4-show-storm-control.webp" width="552" height="123" alt="ASW1 show storm-control broadcast: Gi1/0/1, 1/0/2, 1/0/3 and 1/0/5 link up with upper and lower 20 percent; Gi1/0/4 link up with upper and lower 1 percent; current 0 percent on all" loading="lazy" decoding="async"></a><figcaption>ASW1 show storm-control broadcast: Gi1/0/1, 1/0/2, 1/0/3 and 1/0/5 link up with upper and lower 20 percent; Gi1/0/4 link up with upper and lower 1 percent; current 0 percent on all. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li>User ports: <strong>Upper 20.00%</strong>. Lower is also 20.00% because Packet Tracer has no falling level. On real IOS it would show 10.00%.</li><li><strong>Gi1/0/4 (ATTACKER): 1.00%</strong>, the strict policy for the port you trust least.</li><li><strong>Filter State Link Up</strong>: no port is over its threshold. When broadcast exceeds the upper level, the state changes to Blocking (or the port err-disables with <code translate="no">action shutdown</code>).</li><li><strong>Current 0.00%</strong>: the measured broadcast load right now.</li></ul>
+<p><strong>Why a flood test won&#x27;t trip it:</strong> from ATTACKER, <code translate="no">ping -t 10.10.10.255</code> sends one broadcast per second, roughly 600 bps. 1% of a 100 Mbps link is 1 Mbps, well over a thousand minimum-size frames per second. Even on real IOS a ping won&#x27;t cross that. The configuration and show output are what the exam tests.</p>
+<details class="qa"><summary>Think about it: why give the attacker&#x27;s port 1% when user ports get 20%?</summary>
+<p>Thresholds are a policy statement about each port. A normal PC sends a few broadcasts per second (ARP, DHCP), nowhere near 1% of a gigabit port, so a tight limit costs nothing and catches a flood early. User ports get headroom so a busy workstation or an imaging job isn&#x27;t cut off by mistake. In production you&#x27;d baseline real traffic first and set thresholds just above normal.</p>
+</details>
+<h2 id="phase-5-validation">Phase 5: validation</h2>
+<p>The lab passes when every attack from Phase 0 fails and every legitimate host still works. On real IOS that&#x27;s every row below. In Packet Tracer, judge each row by its Packet Tracer column. Run through it end to end after reopening your saved file.</p>
+<h3 id="attack-results">Attack results</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Attack</th><th scope="col">Protection</th><th scope="col">Real IOS</th><th scope="col">Packet Tracer</th></tr></thead><tbody><tr><td>Rogue DHCP server</td><td>DHCP snooping</td><td>Every PC gets gateway .1</td><td><strong>Works</strong>: gateway .1; with R1&#x27;s DHCP off, no lease at all</td></tr><tr><td>DHCP starvation</td><td>Snooping rate limit</td><td>Port err-disables over 10 pps</td><td>Not testable: no starvation tool</td></tr><tr><td>ARP from a static attacker</td><td>DAI</td><td>Pings fail, drops logged</td><td>Config only: pings succeed, Dropped stays 0</td></tr><tr><td>Legitimate static printer</td><td>DAI + ARP ACL</td><td>Allowed by the ACL</td><td>ACL not supported; PRINTER on DHCP, PC1 can ping it</td></tr><tr><td>Rogue switch on a user port</td><td>BPDU Guard</td><td>Gi1/0/10 err-disabled</td><td><strong>Works</strong></td></tr><tr><td>Rogue switch claims root</td><td>Root Guard</td><td>Fa0/10 root-inconsistent, DSW1 stays root</td><td><strong>Works</strong></td></tr><tr><td>Unidirectional uplink</td><td>Loop Guard</td><td>Port loop-inconsistent</td><td>Not supported</td></tr><tr><td>Broadcast flood</td><td>Storm control</td><td>Excess dropped or port shut</td><td>Config only</td></tr><tr><td>VLAN hopping, walk-up access</td><td>Trunk and unused-port hardening</td><td>No DTP, native 99 unused, unused ports shut</td><td><strong>Works</strong></td></tr></tbody></table></div>
+<h3 id="show-command-checklist">Show-command checklist</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Device</th><th scope="col">Command</th><th scope="col">Pass looks like</th></tr></thead><tbody><tr><td>ASW1</td><td><code translate="no">show ip dhcp snooping</code></td><td>VLAN 10 configured; Gi1/0/24 trusted; host ports rate 10</td></tr><tr><td>ASW1</td><td><code translate="no">show ip dhcp snooping binding</code></td><td>One row per DHCP client, on the right port, including PRINTER on Gi1/0/5</td></tr><tr><td>ASW1</td><td><code translate="no">show ip arp inspection vlan 10</code></td><td>Enabled, Active, three validation checks enabled</td></tr><tr><td>ASW1</td><td><code translate="no">show ip arp inspection interfaces</code></td><td>Gi1/0/24 trusted; host ports untrusted at 15 pps</td></tr><tr><td>ASW1</td><td><code translate="no">show interfaces gi1/0/10 status</code></td><td>err-disabled during Attack 1; disabled (shut) afterwards</td></tr><tr><td>ASW1</td><td><code translate="no">show storm-control broadcast</code></td><td>20% on user ports, 1% on Gi1/0/4</td></tr><tr><td>ASW1</td><td><code translate="no">show interfaces trunk</code></td><td>Gi1/0/24 trunking, native 99, allowed 10,99</td></tr><tr><td>ASW1</td><td><code translate="no">show interfaces status</code></td><td>User ports connected in VLAN 10, unused ports disabled in 999</td></tr><tr><td>DSW1</td><td><code translate="no">show spanning-tree vlan 10</code></td><td>This bridge is the root; Fa0/10 blocking during Attack 2, forwarding after</td></tr><tr><td>DSW1</td><td><code translate="no">show running-config interface gi0/1</code></td><td><code translate="no">spanning-tree guard root</code></td></tr><tr><td>Hosts</td><td><code translate="no">ipconfig</code> on PC1 and PC2</td><td>Gateway 10.10.10.1</td></tr></tbody></table></div>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-attack-prevention/p5-asw1-trunk.webp" aria-label="Open full-size image: ASW1 show interfaces trunk: Gig1/0/24 mode on, 802.1q, trunking, native VLAN 99; VLANs 10 and 99 allowed, active and forwarding"><img src="/assets/img/ccnp/labs/l2-attack-prevention/p5-asw1-trunk.webp" width="612" height="185" alt="ASW1 show interfaces trunk: Gig1/0/24 mode on, 802.1q, trunking, native VLAN 99; VLANs 10 and 99 allowed, active and forwarding" loading="lazy" decoding="async"></a><figcaption>ASW1 show interfaces trunk: Gig1/0/24 mode on, 802.1q, trunking, native VLAN 99; VLANs 10 and 99 allowed, active and forwarding. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> <strong>Mode on</strong> (hard-coded trunk, no DTP negotiation), <strong>802.1q</strong>, <strong>native VLAN 99</strong>, and only VLANs <strong>10,99</strong> allowed, active and forwarding. An attacker can&#x27;t negotiate a trunk, can&#x27;t double-tag into VLAN 10 through the native VLAN, and can&#x27;t reach any VLAN you didn&#x27;t list.</p>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/l2-attack-prevention/p5-asw1-interface-status.webp" aria-label="Open full-size image: ASW1 show interfaces status: Gi1/0/1 to 1/0/5 USER-PORTS connected in VLAN 10, Gi1/0/10 ROGUE-SW1-TEST-PORT disabled in VLAN 10, Gi1/0/24 trunk connected, every other port disabled in VLAN 999"><img src="/assets/img/ccnp/labs/l2-attack-prevention/p5-asw1-interface-status.webp" width="702" height="453" alt="ASW1 show interfaces status: Gi1/0/1 to 1/0/5 USER-PORTS connected in VLAN 10, Gi1/0/10 ROGUE-SW1-TEST-PORT disabled in VLAN 10, Gi1/0/24 trunk connected, every other port disabled in VLAN 999" loading="lazy" decoding="async"></a><figcaption>ASW1 show interfaces status: Gi1/0/1 to 1/0/5 USER-PORTS connected in VLAN 10, Gi1/0/10 ROGUE-SW1-TEST-PORT disabled in VLAN 10, Gi1/0/24 trunk connected, every other port disabled in VLAN 999. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong>Gi1/0/1 to 1/0/5 connected, VLAN 10</strong>: the five legitimate access ports.</li><li><strong>Gi1/0/10 disabled</strong>: shut after the BPDU Guard test because nothing should be connected there.</li><li><strong>Gi1/0/24 connected, trunk</strong>.</li><li><strong>Every other port disabled in VLAN 999</strong>: someone who plugs into a spare port gets no link, and even if a port were turned on by mistake, it would land in a VLAN that goes nowhere.</li></ul>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Symptom</th><th scope="col">Likely cause</th><th scope="col">Fix</th></tr></thead><tbody><tr><td>ASW1 is dark and has no CLI</td><td>The 3650 has no power supply</td><td>Physical tab: add AC-POWER-SUPPLY</td></tr><tr><td>PCs get no IP after snooping is on</td><td>R1 drops option 82 requests with giaddr 0.0.0.0</td><td><code translate="no">no ip dhcp snooping information option</code> on ASW1, or <code translate="no">ip dhcp relay information trust-all</code> on R1</td></tr><tr><td>PCs get no IP, binding table empty</td><td>Uplink Gi1/0/24 not trusted</td><td><code translate="no">ip dhcp snooping trust</code> on Gi1/0/24</td></tr><tr><td>PCs get no IP, R1 is fine</td><td><code translate="no">no service dhcp</code> still set on R1 from an attack step</td><td><code translate="no">service dhcp</code> on R1, then renew</td></tr><tr><td>The whole VLAN loses its gateway after DAI</td><td>Uplink not DAI-trusted, so R1&#x27;s ARP is dropped</td><td><code translate="no">ip arp inspection trust</code> on Gi1/0/24</td></tr><tr><td>ATTACKER can still ping after DAI</td><td>The Packet Tracer limitation, or old ARP cache entries</td><td><code translate="no">arp -d</code> on hosts, <code translate="no">clear arp-cache</code> on R1, test again. If Dropped stays 0, it&#x27;s the simulator</td></tr><tr><td>PRINTER has no binding</td><td>Still static, or hasn&#x27;t renewed</td><td>Config → FastEthernet0 → DHCP, then check the binding table</td></tr><tr><td>A port err-disables again after <code translate="no">no shutdown</code></td><td>The cause is still connected</td><td>Remove the rogue device first, then <code translate="no">shutdown</code> / <code translate="no">no shutdown</code></td></tr><tr><td>Gi1/0/10 err-disabled before Phase 3</td><td>ROGUE-SW1 was cabled early</td><td>Delete the cable, recover the port, reconnect in Phase 3</td></tr><tr><td>Fa0/10 never blocks on DSW1</td><td>ROGUE-SW2 priority not lower than 4096, Root Guard missing, or the trunk isn&#x27;t up</td><td>Check <code translate="no">show spanning-tree vlan 10</code> on ROGUE-SW2 and <code translate="no">show run int fa0/10</code> on DSW1</td></tr><tr><td>Trunk won&#x27;t form</td><td><code translate="no">nonegotiate</code> on one side only, or native VLAN mismatch</td><td>Configure both ends identically</td></tr><tr><td>A command is rejected</td><td>Feature missing in this Packet Tracer version or model</td><td>Check with <code translate="no">?</code>, note it, carry on</td></tr><tr><td>Storm control never drops anything</td><td>Test traffic is far below the threshold</td><td>Expected. Verify the config and show output instead</td></tr></tbody></table></div>
+<h2 id="answer-configs">Answer configs</h2>
+<p>Try every phase before opening these. The Packet Tracer versions are what the activity file accepts; the real IOS version is what the exam expects.</p>
+<details class="qa"><summary>Show the final ASW1 config (Packet Tracer 3650)</summary>
+<pre translate="no"><code translate="no">hostname ASW1
+no ip domain-lookup
+!
+vlan 10
+ name USERS
+vlan 99
+ name NATIVE
+vlan 999
+ name BLACKHOLE
+!
+spanning-tree mode rapid-pvst
+!
+ip dhcp snooping
+ip dhcp snooping vlan 10
+no ip dhcp snooping information option
+!
+ip arp inspection vlan 10
+ip arp inspection validate src-mac dst-mac ip
+!
+interface GigabitEthernet1/0/24
+ description TRUNK-DSW1 (path to the real DHCP server)
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport trunk allowed vlan 10,99
+ switchport nonegotiate
+ ip dhcp snooping trust
+ ip arp inspection trust
+!
+interface range GigabitEthernet1/0/1 - 3 , GigabitEthernet1/0/5
+ description USER-PORTS
+ switchport mode access
+ switchport access vlan 10
+ switchport nonegotiate
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ ip dhcp snooping limit rate 10
+ storm-control broadcast level 20.0
+!
+interface GigabitEthernet1/0/4
+ description ATTACKER - strict policy
+ switchport mode access
+ switchport access vlan 10
+ switchport nonegotiate
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ ip dhcp snooping limit rate 10
+ storm-control broadcast level 1.0
+!
+interface GigabitEthernet1/0/10
+ description ROGUE-SW1-TEST-PORT
+ switchport mode access
+ switchport access vlan 10
+ switchport nonegotiate
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ ip dhcp snooping limit rate 10
+ shutdown
+!
+interface range GigabitEthernet1/0/6 - 9 , GigabitEthernet1/0/11 - 23 , GigabitEthernet1/1/1 - 4
+ switchport mode access
+ switchport access vlan 999
+ shutdown
+!
+interface Vlan10
+ ip address 10.10.10.2 255.255.255.0
+ no shutdown
+ip default-gateway 10.10.10.1</code></pre>
+</details>
+<details class="qa"><summary>Show the final ASW1 config (real IOS)</summary>
+<pre translate="no"><code translate="no">hostname ASW1
+no ip domain-lookup
+!
+vlan 10
+ name USERS
+vlan 99
+ name NATIVE
+vlan 999
+ name BLACKHOLE
+!
+spanning-tree mode rapid-pvst
+!
+ip dhcp snooping
+ip dhcp snooping vlan 10
+no ip dhcp snooping information option
+!
+ip arp inspection vlan 10
+ip arp inspection validate src-mac dst-mac ip
+arp access-list STATIC-HOSTS
+ permit ip host 10.10.10.15 mac host AAAA.BBBB.CCCC
+ip arp inspection filter STATIC-HOSTS vlan 10
+!
+interface GigabitEthernet1/0/24
+ description TRUNK-DSW1
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport trunk allowed vlan 10,99
+ switchport nonegotiate
+ ip dhcp snooping trust
+ ip arp inspection trust
+ spanning-tree guard loop
+!
+interface range GigabitEthernet1/0/1 - 3 , GigabitEthernet1/0/5
+ description USER-PORTS
+ switchport mode access
+ switchport access vlan 10
+ switchport nonegotiate
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ ip dhcp snooping limit rate 10
+ ip arp inspection limit rate 15
+ storm-control broadcast level 20.00 10.00
+ storm-control multicast level 30.00 20.00
+ storm-control action trap
+!
+interface GigabitEthernet1/0/4
+ description ATTACKER - strict policy
+ switchport mode access
+ switchport access vlan 10
+ switchport nonegotiate
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ ip dhcp snooping limit rate 10
+ ip arp inspection limit rate 15
+ storm-control broadcast level 1.00 0.50
+ storm-control action shutdown
+!
+interface GigabitEthernet1/0/10
+ description ROGUE-SW1-TEST-PORT
+ switchport mode access
+ switchport access vlan 10
+ switchport nonegotiate
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ ip dhcp snooping limit rate 10
+ ip arp inspection limit rate 15
+ shutdown
+!
+interface range GigabitEthernet1/0/6 - 9 , GigabitEthernet1/0/11 - 23 , GigabitEthernet1/1/1 - 4
+ switchport mode access
+ switchport access vlan 999
+ shutdown
+!
+interface Vlan10
+ ip address 10.10.10.2 255.255.255.0
+ no shutdown
+ip default-gateway 10.10.10.1</code></pre>
+<p>On real IOS the printer could stay static (10.10.10.15) because the ARP ACL permits it. Any port err-disabled by BPDU Guard, the DHCP or ARP rate limit, or <code translate="no">storm-control action shutdown</code> is recovered with <code translate="no">shutdown</code> / <code translate="no">no shutdown</code> after the cause is removed.</p>
+</details>
+<details class="qa"><summary>Show the final DSW1 config</summary>
+<pre translate="no"><code translate="no">hostname DSW1
+no ip domain-lookup
+!
+vlan 10
+ name USERS
+vlan 99
+ name NATIVE
+vlan 999
+ name BLACKHOLE
+!
+spanning-tree mode rapid-pvst
+spanning-tree vlan 10,99 priority 4096
+!
+interface FastEthernet0/1
+ description R1
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+!
+interface GigabitEthernet0/1
+ description TRUNK-ASW1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport trunk allowed vlan 10,99
+ switchport nonegotiate
+ spanning-tree guard root
+!
+interface FastEthernet0/10
+ description ROGUE-SW2-TEST-DOWNLINK
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport trunk allowed vlan 10,99
+ spanning-tree guard root
+ no shutdown
+!
+interface range FastEthernet0/2 - 9 , FastEthernet0/11 - 24 , GigabitEthernet0/2
+ switchport mode access
+ switchport access vlan 999
+ shutdown
+!
+interface Vlan10
+ ip address 10.10.10.3 255.255.255.0
+ no shutdown
+ip default-gateway 10.10.10.1</code></pre>
+</details>
+<h2 id="go-further-in-cisco-modeling-labs">Go further in Cisco Modeling Labs</h2>
+<p>To see the attacks against real IOS, rebuild the same topology in Cisco Modeling Labs with IOSvL2 switches and a Kali Linux node. Tools such as Yersinia and ettercap generate genuine DHCP starvation and ARP poisoning traffic, so you can watch the snooping rate limit err-disable a port and DAI drop and log spoofed ARP. Check storm control there with <code translate="no">?</code> and the show commands too, since a virtual switch may accept it without enforcing it. Only run attack tools inside your own lab.</p>
+<h2 id="exam-mapping">Exam mapping</h2>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">You configured</th><th scope="col">Attack it stops</th><th scope="col">SCOR v2.0</th></tr></thead><tbody><tr><td>DHCP snooping, trust, rate limit</td><td>Rogue DHCP server, DHCP starvation</td><td>2.3</td></tr><tr><td>DAI, validation checks, ARP ACL</td><td>ARP spoofing and poisoning</td><td>2.3</td></tr><tr><td>PortFast + BPDU Guard</td><td>Rogue switch on a user port</td><td>2.3</td></tr><tr><td>Root Guard</td><td>Rogue root bridge</td><td>2.3</td></tr><tr><td>Loop Guard</td><td>Loops from unidirectional links</td><td>2.3</td></tr><tr><td>Storm control</td><td>Broadcast and multicast storms</td><td>2.3</td></tr><tr><td>Trunk hardening, unused ports in VLAN 999</td><td>VLAN hopping, walk-up access</td><td>2.3</td></tr></tbody></table></div>
+<p>Drill it with the <a href="/ccnp-security/flashcards#d2">flashcards</a> and the <a href="/ccnp-security/mock-exam#d2">mock exam</a>.</p>
+</div>
+      <footer class="post-end">
+        <section class="practice" aria-labelledby="practice-h">
+          <div><h2 id="practice-h" class="sub-h">Lock it in</h2>
+          <p>Lab done? Drill the commands and the attack-to-defense mapping until they're automatic.</p></div>
+          <p class="practice-links"><a class="btn btn-pri" href="/ccnp-security/flashcards#d2">flashcards <span class="p">d2</span></a><a class="btn btn-sec" href="/ccnp-security/mock-exam#d2">mock exam <span class="p">d2</span></a><a class="btn btn-sec" href="/ccnp-security/segmentation-layer-2-hardening">notes</a></p>
+        </section>
+      </footer>
+    </div>
+    <aside class="toc" aria-label="On this page"><span class="toc-title"><span class="h">#</span> show ip route | toc</span><ol><li><a href="#what-you-ll-build">What you&#x27;ll build</a></li><li><a href="#real-ios-vs-packet-tracer-read-this-first">Real IOS vs. Packet Tracer: read this first</a></li><li><a href="#devices-and-topology">Devices and topology</a></li><li><a href="#phase-0-base-build-and-baseline-attacks">Phase 0: base build and baseline attacks</a></li><li><a href="#phase-1-dhcp-snooping">Phase 1: DHCP snooping</a></li><li><a href="#phase-2-dynamic-arp-inspection">Phase 2: Dynamic ARP Inspection</a></li><li><a href="#phase-3-stp-protection">Phase 3: STP protection</a></li><li><a href="#phase-4-storm-control">Phase 4: storm control</a></li><li><a href="#phase-5-validation">Phase 5: validation</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#answer-configs">Answer configs</a></li><li><a href="#go-further-in-cisco-modeling-labs">Go further in Cisco Modeling Labs</a></li><li><a href="#exam-mapping">Exam mapping</a></li></ol></aside>
+  </div>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/ccnp-security">ccnp security</a></li>
+        <li><a href="/ccnp-security/labs">packet tracer labs</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Oct 22, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

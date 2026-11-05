@@ -2059,3 +2059,4 @@ a, button, summary { -webkit-tap-highlight-color: rgba(0, 188, 235, 0.18); }
 @media (max-width: 48rem) { .labhow { grid-template-columns: minmax(0, 1fr); } }
 .labhow li { color: var(--text-2); font-size: 0.93rem; line-height: 1.6; }
 .labhow b { display: block; color: var(--text); font-weight: 600; }
+.labcta + .labcta { margin-top: -1.25rem; }

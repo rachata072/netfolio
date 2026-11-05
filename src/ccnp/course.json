@@ -317,6 +317,35 @@
           "note": "Activity Wizard version"
         }
       ]
+    },
+    {
+      "slug": "l2-attack-prevention-packet-tracer",
+      "file": "l2-attack-prevention.md",
+      "lecture": "segmentation-layer-2-hardening",
+      "title": "Layer 2 Attack Prevention Lab",
+      "short": "Attack prevention lab",
+      "cta": "Attack, protect, prove: rogue DHCP, ARP spoofing, rogue switches and broadcast storms",
+      "seo_title": "Free Packet Tracer Lab: DHCP Snooping, DAI, BPDU Guard (CCNP SCOR 2.3)",
+      "description": "Free CCNP Security Packet Tracer lab: stop rogue DHCP, ARP spoofing and rogue switches with DHCP snooping, DAI, BPDU Guard, Root Guard and storm control.",
+      "dek": "Attack a small switched network, then defend it phase by phase with DHCP snooping, Dynamic ARP Inspection, BPDU Guard, Root Guard and storm control. Real Packet Tracer output explained line by line, with every real IOS vs. Packet Tracer difference called out.",
+      "objectives": [
+        "2.3"
+      ],
+      "date": "2026-11-04",
+      "time": "2 to 3 hours",
+      "tool": "Packet Tracer 9.0+",
+      "downloads": [
+        {
+          "file": "l2-attack-prevention-baseline.pkt",
+          "label": "Baseline lab (.pkt)",
+          "note": "start here"
+        },
+        {
+          "file": "l2-attack-prevention.pka",
+          "label": "Activity with instructions (.pka)",
+          "note": "ungraded"
+        }
+      ]
     }
   ]
 }

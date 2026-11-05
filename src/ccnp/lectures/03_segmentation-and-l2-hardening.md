@@ -1005,6 +1005,11 @@ A **private VLAN**: cameras on **isolated** ports, the gateway (and the NVR, if 
 
 ---
 
-# Lab for this module
+# Labs for this module
 
-Put it into practice in the [Segmentation & Layer 2 Hardening lab](/ccnp-security/labs/segmentation-l2-hardening-packet-tracer): a downloadable Packet Tracer baseline where you add the dead VLANs, lock down access ports and the trunk, apply port security, PortFast and BPDU Guard, park unused ports, and isolate hosts with protected ports. Packet Tracer can't run Yersinia or macof, so the lab is about building and verifying the defenses; the attacks above show why each one matters.
+Two downloadable Packet Tracer labs put this module into practice:
+
+1. [Segmentation & Layer 2 Hardening lab](/ccnp-security/labs/segmentation-l2-hardening-packet-tracer): add the dead VLANs, lock down access ports and the trunk, apply port security, PortFast and BPDU Guard, park unused ports, and isolate hosts with protected ports.
+2. [Layer 2 Attack Prevention lab](/ccnp-security/labs/l2-attack-prevention-packet-tracer): run each attack first, then stop it. A rogue DHCP server is silenced by DHCP snooping, a static-IP attacker meets Dynamic ARP Inspection, rogue switches trip BPDU Guard and Root Guard, and storm control caps broadcasts.
+
+Packet Tracer can't run Yersinia or macof, and it accepts some commands without enforcing them, so each lab tells you exactly what the simulator proves and what you learn from real IOS output instead.

@@ -139,6 +139,7 @@ def make_all(site, posts, outdir):
         ("ccnp-segmentation-layer-2-hardening", "edge# show scor 2.3", "LAYER 2\nHARDENING"),
         ("ccnp-labs", "edge# show labs", "PACKET TRACER\nLABS: FREE"),
         ("ccnp-lab-segmentation-l2-hardening-packet-tracer", "edge# copy l2-lab flash:", "PACKET TRACER\nLAB: LAYER 2"),
+        ("ccnp-lab-l2-attack-prevention-packet-tracer", "edge# show ip dhcp snooping", "PACKET TRACER\nLAB: L2 ATTACKS"),
     ]
     ccnp_sub = "SCOR 350-701 v2.0  /  notes, flashcards, practice exam  /  free"
     for stem, kicker, title in ccnp:

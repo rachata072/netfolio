@@ -305,11 +305,14 @@ def render_lecture(site, hashes, last_change, course, lec, counts):
     if i + 1 < len(lecs):
         hop.append(f'<a class="next" href="{lecs[i+1]["path"]}"><span class="k">next lecture &rarr;</span>{esc(lecs[i+1]["title"])}</a>')
     nexthop = f'<nav class="nexthop" aria-label="More lectures">{"".join(hop)}</nav>' if hop else ""
-    lab = next((x for x in course.get("labs", []) if x["lecture"] == lec["slug"]), None)
-    lab_btn = f'<a class="btn btn-pri" href="{lab["path"]}">Packet Tracer lab <span class="p">.pkt</span></a>' if lab else ""
-    lab_cta = (f'<a class="labcta" href="{lab["path"]}"><span class="lk">hands-on lab</span>'
-               f'<span class="lt"><b>{esc(lab["title"])}</b><span>Download the Packet Tracer file and harden it step by step '
-               f'&middot; {esc(lab["time"])}</span></span><span class="la" aria-hidden="true">&rarr;</span></a>\n') if lab else ""
+    labs = [x for x in course.get("labs", []) if x["lecture"] == lec["slug"]]
+    lab_btn = "".join(f'<a class="btn btn-pri" href="{x["path"]}">{esc(x.get("short", "Packet Tracer lab"))} '
+                      f'<span class="p">.pkt</span></a>' for x in labs)
+    lab_cta = "".join(f'<a class="labcta" href="{x["path"]}"><span class="lk">hands-on lab</span>'
+                      f'<span class="lt"><b>{esc(x["title"])}</b><span>'
+                      f'{esc(x.get("cta", "Download the Packet Tracer file and harden it step by step"))} '
+                      f'&middot; {esc(x["time"])}</span></span><span class="la" aria-hidden="true">&rarr;</span></a>\n'
+                      for x in labs)
 
     main = f'''<main id="main">
 <article class="lecture">
