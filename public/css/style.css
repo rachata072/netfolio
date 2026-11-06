@@ -1204,6 +1204,7 @@ p { margin: 0 0 1rem; }
   border-radius: var(--r-lg);
   background: #040B15;
 }
+.prose .post-figure.fit img { width: auto; max-width: 100%; }
 .prose .post-figure figcaption {
   margin-top: 0.6rem;
   font-family: var(--f-mono);
@@ -2027,6 +2028,11 @@ a, button, summary { -webkit-tap-highlight-color: rgba(0, 188, 235, 0.18); }
 .labdl .sub-h { margin-bottom: 0.8rem; }
 .labdl .dl-list { grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); }
 .labdl .sums { margin-top: 0.9rem; }
+.labenv .env-list { display: grid; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+.labenv .env-list li { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr); gap: 0.25rem 1rem; padding: 0.6rem 0.8rem; border: 1px solid var(--line); border-radius: var(--r-md, 6px); background: var(--bg-2, var(--bg)); }
+.labenv .env-list b { font-family: var(--f-mono); font-size: 0.86rem; font-weight: 600; color: var(--text); }
+.labenv .env-list span { font-size: 0.9rem; color: var(--text-2); line-height: 1.5; }
+@media (max-width: 36rem) { .labenv .env-list li { grid-template-columns: minmax(0, 1fr); } }
 .labdl .side-note { margin: 0.9rem 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; color: var(--text-2); font-size: 0.9rem; }
 
 /* CCNP labs discoverability: 4-up tools, lab call-out on lectures, lab chip */

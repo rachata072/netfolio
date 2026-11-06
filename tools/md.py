@@ -63,7 +63,8 @@ def _cells(row):
         row = row[1:]
     if row.endswith("|"):
         row = row[:-1]
-    return [c.strip() for c in row.split("|")]
+    # "\|" is a literal pipe inside a cell (e.g. `show run \| section aaa`)
+    return [c.strip().replace("\\|", "|") for c in re.split(r"(?<!\\)\|", row)]
 
 
 def convert(md, image_hook=None, link_hook=None, heading_shift=0):

@@ -3,13 +3,13 @@
   "out": "ccnp-security/labs.html",
   "path": "/ccnp-security/labs",
   "nav": "",
-  "title": "Free CCNP Security Packet Tracer Labs (SCOR 350-701 v2.0)",
-  "description": "Free Packet Tracer labs for CCNP Security SCOR 350-701 v2.0: download the .pkt, harden it step by step, and verify every control with show commands.",
-  "og_title": "CCNP Security Packet Tracer labs",
-  "og_description": "Download a working but insecure network, harden it step by step, and prove every control. Free .pkt files with SHA-256 hashes.",
+  "title": "Free CCNP Security Labs: Packet Tracer and Real IOS (SCOR v2.0)",
+  "description": "Free CCNP Security labs for SCOR 350-701 v2.0: Packet Tracer downloads plus real IOS labs. Harden, break and fix, and verify every control with show commands.",
+  "og_title": "CCNP Security labs: Packet Tracer and real IOS",
+  "og_description": "Harden a working but insecure network, break it on purpose, and prove every control. Free .pkt files with SHA-256 hashes, plus real IOS labs.",
   "preload_display": true,
   "scripts": [],
-  "breadcrumbs": [["CCNP Security", "/ccnp-security"], ["Packet Tracer labs", ""]],
+  "breadcrumbs": [["CCNP Security", "/ccnp-security"], ["Labs", ""]],
   "learning": "Lab exercise"
 }
 -->
@@ -17,9 +17,9 @@
   <header class="page-head">
     <div class="wrap">
       <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/ccnp-security">ccnp-security</a><span aria-hidden="true">/</span><span>labs</span></nav>
-      <span class="cli"><span class="h">edge#</span> <span class="v">show</span> <span class="a">labs | include packet-tracer</span></span>
-      <h1>Packet Tracer labs</h1>
-      <p class="sec-lede">Free hands-on labs for {{CCNP_EXAM}}. Each one gives you a network that works but was built the lazy way. You download it, harden it step by step, and prove every control with the same show commands you'd use on the job.</p>
+      <span class="cli"><span class="h">edge#</span> <span class="v">show</span> <span class="a">labs | include packet-tracer|ios</span></span>
+      <h1>Packet Tracer and IOS labs</h1>
+      <p class="sec-lede">Free hands-on labs for {{CCNP_EXAM}}. Packet Tracer labs give you a network that works but was built the lazy way: download it, harden it step by step, and prove every control. Real IOS labs cover what Packet Tracer can't simulate, such as TACACS+ debugging: build it, break it on purpose, and read the fault from the output. Either way you use the same show commands you'd use on the job.</p>
     </div>
   </header>
 
@@ -33,8 +33,9 @@
       <h2 class="sub-h" id="how-h">How every lab works</h2>
       <ul class="labhow">
         <li><b>Read the notes first.</b> Each lab belongs to a lecture that explains the attacks and why each defense exists.</li>
-        <li><b>Download the baseline.</b> A <span class="mono">.pkt</span> file for Cisco Packet Tracer (free with a Cisco Networking Academy account). Some labs add a graded <span class="mono">.pka</span> activity. Every file lists its SHA-256 hash.</li>
-        <li><b>Do, See, Why, Checkpoint.</b> Every step tells you what to type, what output to expect, which attack it stops, and how to prove it worked.</li>
+        <li><b>Packet Tracer labs: download the baseline.</b> A <span class="mono">.pkt</span> file for Cisco Packet Tracer (free with a Cisco Networking Academy account). Some labs add a <span class="mono">.pka</span> activity with the instructions built in. Every file lists its SHA-256 hash.</li>
+        <li><b>Real IOS labs: pick an environment.</b> Cisco Modeling Labs, a DevNet or dCloud sandbox, or your own router. Each lab lists what it needs and how to set up the server side.</li>
+        <li><b>Do, see, prove.</b> Every step tells you what to type, shows the output to expect with the lines that matter explained, and covers which attack or failure it addresses.</li>
         <li><b>Answer configs are hidden</b> until you open them, so try it yourself first.</li>
       </ul>
     </section>

@@ -137,9 +137,11 @@ def make_all(site, posts, outdir):
         ("ccnp-scor-v2-changes", "edge# show scor | diff v1.1 v2.0", "SCOR v2.0:\nWHAT CHANGED"),
         ("ccnp-network-security-firewall-ips-visibility", "edge# show scor 2.1 2.2", "FIREWALL, IPS\n& TELEMETRY"),
         ("ccnp-segmentation-layer-2-hardening", "edge# show scor 2.3", "LAYER 2\nHARDENING"),
-        ("ccnp-labs", "edge# show labs", "PACKET TRACER\nLABS: FREE"),
+        ("ccnp-management-cis-benchmarks-aaa", "edge# show scor 2.4 2.5 2.6", "MANAGEMENT,\nCIS & AAA"),
+        ("ccnp-labs", "edge# show labs", "PT + IOS LABS:\nFREE"),
         ("ccnp-lab-segmentation-l2-hardening-packet-tracer", "edge# copy l2-lab flash:", "PACKET TRACER\nLAB: LAYER 2"),
         ("ccnp-lab-l2-attack-prevention-packet-tracer", "edge# show ip dhcp snooping", "PACKET TRACER\nLAB: L2 ATTACKS"),
+        ("ccnp-lab-aaa-tacacs-configure-troubleshoot", "R8# debug tacacs", "IOS LAB:\nTACACS+ AAA"),
     ]
     ccnp_sub = "SCOR 350-701 v2.0  /  notes, flashcards, practice exam  /  free"
     for stem, kicker, title in ccnp:

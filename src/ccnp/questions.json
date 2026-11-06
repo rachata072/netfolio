@@ -1277,6 +1277,474 @@
    ],
    "explanation": "With action shutdown, crossing the rising threshold err-disables the port. Without an action, excess traffic of that type is simply dropped until it falls below the falling threshold; action trap adds a log message and SNMP trap.",
    "ref": "segmentation-layer-2-hardening#storm-control"
+  },
+  {
+   "id": "q2.4-001",
+   "obj": "2.4",
+   "type": "single",
+   "stem": "A company runs one FTD at a small branch with no central IT team. Which management option fits best?",
+   "options": [
+    "Firewall Device Manager (FDM)",
+    "Firewall Management Center (FMC) on premises",
+    "Catalyst SD-WAN Manager",
+    "Cisco Security Manager"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "One FTD with no central team is the case FDM is built for: an on-box manager for a single device. A central manager adds cost and complexity without benefit here.",
+   "ref": "management-cis-benchmarks-aaa#single-device-vs-multidevice-managers"
+  },
+  {
+   "id": "q2.4-002",
+   "obj": "2.4",
+   "type": "single",
+   "stem": "An organization has ASAs, FTDs and Meraki MX appliances across 120 sites, and administrators work remotely. They want one place to manage security policy. Which solution fits best?",
+   "options": [
+    "ASDM on each ASA",
+    "FDM on each FTD",
+    "Security Cloud Control",
+    "Catalyst SD-WAN Manager"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "Security Cloud Control is cloud-based and manages ASA, FTD (through cloud-delivered FMC) and Meraki MX from one interface, reachable from anywhere. The other options manage one device or one platform.",
+   "ref": "management-cis-benchmarks-aaa#security-cloud-control-scc"
+  },
+  {
+   "id": "q2.4-003",
+   "obj": "2.4",
+   "type": "single",
+   "stem": "Which product is Security Cloud Control the evolution of?",
+   "options": [
+    "Cisco Security Manager",
+    "Cisco Defense Orchestrator",
+    "Firewall Device Manager",
+    "Cisco Prime Infrastructure"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Security Cloud Control evolved from Cisco Defense Orchestrator (CDO), and Cisco documentation and licensing still use the CDO name in places.",
+   "ref": "management-cis-benchmarks-aaa#security-cloud-control-scc"
+  },
+  {
+   "id": "q2.4-004",
+   "obj": "2.4",
+   "type": "single",
+   "stem": "A security team must still be able to reach its firewalls while a DDoS attack saturates the production network. Which design meets this requirement?",
+   "options": [
+    "In-band management over the data interfaces",
+    "Out-of-band management on a separate management network",
+    "Cloud management only",
+    "Local management with FDM"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "In-band management shares the production network, so it fails with it. An out-of-band path is separate, so it stays available during the outage.",
+   "ref": "management-cis-benchmarks-aaa#in-band-vs-out-of-band-management"
+  },
+  {
+   "id": "q2.4-005",
+   "obj": "2.4",
+   "type": "multi",
+   "stem": "Which two statements about on-premises management with FMC compared with cloud management through Security Cloud Control are true?",
+   "options": [
+    "On-premises management keeps management data on the organization's network",
+    "Cloud management requires the organization to patch and upgrade the management platform",
+    "On-premises management can be reached from anywhere without a VPN by design",
+    "Cloud management depends on internet connectivity",
+    "On-premises management removes all maintenance work"
+   ],
+   "answer": [
+    0,
+    3
+   ],
+   "explanation": "On-premises keeps data local but leaves maintenance to you. Cloud management is maintained by Cisco and reachable from anywhere, but it depends on internet access.",
+   "ref": "management-cis-benchmarks-aaa#on-premises-vs-cloud-management"
+  },
+  {
+   "id": "q2.4-006",
+   "obj": "2.4",
+   "type": "single",
+   "stem": "An ASA in a data center can't be reached directly from Security Cloud Control. What lets SCC manage it?",
+   "options": [
+    "A Secure Device Connector on the local network",
+    "Converting the ASA to FTD",
+    "Enabling ASDM on the outside interface",
+    "Registering the ASA to an on-premises FMC"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "A Secure Device Connector is a small VM on the customer network that relays between Security Cloud Control and devices the cloud can't reach directly. Exposing ASDM on the outside interface would weaken security.",
+   "ref": "management-cis-benchmarks-aaa#security-cloud-control-scc"
+  },
+  {
+   "id": "q2.4-007",
+   "obj": "2.4",
+   "type": "single",
+   "stem": "An administrator changes an ASA rule directly with the CLI, bypassing Security Cloud Control. Which SCC capability highlights this?",
+   "options": [
+    "Write once, apply everywhere",
+    "Out-of-band change detection",
+    "Security Analytics and Logging",
+    "ASA-to-FTD migration tooling"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Out-of-band change detection flags changes made directly on the device so they can be accepted or rejected, which is how SCC catches configuration drift.",
+   "ref": "management-cis-benchmarks-aaa#security-cloud-control-scc"
+  },
+  {
+   "id": "q2.4-008",
+   "obj": "2.4",
+   "type": "single",
+   "stem": "Which statement about managing an FTD is true?",
+   "options": [
+    "An FTD can be managed by FDM and FMC at the same time",
+    "FDM manages many FTDs from one console",
+    "An FTD is managed by either FDM or FMC, and FMC manages many devices",
+    "ASDM is the multidevice manager for FTD"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "FDM is on-box management for a single FTD; FMC (on-prem or cloud-delivered) manages many. A device uses one or the other. ASDM is for ASA.",
+   "ref": "management-cis-benchmarks-aaa#the-managers-you-need-to-recognize"
+  },
+  {
+   "id": "q2.5-001",
+   "obj": "2.5",
+   "type": "single",
+   "stem": "What is a CIS Benchmark?",
+   "options": [
+    "A vendor-specific performance test for firewalls",
+    "A consensus-based set of secure configuration recommendations for a specific technology",
+    "An organization-wide list of prioritized security safeguards",
+    "A vulnerability scanner published by the Center for Internet Security"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A CIS Benchmark is a consensus-based configuration guide for one product. The organization-wide list of safeguards is the CIS Controls.",
+   "ref": "management-cis-benchmarks-aaa#what-a-cis-benchmark-is"
+  },
+  {
+   "id": "q2.5-002",
+   "obj": "2.5",
+   "type": "single",
+   "stem": "A CIS Benchmark recommendation is marked Level 2. What does that indicate?",
+   "options": [
+    "It must be checked manually",
+    "It provides defense in depth and may reduce functionality or performance",
+    "It applies only to cloud platforms",
+    "It is optional and has no security benefit"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Level 2 extends Level 1 for environments where security is paramount, and it may affect functionality or performance. Manual vs. automated is a separate attribute.",
+   "ref": "management-cis-benchmarks-aaa#anatomy-of-a-recommendation"
+  },
+  {
+   "id": "q2.5-003",
+   "obj": "2.5",
+   "type": "multi",
+   "stem": "Which two benefits are reasons to adopt CIS Benchmarks?",
+   "options": [
+    "They standardize secure configuration across devices",
+    "They remove the need for patching",
+    "They support compliance with frameworks such as PCI DSS",
+    "They replace the need for a firewall",
+    "They guarantee devices cannot be compromised"
+   ],
+   "answer": [
+    0,
+    2
+   ],
+   "explanation": "Benchmarks reduce attack surface, prevent misconfiguration, standardize configuration and support compliance. They don't replace patching or other controls.",
+   "ref": "management-cis-benchmarks-aaa#why-use-cis-benchmarks"
+  },
+  {
+   "id": "q2.5-004",
+   "obj": "2.5",
+   "type": "single",
+   "stem": "Which part of a CIS Benchmark recommendation tells you how to check whether a device is compliant?",
+   "options": [
+    "Rationale",
+    "Impact",
+    "Audit procedure",
+    "Remediation procedure"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "The audit procedure is the command or check that proves compliance. Remediation is how to fix it; rationale is why; impact is what it might break.",
+   "ref": "management-cis-benchmarks-aaa#anatomy-of-a-recommendation"
+  },
+  {
+   "id": "q2.5-005",
+   "obj": "2.5",
+   "type": "single",
+   "stem": "The CIS Benchmarks for Cisco IOS XE group their recommendations how?",
+   "options": [
+    "By OSI layer",
+    "By management, control and data plane",
+    "By severity only",
+    "By device model"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The Cisco network-device benchmarks follow the three planes: management (AAA, SSH, SNMPv3, NTP, logging), control (routing authentication) and data (uRPF, ACLs).",
+   "ref": "management-cis-benchmarks-aaa#the-cisco-benchmarks-and-how-they-re-organized"
+  },
+  {
+   "id": "q2.5-006",
+   "obj": "2.5",
+   "type": "single",
+   "stem": "A team hardened 80 firewalls to a CIS baseline last year. An audit now finds Telnet enabled on several. What is this called, and what prevents it from going unnoticed?",
+   "options": [
+    "Configuration drift; regular audits and change detection",
+    "Policy shadowing; rule optimization",
+    "Zero-day exposure; patching",
+    "Rule redundancy; object grouping"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "Changes that move a device away from its approved baseline are configuration drift. Regular audits, change logs and out-of-band change detection catch it so it can be remediated.",
+   "ref": "management-cis-benchmarks-aaa#from-benchmark-to-fleet-harden-audit-monitor-drift"
+  },
+  {
+   "id": "q2.5-007",
+   "obj": "2.5",
+   "type": "single",
+   "stem": "Where is most CIS-style management-plane hardening applied on Cisco Secure Firewall Threat Defense?",
+   "options": [
+    "In the FTD expert-mode Linux shell",
+    "In platform settings pushed from the management center",
+    "In the access control policy's default action",
+    "In the intrusion policy"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "FTD management-plane settings such as SSH and HTTPS access, external authentication, syslog, SNMP and NTP live in platform settings deployed from FMC (or FDM / Security Cloud Control).",
+   "ref": "management-cis-benchmarks-aaa#ftd-vs-ios-xe-where-the-hardening-lives"
+  },
+  {
+   "id": "q2.6-001",
+   "obj": "2.6",
+   "type": "multi",
+   "stem": "Which two statements about TACACS+ are true?",
+   "options": [
+    "It uses TCP port 49",
+    "It encrypts only the password",
+    "It separates authentication, authorization and accounting",
+    "It uses UDP ports 1812 and 1813",
+    "It is the preferred protocol for 802.1X network access"
+   ],
+   "answer": [
+    0,
+    2
+   ],
+   "explanation": "TACACS+ runs over TCP 49, encrypts the whole body and separates the three AAA functions, which enables per-command authorization. UDP 1812/1813, password-only hiding and 802.1X describe RADIUS.",
+   "ref": "management-cis-benchmarks-aaa#tacacs-vs-radius",
+   "sample": true
+  },
+  {
+   "id": "q2.6-002",
+   "obj": "2.6",
+   "type": "single",
+   "stem": "An administrator configures aaa authentication login VTY group tacacs+ local. The TACACS+ server is reachable but rejects the user's password. What happens?",
+   "options": [
+    "The router tries the local database",
+    "Authentication fails; the local database is not tried",
+    "The router retries the server until it accepts",
+    "The user is logged in at privilege level 1"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The next method is used only when the current one returns an error, such as no server answering. A reject from a reachable server is final.",
+   "ref": "management-cis-benchmarks-aaa#how-ios-aaa-works-aaa-new-model-and-method-lists"
+  },
+  {
+   "id": "q2.6-003",
+   "obj": "2.6",
+   "type": "single",
+   "stem": "debug tacacs shows Opened TCP/IP handle to the server, followed by received bad AUTHEN packet and Invalid AUTHEN/START/LOGIN/ASCII packet (check keys). What is the cause?",
+   "options": [
+    "The server is unreachable",
+    "The shared key does not match",
+    "The username does not exist",
+    "The method list is not applied"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The TCP connection opened, so the server is reachable. A reply that fails to decrypt points to a shared key mismatch.",
+   "ref": "management-cis-benchmarks-aaa#troubleshooting-aaa-three-layers"
+  },
+  {
+   "id": "q2.6-004",
+   "obj": "2.6",
+   "type": "single",
+   "stem": "test aaa group tacacs+ admin1 Pass legacy succeeds, but VTY logins never appear in debug tacacs and authenticate against the local database. What is the most likely cause?",
+   "options": [
+    "The shared key is wrong",
+    "The TACACS+ server is down",
+    "The method list is not applied to the VTY lines, or its name doesn't match",
+    "TCP port 49 is blocked"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "test aaa talks to the server group directly and ignores line configuration. A working test with a silent debug on real logins means the method list isn't bound to the lines.",
+   "ref": "management-cis-benchmarks-aaa#troubleshooting-aaa-three-layers"
+  },
+  {
+   "id": "q2.6-005",
+   "obj": "2.6",
+   "type": "single",
+   "stem": "A router pings the TACACS+ server successfully, but test aaa reports No authoritative response from any server and debug tacacs shows a connection timeout. What should the engineer check?",
+   "options": [
+    "The shared key on the router",
+    "Whether an ACL or firewall blocks TCP port 49",
+    "The user's password on the server",
+    "Whether aaa new-model is configured"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A connection timeout is a reachability failure. Ping uses ICMP and proves nothing about TCP 49, which a filter may still block.",
+   "ref": "management-cis-benchmarks-aaa#troubleshooting-aaa-three-layers"
+  },
+  {
+   "id": "q2.6-006",
+   "obj": "2.6",
+   "type": "single",
+   "stem": "After aaa new-model and a TACACS+ login list are configured, users log in successfully but cannot enter privileged EXEC mode. What is a valid fix?",
+   "options": [
+    "Add aaa authorization console",
+    "Configure enable secret or aaa authentication enable",
+    "Remove the local keyword from the method list",
+    "Change the server to RADIUS"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Authentication doesn't grant privilege; users land at level 1. An enable secret, enable authentication against the server, or exec authorization returning privilege 15 fixes it.",
+   "ref": "management-cis-benchmarks-aaa#how-ios-aaa-works-aaa-new-model-and-method-lists"
+  },
+  {
+   "id": "q2.6-007",
+   "obj": "2.6",
+   "type": "single",
+   "stem": "Which protocol should be used for per-command authorization of network administrators?",
+   "options": [
+    "RADIUS",
+    "TACACS+",
+    "LDAP",
+    "Kerberos"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "TACACS+ separates authorization from authentication, so the device can ask the server about each command. RADIUS combines authentication and authorization.",
+   "ref": "management-cis-benchmarks-aaa#tacacs-vs-radius"
+  },
+  {
+   "id": "q2.6-008",
+   "obj": "2.6",
+   "type": "single",
+   "stem": "802.1X authentication succeeds in ISE, but the switch never places the endpoint in the VLAN that ISE returns. What is missing on the switch?",
+   "options": [
+    "aaa authorization network",
+    "dot1x pae supplicant",
+    "aaa accounting exec",
+    "ip tacacs source-interface"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "aaa authorization network lets the switch apply authorization attributes from the RADIUS server, such as a VLAN, downloadable ACL or SGT.",
+   "ref": "management-cis-benchmarks-aaa#configuring-radius-for-network-access"
+  },
+  {
+   "id": "q2.6-009",
+   "obj": "2.6",
+   "type": "single",
+   "stem": "ISE changes an endpoint's authorization policy, but the switch keeps the old access until the endpoint reconnects. What should be configured?",
+   "options": [
+    "aaa server radius dynamic-author with ISE as a client",
+    "radius-server deadtime",
+    "aaa accounting dot1x",
+    "authentication open"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "Change of Authorization lets ISE reauthenticate or reassign a live session. On IOS it's enabled with aaa server radius dynamic-author.",
+   "ref": "management-cis-benchmarks-aaa#configuring-radius-for-network-access"
+  },
+  {
+   "id": "q2.6-010",
+   "obj": "2.6",
+   "type": "single",
+   "stem": "A switch's RADIUS shared key was mistyped. What does the switch most likely observe?",
+   "options": [
+    "Access-Reject with a clear key-mismatch message",
+    "Timeouts or replies it discards, while the server log shows the real reason",
+    "An immediate TCP reset",
+    "No effect, because RADIUS keys are optional"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "RADIUS is connectionless and validated with the shared secret, so a key mismatch usually looks like timeouts from the device. The server's log, such as ISE Live Logs, identifies the real cause.",
+   "ref": "management-cis-benchmarks-aaa#troubleshooting-aaa-three-layers"
+  },
+  {
+   "id": "q2.6-011",
+   "obj": "2.6",
+   "type": "single",
+   "stem": "A TACACS+ server was fixed after an outage, but logins still go straight to the local fallback for several minutes. What explains this?",
+   "options": [
+    "The server is marked dead and skipped for the dead-time",
+    "The shared key changed",
+    "aaa new-model was removed",
+    "The method list name is misspelled"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "After repeated failures IOS marks a server dead and skips it for the dead-time window. show aaa servers shows the state.",
+   "ref": "management-cis-benchmarks-aaa#troubleshooting-aaa-three-layers"
+  },
+  {
+   "id": "q2.6-012",
+   "obj": "2.6",
+   "type": "multi",
+   "stem": "Which two RADIUS characteristics are true?",
+   "options": [
+    "It encrypts the entire packet body",
+    "It uses UDP 1812 for authentication",
+    "It combines authentication and authorization",
+    "It uses TCP port 49",
+    "It supports per-command authorization"
+   ],
+   "answer": [
+    1,
+    2
+   ],
+   "explanation": "RADIUS uses UDP 1812 (and 1813 for accounting), hides only the password, and returns authentication and authorization together in one Access-Accept.",
+   "ref": "management-cis-benchmarks-aaa#tacacs-vs-radius"
   }
  ]
 }

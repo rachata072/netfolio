@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free TACACS+ Lab: Configure and Troubleshoot AAA on Cisco IOS (SCOR 2.6)</title>
+<meta name="description" content="Free CCNP Security lab: configure TACACS+ with a local fallback on Cisco IOS, then troubleshoot a wrong key, wrong password and wrong server IP with debug tacacs.">
+<link rel="canonical" href="https://breakfixlearn.com/ccnp-security/labs/aaa-tacacs-configure-troubleshoot">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=629a8f9e5c">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="AAA with TACACS+ Lab: Configure and Troubleshoot">
+<meta property="og:description" content="Build TACACS+ authentication on a real IOS router one verified step at a time, prove a server-only user can log in, then break it three ways and read each fault straight from debug tacacs.">
+<meta property="og:url" content="https://breakfixlearn.com/ccnp-security/labs/aaa-tacacs-configure-troubleshoot">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/ccnp-lab-aaa-tacacs-configure-troubleshoot.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AAA with TACACS+ Lab: Configure and Troubleshoot: free CCNP Security lab">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"AAA with TACACS+ Lab: Configure and Troubleshoot","description":"Free CCNP Security lab: configure TACACS+ with a local fallback on Cisco IOS, then troubleshoot a wrong key, wrong password and wrong server IP with debug tacacs.","url":"https://breakfixlearn.com/ccnp-security/labs/aaa-tacacs-configure-troubleshoot","learningResourceType":"Lab exercise","educationalLevel":"Professional","inLanguage":"en","isAccessibleForFree":true,"datePublished":"2026-11-05","dateModified":"2026-11-05","teaches":["Troubleshoot AAA for device and network access such as TACACS+ and RADIUS"],"author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"encoding":[]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"CCNP Security","item":"https://breakfixlearn.com/ccnp-security"},{"@type":"ListItem","position":3,"name":"AAA with TACACS+ Lab: Configure and Troubleshoot"}]}</script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article class="lecture lab">
+  <header class="post-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/ccnp-security">ccnp-security</a><span aria-hidden="true">/</span><a href="/ccnp-security/labs">labs</a><span aria-hidden="true">/</span><span>aaa-tacacs-configure-troubleshoot</span></nav>
+      <p class="scard-meta"><span class="sid">Real IOS lab</span><span>Domain 2 Network Security &middot; topics 2.6</span></p>
+      <h1 class="mt-2">AAA with TACACS+ Lab: Configure and Troubleshoot</h1>
+      <p class="post-dek">Build TACACS+ authentication on a real IOS router one verified step at a time, prove a server-only user can log in, then break it three ways and read each fault straight from debug tacacs.</p>
+      <div class="post-meta"><time datetime="2026-11-05">updated Nov 5, 2026</time><span class="sep">/</span><span>45 to 60 min</span><span class="sep">/</span><span>Real IOS + TACACS+ server</span><span class="sep">/</span><span>by Trey</span></div>
+    </div>
+  </header>
+  <div class="wrap post-layout">
+    <div class="post-main">
+      <section class="labdl labenv" aria-labelledby="dl-h">
+        <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">show</span> <span class="a">aaa-tacacs-configure-troubleshoot environment</span></span>
+        <h2 id="dl-h" class="sub-h">Where to run this lab</h2>
+        <ul class="env-list"><li><b>Cisco Modeling Labs</b> <span>IOSv or IOL router plus an Ubuntu node running a TACACS+ daemon, or an ISE node. Recommended.</span></li><li><b>DevNet / dCloud</b> <span>Hosted labs and demos with IOS XE and ISE already built.</span></li><li><b>Your own gear</b> <span>Any IOS or IOS XE router and a Linux VM running a TACACS+ server.</span></li><li><b>Packet Tracer</b> <span>Basic AAA only. No debug tacacs, so the troubleshooting half doesn&#x27;t work.</span></li></ul>
+        <p class="side-note">Read the <a href="/ccnp-security/management-cis-benchmarks-aaa">Management Options, CIS Benchmarks &amp; AAA</a> notes first. Topics: <span class="chip obj d2" title="Troubleshoot AAA for device and network access such as TACACS+ and RADIUS">2.6</span></p>
+      </section>
+<details class="toc-mobile"><summary>show ip route | toc (13 sections)</summary><ol><li><a href="#what-you-ll-build">What you&#x27;ll build</a></li><li><a href="#where-to-run-this-lab">Where to run this lab</a></li><li><a href="#topology-and-accounts">Topology and accounts</a></li><li><a href="#part-1-baseline-prove-aaa-is-off">Part 1: baseline (prove AAA is off)</a></li><li><a href="#part-2-build-it-verifying-every-step">Part 2: build it, verifying every step</a></li><li><a href="#part-3-prove-remote-login-uses-tacacs">Part 3: prove remote login uses TACACS+</a></li><li><a href="#part-4-break-it-three-ways-then-fix-it">Part 4: break it three ways, then fix it</a></li><li><a href="#part-5-more-breaks-to-try">Part 5: more breaks to try</a></li><li><a href="#part-6-stretch-authorization-and-accounting">Part 6 (stretch): authorization and accounting</a></li><li><a href="#harden-it-for-production">Harden it for production</a></li><li><a href="#check-yourself">Check yourself</a></li><li><a href="#answer-config">Answer config</a></li><li><a href="#exam-mapping">Exam mapping</a></li></ol></details>
+<div class="prose">
+<h2 id="what-you-ll-build">What you&#x27;ll build</h2>
+<p>A router that authenticates administrators against a TACACS+ server, with a local account as the safety net. You&#x27;ll build it one step at a time with a <strong>verify command after every step</strong>, prove a server-only user can log in, then break it three ways and read each fault straight from <code translate="no">debug tacacs</code>.</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Item</th><th scope="col">Detail</th></tr></thead><tbody><tr><td><strong>Platform</strong></td><td>A real IOS or IOS XE router and a TACACS+ server (see where to run it, below)</td></tr><tr><td><strong>Time</strong></td><td>45 to 60 minutes</td></tr><tr><td><strong>Level</strong></td><td>CCNP Security. You should be comfortable with the IOS CLI and basic routing</td></tr><tr><td><strong>You&#x27;ll practice</strong></td><td><code translate="no">aaa new-model</code>, TACACS+ server definitions, method lists with a local fallback, <code translate="no">test aaa</code>, <code translate="no">show tacacs</code>, <code translate="no">debug tacacs</code>, and reading three different failures</td></tr><tr><td><strong>Exam topic</strong></td><td>2.6 (core); supports 2.5 (CIS Benchmarks)</td></tr><tr><td><strong>Before this</strong></td><td><a href="/ccnp-security/management-cis-benchmarks-aaa">Management Options, CIS Benchmarks &amp; AAA notes</a>, especially <a href="/ccnp-security/management-cis-benchmarks-aaa#aaa-for-device-and-network-access">AAA for device and network access</a></td></tr></tbody></table></div>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Part</th><th scope="col">What you do</th><th scope="col">What it proves</th></tr></thead><tbody><tr><td>1 Baseline</td><td>Check that AAA is off</td><td>You know the starting state</td></tr><tr><td>2 Build</td><td>Local account, AAA on, server, <code translate="no">test aaa</code>, method list, <code translate="no">enable secret</code></td><td>Each step works before you rely on it</td></tr><tr><td>3 Prove</td><td>Log in as a user that exists <strong>only</strong> on the server</td><td>TACACS+ is really doing the authentication</td></tr><tr><td>4 Break and fix</td><td>Wrong key, wrong password, wrong server IP</td><td>You can name the failing layer from the debug</td></tr><tr><td>5 More breaks</td><td>Unapplied list, dead server, no fallback, and more</td><td>The faults that catch people in production</td></tr><tr><td>6 Stretch</td><td>Authorization and accounting</td><td>AAA beyond &quot;can you log in&quot;</td></tr></tbody></table></div>
+<h3 id="the-one-card-to-memorize">The one card to memorize</h3>
+<p>AAA login fails at exactly three layers, and each has its own signature in <code translate="no">debug tacacs</code>:</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Layer</th><th scope="col">Question</th><th scope="col"><code translate="no">debug tacacs</code> says</th></tr></thead><tbody><tr><td><strong>1. Reachability</strong></td><td>Can the router reach the server on TCP 49?</td><td><code translate="no">No authoritative response from any server</code> after a connection timeout</td></tr><tr><td><strong>2. Device trust</strong></td><td>Do the shared keys match?</td><td><code translate="no">Invalid AUTHEN/START ... (check keys)</code> after the connection <strong>opened</strong></td></tr><tr><td><strong>3. User</strong></td><td>Are the username and password valid?</td><td><code translate="no">status = FAIL</code>, <code translate="no">rejected by server</code></td></tr></tbody></table></div>
+<h3 id="think-like-the-defender-first">Think like the defender first</h3>
+<p>Before you type, answer three questions about the router&#x27;s management plane:</p>
+<ul><li><strong>What happens if the TACACS+ server is unreachable?</strong> If the answer is &quot;nobody can log in&quot;, you&#x27;ve built a denial of service into your own network. That&#x27;s why every method list here ends with <code translate="no">local</code>.</li><li><strong>What happens if someone types the wrong password?</strong> It should fail, and a reachable server&#x27;s &quot;no&quot; must be final. If a reject fell through to the local database, an attacker could keep guessing against your weakest password store.</li><li><strong>How will you know it works before you depend on it?</strong> You test the server with <code translate="no">test aaa</code> <strong>before</strong> you point the login lines at it, and you keep your console session open the whole time.</li></ul>
+<h2 id="where-to-run-this-lab">Where to run this lab</h2>
+<p>This lab needs <strong>real IOS behavior</strong>: an actual TACACS+ exchange, real rejects, and <code translate="no">debug tacacs</code> output. Packet Tracer can configure basic AAA with its AAA server device, but it has no <code translate="no">debug tacacs</code>, so the troubleshooting half of the lab doesn&#x27;t work there.</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Environment</th><th scope="col">How to set it up</th></tr></thead><tbody><tr><td><strong>Cisco Modeling Labs (CML)</strong></td><td>An IOSv or IOL router plus an Ubuntu node running a TACACS+ daemon, or an ISE node. Recommended: it&#x27;s the closest to the exam</td></tr><tr><td><strong>Cisco DevNet Sandbox / dCloud</strong></td><td>Hosted labs and demos; look for a topology with IOS XE and ISE already built</td></tr><tr><td><strong>Your own gear</strong></td><td>Any IOS or IOS XE router and a Linux VM running a TACACS+ server, reachable over IP</td></tr></tbody></table></div>
+<p><strong>If you build your own server</strong>, the classic open-source <code translate="no">tac_plus</code> daemon needs only a few lines. This matches the lab&#x27;s accounts (classic <code translate="no">tac_plus</code> syntax; <code translate="no">tac_plus-ng</code> uses a different format):</p>
+<pre translate="no"><code translate="no">key = &quot;Cisco!23&quot;
+
+user = user1 {
+    login = cleartext &quot;Cisco!23&quot;
+    service = exec {
+        priv-lvl = 1
+    }
+}
+
+user = admin1 {
+    login = cleartext &quot;Cisco!23&quot;
+    service = exec {
+        priv-lvl = 15
+    }
+}</code></pre>
+<p>Then add the router as a client. With <code translate="no">tac_plus</code> the shared <code translate="no">key</code> above covers every client; on ISE, add the router under <strong>Network Devices</strong> with its IP and the same shared secret, and enable the <strong>Device Administration</strong> service.</p>
+<blockquote><p><strong>Lab values only.</strong> <code translate="no">Cisco!23</code>, the IPs and the cleartext Telnet login in this lab come from a training sandbox. Never reuse them on real equipment. The production version of this configuration is at the end of the lab.</p></blockquote>
+<h2 id="topology-and-accounts">Topology and accounts</h2>
+<pre translate="no"><code translate="no">                         TCP 49 (TACACS+, body encrypted with the shared key)
+   +--------------+  --------------------------------------&gt;  +--------------------+
+   |  Router R8   |                                            |  TACACS+ server    |
+   |              |        shared key: Cisco!23                |  192.168.1.100     |
+   |  Loopback0   |                                            |                    |
+   |  8.8.8.8     |                                            |  admin1 (also      |
+   |              |                                            |   local on R8)     |
+   |  VTY 0-15 &lt;--+-- telnet 8.8.8.8 from R8 itself            |  user1 (server     |
+   |  Console 0   |                                            |   only)            |
+   +--------------+                                            +--------------------+</code></pre>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Item</th><th scope="col">Value</th></tr></thead><tbody><tr><td>Router</td><td>R8 (real IOS)</td></tr><tr><td>TACACS+ server</td><td>192.168.1.100, <strong>TCP 49</strong></td></tr><tr><td>Shared key</td><td><code translate="no">Cisco!23</code>, identical on router and server</td></tr><tr><td>Loopback0 on R8</td><td>8.8.8.8. Not the internet: R8&#x27;s own loopback, so <code translate="no">telnet 8.8.8.8</code> from R8 tests its own VTY lines</td></tr><tr><td>Local account</td><td><code translate="no">admin1</code> / <code translate="no">Cisco!23</code>, privilege 15</td></tr><tr><td>Server accounts</td><td><code translate="no">admin1</code> and <strong><code translate="no">user1</code></strong>, both <code translate="no">Cisco!23</code></td></tr><tr><td>Method list</td><td><code translate="no">TAC-Login</code>: <code translate="no">group tacacs+</code> then <code translate="no">local</code>, applied to <code translate="no">line vty 0 15</code></td></tr></tbody></table></div>
+<p><strong>Why two accounts?</strong> <code translate="no">admin1</code> exists on the server <strong>and</strong> locally, so a successful <code translate="no">admin1</code> login can&#x27;t prove which one answered. <strong><code translate="no">user1</code> exists only on the server.</strong> If <code translate="no">user1</code> logs in, TACACS+ did the work. That&#x27;s the whole proof.</p>
+<p><strong>Why <code translate="no">telnet 8.8.8.8</code>?</strong> It&#x27;s a quick way to open a VTY session on the same router from the console, without a second device. In production you&#x27;d use SSH from an admin workstation; the hardening section shows how.</p>
+<h2 id="part-1-baseline-prove-aaa-is-off">Part 1: baseline (prove AAA is off)</h2>
+<p>Capture the &quot;before&quot; state. It&#x27;s what makes the &quot;after&quot; convincing.</p>
+<pre translate="no"><code translate="no">show run | include aaa
+show run | include username
+show privilege</code></pre>
+<figure class="post-figure fit"><a href="/assets/img/ccnp/labs/aaa-tacacs/s01-baseline.webp" aria-label="Open full-size image: R8 baseline: show run include aaa returns no aaa new-model, show run include username returns nothing, and show privilege reports level 15"><img src="/assets/img/ccnp/labs/aaa-tacacs/s01-baseline.webp" width="440" height="105" alt="R8 baseline: show run include aaa returns no aaa new-model, show run include username returns nothing, and show privilege reports level 15" loading="lazy" decoding="async"></a><figcaption>R8 baseline: show run include aaa returns no aaa new-model, show run include username returns nothing, and show privilege reports level 15. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong><code translate="no">no aaa new-model</code></strong>: AAA is off. Some images print nothing here instead; both mean the same thing.</li><li><strong>No <code translate="no">username</code> lines</strong>: there&#x27;s no local account yet. If you turned on AAA right now, you could lock yourself out.</li><li><strong><code translate="no">Current privilege level is 15</code></strong>: you&#x27;re on the console at full privilege. <strong>Keep this console session open for the entire lab.</strong> It&#x27;s your way back in if a later step goes wrong.</li></ul>
+<h2 id="part-2-build-it-verifying-every-step">Part 2: build it, verifying every step</h2>
+<h3 id="step-1-local-lifeboat-account-then-aaa-on">Step 1: local lifeboat account, then AAA on</h3>
+<p><code translate="no">aaa new-model</code> makes AAA authoritative for <strong>every</strong> login path the moment you press Enter. Create the local fallback account <strong>first</strong>.</p>
+<pre translate="no"><code translate="no">configure terminal
+ username admin1 privilege 15 secret Cisco!23
+ aaa new-model
+end
+show run | include aaa new-model
+show run | include username</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-tacacs/s02-aaa-new-model.webp" aria-label="Open full-size image: R8 creating local user admin1 with privilege 15, enabling aaa new-model, and verifying both: the username line shows secret 5 with an MD5 hash"><img src="/assets/img/ccnp/labs/aaa-tacacs/s02-aaa-new-model.webp" srcset="/assets/img/ccnp/labs/aaa-tacacs/s02-aaa-new-model-800.webp 800w, /assets/img/ccnp/labs/aaa-tacacs/s02-aaa-new-model.webp 1051w" sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem" width="1051" height="233" alt="R8 creating local user admin1 with privilege 15, enabling aaa new-model, and verifying both: the username line shows secret 5 with an MD5 hash" loading="lazy" decoding="async"></a><figcaption>R8 creating local user admin1 with privilege 15, enabling aaa new-model, and verifying both: the username line shows secret 5 with an MD5 hash. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong><code translate="no">aaa new-model</code></strong> is now in the running config.</li><li><strong><code translate="no">username admin1 privilege 15 secret 5 $1$...</code></strong>: the password is stored as a hash, not in cleartext. <strong>Type 5 is MD5</strong>, which is old. On modern IOS XE, CIS Benchmarks expect a stronger hash: <code translate="no">username admin1 privilege 15 algorithm-type scrypt secret &lt;password&gt;</code> stores it as <strong>type 9</strong>.</li><li><code translate="no">%SYS-5-CONFIG_I: Configured from console by admin1</code>: every configuration change is logged with who made it. That log line is what drift detection and accounting build on.</li></ul>
+<h3 id="step-2-define-the-tacacs-server">Step 2: define the TACACS+ server</h3>
+<pre translate="no"><code translate="no">configure terminal
+ tacacs server Our-TACACS
+  address ipv4 192.168.1.100
+  key Cisco!23
+end
+show run | section tacacs server
+show tacacs
+show aaa servers</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-tacacs/s03-tacacs-server.webp" aria-label="Open full-size image: R8 defining tacacs server Our-TACACS at 192.168.1.100 with key Cisco!23; show tacacs lists the server on port 49 with every counter at zero, and show aaa servers prints nothing"><img src="/assets/img/ccnp/labs/aaa-tacacs/s03-tacacs-server.webp" width="880" height="712" alt="R8 defining tacacs server Our-TACACS at 192.168.1.100 with key Cisco!23; show tacacs lists the server on port 49 with every counter at zero, and show aaa servers prints nothing" loading="lazy" decoding="async"></a><figcaption>R8 defining tacacs server Our-TACACS at 192.168.1.100 with key Cisco!23; show tacacs lists the server on port 49 with every counter at zero, and show aaa servers prints nothing. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong><code translate="no">Our-TACACS</code></strong> is only a local name for the server. The address and port (<strong>49</strong>) are what matter.</li><li><strong><code translate="no">key Cisco!23</code> shows in cleartext</strong> in the running config. Anyone who sees a config backup sees the key. CIS Benchmarks call for encrypting stored secrets: <code translate="no">service password-encryption</code> (weak type 7), or on IOS XE, <code translate="no">key config-key password-encrypt</code> plus <code translate="no">password encryption aes</code>, which stores the key as type 6.</li><li><strong><code translate="no">show tacacs</code> counters are all 0</strong>: the router hasn&#x27;t talked to the server yet. Remember these zeros; Step 3 makes them move.</li><li><strong><code translate="no">show aaa servers</code> printed nothing.</strong> That&#x27;s not a fault. On classic IOS and IOSv it barely reports TACACS+ servers. <strong><code translate="no">show tacacs</code></strong> is the reliable counter view on this router. (<code translate="no">show aaa servers</code> fills in after a test using the <code translate="no">new-code</code> path, and it&#x27;s the main view on IOS XE.)</li></ul>
+<h3 id="step-3-prove-the-server-answers-before-you-rely-on-it">Step 3: prove the server answers before you rely on it</h3>
+<p>This is the habit the exam rewards: <strong>never point login lines at a server you haven&#x27;t tested.</strong> First reachability:</p>
+<pre translate="no"><code translate="no">ping 192.168.1.100</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-tacacs/s04-ping.webp" aria-label="Open full-size image: R8 pinging 192.168.1.100 with 100 percent success after show aaa servers returns nothing"><img src="/assets/img/ccnp/labs/aaa-tacacs/s04-ping.webp" srcset="/assets/img/ccnp/labs/aaa-tacacs/s04-ping-800.webp 800w, /assets/img/ccnp/labs/aaa-tacacs/s04-ping.webp 1032w" sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem" width="1032" height="158" alt="R8 pinging 192.168.1.100 with 100 percent success after show aaa servers returns nothing" loading="lazy" decoding="async"></a><figcaption>R8 pinging 192.168.1.100 with 100 percent success after show aaa servers returns nothing. Select the image to open it full size.</figcaption></figure>
+<p><code translate="no">Success rate is 100 percent</code>: IP reachability works. But <strong>ping uses ICMP, not TCP 49.</strong> A firewall can allow one and block the other, so a good ping doesn&#x27;t prove TACACS+ reachability. The next command does.</p>
+<pre translate="no"><code translate="no">test aaa group tacacs+ admin1 Cisco!23 legacy
+test aaa group tacacs+ user1 Cisco!23 legacy</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-tacacs/s05-test-aaa.webp" aria-label="Open full-size image: R8 test aaa group tacacs+ for admin1 and user1: both report User was successfully authenticated"><img src="/assets/img/ccnp/labs/aaa-tacacs/s05-test-aaa.webp" srcset="/assets/img/ccnp/labs/aaa-tacacs/s05-test-aaa-800.webp 800w, /assets/img/ccnp/labs/aaa-tacacs/s05-test-aaa.webp 1041w" sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem" width="1041" height="218" alt="R8 test aaa group tacacs+ for admin1 and user1: both report User was successfully authenticated" loading="lazy" decoding="async"></a><figcaption>R8 test aaa group tacacs+ for admin1 and user1: both report User was successfully authenticated. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong><code translate="no">User was successfully authenticated</code></strong> for both users.</li><li><strong><code translate="no">user1</code> succeeding is the proof</strong>: it has no local account, so only the server could have said yes.</li><li><code translate="no">test aaa</code> authenticates <strong>without changing your login configuration</strong>. It&#x27;s a safe dry run you can repeat as often as you like.</li><li><strong><code translate="no">legacy</code></strong> uses the older, most compatible test path. <strong><code translate="no">new-code</code></strong> runs through the full server-group machinery (and updates <code translate="no">show aaa servers</code>). If your release doesn&#x27;t accept <code translate="no">legacy</code>, use <code translate="no">new-code</code>.</li></ul>
+<pre translate="no"><code translate="no">show tacacs</code></pre>
+<figure class="post-figure fit"><a href="/assets/img/ccnp/labs/aaa-tacacs/s06-show-tacacs-after-test.webp" aria-label="Open full-size image: show tacacs after the two tests: socket opens 2, socket closes 2, total packets sent 4 and received 4, no failures"><img src="/assets/img/ccnp/labs/aaa-tacacs/s06-show-tacacs-after-test.webp" width="690" height="377" alt="show tacacs after the two tests: socket opens 2, socket closes 2, total packets sent 4 and received 4, no failures" loading="lazy" decoding="async"></a><figcaption>show tacacs after the two tests: socket opens 2, socket closes 2, total packets sent 4 and received 4, no failures. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> <strong>Socket opens 2, Socket closes 2</strong>: each test opened one TCP session to port 49 and closed it cleanly. <strong>Packets sent 4, received 4</strong>: two exchanges per login (the start and the password). Compared with the zeros in Step 2, this is hard evidence that R8 talked to the server.</p>
+<h3 id="step-4-point-the-vty-lines-at-tacacs-with-a-fallback">Step 4: point the VTY lines at TACACS+, with a fallback</h3>
+<pre translate="no"><code translate="no">configure terminal
+ aaa authentication login TAC-Login group tacacs+ local
+ line vty 0 15
+  login authentication TAC-Login
+end
+show run | section line vty
+show run | section aaa</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-tacacs/s07-method-list.webp" aria-label="Open full-size image: R8 creating method list TAC-Login with group tacacs+ then local and applying it to line vty 0 15; show run section line vty shows login authentication TAC-Login on vty 0 4 and 5 15, and show run section aaa lists the method list"><img src="/assets/img/ccnp/labs/aaa-tacacs/s07-method-list.webp" width="920" height="602" alt="R8 creating method list TAC-Login with group tacacs+ then local and applying it to line vty 0 15; show run section line vty shows login authentication TAC-Login on vty 0 4 and 5 15, and show run section aaa lists the method list" loading="lazy" decoding="async"></a><figcaption>R8 creating method list TAC-Login with group tacacs+ then local and applying it to line vty 0 15; show run section line vty shows login authentication TAC-Login on vty 0 4 and 5 15, and show run section aaa lists the method list. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the method list left to right:</strong> try the TACACS+ servers first; <strong>if none answers</strong>, use the local database.</p>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong><code translate="no">login authentication TAC-Login</code></strong> appears under <strong>both</strong> <code translate="no">line vty 0 4</code> and <code translate="no">line vty 5 15</code>. IOS splits the range, but one command covered all 16 lines.</li><li><strong><code translate="no">aaa authentication login TAC-Login group tacacs+ local</code></strong> is in the AAA section. The name on the line and the name of the list match exactly; a one-letter difference would silently break it.</li><li><strong><code translate="no">transport input all</code></strong> and <strong><code translate="no">exec-timeout 60 0</code></strong> are lab defaults a CIS audit would flag: production needs <code translate="no">transport input ssh</code> and an idle timeout of 10 minutes or less.</li><li><strong><code translate="no">aaa session-id common</code></strong> is a default that appears with AAA; leave it.</li></ul>
+<p><strong>Two traps live in this one line:</strong></p>
+<ol><li><strong>No <code translate="no">local</code> = lockout.</strong> With only <code translate="no">group tacacs+</code>, a dead server means nobody logs in.</li><li><strong><code translate="no">local</code> is used only when no server answers, never after a reject.</strong> A wrong password from a reachable server is final.</li></ol>
+<h3 id="step-5-set-enable-secret">Step 5: set enable secret</h3>
+<p>TACACS+ authenticated the login, but <strong>privileged EXEC is a separate check.</strong> A TACACS+ user lands at privilege 1, and <code translate="no">enable</code> needs its own password. Without one, <code translate="no">enable</code> fails.</p>
+<pre translate="no"><code translate="no">configure terminal
+ enable secret Cisco!23
+end</code></pre>
+<p>This is the simplest fix and what the lab uses. The better production options are to authenticate <code translate="no">enable</code> against the server (<code translate="no">aaa authentication enable default group tacacs+ enable</code>) or to have the server hand out privilege 15 at login (<code translate="no">aaa authorization exec</code>, Part 6).</p>
+<h2 id="part-3-prove-remote-login-uses-tacacs">Part 3: prove remote login uses TACACS+</h2>
+<p>From the console:</p>
+<pre translate="no"><code translate="no">telnet 8.8.8.8
+  Username: user1
+  Password: Cisco!23
+enable
+  Password: Cisco!23
+show users
+show run | include username</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-tacacs/s08-show-users.webp" aria-label="Open full-size image: show users: line con 0 owned by admin1 and vty 0 owned by user1 from location 8.8.8.8"><img src="/assets/img/ccnp/labs/aaa-tacacs/s08-show-users.webp" srcset="/assets/img/ccnp/labs/aaa-tacacs/s08-show-users-800.webp 800w, /assets/img/ccnp/labs/aaa-tacacs/s08-show-users.webp 1032w" sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem" width="1032" height="222" alt="show users: line con 0 owned by admin1 and vty 0 owned by user1 from location 8.8.8.8" loading="lazy" decoding="async"></a><figcaption>show users: line con 0 owned by admin1 and vty 0 owned by user1 from location 8.8.8.8. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong><code translate="no">con 0</code> belongs to <code translate="no">admin1</code></strong>: your safety session on the console.</li><li><strong><code translate="no">vty 0</code> belongs to <code translate="no">user1</code></strong>, connected from 8.8.8.8. A user with <strong>no local account</strong> just logged in to a VTY line. Only the TACACS+ server could have authenticated it.</li><li><code translate="no">show run | include username</code> still lists only <code translate="no">admin1</code>, confirming <code translate="no">user1</code> is purely a server identity.</li></ul>
+<p>Type <code translate="no">exit</code> to leave the VTY session and return to the console.</p>
+<h2 id="part-4-break-it-three-ways-then-fix-it">Part 4: break it three ways, then fix it</h2>
+<p>Every break uses the same loop: <strong>turn on the debug, run the test, read the one key line, fix, test again.</strong></p>
+<pre translate="no"><code translate="no">debug tacacs
+test aaa group tacacs+ user1 Cisco!23 legacy
+...
+undebug all</code></pre>
+<h3 id="break-1-wrong-shared-key-device-trust">Break 1: wrong shared key (device trust)</h3>
+<pre translate="no"><code translate="no">configure terminal
+ tacacs server Our-TACACS
+  key Cisco
+end
+debug tacacs
+test aaa group tacacs+ user1 Cisco!23 legacy</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-tacacs/s09-bad-key.webp" aria-label="Open full-size image: Wrong key: test aaa prints No authoritative response from any server, while debug tacacs shows the TCP connection to 192.168.1.100 port 49 opened, then received bad AUTHEN packet and Invalid AUTHEN/START/LOGIN/ASCII packet (check keys)"><img src="/assets/img/ccnp/labs/aaa-tacacs/s09-bad-key.webp" width="940" height="580" alt="Wrong key: test aaa prints No authoritative response from any server, while debug tacacs shows the TCP connection to 192.168.1.100 port 49 opened, then received bad AUTHEN packet and Invalid AUTHEN/START/LOGIN/ASCII packet (check keys)" loading="lazy" decoding="async"></a><figcaption>Wrong key: test aaa prints No authoritative response from any server, while debug tacacs shows the TCP connection to 192.168.1.100 port 49 opened, then received bad AUTHEN packet and Invalid AUTHEN/START/LOGIN/ASCII packet (check keys). Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output, line by line:</strong></p>
+<ol><li><code translate="no">Opening TCP/IP to 192.168.1.100/49</code> then <strong><code translate="no">Opened TCP/IP handle</code></strong>: the TCP connection <strong>succeeded</strong>. Reachability is fine.</li><li><code translate="no">AUTHEN/START/LOGIN/ASCII queued</code> and <code translate="no">processed</code>: the router sent its request, encrypted with the wrong key.</li><li><strong><code translate="no">received bad AUTHEN packet: type = 0, expected 1</code></strong>: the reply decrypted to garbage.</li><li><strong><code translate="no">Invalid AUTHEN/START/LOGIN/ASCII packet (check keys)</code></strong>: IOS names the cause for you. Trust failed.</li></ol>
+<blockquote><p><strong>Read the debug, not the summary.</strong> The <code translate="no">test aaa</code> result says <code translate="no">No authoritative response from any server</code>, which sounds like a reachability problem. If you trusted that line, you&#x27;d waste time on routing and firewalls. The debug shows the connection opened and the key failed. Always check the debug before you choose a fix.</p></blockquote>
+<p><strong>Fix it:</strong> put the key back and test again.</p>
+<pre translate="no"><code translate="no">configure terminal
+ tacacs server Our-TACACS
+  key Cisco!23
+end
+test aaa group tacacs+ user1 Cisco!23 legacy</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-tacacs/s09-key-fixed.webp" aria-label="Open full-size image: Key fixed: User was successfully authenticated; debug shows the connection opened, AUTHEN status GETPASS, the CONT packet with the password, then AUTHEN status PASS and the connection closed"><img src="/assets/img/ccnp/labs/aaa-tacacs/s09-key-fixed.webp" width="951" height="577" alt="Key fixed: User was successfully authenticated; debug shows the connection opened, AUTHEN status GETPASS, the CONT packet with the password, then AUTHEN status PASS and the connection closed" loading="lazy" decoding="async"></a><figcaption>Key fixed: User was successfully authenticated; debug shows the connection opened, AUTHEN status GETPASS, the CONT packet with the password, then AUTHEN status PASS and the connection closed. Select the image to open it full size.</figcaption></figure>
+<p><strong>This is what a healthy exchange looks like:</strong> connection opened → <strong><code translate="no">GETPASS</code></strong> (the server asks for the password) → <code translate="no">send AUTHEN/CONT</code> (the router sends it) → <strong><code translate="no">status = PASS</code></strong> → connection closed. Compare every failure against this.</p>
+<h3 id="break-2-wrong-password-user-credentials">Break 2: wrong password (user credentials)</h3>
+<pre translate="no"><code translate="no">test aaa group tacacs+ user1 WrongPass legacy</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-tacacs/s10-bad-password.webp" aria-label="Open full-size image: Wrong password: User authentication request was rejected by server; debug shows the connection opened, GETPASS, the CONT packet, then AUTHEN status FAIL"><img src="/assets/img/ccnp/labs/aaa-tacacs/s10-bad-password.webp" width="998" height="443" alt="Wrong password: User authentication request was rejected by server; debug shows the connection opened, GETPASS, the CONT packet, then AUTHEN status FAIL" loading="lazy" decoding="async"></a><figcaption>Wrong password: User authentication request was rejected by server; debug shows the connection opened, GETPASS, the CONT packet, then AUTHEN status FAIL. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> the exchange gets further than Break 1. The connection opens, the key is fine (no &quot;check keys&quot;), the server asks for the password (<code translate="no">GETPASS</code>), and then answers <strong><code translate="no">status = FAIL</code></strong>. The summary line says it plainly: <strong><code translate="no">User authentication request was rejected by server</code></strong>.</p>
+<p>The server is healthy and understood the request; it <strong>chose</strong> to say no. That&#x27;s layer 3, the user&#x27;s credentials. And because this is a <strong>reject</strong>, not an error, the <code translate="no">local</code> fallback in <code translate="no">TAC-Login</code> would <strong>not</strong> be tried on a real login.</p>
+<p><strong>Fix it:</strong> use the right password.</p>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-tacacs/s10-password-fixed.webp" aria-label="Open full-size image: Correct password again: User was successfully authenticated"><img src="/assets/img/ccnp/labs/aaa-tacacs/s10-password-fixed.webp" width="973" height="77" alt="Correct password again: User was successfully authenticated" loading="lazy" decoding="async"></a><figcaption>Correct password again: User was successfully authenticated. Select the image to open it full size.</figcaption></figure>
+<h3 id="break-3-wrong-server-ip-reachability">Break 3: wrong server IP (reachability)</h3>
+<pre translate="no"><code translate="no">configure terminal
+ tacacs server Our-TACACS
+  address ipv4 192.168.1.10
+end
+debug tacacs
+test aaa group tacacs+ user1 Cisco!23 legacy</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-tacacs/s11-bad-ip.webp" aria-label="Open full-size image: Wrong server IP: debug shows Opening TCP/IP to 192.168.1.10/49 timeout 5, No authoritative response from any server, then TCP/IP open to 192.168.1.10/49 failed, Connection timed out; remote host not responding"><img src="/assets/img/ccnp/labs/aaa-tacacs/s11-bad-ip.webp" srcset="/assets/img/ccnp/labs/aaa-tacacs/s11-bad-ip-800.webp 800w, /assets/img/ccnp/labs/aaa-tacacs/s11-bad-ip.webp 1357w" sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem" width="1357" height="415" alt="Wrong server IP: debug shows Opening TCP/IP to 192.168.1.10/49 timeout 5, No authoritative response from any server, then TCP/IP open to 192.168.1.10/49 failed, Connection timed out; remote host not responding" loading="lazy" decoding="async"></a><figcaption>Wrong server IP: debug shows Opening TCP/IP to 192.168.1.10/49 timeout 5, No authoritative response from any server, then TCP/IP open to 192.168.1.10/49 failed, Connection timed out; remote host not responding. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> <code translate="no">Opening TCP/IP to 192.168.1.10/49 timeout=5</code>, then nothing comes back. After 5 seconds: <strong><code translate="no">Connection timed out; remote host not responding</code></strong> and <strong><code translate="no">No authoritative response from any server</code></strong>. Unlike Break 1, there&#x27;s <strong>no <code translate="no">Opened TCP/IP handle</code> line</strong>: the connection never existed.</p>
+<p>This is layer 1, reachability. The possible causes: wrong IP (this case), routing, a firewall or ACL dropping TCP 49, or the server is down. Two variations worth knowing:</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Debug ending</th><th scope="col">Meaning</th><th scope="col">Where to look</th></tr></thead><tbody><tr><td><code translate="no">Connection timed out; remote host not responding</code></td><td><strong>Nobody answered</strong>: wrong IP, host down, or a firewall silently dropping TCP 49</td><td>IP address, routing, host power, ACLs</td></tr><tr><td><code translate="no">Connection refused by remote host</code></td><td><strong>Something answered with a reset</strong>: the host is up but nothing listens on port 49</td><td>Start the TACACS+ service, check the port</td></tr></tbody></table></div>
+<p><strong>On a real login</strong>, this is where <code translate="no">local</code> saves you: no server answered, so IOS moves to the next method and <code translate="no">admin1</code> can still log in.</p>
+<p><strong>Fix it:</strong></p>
+<pre translate="no"><code translate="no">configure terminal
+ tacacs server Our-TACACS
+  address ipv4 192.168.1.100
+end
+test aaa group tacacs+ user1 Cisco!23 legacy
+undebug all</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-tacacs/s11-ip-fixed.webp" aria-label="Open full-size image: Address fixed: a first test command with a typo returns Invalid input, then the correct test authenticates user1 and the debug shows GETPASS followed by AUTHEN status PASS"><img src="/assets/img/ccnp/labs/aaa-tacacs/s11-ip-fixed.webp" width="942" height="682" alt="Address fixed: a first test command with a typo returns Invalid input, then the correct test authenticates user1 and the debug shows GETPASS followed by AUTHEN status PASS" loading="lazy" decoding="async"></a><figcaption>Address fixed: a first test command with a typo returns Invalid input, then the correct test authenticates user1 and the debug shows GETPASS followed by AUTHEN status PASS. Select the image to open it full size.</figcaption></figure>
+<p><code translate="no">status = PASS</code> again. (The first command in the screenshot has a typo, <code translate="no">user 1</code>, and IOS rejects it before anything is sent. A useful reminder to read error markers before blaming the server.)</p>
+<h3 id="check-the-counters">Check the counters</h3>
+<pre translate="no"><code translate="no">show tacacs</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-tacacs/s12-show-tacacs-final.webp" aria-label="Open full-size image: Final show tacacs: socket opens 6, socket closes 6, socket timeouts 0, failed connect attempts 1, total packets sent 13 and received 13"><img src="/assets/img/ccnp/labs/aaa-tacacs/s12-show-tacacs-final.webp" width="787" height="371" alt="Final show tacacs: socket opens 6, socket closes 6, socket timeouts 0, failed connect attempts 1, total packets sent 13 and received 13" loading="lazy" decoding="async"></a><figcaption>Final show tacacs: socket opens 6, socket closes 6, socket timeouts 0, failed connect attempts 1, total packets sent 13 and received 13. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong>Socket opens = Socket closes</strong>: every session that opened was closed cleanly.</li><li><strong>Failed Connect Attempts 1</strong>: the wrong-IP test from Break 3, recorded against this server entry. On a production router, a climbing value here is an early warning that the server or the path to it is failing.</li><li>The wrong key and wrong password tests don&#x27;t show up as failures here: the TCP connection worked in both. Those faults live in the debug and the server&#x27;s logs, not in the socket counters.</li></ul>
+<h3 id="the-debug-decoder">The debug decoder</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col"><code translate="no">debug tacacs</code> says</th><th scope="col">Failed layer</th><th scope="col">Root cause</th><th scope="col">Where to look</th></tr></thead><tbody><tr><td><code translate="no">No authoritative response from any server</code> + connection timed out</td><td><strong>Reachability</strong></td><td>Wrong IP, server down, TCP 49 blocked</td><td><code translate="no">ping</code>, routing, ACLs, firewall, service status</td></tr><tr><td><code translate="no">Connection refused</code></td><td><strong>Reachability</strong></td><td>Host up, service not listening</td><td>The TACACS+ service and port</td></tr><tr><td><code translate="no">Opened TCP/IP handle</code> then <code translate="no">(check keys)</code></td><td><strong>Device trust</strong></td><td>Shared key mismatch</td><td>The <code translate="no">key</code> on the router <strong>and</strong> the server</td></tr><tr><td><code translate="no">GETPASS</code> then <code translate="no">status = FAIL</code>, <code translate="no">rejected by server</code></td><td><strong>User</strong></td><td>Wrong username or password, disabled account</td><td>The account on the server</td></tr><tr><td><code translate="no">GETPASS</code> then <code translate="no">status = PASS</code></td><td>Working</td><td></td><td></td></tr></tbody></table></div>
+<h2 id="part-5-more-breaks-to-try">Part 5: more breaks to try</h2>
+<p>The three breaks above are the headline cases. These are the faults that catch people in production. Try them with your console session open.</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">#</th><th scope="col">Break</th><th scope="col">What you see</th><th scope="col">The tell</th><th scope="col">Fix</th></tr></thead><tbody><tr><td>4</td><td><code translate="no">aaa new-model</code> missing</td><td><code translate="no">aaa authentication</code> commands rejected or ignored</td><td>The AAA engine is off</td><td><code translate="no">aaa new-model</code></td></tr><tr><td>5</td><td>List defined but not applied to the line</td><td><code translate="no">debug tacacs</code> <strong>silent</strong> on a real login; <code translate="no">test aaa</code> <strong>works</strong></td><td>The request is never generated</td><td><code translate="no">login authentication TAC-Login</code> under <code translate="no">line vty 0 15</code></td></tr><tr><td>6</td><td>List name misspelled on the line (<code translate="no">TAC-Logn</code>)</td><td>Logins misbehave, debug silent</td><td>Names don&#x27;t match character for character</td><td>Make the names identical</td></tr><tr><td>7</td><td>No <code translate="no">local</code> method and the server is down</td><td><code translate="no">No authoritative response</code>, then <strong>locked out</strong></td><td>No second method to try</td><td><code translate="no">group tacacs+ local</code></td></tr><tr><td>8</td><td>Ping works, auth times out</td><td>Ping 100%, <code translate="no">test aaa</code> times out</td><td>An ACL allows ICMP but blocks TCP 49</td><td>Permit TCP 49 from the router to the server</td></tr><tr><td>9</td><td>Source-interface mismatch</td><td>Timeouts or <code translate="no">(check keys)</code> with the right IP and key</td><td>The server sees an unexpected source IP and has no matching client entry</td><td><code translate="no">ip tacacs source-interface</code> matching the server&#x27;s client entry</td></tr><tr><td>10</td><td>Server marked DEAD</td><td>Fault fixed, logins still go straight to <code translate="no">local</code></td><td>IOS skips a dead server for the dead-time</td><td><code translate="no">show aaa servers</code>; wait out the dead-time or re-test</td></tr><tr><td>11</td><td><code translate="no">enable</code> fails after a good login</td><td>Logged in at priv 1, <code translate="no">enable</code> errors</td><td>Authentication isn&#x27;t privilege</td><td><code translate="no">enable secret</code>, <code translate="no">aaa authentication enable</code>, or <code translate="no">aaa authorization exec</code></td></tr><tr><td>12</td><td>Authorization denies the shell</td><td>Login accepted, then dropped; <code translate="no">debug aaa authorization</code> shows a fail</td><td>Authenticated but not authorized</td><td>Fix the server&#x27;s shell profile, or add <code translate="no">local</code> / <code translate="no">if-authenticated</code></td></tr></tbody></table></div>
+<blockquote><p><strong>The money diagnostic (case 5):</strong> <code translate="no">test aaa</code> works but real logins never reach the server. <code translate="no">test aaa</code> talks to the server group directly and ignores your line configuration, so a working test plus a silent debug on login means the <strong>method-list binding</strong> is wrong, not the server.</p></blockquote>
+<p><strong>Case 7 safely:</strong> set the list to <code translate="no">aaa authentication login TAC-Login group tacacs+</code> (no <code translate="no">local</code>), point the server at 192.168.1.10, and try <code translate="no">telnet 8.8.8.8</code> as <code translate="no">admin1</code>. You&#x27;re denied, because there&#x27;s no second method. Add <code translate="no">local</code> back and the same outage lets <code translate="no">admin1</code> in. Keep the console open: it&#x27;s your way back.</p>
+<h2 id="part-6-stretch-authorization-and-accounting">Part 6 (stretch): authorization and accounting</h2>
+<p>Authentication answers &quot;who are you&quot;. Authorization and accounting answer &quot;what may you do&quot; and &quot;what did you do&quot;.</p>
+<pre translate="no"><code translate="no">configure terminal
+ aaa authorization exec TAC-Exec group tacacs+ local
+ aaa authorization commands 15 TAC-Cmd group tacacs+ local
+ aaa accounting exec default start-stop group tacacs+
+ aaa accounting commands 15 default start-stop group tacacs+
+ line vty 0 15
+  authorization exec TAC-Exec
+  authorization commands 15 TAC-Cmd
+end
+show run | section aaa
+show aaa sessions</code></pre>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead><tbody><tr><td><code translate="no">aaa authorization exec</code></td><td>The server returns the user&#x27;s privilege level at login, so <code translate="no">admin1</code> lands directly at level 15 and nobody shares an <code translate="no">enable</code> password</td></tr><tr><td><code translate="no">aaa authorization commands 15</code></td><td>Every privileged command is sent to the server for approval first. This is <strong>TACACS+&#x27;s headline feature</strong>: RADIUS can&#x27;t authorize individual commands</td></tr><tr><td><code translate="no">aaa accounting exec</code></td><td>Records when each session starts and stops</td></tr><tr><td><code translate="no">aaa accounting commands 15</code></td><td>Records every privileged command with who ran it and when: the audit trail</td></tr></tbody></table></div>
+<blockquote><p><strong>Lockout risk:</strong> if command authorization points only at an unreachable server, an admin can log in and then have <strong>every command denied</strong>. Keep <code translate="no">local</code> (or <code translate="no">if-authenticated</code>) at the end of authorization lists too, and test with the console open.</p></blockquote>
+<h2 id="harden-it-for-production">Harden it for production</h2>
+<p>The lab uses Telnet, a cleartext key and one server to keep things simple. A CIS-aligned version looks like this:</p>
+<pre translate="no"><code translate="no">username admin1 privilege 15 algorithm-type scrypt secret &lt;strong-local-password&gt;
+aaa new-model
+!
+tacacs server ISE-1
+ address ipv4 10.10.99.10
+ key &lt;long-unique-shared-secret&gt;
+tacacs server ISE-2
+ address ipv4 10.10.99.11
+ key &lt;long-unique-shared-secret&gt;
+aaa group server tacacs+ ADMIN-TAC
+ server name ISE-1
+ server name ISE-2
+ ip tacacs source-interface Loopback0
+!
+aaa authentication login VTY-AUTH group ADMIN-TAC local
+aaa authorization exec VTY-AUTHZ group ADMIN-TAC local
+aaa authorization commands 15 VTY-CMD group ADMIN-TAC local
+aaa accounting exec default start-stop group ADMIN-TAC
+aaa accounting commands 15 default start-stop group ADMIN-TAC
+!
+ip ssh version 2
+line vty 0 15
+ login authentication VTY-AUTH
+ authorization exec VTY-AUTHZ
+ authorization commands 15 VTY-CMD
+ transport input ssh
+ exec-timeout 10 0
+ access-class MGMT-ONLY in</code></pre>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Lab shortcut</th><th scope="col">Production fix</th><th scope="col">Why</th></tr></thead><tbody><tr><td>Telnet to the VTY lines</td><td><code translate="no">transport input ssh</code>, <code translate="no">ip ssh version 2</code></td><td>Credentials never cross the wire in cleartext</td></tr><tr><td>One TACACS+ server</td><td>Two servers in a group</td><td>One failure isn&#x27;t an outage</td></tr><tr><td>Key visible in the config</td><td>Encrypted key storage (type 6 on IOS XE)</td><td>Config backups don&#x27;t leak the trust key</td></tr><tr><td>No source interface</td><td><code translate="no">ip tacacs source-interface Loopback0</code></td><td>Requests always come from the IP the server expects</td></tr><tr><td>Type 5 (MD5) local secret</td><td><code translate="no">algorithm-type scrypt</code> (type 9)</td><td>Much harder to crack offline</td></tr><tr><td><code translate="no">exec-timeout 60 0</code></td><td><code translate="no">exec-timeout 10 0</code> or less</td><td>Idle sessions don&#x27;t stay open</td></tr><tr><td>No accounting</td><td>Exec and command accounting</td><td>Every privileged action is recorded</td></tr><tr><td>VTY open to any source</td><td><code translate="no">access-class</code> permitting admin subnets only</td><td>Only the management network can even try</td></tr></tbody></table></div>
+<h2 id="check-yourself">Check yourself</h2>
+<details class="qa"><summary>1. Why create the local user before aaa new-model?</summary>
+<p><code translate="no">aaa new-model</code> makes AAA control every login path immediately. With no local account, a later mistake or an unreachable server can leave no working way to log in.</p>
+</details>
+<details class="qa"><summary>2. A test prints &quot;No authoritative response from any server&quot;. Is the server unreachable?</summary>
+<p>Not necessarily. Run <code translate="no">debug tacacs</code>. If it shows <code translate="no">Opened TCP/IP handle</code> followed by <code translate="no">(check keys)</code>, the server was reachable and the shared key is wrong, exactly as in Break 1. Only a connection that never opens (timeout or refused) is a reachability problem.</p>
+</details>
+<details class="qa"><summary>3. The server is up and rejects a user&#x27;s password. Will the local fallback let them in?</summary>
+<p>No. The next method in a list is tried only when the current method returns an error (no answer). A reject from a reachable server is final.</p>
+</details>
+<details class="qa"><summary>4. test aaa succeeds, but VTY logins never show up in debug tacacs. What&#x27;s wrong?</summary>
+<p>The method list isn&#x27;t applied to the VTY lines, or the name on the line doesn&#x27;t match the list. <code translate="no">test aaa</code> talks to the server group directly and ignores line configuration.</p>
+</details>
+<details class="qa"><summary>5. Ping to the server works, but authentication times out. How?</summary>
+<p>Ping uses ICMP. TACACS+ uses TCP 49. An ACL or firewall can permit one and drop the other. Check the path for TCP 49 specifically.</p>
+</details>
+<details class="qa"><summary>6. What can TACACS+ do that RADIUS effectively can&#x27;t, and why?</summary>
+<p>Per-command authorization. TACACS+ keeps authorization separate from authentication, so the router can ask the server about each command. RADIUS combines authentication and authorization in one exchange.</p>
+</details>
+<h2 id="answer-config">Answer config</h2>
+<details class="qa"><summary>Show the final lab config for R8</summary>
+<pre translate="no"><code translate="no">username admin1 privilege 15 secret Cisco!23
+aaa new-model
+!
+tacacs server Our-TACACS
+ address ipv4 192.168.1.100
+ key Cisco!23
+!
+aaa authentication login TAC-Login group tacacs+ local
+!
+enable secret Cisco!23
+!
+line vty 0 15
+ login authentication TAC-Login
+!
+! Stretch (Part 6)
+aaa authorization exec TAC-Exec group tacacs+ local
+aaa authorization commands 15 TAC-Cmd group tacacs+ local
+aaa accounting exec default start-stop group tacacs+
+aaa accounting commands 15 default start-stop group tacacs+
+line vty 0 15
+ authorization exec TAC-Exec
+ authorization commands 15 TAC-Cmd</code></pre>
+<p>Lab values only. Use the production version above on real equipment.</p>
+</details>
+<h2 id="exam-mapping">Exam mapping</h2>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">You practiced</th><th scope="col">Exam angle</th><th scope="col">SCOR v2.0</th></tr></thead><tbody><tr><td><code translate="no">aaa new-model</code> with a local account first</td><td>Lockout prevention</td><td>2.6</td></tr><tr><td>TACACS+ server, TCP 49, shared key</td><td>TACACS+ vs. RADIUS facts</td><td>2.6</td></tr><tr><td>Method list with <code translate="no">local</code> fallback</td><td>Fallback on error, never on reject</td><td>2.6</td></tr><tr><td><code translate="no">test aaa</code>, <code translate="no">show tacacs</code>, <code translate="no">debug tacacs</code></td><td>Troubleshooting tools</td><td>2.6</td></tr><tr><td>Wrong key, wrong password, wrong IP</td><td>Identify the failing layer from output</td><td>2.6</td></tr><tr><td>Authorization and accounting</td><td>Per-command authorization, audit trail</td><td>2.6</td></tr><tr><td>SSH only, encrypted keys, timeouts</td><td>CIS Benchmark management-plane items</td><td>2.5</td></tr></tbody></table></div>
+<p>Drill it with the <a href="/ccnp-security/flashcards#d2">flashcards</a> and the <a href="/ccnp-security/mock-exam#d2">mock exam</a>.</p>
+</div>
+      <footer class="post-end">
+        <section class="practice" aria-labelledby="practice-h">
+          <div><h2 id="practice-h" class="sub-h">Lock it in</h2>
+          <p>Lab done? Drill the commands and the attack-to-defense mapping until they're automatic.</p></div>
+          <p class="practice-links"><a class="btn btn-pri" href="/ccnp-security/flashcards#d2">flashcards <span class="p">d2</span></a><a class="btn btn-sec" href="/ccnp-security/mock-exam#d2">mock exam <span class="p">d2</span></a><a class="btn btn-sec" href="/ccnp-security/management-cis-benchmarks-aaa">notes</a></p>
+        </section>
+      </footer>
+    </div>
+    <aside class="toc" aria-label="On this page"><span class="toc-title"><span class="h">#</span> show ip route | toc</span><ol><li><a href="#what-you-ll-build">What you&#x27;ll build</a></li><li><a href="#where-to-run-this-lab">Where to run this lab</a></li><li><a href="#topology-and-accounts">Topology and accounts</a></li><li><a href="#part-1-baseline-prove-aaa-is-off">Part 1: baseline (prove AAA is off)</a></li><li><a href="#part-2-build-it-verifying-every-step">Part 2: build it, verifying every step</a></li><li><a href="#part-3-prove-remote-login-uses-tacacs">Part 3: prove remote login uses TACACS+</a></li><li><a href="#part-4-break-it-three-ways-then-fix-it">Part 4: break it three ways, then fix it</a></li><li><a href="#part-5-more-breaks-to-try">Part 5: more breaks to try</a></li><li><a href="#part-6-stretch-authorization-and-accounting">Part 6 (stretch): authorization and accounting</a></li><li><a href="#harden-it-for-production">Harden it for production</a></li><li><a href="#check-yourself">Check yourself</a></li><li><a href="#answer-config">Answer config</a></li><li><a href="#exam-mapping">Exam mapping</a></li></ol></aside>
+  </div>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/ccnp-security">ccnp security</a></li>
+        <li><a href="/ccnp-security/labs">ccnp labs</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Oct 22, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

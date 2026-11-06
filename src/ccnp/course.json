@@ -288,6 +288,28 @@
       ],
       "date": "2026-11-01",
       "order": 10
+    },
+    {
+      "slug": "management-cis-benchmarks-aaa",
+      "module": "04",
+      "file": "04_management-cis-benchmarks-aaa.md",
+      "title": "Management Options, CIS Benchmarks & AAA",
+      "seo_title": "SCOR 2.4-2.6: Security Cloud Control, CIS Benchmarks, TACACS+ vs RADIUS",
+      "description": "Free CCNP Security notes for SCOR 350-701 v2.0 topics 2.4 to 2.6: FMC vs. Security Cloud Control, out-of-band management, CIS Benchmarks, TACACS+ and RADIUS.",
+      "dek": "Who manages your security devices, how they stay hardened, and who may log in: single vs. multidevice managers, Security Cloud Control, CIS Benchmarks and drift, then AAA with TACACS+ and RADIUS, troubleshooting included.",
+      "objectives": [
+        "2.4",
+        "2.5",
+        "2.6"
+      ],
+      "supports": [
+        "2.1",
+        "2.3",
+        "2.7",
+        "6.1"
+      ],
+      "date": "2026-11-05",
+      "order": 15
     }
   ],
   "labs": [
@@ -344,6 +366,42 @@
           "file": "l2-attack-prevention.pka",
           "label": "Activity with instructions (.pka)",
           "note": "ungraded"
+        }
+      ]
+    },
+    {
+      "slug": "aaa-tacacs-configure-troubleshoot",
+      "file": "aaa-tacacs.md",
+      "lecture": "management-cis-benchmarks-aaa",
+      "platform": "ios",
+      "title": "AAA with TACACS+ Lab: Configure and Troubleshoot",
+      "short": "TACACS+ lab",
+      "cta": "Build TACACS+ login with a local fallback, then break it three ways and read each fault from debug tacacs",
+      "seo_title": "Free TACACS+ Lab: Configure and Troubleshoot AAA on Cisco IOS (SCOR 2.6)",
+      "description": "Free CCNP Security lab: configure TACACS+ with a local fallback on Cisco IOS, then troubleshoot a wrong key, wrong password and wrong server IP with debug tacacs.",
+      "dek": "Build TACACS+ authentication on a real IOS router one verified step at a time, prove a server-only user can log in, then break it three ways and read each fault straight from debug tacacs.",
+      "objectives": [
+        "2.6"
+      ],
+      "date": "2026-11-05",
+      "time": "45 to 60 min",
+      "tool": "Real IOS + TACACS+ server",
+      "environments": [
+        {
+          "name": "Cisco Modeling Labs",
+          "note": "IOSv or IOL router plus an Ubuntu node running a TACACS+ daemon, or an ISE node. Recommended."
+        },
+        {
+          "name": "DevNet / dCloud",
+          "note": "Hosted labs and demos with IOS XE and ISE already built."
+        },
+        {
+          "name": "Your own gear",
+          "note": "Any IOS or IOS XE router and a Linux VM running a TACACS+ server."
+        },
+        {
+          "name": "Packet Tracer",
+          "note": "Basic AAA only. No debug tacacs, so the troubleshooting half doesn't work."
         }
       ]
     }

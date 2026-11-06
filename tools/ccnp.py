@@ -100,7 +100,8 @@ def _figure_hook(item, src_root=None, pub_prefix="ccnp"):
             srcset = (f' srcset="/assets/img/{pub_prefix}/{folder}/{small.name} {sw}w, {url} {w}w"'
                       f' sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem"')
         a = esc(alt)
-        return (f'<figure class="post-figure"><a href="{url}" aria-label="Open full-size image: {a}">'
+        fit = " fit" if w < 700 else ""  # small screenshots stay at native size instead of upscaling
+        return (f'<figure class="post-figure{fit}"><a href="{url}" aria-label="Open full-size image: {a}">'
                 f'<img src="{url}"{srcset} width="{w}" height="{h}" alt="{a}" loading="lazy" decoding="async"></a>'
                 f'<figcaption>{a}. Select the image to open it full size.</figcaption></figure>')
     return hook
@@ -144,6 +145,13 @@ def load_lectures(course):
 # ------------------------------------------------------------------------- labs
 LAB_FILES = f"{BASE}/labs/files"
 FILE_KIND = {".pkt": "PKT", ".pka": "PKA", ".zip": "ZIP", ".txt": "TXT"}
+# lab platforms: Packet Tracer labs ship files; real-IOS labs run in CML or a sandbox
+PLATFORM = {
+    "pt": {"chip": "Packet Tracer lab", "mod": "PT", "short": "Packet Tracer lab",
+           "cta": "Download the Packet Tracer file and harden it step by step", "alt": "free Packet Tracer lab"},
+    "ios": {"chip": "Real IOS lab", "mod": "IOS", "short": "Real IOS lab",
+            "cta": "Build it on a real IOS router and troubleshoot it step by step", "alt": "free CCNP Security lab"},
+}
 
 
 def load_labs(course):
@@ -162,9 +170,15 @@ def load_labs(course):
         if not lab["lec"]:
             sys.exit(f"course.json: lab {lab['slug']} points at unknown lecture {lab['lecture']!r}")
         lab["path"] = f"{BASE}/labs/{lab['slug']}"
+        lab.setdefault("platform", "pt")
+        if lab["platform"] not in PLATFORM:
+            sys.exit(f"course.json: lab {lab['slug']} has unknown platform {lab['platform']!r}")
+        lab["pf"] = PLATFORM[lab["platform"]]
+        if not lab.get("downloads") and not lab.get("environments"):
+            sys.exit(f"course.json: lab {lab['slug']} needs downloads or environments")
         _render_md(lab, "labs", "ccnp/labs")
         lab["files"] = []
-        for d in lab["downloads"]:
+        for d in lab.get("downloads", []):
             if not re.fullmatch(r"[a-z0-9-]+\.(pkt|pka|zip|txt)", d["file"]):
                 sys.exit(f"lab {lab['slug']}: download name {d['file']!r} not allowed")
             f = SRC_C / "labs" / "files" / d["file"]
@@ -196,20 +210,9 @@ def render_lab(site, hashes, last_change, course, lab):
     objs = " ".join(obj_chip(o, course) for o in lab["objectives"])
     d0 = lab["objectives"][0].split(".")[0]
     lec = lab["lec"]
-    main = f'''<main id="main">
-<article class="lecture lab">
-  <header class="post-head">
-    <div class="wrap">
-      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="{BASE}">ccnp-security</a><span aria-hidden="true">/</span><a href="{BASE}/labs">labs</a><span aria-hidden="true">/</span><span>{esc(lab["slug"])}</span></nav>
-      <p class="scard-meta"><span class="sid">Packet Tracer lab</span><span>Domain {esc(d0)} {esc(course["domains"][int(d0)-1]["name"])} &middot; topics {esc(", ".join(lab["objectives"]))}</span></p>
-      <h1 class="mt-2">{esc(lab["title"])}</h1>
-      <p class="post-dek">{esc(lab["dek"])}</p>
-      <div class="post-meta"><time datetime="{lab["date"]}">updated {B.fmt_date(lab.get("updated", lab["date"]))}</time><span class="sep">/</span><span>{esc(lab["time"])}</span><span class="sep">/</span><span>{esc(lab["tool"])}</span><span class="sep">/</span><span>by {esc(site["author"])}</span></div>
-    </div>
-  </header>
-  <div class="wrap post-layout">
-    <div class="post-main">
-      <section class="labdl" aria-labelledby="dl-h">
+    note = f'<p class="side-note">Read the <a href="{lec["path"]}">{esc(lec["title"])}</a> notes first. Topics: {objs}</p>'
+    if lab["files"]:
+        lab_box = f'''      <section class="labdl" aria-labelledby="dl-h">
         <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">copy</span> <span class="a">{esc(lab["slug"])} flash:</span></span>
         <h2 id="dl-h" class="sub-h">Download the lab</h2>
         <ul class="dl-list">{"".join(tiles)}</ul>
@@ -218,8 +221,30 @@ def render_lab(site, hashes, last_change, course, lab):
           <div class="tbl"><table class="sheet-files"><thead><tr><th scope="col">File</th><th scope="col">SHA-256</th></tr></thead><tbody>{"".join(sums)}</tbody></table></div>
           <p>Compare with <code translate="no">Get-FileHash .\\file.pkt -Algorithm SHA256</code> (PowerShell) or <code translate="no">sha256sum file.pkt</code>. Different hash, different file: delete it.</p>
         </details>
-        <p class="side-note">Read the <a href="{lec["path"]}">{esc(lec["title"])}</a> notes first. Topics: {objs}</p>
-      </section>
+        {note}
+      </section>'''
+    else:
+        envs = "".join(f'<li><b>{esc(e["name"])}</b> <span>{esc(e["note"])}</span></li>' for e in lab["environments"])
+        lab_box = f'''      <section class="labdl labenv" aria-labelledby="dl-h">
+        <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">show</span> <span class="a">{esc(lab["slug"])} environment</span></span>
+        <h2 id="dl-h" class="sub-h">Where to run this lab</h2>
+        <ul class="env-list">{envs}</ul>
+        {note}
+      </section>'''
+    main = f'''<main id="main">
+<article class="lecture lab">
+  <header class="post-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="{BASE}">ccnp-security</a><span aria-hidden="true">/</span><a href="{BASE}/labs">labs</a><span aria-hidden="true">/</span><span>{esc(lab["slug"])}</span></nav>
+      <p class="scard-meta"><span class="sid">{esc(lab["pf"]["chip"])}</span><span>Domain {esc(d0)} {esc(course["domains"][int(d0)-1]["name"])} &middot; topics {esc(", ".join(lab["objectives"]))}</span></p>
+      <h1 class="mt-2">{esc(lab["title"])}</h1>
+      <p class="post-dek">{esc(lab["dek"])}</p>
+      <div class="post-meta"><time datetime="{lab["date"]}">updated {B.fmt_date(lab.get("updated", lab["date"]))}</time><span class="sep">/</span><span>{esc(lab["time"])}</span><span class="sep">/</span><span>{esc(lab["tool"])}</span><span class="sep">/</span><span>by {esc(site["author"])}</span></div>
+    </div>
+  </header>
+  <div class="wrap post-layout">
+    <div class="post-main">
+{lab_box}
 {toc_mobile}<div class="prose">
 {lab["body"].rstrip()}
 </div>
@@ -261,7 +286,7 @@ def render_lab(site, hashes, last_change, course, lab):
                   title=lab["seo_title"], description=lab["description"], path=lab["path"],
                   og_title=lab["title"], og_description=lab["dek"], og_type="article", jsonld=jsonld,
                   og_image=og if (B.PUB / og.lstrip("/")).exists() else None,
-                  og_image_alt=f'{lab["title"]}: free Packet Tracer lab')
+                  og_image_alt=f'{lab["title"]}: {lab["pf"]["alt"]}')
 
 
 def block_labs(course):
@@ -272,10 +297,11 @@ def block_labs(course):
     for lab in labs:
         chips = "".join(obj_chip(o, course) for o in lab["objectives"])
         kinds = " + ".join(f'.{f["file"].rsplit(".", 1)[1]}' for f in lab["files"])
+        how = f"download {kinds}" if kinds else lab["tool"]
         items.append(
-            f'<li><a class="lec" href="{lab["path"]}"><span class="mod">PT</span>'
+            f'<li><a class="lec" href="{lab["path"]}"><span class="mod">{esc(lab["pf"]["mod"])}</span>'
             f'<span class="lt"><b>{esc(lab["title"])}</b><span class="ld">{esc(lab["dek"])}</span>'
-            f'<span class="lc">{chips}<span class="lm">{esc(lab["time"])} &middot; download {esc(kinds)}</span></span></span></a></li>')
+            f'<span class="lc">{chips}<span class="lm">{esc(lab["time"])} &middot; {esc(how)}</span></span></span></a></li>')
     return '<ol class="lecs">' + "".join(items) + "</ol>"
 
 
@@ -306,11 +332,11 @@ def render_lecture(site, hashes, last_change, course, lec, counts):
         hop.append(f'<a class="next" href="{lecs[i+1]["path"]}"><span class="k">next lecture &rarr;</span>{esc(lecs[i+1]["title"])}</a>')
     nexthop = f'<nav class="nexthop" aria-label="More lectures">{"".join(hop)}</nav>' if hop else ""
     labs = [x for x in course.get("labs", []) if x["lecture"] == lec["slug"]]
-    lab_btn = "".join(f'<a class="btn btn-pri" href="{x["path"]}">{esc(x.get("short", "Packet Tracer lab"))} '
-                      f'<span class="p">.pkt</span></a>' for x in labs)
+    lab_btn = "".join(f'<a class="btn btn-pri" href="{x["path"]}">{esc(x.get("short", x["pf"]["short"]))}'
+                      + (f' <span class="p">.pkt</span>' if x["files"] else "") + '</a>' for x in labs)
     lab_cta = "".join(f'<a class="labcta" href="{x["path"]}"><span class="lk">hands-on lab</span>'
                       f'<span class="lt"><b>{esc(x["title"])}</b><span>'
-                      f'{esc(x.get("cta", "Download the Packet Tracer file and harden it step by step"))} '
+                      f'{esc(x.get("cta", x["pf"]["cta"]))} '
                       f'&middot; {esc(x["time"])}</span></span><span class="la" aria-hidden="true">&rarr;</span></a>\n'
                       for x in labs)
 
@@ -459,7 +485,7 @@ def block_stats(course, cards, qs):
     n_obj = len(course["obj"])
     rows = [
         ("lectures", len(course["lectures"]), "published"),
-        ("labs", len(course.get("labs", [])), "Packet Tracer"),
+        ("labs", len(course.get("labs", [])), "hands-on"),
         ("objectives", f'{len(cov)}/{n_obj}', "have notes"),
         ("flashcards", len(cards), "in the deck"),
         ("questions", len(qs), "in the exam bank"),
@@ -498,8 +524,12 @@ def block_lectures(course):
     items = []
     for lec in course["lectures"]:
         chips = "".join(obj_chip(o, course) for o in lec["objectives"])
-        has_lab = any(x["lecture"] == lec["slug"] for x in course.get("labs", []))
-        lab_chip = '<span class="chip labchip">+ Packet Tracer lab</span>' if has_lab else ""
+        mine = [x for x in course.get("labs", []) if x["lecture"] == lec["slug"]]
+        kinds = {x.get("platform", "pt") for x in mine}
+        lab_chip = ""
+        if mine:
+            what = "Packet Tracer lab" if kinds == {"pt"} else "real IOS lab" if kinds == {"ios"} else "hands-on lab"
+            lab_chip = f'<span class="chip labchip">+ {what}{"s" if len(mine) > 1 else ""}</span>'
         items.append(
             f'<li><a class="lec" href="{lec["path"]}"><span class="mod">D{esc(lec["objectives"][0].split(".")[0])}</span>'
             f'<span class="lt"><b>{esc(lec["title"])}</b><span class="ld">{esc(lec["dek"])}</span>'

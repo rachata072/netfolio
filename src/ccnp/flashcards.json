@@ -909,6 +909,342 @@
    "front": "`storm-control broadcast level 20.00` with no falling value: when does forwarding resume?",
    "back": "The falling threshold **defaults to the rising threshold**, so broadcast forwarding resumes once traffic drops below 20%.",
    "ref": "segmentation-layer-2-hardening#storm-control"
+  },
+  {
+   "id": "c2.4-001",
+   "obj": "2.4",
+   "front": "Single-device vs. multidevice manager: what's the difference, and why does it matter?",
+   "back": "A **single-device** manager configures one box at a time (FDM, ASDM, CLI). A **multidevice** manager pushes one change to many devices (FMC, Security Cloud Control). Beyond a handful of devices, central management is how you stay consistent and auditable.",
+   "ref": "management-cis-benchmarks-aaa#single-device-vs-multidevice-managers"
+  },
+  {
+   "id": "c2.4-002",
+   "obj": "2.4",
+   "front": "FDM vs. FMC?",
+   "back": "**FDM** (Firewall Device Manager): on-box web GUI for **one** FTD. **FMC** (Firewall Management Center): central manager for **many** FTDs, on-prem appliance or VM. An FTD uses one or the other, not both.",
+   "ref": "management-cis-benchmarks-aaa#the-managers-you-need-to-recognize"
+  },
+  {
+   "id": "c2.4-003",
+   "obj": "2.4",
+   "front": "What is ASDM?",
+   "back": "**Adaptive Security Device Manager**: a Java GUI that manages **one ASA** at a time.",
+   "ref": "management-cis-benchmarks-aaa#the-managers-you-need-to-recognize"
+  },
+  {
+   "id": "c2.4-004",
+   "obj": "2.4",
+   "front": "What is Security Cloud Control (SCC)?",
+   "back": "Cisco's **cloud-based, AI-assisted, multidevice** manager for ASA, FTD (cloud-delivered FMC), Meraki MX, SD-WAN, Multicloud Defense and Secure Access. The **evolution of Cisco Defense Orchestrator (CDO)**.",
+   "ref": "management-cis-benchmarks-aaa#security-cloud-control-scc"
+  },
+  {
+   "id": "c2.4-005",
+   "obj": "2.4",
+   "front": "A question mentions Cisco Defense Orchestrator (CDO). What should you think?",
+   "back": "**Security Cloud Control.** SCC is the evolution of CDO; Cisco docs and licensing still use the CDO name in places.",
+   "ref": "management-cis-benchmarks-aaa#security-cloud-control-scc"
+  },
+  {
+   "id": "c2.4-006",
+   "obj": "2.4",
+   "front": "How does Security Cloud Control manage devices the cloud can't reach directly?",
+   "back": "Through a **Secure Device Connector (SDC)**: a small VM on your network that relays between SCC and the device.",
+   "ref": "management-cis-benchmarks-aaa#security-cloud-control-scc"
+  },
+  {
+   "id": "c2.4-007",
+   "obj": "2.4",
+   "front": "SCC's three stated goals?",
+   "back": "**Simplify operations**, **enhance security** (AI-assisted log analysis), **improve clarity** (visibility across the estate).",
+   "ref": "management-cis-benchmarks-aaa#security-cloud-control-scc"
+  },
+  {
+   "id": "c2.4-008",
+   "obj": "2.4",
+   "front": "What is out-of-band change detection in SCC?",
+   "back": "SCC flags any change made **directly on a device** instead of through SCC, so you can accept or reject it. It's drift detection for the fleet.",
+   "ref": "management-cis-benchmarks-aaa#security-cloud-control-scc"
+  },
+  {
+   "id": "c2.4-009",
+   "obj": "2.4",
+   "front": "What manages the Catalyst SD-WAN fabric, and what's its gap?",
+   "back": "**Catalyst SD-WAN Manager** (formerly vManage). It handles SD-WAN connectivity and routing, not unified security policy across firewalls; SCC fills that gap.",
+   "ref": "management-cis-benchmarks-aaa#the-managers-you-need-to-recognize"
+  },
+  {
+   "id": "c2.4-010",
+   "obj": "2.4",
+   "front": "In-band vs. out-of-band management?",
+   "back": "**In-band**: management shares the production network (simple, less secure, fails with production). **Out-of-band**: a separate management network or console path (secure, survives outages, costs more). **OOB is best practice.**",
+   "ref": "management-cis-benchmarks-aaa#in-band-vs-out-of-band-management"
+  },
+  {
+   "id": "c2.4-011",
+   "obj": "2.4",
+   "front": "Why does out-of-band management matter most during an incident?",
+   "back": "A DoS or routing failure that takes down production also takes down **in-band** access, exactly when you need it. OOB keeps a path to fix things.",
+   "ref": "management-cis-benchmarks-aaa#in-band-vs-out-of-band-management"
+  },
+  {
+   "id": "c2.4-012",
+   "obj": "2.4",
+   "front": "Name three out-of-band constructs on Cisco platforms.",
+   "back": "FTD's dedicated **Management** interface, an ASA interface with **`management-only`**, the IOS XE **Mgmt-intf VRF** (Gi0/0), and **console servers**.",
+   "ref": "management-cis-benchmarks-aaa#in-band-vs-out-of-band-management"
+  },
+  {
+   "id": "c2.4-013",
+   "obj": "2.4",
+   "front": "On-prem vs. cloud management: pros and cons?",
+   "back": "**On-prem** (FMC): full control, data stays local; you maintain it. **Cloud** (SCC, SaaS): reachable anywhere, scales, Cisco maintains it; depends on internet access, less direct control.",
+   "ref": "management-cis-benchmarks-aaa#on-premises-vs-cloud-management"
+  },
+  {
+   "id": "c2.4-014",
+   "obj": "2.4",
+   "front": "Mixed ASA, FTD and Meraki MX at 120 sites, remote admins. Which manager?",
+   "back": "**Security Cloud Control**: multi-platform, multidevice, cloud-reachable from anywhere.",
+   "ref": "management-cis-benchmarks-aaa#selecting-a-management-option"
+  },
+  {
+   "id": "c2.5-001",
+   "obj": "2.5",
+   "front": "What is a CIS Benchmark?",
+   "back": "A **consensus-based** set of secure configuration recommendations for **one specific technology**, published free by the **Center for Internet Security**.",
+   "ref": "management-cis-benchmarks-aaa#what-a-cis-benchmark-is"
+  },
+  {
+   "id": "c2.5-002",
+   "obj": "2.5",
+   "front": "CIS Benchmarks vs. CIS Controls?",
+   "back": "**Benchmarks**: configuration guides for one product (e.g. IOS XE). **Controls**: an organization-wide, prioritized set of safeguards. Each benchmark recommendation maps to the Controls it supports.",
+   "ref": "management-cis-benchmarks-aaa#what-a-cis-benchmark-is"
+  },
+  {
+   "id": "c2.5-003",
+   "obj": "2.5",
+   "front": "Four reasons to use CIS Benchmarks?",
+   "back": "**Reduce the attack surface**, **prevent misconfiguration**, **standardize** configuration across devices, **support compliance** (PCI DSS, HIPAA, NIST).",
+   "ref": "management-cis-benchmarks-aaa#why-use-cis-benchmarks"
+  },
+  {
+   "id": "c2.5-004",
+   "obj": "2.5",
+   "front": "Level 1 vs. Level 2 profile?",
+   "back": "**Level 1**: practical baseline, clear benefit, shouldn't break operations. **Level 2**: defense in depth for high-security environments; extends Level 1 and **may reduce functionality or performance**.",
+   "ref": "management-cis-benchmarks-aaa#anatomy-of-a-recommendation"
+  },
+  {
+   "id": "c2.5-005",
+   "obj": "2.5",
+   "front": "Automated vs. Manual assessment status?",
+   "back": "**Automated**: a tool can check pass/fail. **Manual**: a human must verify.",
+   "ref": "management-cis-benchmarks-aaa#anatomy-of-a-recommendation"
+  },
+  {
+   "id": "c2.5-006",
+   "obj": "2.5",
+   "front": "Fields of a CIS Benchmark recommendation?",
+   "back": "Title, profile, assessment status, description and **rationale**, **impact**, **audit** procedure, **remediation** procedure, default value, CIS Controls mapping.",
+   "ref": "management-cis-benchmarks-aaa#anatomy-of-a-recommendation"
+  },
+  {
+   "id": "c2.5-007",
+   "obj": "2.5",
+   "front": "How are the Cisco network-device CIS Benchmarks organized?",
+   "back": "By the **three planes**: **management** (AAA, SSHv2, SNMPv3, NTP auth, logging), **control** (routing protocol authentication), **data** (uRPF, ACLs, no source routing).",
+   "ref": "management-cis-benchmarks-aaa#the-cisco-benchmarks-and-how-they-re-organized"
+  },
+  {
+   "id": "c2.5-008",
+   "obj": "2.5",
+   "front": "Which two Cisco platforms does SCOR 2.5 name for CIS Benchmarks?",
+   "back": "**Cisco Secure Firewall Threat Defense (FTD)** and **Cisco IOS XE**. CIS also publishes ASA, IOS XR and NX-OS benchmarks.",
+   "ref": "management-cis-benchmarks-aaa#the-cisco-benchmarks-and-how-they-re-organized"
+  },
+  {
+   "id": "c2.5-009",
+   "obj": "2.5",
+   "front": "Where do you apply CIS hardening on FTD vs. IOS XE?",
+   "back": "**IOS XE**: CLI configuration. **FTD**: mostly **platform settings** pushed from FMC (or FDM / SCC): management access lists, external authentication, syslog, SNMP, NTP, banners, timeouts.",
+   "ref": "management-cis-benchmarks-aaa#ftd-vs-ios-xe-where-the-hardening-lives"
+  },
+  {
+   "id": "c2.5-010",
+   "obj": "2.5",
+   "front": "What is configuration drift?",
+   "back": "The gap between the **approved hardened baseline** and what's actually running, caused by later changes, upgrades or quick fixes.",
+   "ref": "management-cis-benchmarks-aaa#from-benchmark-to-fleet-harden-audit-monitor-drift"
+  },
+  {
+   "id": "c2.5-011",
+   "obj": "2.5",
+   "front": "The benchmark-to-fleet loop?",
+   "back": "**Harden** (golden config) → **audit** (CIS-CAT, scanners) → **detect drift** (change logs, out-of-band change detection, diffs) → **remediate** → repeat.",
+   "ref": "management-cis-benchmarks-aaa#from-benchmark-to-fleet-harden-audit-monitor-drift"
+  },
+  {
+   "id": "c2.5-012",
+   "obj": "2.5",
+   "front": "Do CIS Benchmarks replace patching?",
+   "back": "**No.** They're one component. A hardened device running vulnerable software is still vulnerable: pair benchmarks with patching and vulnerability management.",
+   "ref": "management-cis-benchmarks-aaa#from-benchmark-to-fleet-harden-audit-monitor-drift"
+  },
+  {
+   "id": "c2.6-001",
+   "obj": "2.6",
+   "front": "Authentication, authorization, accounting in one line each?",
+   "back": "**Authentication**: who are you? **Authorization**: what may you do? **Accounting**: what did you do?",
+   "ref": "management-cis-benchmarks-aaa#authentication-authorization-and-accounting"
+  },
+  {
+   "id": "c2.6-002",
+   "obj": "2.6",
+   "front": "Device administration vs. network access: which protocol fits each?",
+   "back": "**Device administration** (admins logging in to network devices): **TACACS+**. **Network access** (users and endpoints joining via 802.1X, MAB, VPN, wireless): **RADIUS**.",
+   "ref": "management-cis-benchmarks-aaa#device-administration-vs-network-access"
+  },
+  {
+   "id": "c2.6-003",
+   "obj": "2.6",
+   "front": "TACACS+ transport and port?",
+   "back": "**TCP 49.**",
+   "ref": "management-cis-benchmarks-aaa#tacacs-vs-radius"
+  },
+  {
+   "id": "c2.6-004",
+   "obj": "2.6",
+   "front": "RADIUS ports?",
+   "back": "**UDP 1812** authentication/authorization, **UDP 1813** accounting. Legacy: **1645 / 1646**.",
+   "ref": "management-cis-benchmarks-aaa#tacacs-vs-radius"
+  },
+  {
+   "id": "c2.6-005",
+   "obj": "2.6",
+   "front": "What does each protocol encrypt?",
+   "back": "**TACACS+**: the **entire packet body** (header readable). **RADIUS**: **only the password** attribute; usernames and other attributes are cleartext.",
+   "ref": "management-cis-benchmarks-aaa#tacacs-vs-radius"
+  },
+  {
+   "id": "c2.6-006",
+   "obj": "2.6",
+   "front": "Which protocol separates AAA, and why does it matter?",
+   "back": "**TACACS+** separates authentication, authorization and accounting, which enables **per-command authorization**. RADIUS combines authentication and authorization in one Access-Accept.",
+   "ref": "management-cis-benchmarks-aaa#tacacs-vs-radius"
+  },
+  {
+   "id": "c2.6-007",
+   "obj": "2.6",
+   "front": "What does `aaa new-model` do, and what must you do first?",
+   "back": "Switches the device to the AAA framework: **every login path** is now controlled by AAA. Create a **local privilege-15 account first** so you can't lock yourself out.",
+   "ref": "management-cis-benchmarks-aaa#how-ios-aaa-works-aaa-new-model-and-method-lists"
+  },
+  {
+   "id": "c2.6-008",
+   "obj": "2.6",
+   "front": "Read: `aaa authentication login TAC group tacacs+ local`",
+   "back": "Try the TACACS+ servers first; use the **local database only if no server answers**.",
+   "ref": "management-cis-benchmarks-aaa#how-ios-aaa-works-aaa-new-model-and-method-lists"
+  },
+  {
+   "id": "c2.6-009",
+   "obj": "2.6",
+   "front": "When does a method list move to the next method?",
+   "back": "Only when the current method returns an **error** (no server answered). A **reject** (wrong password from a reachable server) is **final**.",
+   "ref": "management-cis-benchmarks-aaa#how-ios-aaa-works-aaa-new-model-and-method-lists"
+  },
+  {
+   "id": "c2.6-010",
+   "obj": "2.6",
+   "front": "Named vs. default method list?",
+   "back": "A **named** list applies only where it's referenced (`login authentication NAME` on a line). The **default** list applies to every line that doesn't name one, **including the console**.",
+   "ref": "management-cis-benchmarks-aaa#how-ios-aaa-works-aaa-new-model-and-method-lists"
+  },
+  {
+   "id": "c2.6-011",
+   "obj": "2.6",
+   "front": "A TACACS+ user logs in but `enable` fails. Why, and three fixes?",
+   "back": "Authentication isn't privilege: the user lands at priv 1. Fix with `enable secret`, `aaa authentication enable default group tacacs+ enable`, or `aaa authorization exec` so the server returns priv 15.",
+   "ref": "management-cis-benchmarks-aaa#how-ios-aaa-works-aaa-new-model-and-method-lists"
+  },
+  {
+   "id": "c2.6-012",
+   "obj": "2.6",
+   "front": "Why `ip tacacs source-interface Loopback0`?",
+   "back": "Requests always come from one predictable IP, which must match the **network device entry** on the server. A mismatch looks like a timeout or a key error.",
+   "ref": "management-cis-benchmarks-aaa#configuring-tacacs-for-device-administration"
+  },
+  {
+   "id": "c2.6-013",
+   "obj": "2.6",
+   "front": "Is authorization applied on the console by default?",
+   "back": "**No.** IOS skips authorization on the console unless you add `aaa authorization console`, so a broken server can't lock you out of the last-resort path.",
+   "ref": "management-cis-benchmarks-aaa#configuring-tacacs-for-device-administration"
+  },
+  {
+   "id": "c2.6-014",
+   "obj": "2.6",
+   "front": "What does `aaa authorization network` do for 802.1X?",
+   "back": "Lets the switch **apply what ISE returns**: VLAN, downloadable ACL, SGT. Without it, those attributes are ignored.",
+   "ref": "management-cis-benchmarks-aaa#configuring-radius-for-network-access"
+  },
+  {
+   "id": "c2.6-015",
+   "obj": "2.6",
+   "front": "What is CoA and what enables it on IOS?",
+   "back": "**Change of Authorization** (RFC 5176): the RADIUS server changes a live session (reauthenticate, reassign, disconnect). Enabled with `aaa server radius dynamic-author`; ISE uses UDP 1700 by default, the RFC port is 3799.",
+   "ref": "management-cis-benchmarks-aaa#configuring-radius-for-network-access"
+  },
+  {
+   "id": "c2.6-016",
+   "obj": "2.6",
+   "front": "The three layers of AAA failure?",
+   "back": "**Reachability** (can the device reach the server on TCP 49 / UDP 1812?), **device trust** (shared key, device registered, source IP), **user** (credentials and permissions).",
+   "ref": "management-cis-benchmarks-aaa#troubleshooting-aaa-three-layers"
+  },
+  {
+   "id": "c2.6-017",
+   "obj": "2.6",
+   "front": "`debug tacacs`: `Opened TCP/IP handle` then `Invalid AUTHEN/START ... (check keys)`?",
+   "back": "**Shared key mismatch.** The server was reachable (the connection opened) but the reply decrypted to garbage.",
+   "ref": "management-cis-benchmarks-aaa#troubleshooting-aaa-three-layers"
+  },
+  {
+   "id": "c2.6-018",
+   "obj": "2.6",
+   "front": "`debug tacacs`: `GETPASS` then `status = FAIL`?",
+   "back": "**Bad credentials.** The server understood the request and rejected the user. The `local` fallback won't be tried.",
+   "ref": "management-cis-benchmarks-aaa#troubleshooting-aaa-three-layers"
+  },
+  {
+   "id": "c2.6-019",
+   "obj": "2.6",
+   "front": "`Connection timed out` vs. `Connection refused` to port 49?",
+   "back": "**Timed out**: nobody answered (wrong IP, host down, firewall dropping). **Refused**: the host answered with a reset; the TACACS+ service isn't listening.",
+   "ref": "management-cis-benchmarks-aaa#troubleshooting-aaa-three-layers"
+  },
+  {
+   "id": "c2.6-020",
+   "obj": "2.6",
+   "front": "What does `test aaa group tacacs+ USER PASS legacy` prove, and what doesn't it test?",
+   "back": "That the **server group** can authenticate the user, without changing login config. It **ignores line configuration**, so it can't catch an unapplied or misspelled method list.",
+   "ref": "management-cis-benchmarks-aaa#troubleshooting-aaa-three-layers"
+  },
+  {
+   "id": "c2.6-021",
+   "obj": "2.6",
+   "front": "RADIUS shared key mismatch: what does the switch usually see?",
+   "back": "Often just **timeouts** (the server drops the request, or the reply fails the authenticator check). The server's log (e.g. ISE Live Logs) shows the real reason.",
+   "ref": "management-cis-benchmarks-aaa#troubleshooting-aaa-three-layers"
+  },
+  {
+   "id": "c2.6-022",
+   "obj": "2.6",
+   "front": "802.1X fails and ISE Live Logs show nothing at all. First suspects?",
+   "back": "The switch never reached ISE: server marked DEAD, routing or ACL blocking UDP 1812, or 802.1X not enabled (`dot1x system-auth-control`). Check `show aaa servers`.",
+   "ref": "management-cis-benchmarks-aaa#troubleshooting-network-access-802-1x-and-mab"
   }
  ]
 }

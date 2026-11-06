@@ -143,7 +143,7 @@ def footer(site, last_change):
         <li><a href="/blog">blog</a></li>
         <li><a href="/cheat-sheets">cheat sheets</a></li>
         <li><a href="/ccnp-security">ccnp security</a></li>
-        <li><a href="/ccnp-security/labs">packet tracer labs</a></li>
+        <li><a href="/ccnp-security/labs">ccnp labs</a></li>
         <li><a href="/#about">about</a></li>
         <li><a href="/privacy">privacy</a></li>
         <li><a href="/feed.xml">rss feed</a></li>
