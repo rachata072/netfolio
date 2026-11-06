@@ -1,0 +1,55 @@
+<!--
+  Text version of AI-03, shown under the sheet image on /cheat-sheets/ai-03.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<h2 id="templates">6 templates to copy</h2>
+<p>Swap the &lt;tags&gt; for your own masked data.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">#</th><th scope="col">Task</th><th scope="col">Prompt</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><th scope="row">Read the output</th><td>You are a senior network engineer. Here is &lt;output&gt; from show ip interface brief. List the 3 most likely causes, the read-only check for each, and what each result means.</td></tr>
+    <tr><td>2</td><th scope="row">Explain a config</th><td>Explain this config line by line for a CCNA student. Flag anything insecure and say why. &lt;config&gt;...&lt;/config&gt;</td></tr>
+    <tr><td>3</td><th scope="row">Write a script</th><td>Write a Python 3 Netmiko script that backs up running configs from &lt;device list&gt;. Read credentials from environment variables, add error handling and a dry-run mode, and comment each step.</td></tr>
+    <tr><td>4</td><th scope="row">Ticket to user email</th><td>Rewrite this ticket note as an email to a non-technical user: what happened, what we fixed, what they need to do. Under 120 words, friendly. &lt;note&gt;</td></tr>
+    <tr><td>5</td><th scope="row">Notes to runbook</th><td>Turn these notes into an SOP with purpose, prerequisites, numbered steps, how to verify, and rollback. Ask me about any gap. &lt;notes&gt;</td></tr>
+    <tr><td>6</td><th scope="row">Review a rule set</th><td>Review this ACL for shadowed lines, rules that are too broad, and a missing final deny with log. Reply as a table: line, issue, fix. &lt;acl&gt;</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="mask">Mask before you paste</h2>
+<ul>
+  <li><b>Secrets:</b> <code>show run | exclude secret|password</code></li>
+  <li><b>IP addresses:</b> swap them for 192.0.2.x and 198.51.100.x</li>
+  <li><b>Names:</b> use <code>user1</code> and <code>example.com</code></li>
+  <li><b>Keys and tokens:</b> delete them, every time</li>
+</ul>
+
+<h2 id="checkable">Make the answer checkable</h2>
+<ul>
+  <li>"Put every command in a code block."</li>
+  <li>"Only show commands until I confirm."</li>
+  <li>"List what you assumed about my setup."</li>
+  <li>"Link the vendor doc for each command."</li>
+</ul>
+
+<h2 id="followups">Follow-ups that improve any answer</h2>
+<ul>
+  <li>"What could go wrong if I run this?"</li>
+  <li>"Give me the rollback steps too."</li>
+  <li>"Explain it like I'm new to this."</li>
+  <li>"Compare both options in a table."</li>
+  <li>"Turn this into a checklist."</li>
+  <li>"What would prove you wrong?"</li>
+</ul>
+
+<h2 id="safe">Use AI safely at work</h2>
+<p class="note note-caution"><b>Danger.</b> Never run an AI-written script or config on production until you have read it and tested it in a lab.</p>
+<p class="note note-caution"><b>Caution.</b> Use only the AI tools your company approves. Public tools may keep what you paste.</p>
+<p class="note note-caution"><b>Caution.</b> AI can invent flags and commands. Check each one in the vendor docs.</p>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>Paste the real output, masked</li>
+  <li>Say the device, OS and version</li>
+  <li>You own the change, not the AI</li>
+</ul>

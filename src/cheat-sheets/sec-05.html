@@ -1,0 +1,92 @@
+<!--
+  Text version of SEC-05, shown under the sheet image on /cheat-sheets/sec-05.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<h2 id="events">Security log events to know</h2>
+<p>Find them in Event Viewer under Windows Logs, Security. Microsoft rates 4719 and 1102 high: investigate every one.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Event ID</th><th scope="col">What happened</th><th scope="col">Why care</th></tr></thead>
+  <tbody>
+    <tr><td>4624</td><td>Logon succeeded</td><td>Check the logon type</td></tr>
+    <tr><td>4625</td><td>Logon failed</td><td>Many in a row = password guessing</td></tr>
+    <tr><td>4648</td><td>Logon with explicit credentials</td><td>runas, lateral movement</td></tr>
+    <tr><td>4672</td><td>Admin rights given to a new logon</td><td>Who is acting as admin?</td></tr>
+    <tr><td>4688</td><td>New process created</td><td>Needs process auditing turned on</td></tr>
+    <tr><td>4697</td><td>Service install attempted</td><td>Persistence</td></tr>
+    <tr><td>4698</td><td>Scheduled task created</td><td>Persistence</td></tr>
+    <tr><td>4720</td><td>User account created</td><td>Was it expected?</td></tr>
+    <tr><td>4724</td><td>Password reset attempted</td><td>By whom?</td></tr>
+    <tr><td>4732</td><td>Member added to a local group</td><td>Administrators?</td></tr>
+    <tr><td>4740</td><td>Account locked out</td><td>Find the source</td></tr>
+    <tr><td>4768</td><td>Kerberos TGT requested</td><td>On domain controllers</td></tr>
+    <tr><td>4719</td><td>System audit policy changed</td><td>High</td></tr>
+    <tr><td>1102</td><td>Audit log cleared</td><td>High</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="logon-types">Logon types (in 4624 and 4625)</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Type</th><th scope="col">Name</th><th scope="col">Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>2</td><td>Interactive</td><td>At the keyboard</td></tr>
+    <tr><td>3</td><td>Network</td><td>File share, net use</td></tr>
+    <tr><td>4</td><td>Batch</td><td>Scheduled task</td></tr>
+    <tr><td>5</td><td>Service</td><td>A service started</td></tr>
+    <tr><td>7</td><td>Unlock</td><td>Screen unlocked</td></tr>
+    <tr><td>10</td><td>RemoteInteractive</td><td>Remote Desktop (RDP)</td></tr>
+    <tr><td>11</td><td>CachedInteractive</td><td>Cached credentials; no domain controller contacted</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="hunt">Hunt with PowerShell (run as admin)</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">Shows</th></tr></thead>
+  <tbody>
+    <tr><td><code>Get-WinEvent -FilterHashtable @{LogName='Security';Id=4625} -MaxEvents 20</code></td><td>Last 20 failed logons</td></tr>
+    <tr><td><code>Get-LocalGroupMember Administrators</code></td><td>Who is a local admin</td></tr>
+    <tr><td><code>Get-ScheduledTask</code></td><td>Tasks: look for odd names and paths</td></tr>
+    <tr><td><code>Get-NetTCPConnection -State Established</code></td><td>Live connections</td></tr>
+    <tr><td><code>Get-Process | Select-Object Name, Id, Path</code></td><td>Where each process runs from</td></tr>
+    <tr><td><code>Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Run</code></td><td>Run key autostarts (also check <code>HKCU:</code>)</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="defender">Defender and files</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>Get-MpComputerStatus</code></td><td>Is antivirus on and up to date?</td></tr>
+    <tr><td><code>Update-MpSignature</code></td><td>Update definitions</td></tr>
+    <tr><td><code>Start-MpScan -ScanType QuickScan</code></td><td>Quick scan</td></tr>
+    <tr><td><code>Get-MpThreatDetection</code></td><td>What Defender caught</td></tr>
+    <tr><td><code>Get-FileHash .\file.exe</code></td><td>SHA-256 hash to look up</td></tr>
+    <tr><td><code>Get-AuthenticodeSignature .\file.exe</code></td><td>Who signed the file</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="visibility">Turn on visibility first</h2>
+<ul>
+  <li><code>auditpol /get /category:*</code> shows what is being audited.</li>
+  <li><code>wevtutil epl Security C:\IR\sec.evtx</code> exports the Security log as evidence.</li>
+  <li><b>Script block logging</b> (event 4104): Group Policy, Administrative Templates, Windows Components, Windows PowerShell, <i>Turn on PowerShell Script Block Logging</i>. Windows PowerShell 5.1 logs to <code>Microsoft-Windows-PowerShell/Operational</code>; PowerShell 7 logs to <code>PowerShellCore/Operational</code>.</li>
+  <li>Event 4688 needs <i>Audit Process Creation</i> turned on, plus the command-line policy to see arguments.</li>
+</ul>
+
+<h2 id="triage">Triage order</h2>
+<ol>
+  <li>Who logged on? (4624, 4625)</li>
+  <li>New users or admins? (4720, 4732)</li>
+  <li>What persists? Tasks, services, Run keys</li>
+  <li>What talks out? Connections</li>
+  <li>Is Defender healthy?</li>
+</ol>
+<p class="note note-caution"><b>Danger.</b> Isolate the host. Do not wipe it. Escalate.</p>
+<p class="note note-caution"><b>Caution.</b> Export logs before a reboot or reimage.</p>
+<p class="note note-caution"><b>Caution.</b> Never turn off Defender to make an app work.</p>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>A burst of 4625 events for one user = password guessing</li>
+  <li>Logon type 10 = RDP</li>
+  <li>1102 = someone cleared the log</li>
+</ul>

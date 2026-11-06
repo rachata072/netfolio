@@ -1,0 +1,59 @@
+<!--
+  Text version of IT-05, shown under the sheet image on /cheat-sheets/it-05.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<h2 id="offboarding">Offboarding a leaver: do it in this order</h2>
+<p>Record each step in the ticket.</p>
+<ol>
+  <li><b>Disable</b> the AD account and the Entra ID account.</li>
+  <li><b>Revoke sessions</b> to kill refresh tokens in Entra ID.</li>
+  <li><b>Reset the password</b> to a random value; twice if compromise is suspected.</li>
+  <li><b>Mailbox:</b> convert it to shared and give the manager access.</li>
+  <li><b>Licenses:</b> remove them once the mailbox is shared.</li>
+  <li><b>Groups:</b> remove the user and move the account to a Disabled OU.</li>
+  <li><b>Devices:</b> retire or wipe them, and collect the hardware.</li>
+  <li><b>Hand over</b> files and shared drives, and remove MFA methods.</li>
+</ol>
+
+<h2 id="ad">Active Directory (on-prem)</h2>
+<p>These need the RSAT ActiveDirectory module. Set <code>$pw = Read-Host -AsSecureString</code> first so the password never appears on screen or in history.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>Get-ADUser jdoe -Properties LockedOut, PasswordLastSet, LastLogonDate</code></td><td>Status at a glance</td></tr>
+    <tr><td><code>Unlock-ADAccount -Identity jdoe</code></td><td>Unlock</td></tr>
+    <tr><td><code>Set-ADAccountPassword jdoe -Reset -NewPassword $pw</code></td><td>Reset the password</td></tr>
+    <tr><td><code>Disable-ADAccount -Identity jdoe</code></td><td>Disable</td></tr>
+    <tr><td><code>Get-ADPrincipalGroupMembership jdoe | Select-Object Name</code></td><td>Groups the user is in</td></tr>
+    <tr><td><code>Add-ADGroupMember SALES -Members jdoe</code></td><td>Add to a group</td></tr>
+    <tr><td><code>Search-ADAccount -AccountInactive -TimeSpan 90.00:00:00 -UsersOnly</code></td><td>Accounts unused for 90 days</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="m365">Entra ID and Exchange Online</h2>
+<p>Use Microsoft Graph PowerShell. The MSOnline and AzureAD modules are retired.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>Connect-MgGraph -Scopes "User.ReadWrite.All"</code></td><td>Sign in to Graph</td></tr>
+    <tr><td><code>Update-MgUser -UserId $id -AccountEnabled:$false</code></td><td>Block sign-in</td></tr>
+    <tr><td><code>Revoke-MgUserSignInSession -UserId $id</code></td><td>Revoke sessions</td></tr>
+    <tr><td><code>Get-MgUserLicenseDetail -UserId $id</code></td><td>List licenses</td></tr>
+    <tr><td><code>Set-MgUserLicense -UserId $id -RemoveLicenses @($skuId) -AddLicenses @{}</code></td><td>Remove a license</td></tr>
+    <tr><td><code>Connect-ExchangeOnline</code>, then <code>Set-Mailbox jdoe -Type Shared</code></td><td>Convert to a shared mailbox</td></tr>
+    <tr><td><code>Add-MailboxPermission jdoe -User manager -AccessRights FullAccess</code></td><td>Give the manager access</td></tr>
+  </tbody>
+</table></div>
+<p>A shared mailbox holds up to 50 GB with no license. Keep sign-in blocked on it.</p>
+
+<h2 id="safe">Stay safe</h2>
+<p class="note note-caution"><b>Danger.</b> Verify identity before any reset or unlock: call back on the number on file, not one in the ticket.</p>
+<p class="note note-caution"><b>Caution.</b> After a revoke, apps may keep working until their access token expires (about 1 hour by default).</p>
+<p class="note note-caution"><b>Caution.</b> Use the Helpdesk Administrator or User Administrator role, not Global Administrator. Never put passwords in tickets.</p>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>Disable first, delete later</li>
+  <li>Convert the mailbox before removing the license</li>
+  <li>For synced users, make changes in on-prem AD</li>
+</ul>

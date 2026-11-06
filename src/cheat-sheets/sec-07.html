@@ -1,0 +1,56 @@
+<!--
+  Text version of SEC-07, shown under the sheet image on /cheat-sheets/sec-07.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<h2 id="list">The OWASP Top 10:2025</h2>
+<p>OWASP ranks the list from data plus a practitioner survey.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">ID</th><th scope="col">Risk</th><th scope="col">Looks like</th><th scope="col">Fix</th></tr></thead>
+  <tbody>
+    <tr><td>A01</td><th scope="row">Broken Access Control</th><td>Change <code>?id=1001</code> to <code>1002</code> and see another user's data. Includes SSRF.</td><td>Deny by default; check every request on the server, per object</td></tr>
+    <tr><td>A02</td><th scope="row">Security Misconfiguration</th><td>Default admin password, debug pages, open cloud storage</td><td>Hardened baseline, remove extras, same config in every environment</td></tr>
+    <tr><td>A03</td><th scope="row">Software Supply Chain Failures</th><td>Old library with a known CVE, poisoned package, tampered build</td><td>SBOM, scan dependencies, trusted and signed sources</td></tr>
+    <tr><td>A04</td><th scope="row">Cryptographic Failures</th><td>HTTP logins, MD5 passwords, keys in code</td><td>TLS everywhere; bcrypt or Argon2 for passwords; a key vault</td></tr>
+    <tr><td>A05</td><th scope="row">Injection</th><td>SQL injection (<code>' OR 1=1--</code>), XSS, command injection</td><td>Parameterized queries; encode output; validate input</td></tr>
+    <tr><td>A06</td><th scope="row">Insecure Design</th><td>Password reset with guessable questions; no rate limits</td><td>Threat model early; secure design patterns; abuse cases</td></tr>
+    <tr><td>A07</td><th scope="row">Authentication Failures</th><td>Credential stuffing works, no MFA, sessions never expire</td><td>MFA, breached-password checks, short sessions, lockout</td></tr>
+    <tr><td>A08</td><th scope="row">Software or Data Integrity Failures</th><td>Unsigned auto-updates, unsafe deserialization</td><td>Sign and verify code and data; protect the CI/CD pipeline</td></tr>
+    <tr><td>A09</td><th scope="row">Security Logging and Alerting Failures</th><td>Breach found months later; no alert on 1,000 failed logins</td><td>Log auth and access events; alert on them; keep logs safe</td></tr>
+    <tr><td>A10</td><th scope="row">Mishandling of Exceptional Conditions (new)</th><td>Stack trace shown to users; an error leaves a transaction half done</td><td>Catch errors where they happen; fail closed; roll back fully</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="changes">What changed from 2021</h2>
+<ul>
+  <li><b>Expanded:</b> A03 Software Supply Chain Failures grew from 2021's Vulnerable and Outdated Components.</li>
+  <li><b>New:</b> A10 Mishandling of Exceptional Conditions.</li>
+  <li><b>Merged:</b> SSRF now sits inside A01.</li>
+  <li><b>Moved up:</b> Security Misconfiguration went from #5 to #2.</li>
+</ul>
+
+<h2 id="habits">Five habits that cover most</h2>
+<ul>
+  <li><b>Server-side checks:</b> never trust the browser</li>
+  <li><b>Parameterize:</b> every query, every time</li>
+  <li><b>Patch dependencies:</b> scan and update weekly</li>
+  <li><b>MFA:</b> for users and admins</li>
+  <li><b>Log and alert:</b> logins, access denied, errors</li>
+</ul>
+
+<h2 id="test">Test safely</h2>
+<p class="note note-auth"><b>Authorized use only.</b> Test only apps you own or have written permission to test. Use practice targets like OWASP Juice Shop.</p>
+<p class="note note-caution"><b>Caution.</b> Scanners can change or delete data. Point them at a test copy, never production.</p>
+
+<h2 id="deeper">Go deeper</h2>
+<ul>
+  <li><b>OWASP ASVS:</b> requirements to build and verify against</li>
+  <li><b>OWASP Cheat Sheet Series:</b> guidance per topic</li>
+  <li><b>OWASP Juice Shop:</b> a safe, deliberately vulnerable app</li>
+</ul>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>A01 Broken Access Control is #1</li>
+  <li>Fix the class of bug, not one URL</li>
+  <li>The Top 10 is an awareness list, not a full standard</li>
+</ul>

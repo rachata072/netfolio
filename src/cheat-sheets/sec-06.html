@@ -1,0 +1,77 @@
+<!--
+  Text version of SEC-06, shown under the sheet image on /cheat-sheets/sec-06.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<h2 id="tactics">The 15 Enterprise tactics</h2>
+<p>Tactics are the attacker's goal (the "why"). ATT&amp;CK v19 (April 2026) split Defense Evasion into Stealth and Defense Impairment. Checked against ATT&amp;CK v20.1.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">ID</th><th scope="col">Tactic</th><th scope="col">Goal</th></tr></thead>
+  <tbody>
+    <tr><td>TA0043</td><th scope="row">Reconnaissance</th><td>Gather information</td></tr>
+    <tr><td>TA0042</td><th scope="row">Resource Development</th><td>Buy or build tools</td></tr>
+    <tr><td>TA0001</td><th scope="row">Initial Access</th><td>Get in</td></tr>
+    <tr><td>TA0002</td><th scope="row">Execution</th><td>Run code</td></tr>
+    <tr><td>TA0003</td><th scope="row">Persistence</th><td>Stay in</td></tr>
+    <tr><td>TA0004</td><th scope="row">Privilege Escalation</th><td>Get admin</td></tr>
+    <tr><td>TA0005</td><th scope="row">Stealth</th><td>Look normal</td></tr>
+    <tr><td>TA0112</td><th scope="row">Defense Impairment</th><td>Break security tools</td></tr>
+    <tr><td>TA0006</td><th scope="row">Credential Access</th><td>Steal passwords</td></tr>
+    <tr><td>TA0007</td><th scope="row">Discovery</th><td>Map the network</td></tr>
+    <tr><td>TA0008</td><th scope="row">Lateral Movement</th><td>Spread</td></tr>
+    <tr><td>TA0009</td><th scope="row">Collection</th><td>Gather data</td></tr>
+    <tr><td>TA0011</td><th scope="row">Command and Control</th><td>Talk to home</td></tr>
+    <tr><td>TA0010</td><th scope="row">Exfiltration</th><td>Steal data</td></tr>
+    <tr><td>TA0040</td><th scope="row">Impact</th><td>Encrypt, destroy</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="attacks">Common attacks: spot them, stop them</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Attack</th><th scope="col">Technique</th><th scope="col">Spot it</th><th scope="col">Key mitigations</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Phishing</th><td>T1566</td><td>User reports, mail filter hits</td><td>M1017 user training, M1049 antivirus</td></tr>
+    <tr><th scope="row">Exploit a public app</th><td>T1190</td><td>WAF and IDS alerts, odd errors</td><td>M1051 update software, M1016 vulnerability scanning</td></tr>
+    <tr><th scope="row">Stolen valid account</th><td>T1078</td><td>Logon at an odd time or place</td><td>M1032 MFA, M1026 privileged account management</td></tr>
+    <tr><th scope="row">Password spraying</th><td>T1110.003</td><td>4625 across many users</td><td>M1032 MFA, M1036 account use policies</td></tr>
+    <tr><th scope="row">Malicious PowerShell</th><td>T1059.001</td><td>Script block log 4104</td><td>M1038 execution prevention, M1045 code signing</td></tr>
+    <tr><th scope="row">Credential dumping</th><td>T1003</td><td>LSASS access alerts</td><td>M1043 credential access protection, M1026</td></tr>
+    <tr><th scope="row">RDP to spread</th><td>T1021.001</td><td>4624 logon type 10</td><td>M1035 limit access over the network, M1032 MFA</td></tr>
+    <tr><th scope="row">Scheduled task</th><td>T1053.005</td><td>4698 task created</td><td>M1047 audit, M1028 OS configuration</td></tr>
+    <tr><th scope="row">Clear event logs</th><td>T1685.005</td><td>1102 log cleared</td><td>M1029 remote data storage (send logs off-host)</td></tr>
+    <tr><th scope="row">Adversary in the middle</th><td>T1557</td><td>ARP or DHCP oddities</td><td>M1041 encrypt, M1030 network segmentation</td></tr>
+    <tr><th scope="row">Ransomware</th><td>T1486</td><td>Mass file renames</td><td>M1053 offline backup, M1040 behavior prevention</td></tr>
+    <tr><th scope="row">Exfiltration over C2</th><td>T1041</td><td>Big outbound transfer to one host</td><td>M1057 data loss prevention, M1031 intrusion prevention</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="ids">Read an ID</h2>
+<p><code>T1110.003</code> is technique T1110 (Brute Force), sub-technique .003 (Password Spraying).</p>
+<ul>
+  <li><b>TA</b>: tactic, the goal</li>
+  <li><b>T</b>: technique; <code>.00x</code> is a sub-technique</li>
+  <li><b>M</b>: mitigation</li>
+  <li><b>G</b> and <b>S</b>: threat group and software</li>
+</ul>
+
+<h2 id="mitigations">Mitigations seen most</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">ID</th><th scope="col">Mitigation</th><th scope="col">Helps against</th></tr></thead>
+  <tbody>
+    <tr><td>M1032</td><td>Multi-factor authentication</td><td>Stolen accounts, spraying, RDP</td></tr>
+    <tr><td>M1026</td><td>Privileged account management</td><td>Fewer, separate admin accounts</td></tr>
+    <tr><td>M1051</td><td>Update software</td><td>Known vulnerabilities</td></tr>
+    <tr><td>M1053</td><td>Data backup</td><td>Ransomware; keep backups offline and test restores</td></tr>
+    <tr><td>M1017</td><td>User training</td><td>Phishing; teach people to report</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="use">Use it right</h2>
+<p class="note note-auth"><b>Authorized use only.</b> Emulate attacks only in your lab or with written permission.</p>
+<p class="note note-caution"><b>Caution.</b> IDs change between versions (T1562 is now T1685). Note the ATT&amp;CK version you used.</p>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>Tactic = why; technique = how</li>
+  <li>MFA appears in many mitigations</li>
+  <li>Map every alert to a technique ID</li>
+</ul>

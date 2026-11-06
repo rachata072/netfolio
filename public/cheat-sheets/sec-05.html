@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SEC-05 Windows &amp; PowerShell for defenders Cheat Sheet (PDF) | breakfixlearn</title>
+<meta name="description" content="Free one-page Windows security cheat sheet for defenders: key event IDs, logon types, PowerShell hunting, Defender and logging. PDF (Letter, A4) and image.">
+<link rel="canonical" href="https://breakfixlearn.com/cheat-sheets/sec-05">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=629a8f9e5c">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="Windows &amp; PowerShell for defenders cheat sheet (SEC-05)">
+<meta property="og:description" content="The Windows Security log events and logon types to know, PowerShell hunting and Defender commands, how to turn on logging, and a triage order.">
+<meta property="og:url" content="https://breakfixlearn.com/cheat-sheets/sec-05">
+<meta property="og:image" content="https://breakfixlearn.com/cheat-sheets/files/bfl-sec-05-windows-powershell-defenders_v1.0_social.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SEC-05 Windows &amp; PowerShell for defenders cheat sheet preview">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"SEC-05 Windows & PowerShell for defenders cheat sheet","description":"Free one-page Windows security cheat sheet for defenders: key event IDs, logon types, PowerShell hunting, Defender and logging. PDF (Letter, A4) and image.","url":"https://breakfixlearn.com/cheat-sheets/sec-05","learningResourceType":"Cheat sheet","educationalLevel":"Beginner","teaches":"Windows & PowerShell for defenders","keywords":"Windows, Event logs, PowerShell, Defender, Threat hunting","inLanguage":"en","isAccessibleForFree":true,"license":"https://creativecommons.org/licenses/by-nc/4.0/","version":"1.0","datePublished":"2026-11-05","dateModified":"2026-11-05","image":"https://breakfixlearn.com/cheat-sheets/files/bfl-sec-05-windows-powershell-defenders_v1.0_social.webp","author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"encoding":[{"@type":"MediaObject","name":"SEC-05 Windows & PowerShell for defenders (US Letter)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-sec-05-windows-powershell-defenders_v1.0_print-letter.pdf","encodingFormat":"application/pdf","contentSize":"122 KB","sha256":"35ab77e18312ad2684d8c76a8c2a21bea9c6c5ff8f945ef8e4ceca1e79c6e672"},{"@type":"MediaObject","name":"SEC-05 Windows & PowerShell for defenders (A4)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-sec-05-windows-powershell-defenders_v1.0_print-a4.pdf","encodingFormat":"application/pdf","contentSize":"122 KB","sha256":"63013c5ef91169e80e3facef20669bd8f0bb0bfff1db1c0a75eaf2d03b5d2818"},{"@type":"MediaObject","name":"SEC-05 Windows & PowerShell for defenders (Screen)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-sec-05-windows-powershell-defenders_v1.0_web.pdf","encodingFormat":"application/pdf","contentSize":"99 KB","sha256":"2e4e99dfffef5f0431f7cd39c9ecbb62ca80de10d759b21b57a6f6493ce57f24"},{"@type":"MediaObject","name":"SEC-05 Windows & PowerShell for defenders (Hi-res image)","contentUrl":"https://breakfixlearn.com/cheat-sheets/files/bfl-sec-05-windows-powershell-defenders_v1.0_full.webp","encodingFormat":"image/webp","contentSize":"508 KB","sha256":"cd4605efb62045607ee1fd7ce698c98a1469ef3d9a6cb0118d3631af27e85a7b"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"Cheat sheets","item":"https://breakfixlearn.com/cheat-sheets"},{"@type":"ListItem","position":3,"name":"SEC-05 Windows & PowerShell for defenders"}]}</script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets" aria-current="page"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article class="sheet">
+  <header class="post-head sheet-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/cheat-sheets">cheat-sheets</a><span aria-hidden="true">/</span><a href="/cheat-sheets#cybersecurity">sec</a></nav>
+      <p class="scard-meta"><span class="sid k-cybersecurity">SEC-05</span><span>Cybersecurity</span></p>
+      <h1>Windows &amp; PowerShell for defenders</h1>
+      <p class="post-dek"><b>Use this when:</b> you check a Windows PC or server for signs of compromise: logons, new accounts, odd tasks, connections and Defender status.</p>
+      <div class="post-meta"><span>Security+ and CySA+</span><span class="sep">/</span><span>v1.0</span><span class="sep">/</span><time datetime="2026-11-05">Nov 5, 2026</time><span class="sep">/</span><span>1 page</span><span class="sep">/</span><a href="https://creativecommons.org/licenses/by-nc/4.0/" rel="license noopener" target="_blank">CC BY-NC 4.0</a></div>
+    </div>
+  </header>
+  <div class="wrap sheet-grid">
+    <figure class="sheet-paper">
+      <a href="/cheat-sheets/files/bfl-sec-05-windows-powershell-defenders_v1.0_full.webp" aria-label="Open the full-size SEC-05 image (2550 by 3300 pixels)">
+        <img src="/cheat-sheets/files/bfl-sec-05-windows-powershell-defenders_v1.0_web.webp" srcset="/cheat-sheets/files/bfl-sec-05-windows-powershell-defenders_v1.0_web.webp 1200w, /cheat-sheets/files/bfl-sec-05-windows-powershell-defenders_v1.0_full.webp 2550w" sizes="(max-width: 60rem) calc(100vw - 2rem), 46rem"
+             width="1200" height="1553" fetchpriority="high" decoding="async"
+             alt="SEC-05 Windows &amp; PowerShell for defenders cheat sheet. Every table on it is repeated as text below.">
+      </a>
+      <figcaption>Tap the sheet for the full-size image. The <a href="#text-version">text version</a> below is screen-reader friendly.</figcaption>
+    </figure>
+    <aside class="sheet-side" aria-labelledby="dl-h">
+      <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">copy</span> <span class="a">sec-05 flash:</span></span>
+      <h2 id="dl-h" class="side-h">Download</h2>
+      <ul class="dl-list"><li><a class="dl dl-pri" href="/cheat-sheets/files/bfl-sec-05-windows-powershell-defenders_v1.0_print-letter.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>US Letter</b><span class="dl-m">print &middot; 122 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-sec-05-windows-powershell-defenders_v1.0_print-a4.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>A4</b><span class="dl-m">print &middot; 122 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-sec-05-windows-powershell-defenders_v1.0_web.pdf" download><span class="dl-k">PDF</span><span class="dl-t"><b>Screen</b><span class="dl-m">links work &middot; 99 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/cheat-sheets/files/bfl-sec-05-windows-powershell-defenders_v1.0_full.webp" download><span class="dl-k">WebP</span><span class="dl-t"><b>Hi-res image</b><span class="dl-m">2550 &times; 3300 &middot; 508 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li></ul>
+      <p class="dl-open"><a href="/cheat-sheets/files/bfl-sec-05-windows-powershell-defenders_v1.0_web.pdf">Open the PDF in your browser</a> instead of downloading it.</p>
+      <details class="sums">
+        <summary>Verify your download (SHA-256)</summary>
+        <div class="tbl"><table class="sheet-files"><thead><tr><th scope="col">File</th><th scope="col">SHA-256</th></tr></thead><tbody><tr><td translate="no">bfl-sec-05-windows-powershell-defenders_v1.0_web.pdf</td><td translate="no">2e4e99dfffef5f0431f7cd39c9ecbb62ca80de10d759b21b57a6f6493ce57f24</td></tr><tr><td translate="no">bfl-sec-05-windows-powershell-defenders_v1.0_print-letter.pdf</td><td translate="no">35ab77e18312ad2684d8c76a8c2a21bea9c6c5ff8f945ef8e4ceca1e79c6e672</td></tr><tr><td translate="no">bfl-sec-05-windows-powershell-defenders_v1.0_print-a4.pdf</td><td translate="no">63013c5ef91169e80e3facef20669bd8f0bb0bfff1db1c0a75eaf2d03b5d2818</td></tr><tr><td translate="no">bfl-sec-05-windows-powershell-defenders_v1.0_full.webp</td><td translate="no">cd4605efb62045607ee1fd7ce698c98a1469ef3d9a6cb0118d3631af27e85a7b</td></tr></tbody></table></div>
+        <p>Compare the hash with the one printed by
+          <code translate="no">Get-FileHash .\file.pdf -Algorithm SHA256</code> (PowerShell) or
+          <code translate="no">sha256sum file.pdf</code> (Linux, macOS: <code translate="no">shasum -a 256</code>). Different hash, different file: delete it.</p>
+      </details>
+      <p class="side-note">Free for personal and classroom use under CC BY-NC 4.0. Keep the credit line; don't sell it. Spotted a mistake? <a href="mailto:treyrct858@gmail.com?subject=SEC-05%20v1.0%20correction">Email a correction</a>.</p>
+    </aside>
+  </div>
+  <section class="wrap sheet-text" aria-labelledby="text-version">
+    <div class="prose">
+      <h2 id="text-version">Text version</h2>
+      <p>Everything on the sheet, as plain HTML: handy for screen readers, copy-paste and search.</p>
+<h3 id="events">Security log events to know</h3>
+<p>Find them in Event Viewer under Windows Logs, Security. Microsoft rates 4719 and 1102 high: investigate every one.</p>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Event ID</th><th scope="col">What happened</th><th scope="col">Why care</th></tr></thead>
+  <tbody>
+    <tr><td>4624</td><td>Logon succeeded</td><td>Check the logon type</td></tr>
+    <tr><td>4625</td><td>Logon failed</td><td>Many in a row = password guessing</td></tr>
+    <tr><td>4648</td><td>Logon with explicit credentials</td><td>runas, lateral movement</td></tr>
+    <tr><td>4672</td><td>Admin rights given to a new logon</td><td>Who is acting as admin?</td></tr>
+    <tr><td>4688</td><td>New process created</td><td>Needs process auditing turned on</td></tr>
+    <tr><td>4697</td><td>Service install attempted</td><td>Persistence</td></tr>
+    <tr><td>4698</td><td>Scheduled task created</td><td>Persistence</td></tr>
+    <tr><td>4720</td><td>User account created</td><td>Was it expected?</td></tr>
+    <tr><td>4724</td><td>Password reset attempted</td><td>By whom?</td></tr>
+    <tr><td>4732</td><td>Member added to a local group</td><td>Administrators?</td></tr>
+    <tr><td>4740</td><td>Account locked out</td><td>Find the source</td></tr>
+    <tr><td>4768</td><td>Kerberos TGT requested</td><td>On domain controllers</td></tr>
+    <tr><td>4719</td><td>System audit policy changed</td><td>High</td></tr>
+    <tr><td>1102</td><td>Audit log cleared</td><td>High</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="logon-types">Logon types (in 4624 and 4625)</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Type</th><th scope="col">Name</th><th scope="col">Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>2</td><td>Interactive</td><td>At the keyboard</td></tr>
+    <tr><td>3</td><td>Network</td><td>File share, net use</td></tr>
+    <tr><td>4</td><td>Batch</td><td>Scheduled task</td></tr>
+    <tr><td>5</td><td>Service</td><td>A service started</td></tr>
+    <tr><td>7</td><td>Unlock</td><td>Screen unlocked</td></tr>
+    <tr><td>10</td><td>RemoteInteractive</td><td>Remote Desktop (RDP)</td></tr>
+    <tr><td>11</td><td>CachedInteractive</td><td>Cached credentials; no domain controller contacted</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="hunt">Hunt with PowerShell (run as admin)</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">Shows</th></tr></thead>
+  <tbody>
+    <tr><td><code translate="no">Get-WinEvent -FilterHashtable @{LogName='Security';Id=4625} -MaxEvents 20</code></td><td>Last 20 failed logons</td></tr>
+    <tr><td><code translate="no">Get-LocalGroupMember Administrators</code></td><td>Who is a local admin</td></tr>
+    <tr><td><code translate="no">Get-ScheduledTask</code></td><td>Tasks: look for odd names and paths</td></tr>
+    <tr><td><code translate="no">Get-NetTCPConnection -State Established</code></td><td>Live connections</td></tr>
+    <tr><td><code translate="no">Get-Process | Select-Object Name, Id, Path</code></td><td>Where each process runs from</td></tr>
+    <tr><td><code translate="no">Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Run</code></td><td>Run key autostarts (also check <code translate="no">HKCU:</code>)</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="defender">Defender and files</h3>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code translate="no">Get-MpComputerStatus</code></td><td>Is antivirus on and up to date?</td></tr>
+    <tr><td><code translate="no">Update-MpSignature</code></td><td>Update definitions</td></tr>
+    <tr><td><code translate="no">Start-MpScan -ScanType QuickScan</code></td><td>Quick scan</td></tr>
+    <tr><td><code translate="no">Get-MpThreatDetection</code></td><td>What Defender caught</td></tr>
+    <tr><td><code translate="no">Get-FileHash .\file.exe</code></td><td>SHA-256 hash to look up</td></tr>
+    <tr><td><code translate="no">Get-AuthenticodeSignature .\file.exe</code></td><td>Who signed the file</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="visibility">Turn on visibility first</h3>
+<ul>
+  <li><code translate="no">auditpol /get /category:*</code> shows what is being audited.</li>
+  <li><code translate="no">wevtutil epl Security C:\IR\sec.evtx</code> exports the Security log as evidence.</li>
+  <li><b>Script block logging</b> (event 4104): Group Policy, Administrative Templates, Windows Components, Windows PowerShell, <i>Turn on PowerShell Script Block Logging</i>. Windows PowerShell 5.1 logs to <code translate="no">Microsoft-Windows-PowerShell/Operational</code>; PowerShell 7 logs to <code translate="no">PowerShellCore/Operational</code>.</li>
+  <li>Event 4688 needs <i>Audit Process Creation</i> turned on, plus the command-line policy to see arguments.</li>
+</ul>
+
+<h3 id="triage">Triage order</h3>
+<ol>
+  <li>Who logged on? (4624, 4625)</li>
+  <li>New users or admins? (4720, 4732)</li>
+  <li>What persists? Tasks, services, Run keys</li>
+  <li>What talks out? Connections</li>
+  <li>Is Defender healthy?</li>
+</ol>
+<p class="note note-caution"><b>Danger.</b> Isolate the host. Do not wipe it. Escalate.</p>
+<p class="note note-caution"><b>Caution.</b> Export logs before a reboot or reimage.</p>
+<p class="note note-caution"><b>Caution.</b> Never turn off Defender to make an app work.</p>
+
+<h3 id="remember">Remember</h3>
+<ul>
+  <li>A burst of 4625 events for one user = password guessing</li>
+  <li>Logon type 10 = RDP</li>
+  <li>1102 = someone cleared the log</li>
+</ul>
+      <h3>Sources</h3>
+      <ul><li><a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/plan/appendix-l--events-to-monitor" rel="noopener" target="_blank">Microsoft Learn, Appendix L: Events to Monitor</a></li><li><a href="https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4624" rel="noopener" target="_blank">Microsoft Learn, event 4624 and logon types</a></li><li><a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_logging_windows" rel="noopener" target="_blank">Microsoft Learn, about_Logging_Windows</a></li><li><a href="https://learn.microsoft.com/en-us/powershell/module/defender/start-mpscan" rel="noopener" target="_blank">Microsoft Learn, Start-MpScan</a></li></ul>
+      <h3>Go deeper on the blog</h3><ul><li><a href="/blog/windows-11-stig-audit-policy-wdigest-autoplay-seclogon">Hardening Windows 11 Against DISA STIGs, Part 2: Audit Policy, WDigest, AutoPlay and Seclogon</a></li></ul>
+    </div>
+    <nav class="nexthop" aria-label="More cheat sheets"><a class="prev" href="/cheat-sheets/sec-04"><span class="k">&larr; previous sheet</span>SEC-04 Linux security commands</a><a class="next" href="/cheat-sheets/sec-06"><span class="k">next sheet &rarr;</span>SEC-06 Common attacks &amp; mitigations (MITRE ATT&amp;CK)</a></nav>
+  </section>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/ccnp-security">ccnp security</a></li>
+        <li><a href="/ccnp-security/labs">ccnp labs</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Oct 22, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

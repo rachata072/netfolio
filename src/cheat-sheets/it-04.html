@@ -1,0 +1,80 @@
+<!--
+  Text version of IT-04, shown under the sheet image on /cheat-sheets/it-04.
+  Accessible alternative to the image and what search engines read. Keep it in sync with the sheet.
+-->
+<h2 id="stack">Work up the stack: stop at the first failure</h2>
+<p>The examples use 192.0.2.1 as the gateway.</p>
+<ol>
+  <li><b>Link:</b> cable lights on? Wi-Fi on? Airplane mode off?</li>
+  <li><b>IP address:</b> <code>ipconfig /all</code>. A 169.254.x.x address means no DHCP reply.</li>
+  <li><b>Gateway:</b> <code>ping 192.0.2.1</code>. Is the local network OK?</li>
+  <li><b>Internet:</b> ping a public IP address your team trusts.</li>
+  <li><b>DNS:</b> <code>nslookup example.com</code>. Does the name resolve?</li>
+  <li><b>App or port:</b> <code>Test-NetConnection example.com -Port 443</code>. Is the port open?</li>
+</ol>
+
+<h2 id="symptoms">Symptom to likely cause</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Symptom</th><th scope="col">Likely cause and next step</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">169.254.x.x address</th><td>No DHCP reply: cable, wrong VLAN or DHCP server down. Try <code>ipconfig /renew</code>.</td></tr>
+    <tr><th scope="row">IP works, names fail</th><td>DNS: wrong DNS server or a bad cache. Run <code>ipconfig /flushdns</code> and check DNS in <code>ipconfig /all</code>.</td></tr>
+    <tr><th scope="row">"Connected, no internet"</th><td>Gateway or DNS problem. Ping the gateway, then a public IP.</td></tr>
+    <tr><th scope="row">One site fails</th><td>That site, a proxy or a web filter. Try another browser and <code>Test-NetConnection</code>.</td></tr>
+    <tr><th scope="row">IP conflict warning</th><td>Two devices with one IP, often a static one. <code>arp -a</code> shows the MAC behind it.</td></tr>
+    <tr><th scope="row">Slow or drops on Wi-Fi</th><td>Weak signal or a crowded 2.4 GHz band. <code>netsh wlan show interfaces</code> shows the signal %.</td></tr>
+    <tr><th scope="row">Whole office down</th><td>Not this PC. Check the switch, ISP or outage page, then escalate.</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="diagnose">Diagnose (Windows)</h2>
+<div class="tbl"><table>
+  <thead><tr><th scope="col">Command</th><th scope="col">Shows</th></tr></thead>
+  <tbody>
+    <tr><td><code>Get-NetIPConfiguration</code></td><td>IP, gateway and DNS</td></tr>
+    <tr><td><code>Resolve-DnsName example.com</code></td><td>DNS answer</td></tr>
+    <tr><td><code>Test-NetConnection example.com -Port 443</code></td><td>Is the port open?</td></tr>
+    <tr><td><code>ping -t 192.0.2.1</code></td><td>Watch for drops (Ctrl+C to stop)</td></tr>
+    <tr><td><code>pathping example.com</code></td><td>Packet loss per hop</td></tr>
+    <tr><td><code>tracert example.com</code></td><td>Where the path stops</td></tr>
+    <tr><td><code>netsh wlan show wlanreport</code></td><td>Wi-Fi history report</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="wifi">Wi-Fi checks</h2>
+<ul>
+  <li><b>Signal:</b> low signal %? Move closer.</li>
+  <li><b>Band:</b> try 5 GHz if 2.4 GHz is crowded.</li>
+  <li><b>Profile:</b> forget the network and rejoin.</li>
+  <li><b>Driver:</b> update it and check power saving.</li>
+  <li><b>Captive portal:</b> on guest Wi-Fi, open a browser.</li>
+</ul>
+
+<h2 id="fix">Fix ladder</h2>
+<p>Run these in an admin prompt, in this order (Microsoft's recommended sequence):</p>
+<ol>
+  <li><code>netsh winsock reset</code></li>
+  <li><code>netsh int ip reset</code></li>
+  <li><code>ipconfig /release</code>, then <code>ipconfig /renew</code></li>
+  <li><code>ipconfig /flushdns</code></li>
+  <li>Last resort: Settings, Network reset (the PC restarts)</li>
+</ol>
+
+<h2 id="escalate">Escalate with proof</h2>
+<ul>
+  <li>User, PC name and location</li>
+  <li>Wired or Wi-Fi</li>
+  <li><code>ipconfig /all</code> output</li>
+  <li>Which step failed</li>
+  <li>When it started</li>
+  <li>How many users are affected</li>
+</ul>
+<p class="note note-caution"><b>Danger.</b> Never turn off the firewall or antivirus "to test" the connection.</p>
+<p class="note note-caution"><b>Caution.</b> <code>ipconfig /release</code> drops a remote session. Network reset removes VPN clients and virtual switches.</p>
+
+<h2 id="remember">Remember</h2>
+<ul>
+  <li>169.254 = DHCP never answered</li>
+  <li>IP works but names fail = DNS</li>
+  <li>Many users down = not the PC</li>
+</ul>

@@ -564,24 +564,121 @@
     },
     {
       "id": "SEC-05",
+      "slug": "windows-powershell-defenders",
       "title": "Windows & PowerShell for defenders",
       "cat": "cybersecurity",
       "wave": 2,
-      "status": "planned"
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-11-05",
+      "exam": "Security+ and CySA+",
+      "use_when": "You check a Windows PC or server for signs of compromise: logons, new accounts, odd tasks, connections and Defender status.",
+      "summary": "The Windows Security log events and logon types to know, PowerShell hunting and Defender commands, how to turn on logging, and a triage order.",
+      "description": "Free one-page Windows security cheat sheet for defenders: key event IDs, logon types, PowerShell hunting, Defender and logging. PDF (Letter, A4) and image.",
+      "tags": [
+        "Windows",
+        "Event logs",
+        "PowerShell",
+        "Defender",
+        "Threat hunting"
+      ],
+      "sources": [
+        [
+          "Microsoft Learn, Appendix L: Events to Monitor",
+          "https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/plan/appendix-l--events-to-monitor"
+        ],
+        [
+          "Microsoft Learn, event 4624 and logon types",
+          "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4624"
+        ],
+        [
+          "Microsoft Learn, about_Logging_Windows",
+          "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_logging_windows"
+        ],
+        [
+          "Microsoft Learn, Start-MpScan",
+          "https://learn.microsoft.com/en-us/powershell/module/defender/start-mpscan"
+        ]
+      ],
+      "related": [
+        "windows-11-stig-audit-policy-wdigest-autoplay-seclogon"
+      ]
     },
     {
       "id": "SEC-06",
+      "slug": "attacks-mitre-attack",
       "title": "Common attacks & mitigations (MITRE ATT&CK)",
       "cat": "cybersecurity",
       "wave": 2,
-      "status": "planned"
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-11-05",
+      "exam": "MITRE ATT&CK v20, Security+ and CySA+",
+      "use_when": "You map an alert or incident to MITRE ATT&CK, or need the controls that stop the attacks seen most.",
+      "summary": "The 15 ATT&CK Enterprise tactics (with the v19 Stealth and Defense Impairment split), 12 common techniques with detections and mitigations, and how to read IDs.",
+      "description": "Free one-page MITRE ATT&CK cheat sheet: 15 tactics, common techniques with IDs, how to spot them and key mitigations. PDF (Letter, A4) and image.",
+      "tags": [
+        "MITRE ATT&CK",
+        "Threat detection",
+        "Mitigations",
+        "Blue team",
+        "Incident response"
+      ],
+      "sources": [
+        [
+          "MITRE ATT&CK Enterprise tactics",
+          "https://attack.mitre.org/tactics/enterprise/"
+        ],
+        [
+          "MITRE ATT&CK updates, April 2026 (v19)",
+          "https://attack.mitre.org/resources/updates/updates-april-2026/"
+        ],
+        [
+          "Microsoft Learn, Appendix L: Events to Monitor",
+          "https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/plan/appendix-l--events-to-monitor"
+        ]
+      ],
+      "related": [
+        "soc-homelab-first-alerts-attack-simulation"
+      ]
     },
     {
       "id": "SEC-07",
+      "slug": "owasp-top-10",
       "title": "OWASP Top 10 web risks",
       "cat": "cybersecurity",
       "wave": 2,
-      "status": "planned"
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-11-05",
+      "exam": "OWASP Top 10:2025 and Security+",
+      "use_when": "You build, review or test a web app and need the ten most important risk areas, what they look like and how to fix them.",
+      "summary": "The OWASP Top 10:2025 with an example and a fix for each risk, what changed from 2021, five habits that cover most of the list, and safe testing.",
+      "description": "Free one-page OWASP Top 10:2025 cheat sheet: all ten web risks with examples and fixes, plus what changed from 2021. PDF (Letter, A4) and image.",
+      "tags": [
+        "OWASP Top 10",
+        "Web security",
+        "AppSec",
+        "Injection",
+        "Access control"
+      ],
+      "sources": [
+        [
+          "OWASP Top 10:2025",
+          "https://top10.owasp.org/2025/"
+        ],
+        [
+          "OWASP Top 10:2025 introduction",
+          "https://top10.owasp.org/2025/0x00_2025-Introduction/"
+        ],
+        [
+          "OWASP Cheat Sheet Series",
+          "https://cheatsheetseries.owasp.org/"
+        ]
+      ],
+      "related": [
+        "openclaw-nat64-ssrf-guard-bypass"
+      ]
     },
     {
       "id": "SEC-08",
@@ -744,17 +841,89 @@
     },
     {
       "id": "IT-04",
+      "slug": "network-troubleshooting",
       "title": "Network troubleshooting for help desk",
       "cat": "it-support",
       "wave": 2,
-      "status": "planned"
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-11-05",
+      "exam": "CompTIA A+ and Network+",
+      "use_when": "A user says \"the internet is down\" and you need to find where it breaks, fix the common causes, or escalate with proof.",
+      "summary": "Six checks up the stack, symptoms and their likely causes, Windows diagnose commands, Wi-Fi checks, Microsoft's fix ladder and what to send when you escalate.",
+      "description": "Free one-page help desk network troubleshooting cheat sheet: step-by-step checks, symptom table, Windows commands, fix ladder. PDF (Letter, A4) and image.",
+      "tags": [
+        "Network troubleshooting",
+        "Help desk",
+        "Windows",
+        "DNS",
+        "DHCP",
+        "Wi-Fi"
+      ],
+      "sources": [
+        [
+          "Microsoft Support, Fix Ethernet connection problems in Windows",
+          "https://support.microsoft.com/en-us/windows/experience/connectivity-networking/fix-ethernet-connection-problems-in-windows"
+        ],
+        [
+          "Microsoft Learn, troubleshoot TCP/IP communication",
+          "https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/troubleshoot-tcp-ip-communication-guidance"
+        ],
+        [
+          "Microsoft Learn, Test-NetConnection",
+          "https://learn.microsoft.com/en-us/powershell/module/nettcpip/test-netconnection"
+        ]
+      ],
+      "related": [
+        "freshservice-service-desk-simulation-sla-tickets"
+      ]
     },
     {
       "id": "IT-05",
+      "slug": "active-directory-m365",
       "title": "Active Directory & Microsoft 365 account tasks",
       "cat": "it-support",
       "wave": 2,
-      "status": "planned"
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-11-05",
+      "exam": "CompTIA A+ and Microsoft 365 admin basics",
+      "use_when": "You unlock, reset, create or offboard users in Active Directory, Entra ID and Exchange Online.",
+      "summary": "An 8-step offboarding order, everyday Active Directory PowerShell, Microsoft Graph and Exchange Online commands, and identity safety rules.",
+      "description": "Free one-page Active Directory and Microsoft 365 account cheat sheet: offboarding steps, AD and Graph PowerShell, shared mailboxes. PDF (Letter, A4) and image.",
+      "tags": [
+        "Active Directory",
+        "Microsoft 365",
+        "Entra ID",
+        "Exchange Online",
+        "PowerShell"
+      ],
+      "sources": [
+        [
+          "Microsoft Learn, revoke user access in an emergency",
+          "https://learn.microsoft.com/en-us/entra/identity/users/users-revoke-access"
+        ],
+        [
+          "Microsoft Learn, remove licenses with PowerShell",
+          "https://learn.microsoft.com/en-us/microsoft-365/enterprise/remove-licenses-from-user-accounts-with-microsoft-365-powershell"
+        ],
+        [
+          "Microsoft Learn, convert a mailbox",
+          "https://learn.microsoft.com/en-us/exchange/recipients-in-exchange-online/manage-user-mailboxes/convert-a-mailbox"
+        ],
+        [
+          "Microsoft Learn, about shared mailboxes",
+          "https://learn.microsoft.com/en-us/microsoft-365/admin/email/about-shared-mailboxes"
+        ],
+        [
+          "Microsoft Entra blog, MSOnline and AzureAD retirement",
+          "https://techcommunity.microsoft.com/blog/microsoft-entra-blog/action-required-msonline-and-azuread-powershell-retirement---2025-info-and-resou/4364991"
+        ]
+      ],
+      "related": [
+        "active-directory-home-lab-windows-server-2022-gpo",
+        "automate-microsoft-365-admin-tasks-powershell-graph"
+      ]
     },
     {
       "id": "IT-06",
@@ -864,17 +1033,88 @@
     },
     {
       "id": "AI-03",
+      "slug": "prompts-it-networking",
       "title": "Prompts for IT & networking tasks",
       "cat": "ai",
       "wave": 2,
-      "status": "planned"
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-11-05",
+      "exam": "Claude, ChatGPT and Gemini",
+      "use_when": "You want AI help with real IT work: reading output, explaining configs, writing scripts, tickets and runbooks.",
+      "summary": "Six copy-ready prompt templates for IT and networking work, how to mask data before you paste, how to get checkable answers, and follow-up prompts.",
+      "description": "Free one-page cheat sheet of AI prompts for IT and networking: troubleshooting, configs, scripts, tickets, runbooks and ACL reviews. PDF (Letter, A4) and image.",
+      "tags": [
+        "Prompt templates",
+        "AI for IT",
+        "Networking",
+        "Automation",
+        "Help desk"
+      ],
+      "sources": [
+        [
+          "Anthropic, prompt engineering overview",
+          "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview"
+        ],
+        [
+          "OpenAI, prompt engineering guide",
+          "https://platform.openai.com/docs/guides/prompt-engineering"
+        ],
+        [
+          "Google, Gemini prompting strategies",
+          "https://ai.google.dev/gemini-api/docs/prompting-strategies"
+        ],
+        [
+          "OWASP Top 10 for LLM applications (2025)",
+          "https://genai.owasp.org/llm-top-10/"
+        ]
+      ],
+      "related": [
+        "py-configbackup-netmiko-config-backup-alerts",
+        "best-ai-tools-network-engineers-2026"
+      ]
     },
     {
       "id": "AI-04",
+      "slug": "owasp-llm-top-10",
       "title": "AI security risks (OWASP LLM Top 10)",
       "cat": "ai",
       "wave": 2,
-      "status": "planned"
+      "status": "live",
+      "version": "1.0",
+      "date": "2026-11-05",
+      "exam": "OWASP LLM Top 10 (2025) and Security+",
+      "use_when": "You build, buy or review a chatbot, AI agent or RAG app and need the top risks and the controls that stop them.",
+      "summary": "The OWASP Top 10 for LLM applications (2025) with an example and a control for each, defense layers for AI agents, and the NIST AI RMF functions.",
+      "description": "Free one-page AI security cheat sheet: OWASP LLM Top 10 2025 risks with examples and fixes, agent defenses, NIST AI RMF. PDF (Letter, A4) and image.",
+      "tags": [
+        "AI security",
+        "OWASP LLM Top 10",
+        "Prompt injection",
+        "AI agents",
+        "NIST AI RMF"
+      ],
+      "sources": [
+        [
+          "OWASP Top 10 for LLM applications (2025)",
+          "https://genai.owasp.org/llm-top-10/"
+        ],
+        [
+          "OWASP LLM01:2025 Prompt Injection",
+          "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+        ],
+        [
+          "OWASP LLM06:2025 Excessive Agency",
+          "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+        ],
+        [
+          "NIST AI Risk Management Framework",
+          "https://www.nist.gov/itl/ai-risk-management-framework"
+        ]
+      ],
+      "related": [
+        "copilot-prompt-injection-threat-hunt-echoleak"
+      ]
     },
     {
       "id": "AI-05",
