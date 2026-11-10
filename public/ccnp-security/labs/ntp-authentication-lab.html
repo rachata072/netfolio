@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free NTP Authentication Lab: hmac-sha2-256 on Cisco IOS XE (SCOR 2.7)</title>
+<meta name="description" content="Free CCNP Security lab: configure authenticated NTP with hmac-sha2-256 between two IOS XE routers, verify the sync and the key match, and troubleshoot it.">
+<link rel="canonical" href="https://breakfixlearn.com/ccnp-security/labs/ntp-authentication-lab">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=629a8f9e5c">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="Authenticated NTP Lab: HMAC-SHA-256 Between Two Routers">
+<meta property="og:description" content="Configure an authenticated NTP server and client on IOS XE, watch the client go from stratum 16 to synchronized, and prove the key match from the debug and association detail.">
+<meta property="og:url" content="https://breakfixlearn.com/ccnp-security/labs/ntp-authentication-lab">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/ccnp-lab-ntp-authentication-lab.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Authenticated NTP Lab: HMAC-SHA-256 Between Two Routers: free CCNP Security lab">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Authenticated NTP Lab: HMAC-SHA-256 Between Two Routers","description":"Free CCNP Security lab: configure authenticated NTP with hmac-sha2-256 between two IOS XE routers, verify the sync and the key match, and troubleshoot it.","url":"https://breakfixlearn.com/ccnp-security/labs/ntp-authentication-lab","learningResourceType":"Lab exercise","educationalLevel":"Professional","inLanguage":"en","isAccessibleForFree":true,"datePublished":"2026-11-09","dateModified":"2026-11-09","teaches":["Configure secure network management of perimeter security and infrastructure devices such as SNMPv3, NetConf, RestConf, APIs, secure syslog, and NTP with authentication"],"author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"encoding":[]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"CCNP Security","item":"https://breakfixlearn.com/ccnp-security"},{"@type":"ListItem","position":3,"name":"Authenticated NTP Lab: HMAC-SHA-256 Between Two Routers"}]}</script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article class="lecture lab">
+  <header class="post-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/ccnp-security">ccnp-security</a><span aria-hidden="true">/</span><a href="/ccnp-security/labs">labs</a><span aria-hidden="true">/</span><span>ntp-authentication-lab</span></nav>
+      <p class="scard-meta"><span class="sid">Real IOS lab</span><span>Domain 2 Network Security &middot; topics 2.7</span></p>
+      <h1 class="mt-2">Authenticated NTP Lab: HMAC-SHA-256 Between Two Routers</h1>
+      <p class="post-dek">Configure an authenticated NTP server and client on IOS XE, watch the client go from stratum 16 to synchronized, and prove the key match from the debug and association detail.</p>
+      <div class="post-meta"><time datetime="2026-11-09">updated Nov 9, 2026</time><span class="sep">/</span><span>30 to 45 min</span><span class="sep">/</span><span>Two IOS XE routers</span><span class="sep">/</span><span>by Trey</span></div>
+    </div>
+  </header>
+  <div class="wrap post-layout">
+    <div class="post-main">
+      <section class="labdl labenv" aria-labelledby="dl-h">
+        <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">show</span> <span class="a">ntp-authentication-lab environment</span></span>
+        <h2 id="dl-h" class="sub-h">Where to run this lab</h2>
+        <ul class="env-list"><li><b>Cisco Modeling Labs</b> <span>Two Catalyst 8000V, CSR 1000v or IOSv routers on one link. Recommended.</span></li><li><b>DevNet / dCloud</b> <span>Any reservable topology with two IOS XE routers.</span></li><li><b>Your own gear</b> <span>Two IOS or IOS XE routers; older releases may offer md5 keys only.</span></li></ul>
+        <p class="side-note">Read the <a href="/ccnp-security/secure-network-management">Secure Network Management: SNMPv3, NETCONF, RESTCONF, NTP &amp; Syslog</a> notes first. Topics: <span class="chip obj d2" title="Configure secure network management of perimeter security and infrastructure devices such as SNMPv3, NetConf, RestConf, APIs, secure syslog, and NTP with authentication">2.7</span></p>
+      </section>
+<details class="toc-mobile"><summary>show ip route | toc (11 sections)</summary><ol><li><a href="#what-you-ll-build">What you&#x27;ll build</a></li><li><a href="#where-to-run-this-lab">Where to run this lab</a></li><li><a href="#topology">Topology</a></li><li><a href="#part-1-r2-the-authenticated-server">Part 1: R2, the authenticated server</a></li><li><a href="#part-2-r1-the-authenticated-client">Part 2: R1, the authenticated client</a></li><li><a href="#part-3-verify-be-patient">Part 3: verify (be patient)</a></li><li><a href="#part-4-break-it-on-purpose">Part 4: break it on purpose</a></li><li><a href="#harden-it-for-production">Harden it for production</a></li><li><a href="#check-yourself">Check yourself</a></li><li><a href="#answer-config">Answer config</a></li><li><a href="#exam-mapping">Exam mapping</a></li></ol></details>
+<div class="prose">
+<h2 id="what-you-ll-build">What you&#x27;ll build</h2>
+<p>Two IOS XE routers: <strong>R2</strong> becomes an authenticated NTP <strong>server</strong>, and <strong>R1</strong> its <strong>client</strong>, accepting time only when R2 signs it with an HMAC-SHA-256 key. You&#x27;ll watch R1 go from <strong>stratum 16</strong> (no trusted time) to <strong>synchronized</strong>, and prove the authentication from the debug output and <code translate="no">show ntp associations detail</code>.</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Item</th><th scope="col">Detail</th></tr></thead><tbody><tr><td><strong>Platform</strong></td><td>Two IOS XE routers on the same subnet (see where to run it, below)</td></tr><tr><td><strong>Time</strong></td><td>30 to 45 minutes, most of it waiting for the clocks to sync</td></tr><tr><td><strong>Level</strong></td><td>CCNP Security</td></tr><tr><td><strong>You&#x27;ll practice</strong></td><td><code translate="no">clock set</code>, <code translate="no">ntp master</code>, <code translate="no">ntp authenticate</code>, <code translate="no">ntp authentication-key</code>, <code translate="no">ntp trusted-key</code>, <code translate="no">ntp server ... key</code>, <code translate="no">show ntp status / associations / packets</code>, <code translate="no">debug ntp all</code></td></tr><tr><td><strong>Exam topic</strong></td><td>2.7 (core)</td></tr><tr><td><strong>Before this</strong></td><td><a href="/ccnp-security/secure-network-management">Secure Network Management notes</a>, especially <a href="/ccnp-security/secure-network-management#ntp-with-authentication">NTP with authentication</a></td></tr></tbody></table></div>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Part</th><th scope="col">What you do</th><th scope="col">What it proves</th></tr></thead><tbody><tr><td>1 Server</td><td>Set R2&#x27;s clock and make it an authenticated source</td><td>The time source exists and signs its replies</td></tr><tr><td>2 Client</td><td>Set R1&#x27;s clock close, add the key, point at R2</td><td>The client will only trust signed time</td></tr><tr><td>3 Verify</td><td>Packets, associations, debug, status, detail</td><td>Two-way traffic, matching keys, synchronization, authentication</td></tr><tr><td>4 Break</td><td>Wrong key, clock too far off, unreachable server</td><td>You can tell the faults apart</td></tr></tbody></table></div>
+<h3 id="the-one-thing-to-remember">The one thing to remember</h3>
+<p><strong>The client authenticates the server.</strong> Authentication needs <strong>all four</strong> commands on the client (<code translate="no">ntp authenticate</code>, <code translate="no">ntp authentication-key</code>, <code translate="no">ntp trusted-key</code>, <code translate="no">ntp server ... key</code>), and the key number, algorithm and secret must match the server exactly.</p>
+<h3 id="think-like-the-defender-first">Think like the defender first</h3>
+<ul><li><strong>What breaks if this router&#x27;s clock is wrong?</strong> Log correlation, certificate checks (VPNs, HTTPS, secure syslog), and anything time-based. Time is a dependency of other security controls.</li><li><strong>Who could change it?</strong> Without authentication, anyone who can send UDP 123 packets that look like the server&#x27;s.</li><li><strong>What&#x27;s the fallback when time isn&#x27;t trusted?</strong> The client should refuse the time and stay unsynchronized, not accept whatever arrives. That&#x27;s exactly what you&#x27;ll see when you break the key.</li></ul>
+<h2 id="where-to-run-this-lab">Where to run this lab</h2>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Environment</th><th scope="col">How to set it up</th></tr></thead><tbody><tr><td><strong>Cisco Modeling Labs (CML)</strong></td><td>Two Catalyst 8000V (or CSR 1000v / IOSv) routers on one link. Recommended</td></tr><tr><td><strong>Cisco DevNet Sandbox / dCloud</strong></td><td>Any reservable topology with two IOS XE routers</td></tr><tr><td><strong>Your own gear</strong></td><td>Two IOS or IOS XE routers. Older releases may only offer <code translate="no">md5</code> keys; use the strongest algorithm <code translate="no">ntp authentication-key 5 ?</code> lists</td></tr></tbody></table></div>
+<blockquote><p><strong>Lab values only.</strong> The key secret below is a training value. Never reuse it on real equipment.</p></blockquote>
+<h2 id="topology">Topology</h2>
+<pre translate="no"><code translate="no">  +-------------------------+      10.0.0.0/24      +-------------------------+
+  |  R1  NTP client         | --------------------&gt; |  R2  NTP server         |
+  |  10.0.0.1               |       UDP 123         |  10.0.0.2               |
+  |  becomes stratum 4      | &lt;-------------------- |  ntp master 3           |
+  +-------------------------+  replies signed with  +-------------------------+
+                                key 5 (hmac-sha2-256)</code></pre>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Item</th><th scope="col">Value</th></tr></thead><tbody><tr><td>NTP server</td><td>R2, 10.0.0.2, <code translate="no">ntp master 3</code></td></tr><tr><td>NTP client</td><td>R1, 10.0.0.1</td></tr><tr><td>Key</td><td>ID <strong>5</strong>, <strong><code translate="no">hmac-sha2-256</code></strong>, secret <code translate="no">NtpLabKey123456</code>, identical on both</td></tr><tr><td>Time zone</td><td>EST, UTC -5</td></tr></tbody></table></div>
+<h2 id="part-1-r2-the-authenticated-server">Part 1: R2, the authenticated server</h2>
+<h3 id="step-1-time-zone-and-clock">Step 1: time zone and clock</h3>
+<p><code translate="no">clock set</code> is a <strong>privileged EXEC</strong> command, not a configuration command. Set the time zone in configuration mode, leave it, then set the clock:</p>
+<pre translate="no"><code translate="no">configure terminal
+ clock timezone EST -5 0
+ exit
+clock set 16:40:00 09 Nov 2026
+show clock</code></pre>
+<p>Use the real current time.</p>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/ntp-auth/s01-r2-clock.webp" aria-label="Open full-size image: R2: clock timezone EST -5 0 in configuration mode, then clock set 16:40:00 09 Nov 2026 at the privileged prompt; show clock reports 16:40:02 EST Mon Nov 9 2026"><img src="/assets/img/ccnp/labs/ntp-auth/s01-r2-clock.webp" width="790" height="172" alt="R2: clock timezone EST -5 0 in configuration mode, then clock set 16:40:00 09 Nov 2026 at the privileged prompt; show clock reports 16:40:02 EST Mon Nov 9 2026" loading="lazy" decoding="async"></a><figcaption>R2: clock timezone EST -5 0 in configuration mode, then clock set 16:40:00 09 Nov 2026 at the privileged prompt; show clock reports 16:40:02 EST Mon Nov 9 2026. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> <strong><code translate="no">16:40:02.963 EST Mon Nov 9 2026</code></strong>: the clock is set, in the right zone. R2 is about to become the time source for R1, so its own time has to be right. Typed at <code translate="no">(config)#</code>, <code translate="no">clock set</code> would be rejected with <code translate="no">% Invalid input detected</code>.</p>
+<h3 id="step-2-make-r2-an-authenticated-time-source">Step 2: make R2 an authenticated time source</h3>
+<pre translate="no"><code translate="no">configure terminal
+ ntp master 3
+ ntp source GigabitEthernet1
+ ntp authentication-key 5 hmac-sha2-256 NtpLabKey123456
+ ntp trusted-key 5
+ ntp authenticate
+ end
+show run | include ntp</code></pre>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Command</th><th scope="col">Why</th></tr></thead><tbody><tr><td><code translate="no">ntp master 3</code></td><td>Serve time from the local clock as stratum 3 (reference <code translate="no">127.127.1.1</code>). In production, R2 would itself sync to upstream servers instead</td></tr><tr><td><code translate="no">ntp source GigabitEthernet1</code></td><td>Always send NTP from the same address, so clients and ACLs see a predictable source</td></tr><tr><td><code translate="no">ntp authentication-key 5 hmac-sha2-256 ...</code></td><td>Define key 5. SHA-256 is far stronger than the legacy <code translate="no">md5</code> option</td></tr><tr><td><code translate="no">ntp trusted-key 5</code></td><td>Only trusted keys are used</td></tr><tr><td><code translate="no">ntp authenticate</code></td><td>Turn on authentication</td></tr></tbody></table></div>
+<h2 id="part-2-r1-the-authenticated-client">Part 2: R1, the authenticated client</h2>
+<h3 id="step-3-time-zone-and-clock-close-to-r2-s">Step 3: time zone and clock, close to R2&#x27;s</h3>
+<p>NTP refuses to step a clock that&#x27;s more than about <strong>1000 seconds</strong> off (its panic threshold). Set R1 roughly right first:</p>
+<pre translate="no"><code translate="no">configure terminal
+ clock timezone EST -5 0
+ exit
+clock set 16:47:00 09 Nov 2026
+show clock</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/ntp-auth/s03-r1-clock.webp" aria-label="Open full-size image: R1: clock timezone EST -5 0, then clock set 16:47:00 09 Nov 2026; show clock reports 16:47:02 EST Mon Nov 9 2026"><img src="/assets/img/ccnp/labs/ntp-auth/s03-r1-clock.webp" width="787" height="162" alt="R1: clock timezone EST -5 0, then clock set 16:47:00 09 Nov 2026; show clock reports 16:47:02 EST Mon Nov 9 2026" loading="lazy" decoding="async"></a><figcaption>R1: clock timezone EST -5 0, then clock set 16:47:00 09 Nov 2026; show clock reports 16:47:02 EST Mon Nov 9 2026. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> R1 reads <strong>16:47</strong>, set a few minutes apart from R2. That&#x27;s well within NTP&#x27;s limit, so NTP can correct it. A clock years off would never sync, however good the key. The leading dot is IOS flagging the time: it was set by hand and NTP hasn&#x27;t synchronized it yet.</p>
+<h3 id="step-4-the-key-and-the-server-it-applies-to">Step 4: the key, and the server it applies to</h3>
+<pre translate="no"><code translate="no">configure terminal
+ ntp authenticate
+ ntp authentication-key 5 hmac-sha2-256 NtpLabKey123456
+ ntp trusted-key 5
+ ntp server 10.0.0.2 key 5
+ end
+show run | include ntp</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/ntp-auth/s04-r1-ntp-config.webp" aria-label="Open full-size image: R1 show run include ntp: ntp authentication-key 5 hmac-sha2-256 followed by an encrypted string, ntp authenticate, ntp trusted-key 5, ntp server 10.0.0.2 key 5"><img src="/assets/img/ccnp/labs/ntp-auth/s04-r1-ntp-config.webp" width="860" height="117" alt="R1 show run include ntp: ntp authentication-key 5 hmac-sha2-256 followed by an encrypted string, ntp authenticate, ntp trusted-key 5, ntp server 10.0.0.2 key 5" loading="lazy" decoding="async"></a><figcaption>R1 show run include ntp: ntp authentication-key 5 hmac-sha2-256 followed by an encrypted string, ntp authenticate, ntp trusted-key 5, ntp server 10.0.0.2 key 5. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong>All four pieces</strong> are present: the key, <code translate="no">ntp authenticate</code>, <code translate="no">ntp trusted-key 5</code>, and <strong><code translate="no">ntp server 10.0.0.2 key 5</code></strong>, which binds the key to this server.</li><li><strong>The secret isn&#x27;t shown as typed.</strong> IOS stores it in an encrypted (reversible) form. That keeps it off a casual glance at the screen, but anyone with the config file can recover it, so protect configuration backups.</li></ul>
+<h2 id="part-3-verify-be-patient">Part 3: verify (be patient)</h2>
+<h3 id="is-there-a-conversation">Is there a conversation?</h3>
+<pre translate="no"><code translate="no">show ntp packets</code></pre>
+<figure class="post-figure fit"><a href="/assets/img/ccnp/labs/ntp-auth/s05-ntp-packets.webp" aria-label="Open full-size image: R1 show ntp packets: 14 in, 14 out, 0 old version, 0 protocol errors"><img src="/assets/img/ccnp/labs/ntp-auth/s05-ntp-packets.webp" width="688" height="125" alt="R1 show ntp packets: 14 in, 14 out, 0 old version, 0 protocol errors" loading="lazy" decoding="async"></a><figcaption>R1 show ntp packets: 14 in, 14 out, 0 old version, 0 protocol errors. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> <strong>In 14, Out 14</strong>. Both directions are moving: R1 asks, R2 answers. If <strong>Out climbed and In stayed at 0</strong>, R2 wouldn&#x27;t be answering (unreachable, UDP 123 filtered, or not serving time). Zero protocol errors.</p>
+<h3 id="early-the-association-is-initializing">Early: the association is initializing</h3>
+<pre translate="no"><code translate="no">show ntp associations</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/ntp-auth/s06-associations-init.webp" aria-label="Open full-size image: R1 show ntp associations early on: tilde 10.0.0.2, ref clock .INIT., stratum 16, reach 0"><img src="/assets/img/ccnp/labs/ntp-auth/s06-associations-init.webp" width="997" height="116" alt="R1 show ntp associations early on: tilde 10.0.0.2, ref clock .INIT., stratum 16, reach 0" loading="lazy" decoding="async"></a><figcaption>R1 show ntp associations early on: tilde 10.0.0.2, ref clock .INIT., stratum 16, reach 0. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong><code translate="no">~10.0.0.2</code></strong>: the tilde means <strong>configured</strong>. There&#x27;s no <code translate="no">*</code> yet, so R1 hasn&#x27;t chosen it as its time source.</li><li><strong>ref clock <code translate="no">.INIT.</code></strong> and <strong>st 16</strong>: still initializing; stratum 16 means &quot;no trusted time&quot;.</li><li><strong>reach 0</strong>: no successful polls recorded yet.</li></ul>
+<p>This is normal for the first few minutes. NTP is deliberately cautious: it collects several samples before it trusts a source.</p>
+<h3 id="authentication-in-the-debug">Authentication in the debug</h3>
+<pre translate="no"><code translate="no">debug ntp all
+show log | include NTP</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/ntp-auth/s07-debug-sha256-match.webp" aria-label="Open full-size image: debug ntp output: NTP Core ntp_receive message received, peer is 0x80007F6..., next action is 1. SHA256-Match: 1"><img src="/assets/img/ccnp/labs/ntp-auth/s07-debug-sha256-match.webp" width="871" height="100" alt="debug ntp output: NTP Core ntp_receive message received, peer is 0x80007F6..., next action is 1. SHA256-Match: 1" loading="lazy" decoding="async"></a><figcaption>debug ntp output: NTP Core ntp_receive message received, peer is 0x80007F6..., next action is 1. SHA256-Match: 1. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> <strong><code translate="no">SHA256-Match: 1</code></strong>. The HMAC-SHA-256 on R2&#x27;s reply matched R1&#x27;s key 5: authentication succeeded. A <strong><code translate="no">0</code></strong> here would mean the keys differ, and R1 would discard the reply. Turn debugging off afterwards with <code translate="no">undebug all</code>; NTP debugs are chatty.</p>
+<p>The debug timestamps (21:51) are in <strong>UTC</strong> while <code translate="no">show clock</code> shows EST. Logs are only useful for correlation when every device stamps them the same way: <code translate="no">service timestamps log datetime msec localtime show-timezone</code> puts the local time and zone on every message.</p>
+<h3 id="synchronized">Synchronized</h3>
+<p>After a few minutes:</p>
+<pre translate="no"><code translate="no">show ntp associations
+show ntp status</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/ntp-auth/s08-associations-synced.webp" aria-label="Open full-size image: R1 show ntp associations after sync: asterisk tilde 10.0.0.2, ref clock 127.127.1.1, stratum 3, reach 1"><img src="/assets/img/ccnp/labs/ntp-auth/s08-associations-synced.webp" srcset="/assets/img/ccnp/labs/ntp-auth/s08-associations-synced-800.webp 800w, /assets/img/ccnp/labs/ntp-auth/s08-associations-synced.webp 1002w" sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem" width="1002" height="121" alt="R1 show ntp associations after sync: asterisk tilde 10.0.0.2, ref clock 127.127.1.1, stratum 3, reach 1" loading="lazy" decoding="async"></a><figcaption>R1 show ntp associations after sync: asterisk tilde 10.0.0.2, ref clock 127.127.1.1, stratum 3, reach 1. Select the image to open it full size.</figcaption></figure>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/ntp-auth/s09-ntp-status.webp" aria-label="Open full-size image: R1 show ntp status: Clock is synchronized, stratum 4, reference is 10.0.0.2, clock offset 34 msec, root delay 82 msec"><img src="/assets/img/ccnp/labs/ntp-auth/s09-ntp-status.webp" width="982" height="211" alt="R1 show ntp status: Clock is synchronized, stratum 4, reference is 10.0.0.2, clock offset 34 msec, root delay 82 msec" loading="lazy" decoding="async"></a><figcaption>R1 show ntp status: Clock is synchronized, stratum 4, reference is 10.0.0.2, clock offset 34 msec, root delay 82 msec. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong><code translate="no">*~10.0.0.2</code></strong>: the <strong><code translate="no">*</code></strong> means R1 is now <strong>synced</strong> to R2 (its system peer).</li><li><strong>ref clock <code translate="no">127.127.1.1</code></strong>: R2&#x27;s own reference, the local clock it serves because of <code translate="no">ntp master</code>.</li><li><strong>st 3</strong>: R2&#x27;s stratum. <strong>reach 1</strong>: the most recent poll was answered; it climbs toward <strong>377</strong> (octal: all of the last 8 polls) as the association settles.</li><li><strong><code translate="no">Clock is synchronized, stratum 4, reference is 10.0.0.2</code></strong>: the one-line verdict. R1 is one hop below R2, so stratum 4.</li><li><strong>clock offset 34 msec</strong>: R1 is now within milliseconds of R2, down from minutes.</li></ul>
+<h3 id="proof-the-time-is-authenticated">Proof the time is authenticated</h3>
+<pre translate="no"><code translate="no">show ntp associations detail</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/ntp-auth/s10-associations-detail.webp" aria-label="Open full-size image: R1 show ntp associations detail: 10.0.0.2 configured, ipv4, authenticated, sys.peer, authtype hmac-sha2-256, our_master, sane, valid, stratum 3; our mode client, peer mode server; assoc in packets 18, out packets 18, error packets 10"><img src="/assets/img/ccnp/labs/ntp-auth/s10-associations-detail.webp" srcset="/assets/img/ccnp/labs/ntp-auth/s10-associations-detail-800.webp 800w, /assets/img/ccnp/labs/ntp-auth/s10-associations-detail.webp 1237w" sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem" width="1237" height="402" alt="R1 show ntp associations detail: 10.0.0.2 configured, ipv4, authenticated, sys.peer, authtype hmac-sha2-256, our_master, sane, valid, stratum 3; our mode client, peer mode server; assoc in packets 18, out packets 18, error packets 10" loading="lazy" decoding="async"></a><figcaption>R1 show ntp associations detail: 10.0.0.2 configured, ipv4, authenticated, sys.peer, authtype hmac-sha2-256, our_master, sane, valid, stratum 3; our mode client, peer mode server; assoc in packets 18, out packets 18, error packets 10. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong><code translate="no">authenticated</code></strong> and <strong><code translate="no">authtype (hmac-sha2-256)</code></strong>: the proof that this association uses the key. Without <code translate="no">key 5</code> on the <code translate="no">ntp server</code> line, R1 could still sync, but this field wouldn&#x27;t say authenticated.</li><li><strong><code translate="no">our_master</code>, <code translate="no">sane</code>, <code translate="no">valid</code></strong>: R2 is the chosen source and its data passed NTP&#x27;s checks.</li><li><strong>our mode client, peer mode server</strong>: client/server mode, where the client verifies the server.</li><li><strong>assoc in 18, out 18, error packets 10</strong>: errors are packets that were rejected. A count from the start-up period is normal; a number that keeps climbing points to a key, timing or reachability problem.</li></ul>
+<h2 id="part-4-break-it-on-purpose">Part 4: break it on purpose</h2>
+<h3 id="break-1-key-mismatch">Break 1: key mismatch</h3>
+<p>On R1 only, change the secret:</p>
+<pre translate="no"><code translate="no">configure terminal
+ ntp authentication-key 5 hmac-sha2-256 WrongKey987654
+ end</code></pre>
+<p>With <code translate="no">debug ntp all</code> on, the log now shows <strong><code translate="no">SHA256-Match: 0</code></strong>, and after the current sync ages out <code translate="no">show ntp status</code> reports <strong>unsynchronized</strong>. R1 refuses time it can&#x27;t verify, which is the whole point. <strong>Fix:</strong> put the identical secret back. The key number, algorithm <strong>and</strong> secret must match.</p>
+<h3 id="break-2-clock-too-far-off">Break 2: clock too far off</h3>
+<pre translate="no"><code translate="no">clock set 11:00:00 02 Jun 2020</code></pre>
+<p>Even with the right key, NTP won&#x27;t step a clock that&#x27;s years off. R1 stays at stratum 16. <strong>Fix:</strong> set the clock close to R2&#x27;s, then wait.</p>
+<h3 id="break-3-the-server-doesn-t-answer">Break 3: the server doesn&#x27;t answer</h3>
+<p>Shut R2&#x27;s interface, or point R1 at a wrong address. <code translate="no">show ntp packets</code> on R1 shows <strong>Out climbing while In stays the same</strong>: one-sided traffic. <strong>Fix:</strong> check reachability, ACLs for UDP 123, and that R2 is serving time.</p>
+<h3 id="break-decoder">Break decoder</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Symptom</th><th scope="col">Layer</th><th scope="col">Cause</th><th scope="col">Fix</th></tr></thead><tbody><tr><td><code translate="no">SHA256-Match: 0</code>, no sync</td><td>Authentication</td><td>Key number, algorithm or secret differ</td><td>Identical key on both ends</td></tr><tr><td>Out climbing, In flat</td><td>Reachability</td><td>Server down, UDP 123 filtered, nothing serving time</td><td>Ping, ACLs, <code translate="no">ntp master</code> or upstream sync on the server</td></tr><tr><td>Stuck at st 16 with matching keys</td><td>Time offset</td><td>Clock too far off, or not enough time yet</td><td><code translate="no">clock set</code> close; wait several minutes</td></tr><tr><td>Synced, but <code translate="no">detail</code> doesn&#x27;t say authenticated</td><td>Configuration</td><td><code translate="no">key 5</code> missing on <code translate="no">ntp server</code>, or <code translate="no">ntp authenticate</code> / <code translate="no">trusted-key</code> missing</td><td>Add the missing piece</td></tr><tr><td>Everything looks right but no sync</td><td>Process stuck</td><td>Association needs restarting</td><td><code translate="no">no ntp server 10.0.0.2 key 5</code>, then add it again</td></tr></tbody></table></div>
+<h2 id="harden-it-for-production">Harden it for production</h2>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Lab shortcut</th><th scope="col">Production fix</th></tr></thead><tbody><tr><td>R2 serves its own clock (<code translate="no">ntp master</code>)</td><td>Internal servers sync to several trusted upstream sources</td></tr><tr><td>One server</td><td>At least three authenticated servers, so a bad one is outvoted (a falseticker)</td></tr><tr><td>Anyone can query R2</td><td><code translate="no">ntp access-group serve-only &lt;ACL&gt;</code> on servers, <code translate="no">ntp access-group peer &lt;ACL&gt;</code> on clients, UDP 123 filtered at the edge</td></tr><tr><td>Debug timestamps in UTC, clock in EST</td><td><code translate="no">service timestamps log datetime msec localtime show-timezone</code> everywhere</td></tr><tr><td>Key visible in config backups</td><td>Protect backups; rotate keys</td></tr></tbody></table></div>
+<h2 id="check-yourself">Check yourself</h2>
+<details class="qa"><summary>1. In client/server mode, who authenticates whom?</summary>
+<p>The client authenticates the server. <code translate="no">ntp server 10.0.0.2 key 5</code> means R1 accepts time from R2 only if R2&#x27;s packets are signed with trusted key 5.</p>
+</details>
+<details class="qa"><summary>2. Why set the clock by hand before NTP?</summary>
+<p>NTP won&#x27;t step a clock that&#x27;s more than about 1000 seconds off. A clock that&#x27;s far out never syncs, however good the key.</p>
+</details>
+<details class="qa"><summary>3. show ntp packets shows Out 6, In 0. What does that mean?</summary>
+<p>R1 is asking and nobody is answering: R2 is unreachable, UDP 123 is filtered, or R2 isn&#x27;t serving time.</p>
+</details>
+<details class="qa"><summary>4. What do * and ~ mean in show ntp associations?</summary>
+<p><code translate="no">~</code> means the peer is configured. <code translate="no">*</code> means it&#x27;s the system peer: the source the clock is synchronized to.</p>
+</details>
+<details class="qa"><summary>5. Why does R1 show stratum 4?</summary>
+<p>It syncs to R2, which serves stratum 3. Each hop adds one.</p>
+</details>
+<h2 id="answer-config">Answer config</h2>
+<details class="qa"><summary>Show the final config for both routers</summary>
+<pre translate="no"><code translate="no">! R2 (server)
+clock timezone EST -5 0
+ntp master 3
+ntp source GigabitEthernet1
+ntp authentication-key 5 hmac-sha2-256 NtpLabKey123456
+ntp trusted-key 5
+ntp authenticate
+!
+! R1 (client)
+clock timezone EST -5 0
+ntp authentication-key 5 hmac-sha2-256 NtpLabKey123456
+ntp trusted-key 5
+ntp authenticate
+ntp server 10.0.0.2 key 5</code></pre>
+<p><code translate="no">clock set</code> is a privileged EXEC command, so it isn&#x27;t part of the configuration. Lab values only.</p>
+</details>
+<h2 id="exam-mapping">Exam mapping</h2>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">You practiced</th><th scope="col">Exam angle</th><th scope="col">SCOR v2.0</th></tr></thead><tbody><tr><td>The four authentication commands</td><td>All four required; keys must match</td><td>2.7</td></tr><tr><td><code translate="no">ntp server ... key 5</code></td><td>The client authenticates the server</td><td>2.7</td></tr><tr><td>Stratum 16 to 3 / 4</td><td>Stratum meaning, <code translate="no">ntp master</code></td><td>2.7</td></tr><tr><td><code translate="no">show ntp status</code>, <code translate="no">associations</code>, <code translate="no">detail</code></td><td>Verify sync and authentication</td><td>2.7</td></tr><tr><td>Wrong key, clock offset, one-sided packets</td><td>Troubleshooting NTP</td><td>2.7</td></tr></tbody></table></div>
+<p>Drill it with the <a href="/ccnp-security/flashcards#d2">flashcards</a> and the <a href="/ccnp-security/mock-exam#d2">mock exam</a>.</p>
+</div>
+      <footer class="post-end">
+        <section class="practice" aria-labelledby="practice-h">
+          <div><h2 id="practice-h" class="sub-h">Lock it in</h2>
+          <p>Lab done? Drill the commands and the attack-to-defense mapping until they're automatic.</p></div>
+          <p class="practice-links"><a class="btn btn-pri" href="/ccnp-security/flashcards#d2">flashcards <span class="p">d2</span></a><a class="btn btn-sec" href="/ccnp-security/mock-exam#d2">mock exam <span class="p">d2</span></a><a class="btn btn-sec" href="/ccnp-security/secure-network-management">notes</a></p>
+        </section>
+      </footer>
+    </div>
+    <aside class="toc" aria-label="On this page"><span class="toc-title"><span class="h">#</span> show ip route | toc</span><ol><li><a href="#what-you-ll-build">What you&#x27;ll build</a></li><li><a href="#where-to-run-this-lab">Where to run this lab</a></li><li><a href="#topology">Topology</a></li><li><a href="#part-1-r2-the-authenticated-server">Part 1: R2, the authenticated server</a></li><li><a href="#part-2-r1-the-authenticated-client">Part 2: R1, the authenticated client</a></li><li><a href="#part-3-verify-be-patient">Part 3: verify (be patient)</a></li><li><a href="#part-4-break-it-on-purpose">Part 4: break it on purpose</a></li><li><a href="#harden-it-for-production">Harden it for production</a></li><li><a href="#check-yourself">Check yourself</a></li><li><a href="#answer-config">Answer config</a></li><li><a href="#exam-mapping">Exam mapping</a></li></ol></aside>
+  </div>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/ccnp-security">ccnp security</a></li>
+        <li><a href="/ccnp-security/labs">ccnp labs</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Oct 22, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

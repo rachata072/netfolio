@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free NETCONF and RESTCONF Lab on IOS XE with curl and Python (SCOR 2.7)</title>
+<meta name="description" content="Free CCNP Security lab: enable RESTCONF and NETCONF on IOS XE, verify the YANG processes, and read interfaces, OSPF and the full config with curl and Python.">
+<link rel="canonical" href="https://breakfixlearn.com/ccnp-security/labs/netconf-restconf-lab">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=629a8f9e5c">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="NETCONF and RESTCONF Lab: YANG Data with curl and Python">
+<meta property="og:description" content="Enable RESTCONF over HTTPS and NETCONF over SSH on IOS XE, confirm the YANG processes are ready, and read live data with curl, Python requests and ncclient.">
+<meta property="og:url" content="https://breakfixlearn.com/ccnp-security/labs/netconf-restconf-lab">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/ccnp-lab-netconf-restconf-lab.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="NETCONF and RESTCONF Lab: YANG Data with curl and Python: free CCNP Security lab">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"NETCONF and RESTCONF Lab: YANG Data with curl and Python","description":"Free CCNP Security lab: enable RESTCONF and NETCONF on IOS XE, verify the YANG processes, and read interfaces, OSPF and the full config with curl and Python.","url":"https://breakfixlearn.com/ccnp-security/labs/netconf-restconf-lab","learningResourceType":"Lab exercise","educationalLevel":"Professional","inLanguage":"en","isAccessibleForFree":true,"datePublished":"2026-11-09","dateModified":"2026-11-09","teaches":["Configure secure network management of perimeter security and infrastructure devices such as SNMPv3, NetConf, RestConf, APIs, secure syslog, and NTP with authentication"],"author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"encoding":[]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"CCNP Security","item":"https://breakfixlearn.com/ccnp-security"},{"@type":"ListItem","position":3,"name":"NETCONF and RESTCONF Lab: YANG Data with curl and Python"}]}</script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article class="lecture lab">
+  <header class="post-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/ccnp-security">ccnp-security</a><span aria-hidden="true">/</span><a href="/ccnp-security/labs">labs</a><span aria-hidden="true">/</span><span>netconf-restconf-lab</span></nav>
+      <p class="scard-meta"><span class="sid">Real IOS lab</span><span>Domain 2 Network Security &middot; topics 2.7</span></p>
+      <h1 class="mt-2">NETCONF and RESTCONF Lab: YANG Data with curl and Python</h1>
+      <p class="post-dek">Enable RESTCONF over HTTPS and NETCONF over SSH on IOS XE, confirm the YANG processes are ready, and read live data with curl, Python requests and ncclient.</p>
+      <div class="post-meta"><time datetime="2026-11-09">updated Nov 9, 2026</time><span class="sep">/</span><span>45 to 60 min</span><span class="sep">/</span><span>IOS XE router + Linux with Python 3</span><span class="sep">/</span><span>by Trey</span></div>
+    </div>
+  </header>
+  <div class="wrap post-layout">
+    <div class="post-main">
+      <section class="labdl labenv" aria-labelledby="dl-h">
+        <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">show</span> <span class="a">netconf-restconf-lab environment</span></span>
+        <h2 id="dl-h" class="sub-h">Where to run this lab</h2>
+        <ul class="env-list"><li><b>Cisco Modeling Labs</b> <span>Catalyst 8000V or CSR 1000v routers plus an Ubuntu node. Recommended.</span></li><li><b>DevNet / dCloud</b> <span>IOS XE sandboxes, used from your own Linux machine.</span></li><li><b>Your own gear</b> <span>Any IOS XE router and a Linux VM on the same subnet.</span></li></ul>
+        <p class="side-note">Read the <a href="/ccnp-security/secure-network-management">Secure Network Management: SNMPv3, NETCONF, RESTCONF, NTP &amp; Syslog</a> notes first. Topics: <span class="chip obj d2" title="Configure secure network management of perimeter security and infrastructure devices such as SNMPv3, NetConf, RestConf, APIs, secure syslog, and NTP with authentication">2.7</span></p>
+      </section>
+<details class="toc-mobile"><summary>show ip route | toc (12 sections)</summary><ol><li><a href="#what-you-ll-build">What you&#x27;ll build</a></li><li><a href="#where-to-run-this-lab">Where to run this lab</a></li><li><a href="#topology">Topology</a></li><li><a href="#part-1-baseline">Part 1: baseline</a></li><li><a href="#part-2-enable-restconf">Part 2: enable RESTCONF</a></li><li><a href="#part-3-read-data-with-restconf">Part 3: read data with RESTCONF</a></li><li><a href="#part-4-enable-netconf">Part 4: enable NETCONF</a></li><li><a href="#part-5-break-it-on-purpose">Part 5: break it on purpose</a></li><li><a href="#harden-it-for-production">Harden it for production</a></li><li><a href="#check-yourself">Check yourself</a></li><li><a href="#answer-config">Answer config</a></li><li><a href="#exam-mapping">Exam mapping</a></li></ol></details>
+<div class="prose">
+<h2 id="what-you-ll-build">What you&#x27;ll build</h2>
+<p>Two model-driven management interfaces on an IOS XE router: <strong>RESTCONF</strong> over HTTPS and <strong>NETCONF</strong> over SSH. You&#x27;ll confirm the YANG processes behind them are actually running, then read live data from a Linux host with <code translate="no">curl</code>, Python <code translate="no">requests</code> and <code translate="no">ncclient</code>: the interface list, the OSPF configuration, and the entire running configuration as XML.</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Item</th><th scope="col">Detail</th></tr></thead><tbody><tr><td><strong>Platform</strong></td><td>An IOS XE router with SSH working, and a Linux host with Python 3 (see where to run it, below)</td></tr><tr><td><strong>Time</strong></td><td>45 to 60 minutes</td></tr><tr><td><strong>Level</strong></td><td>CCNP Security. Basic Python helps but isn&#x27;t required: every script is shown in full</td></tr><tr><td><strong>You&#x27;ll practice</strong></td><td><code translate="no">restconf</code>, <code translate="no">netconf-yang</code>, <code translate="no">show platform software yang-management process</code>, <code translate="no">show netconf-yang sessions</code>, RESTCONF URLs and headers, NETCONF capabilities, certificate errors</td></tr><tr><td><strong>Exam topic</strong></td><td>2.7 (core)</td></tr><tr><td><strong>Before this</strong></td><td><a href="/ccnp-security/secure-network-management">Secure Network Management notes</a>, especially <a href="/ccnp-security/secure-network-management#netconf-restconf-and-yang">NETCONF, RESTCONF and YANG</a></td></tr></tbody></table></div>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Part</th><th scope="col">What you do</th><th scope="col">What it proves</th></tr></thead><tbody><tr><td>1 Baseline</td><td>Check what&#x27;s already enabled</td><td>Know your starting attack surface</td></tr><tr><td>2 RESTCONF</td><td>Enable it, check the HTTPS server and the YANG processes</td><td>It&#x27;s on <strong>and</strong> ready</td></tr><tr><td>3 Read with RESTCONF</td><td>Python and curl against two YANG models</td><td>Structured data over HTTPS</td></tr><tr><td>4 NETCONF</td><td>Enable it, open a session, read the whole config</td><td>Structured data over SSH 830</td></tr><tr><td>5 Break</td><td>Certificate errors, early requests, wrong names</td><td>Read each failure correctly</td></tr></tbody></table></div>
+<h3 id="the-one-thing-to-remember">The one thing to remember</h3>
+<p><strong>NETCONF = SSH / 830 / XML / transactions. RESTCONF = HTTPS / 443 / JSON or XML / HTTP methods.</strong> Both carry the same YANG models, and <strong>NETCONF doesn&#x27;t need the HTTPS server.</strong></p>
+<h3 id="think-like-the-defender-first">Think like the defender first</h3>
+<p>An API that can read the whole configuration can usually change it too. Before you enable one, decide:</p>
+<ul><li><strong>Which transport, and is it encrypted?</strong> HTTPS and SSH only. Never the plain HTTP server.</li><li><strong>Who can reach it?</strong> Automation hosts, not the user network.</li><li><strong>Which account does it use?</strong> A dedicated one, with authorization and accounting, because a script with privilege 15 is an administrator.</li></ul>
+<h2 id="where-to-run-this-lab">Where to run this lab</h2>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Environment</th><th scope="col">How to set it up</th></tr></thead><tbody><tr><td><strong>Cisco Modeling Labs (CML)</strong></td><td>A Catalyst 8000V (or CSR 1000v) router and an Ubuntu node with Python 3, on one subnet. Recommended</td></tr><tr><td><strong>Cisco DevNet Sandbox</strong></td><td>The always-on IOS XE sandbox exposes RESTCONF and NETCONF; use your own machine as the client</td></tr><tr><td><strong>Your own gear</strong></td><td>Any IOS XE 16.x or 17.x device and a Linux VM</td></tr></tbody></table></div>
+<p>On the Linux host:</p>
+<pre translate="no"><code translate="no">python3 -m venv .venv &amp;&amp; . .venv/bin/activate
+pip install requests ncclient</code></pre>
+<p><strong>SSH must already work on the router</strong> (hostname, domain name, RSA key, a local user, <code translate="no">transport input ssh</code>). RESTCONF needs a <strong>privilege 15</strong> account.</p>
+<blockquote><p><strong>Lab values only.</strong> The <code translate="no">john</code> / <code translate="no">Cisco123</code> login in the screenshots is a training value. In the scripts below the password is typed at run time, never stored in the file.</p></blockquote>
+<h2 id="topology">Topology</h2>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Item</th><th scope="col">Value</th></tr></thead><tbody><tr><td>Router</td><td>R1, 10.0.0.1, IOS XE 17.3, OSPF process 1 in area 51</td></tr><tr><td>Linux host</td><td>10.0.0.5, Python 3 with <code translate="no">requests</code> and <code translate="no">ncclient</code></td></tr><tr><td>RESTCONF</td><td>HTTPS, TCP 443</td></tr><tr><td>NETCONF</td><td>SSH subsystem, TCP 830</td></tr></tbody></table></div>
+<h2 id="part-1-baseline">Part 1: baseline</h2>
+<pre translate="no"><code translate="no">show running-config | include ip http|restconf|netconf</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/netconf-restconf/s01-baseline.webp" aria-label="Open full-size image: R1 baseline: ip http server and ip http authentication local are configured, with no ip http secure-server"><img src="/assets/img/ccnp/labs/netconf-restconf/s01-baseline.webp" width="743" height="100" alt="R1 baseline: ip http server and ip http authentication local are configured, with no ip http secure-server" loading="lazy" decoding="async"></a><figcaption>R1 baseline: ip http server and ip http authentication local are configured, with no ip http secure-server. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output, as a defender:</strong></p>
+<ul><li><strong><code translate="no">ip http server</code></strong> is <strong>on</strong>: the <strong>plain HTTP</strong> server, port 80, cleartext. Many images ship like this. Anything that logs in over it sends credentials in the clear.</li><li><strong><code translate="no">no ip http secure-server</code></strong>: HTTPS is off.</li><li><strong><code translate="no">ip http authentication local</code></strong>: the web server checks the local user database (or AAA). RESTCONF will use this.</li><li>No <code translate="no">restconf</code> or <code translate="no">netconf-yang</code> yet.</li></ul>
+<p>The finding before you&#x27;ve configured anything: a cleartext management service is already listening. Remember it for the hardening section.</p>
+<h2 id="part-2-enable-restconf">Part 2: enable RESTCONF</h2>
+<pre translate="no"><code translate="no">configure terminal
+ ip http secure-server
+ restconf
+ end
+show running-config | include ip http|restconf|netconf</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/netconf-restconf/s02-enable-restconf.webp" aria-label="Open full-size image: Enabling ip http secure-server and restconf; the running config now shows ip http server, ip http authentication local, ip http secure-server and restconf"><img src="/assets/img/ccnp/labs/netconf-restconf/s02-enable-restconf.webp" width="798" height="188" alt="Enabling ip http secure-server and restconf; the running config now shows ip http server, ip http authentication local, ip http secure-server and restconf" loading="lazy" decoding="async"></a><figcaption>Enabling ip http secure-server and restconf; the running config now shows ip http server, ip http authentication local, ip http secure-server and restconf. Select the image to open it full size.</figcaption></figure>
+<p>RESTCONF runs on the HTTPS server, so both lines are required.</p>
+<h3 id="check-the-https-server">Check the HTTPS server</h3>
+<pre translate="no"><code translate="no">show ip http server status | include secure|server|Restconf</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/netconf-restconf/s03-http-server-status.webp" aria-label="Open full-size image: show ip http server status: HTTP server enabled on port 80, authentication local, HTTP secure server enabled on port 443 with TLSv1.2 and TLSv1.1, client authentication disabled, and a self-signed trustpoint"><img src="/assets/img/ccnp/labs/netconf-restconf/s03-http-server-status.webp" width="842" height="666" alt="show ip http server status: HTTP server enabled on port 80, authentication local, HTTP secure server enabled on port 443 with TLSv1.2 and TLSv1.1, client authentication disabled, and a self-signed trustpoint" loading="lazy" decoding="async"></a><figcaption>show ip http server status: HTTP server enabled on port 80, authentication local, HTTP secure server enabled on port 443 with TLSv1.2 and TLSv1.1, client authentication disabled, and a self-signed trustpoint. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong><code translate="no">HTTP secure server status: Enabled</code></strong> on <strong>port 443</strong>: RESTCONF&#x27;s transport is up.</li><li><strong><code translate="no">HTTP server status: Enabled</code>, port 80</strong>: the cleartext server from the baseline is still running alongside it.</li><li><strong><code translate="no">TLS version: TLSv1.2 TLSv1.1</code></strong>: TLS 1.1 is deprecated and should be turned off.</li><li><strong><code translate="no">trustpoint: TP-self-signed-...</code></strong>: the router made its own certificate. Clients can&#x27;t validate it, which is exactly the curl error in Part 5.</li><li><strong><code translate="no">access class: 0</code></strong> / <strong><code translate="no">IPv4 access class: None</code></strong>: no ACL; any host that can route to the router can try to log in.</li></ul>
+<h3 id="check-the-yang-processes-are-ready">Check the YANG processes are ready</h3>
+<pre translate="no"><code translate="no">show platform software yang-management process</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/netconf-restconf/s04-yang-processes-restconf.webp" aria-label="Open full-size image: show platform software yang-management process with RESTCONF on: confd, nesd, syncfd, dmiauthd, nginx, ndbmand and pubd Running, ncsshd Not Running"><img src="/assets/img/ccnp/labs/netconf-restconf/s04-yang-processes-restconf.webp" width="717" height="220" alt="show platform software yang-management process with RESTCONF on: confd, nesd, syncfd, dmiauthd, nginx, ndbmand and pubd Running, ncsshd Not Running" loading="lazy" decoding="async"></a><figcaption>show platform software yang-management process with RESTCONF on: confd, nesd, syncfd, dmiauthd, nginx, ndbmand and pubd Running, ncsshd Not Running. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong><code translate="no">nginx</code> Running</strong>: the web front end that answers RESTCONF requests.</li><li><strong><code translate="no">confd</code> Running</strong>: the configuration database that holds the YANG data.</li><li><strong><code translate="no">ncsshd</code> Not Running</strong>: the NETCONF SSH server. Correct: NETCONF isn&#x27;t enabled yet.</li></ul>
+<p><strong>This command is the gate.</strong> Right after you enable RESTCONF, these processes take a minute or two to start. Query too early and you get an HTML error page instead of data (Part 5).</p>
+<h2 id="part-3-read-data-with-restconf">Part 3: read data with RESTCONF</h2>
+<h3 id="the-interface-list-standard-ietf-model-json">The interface list (standard IETF model, JSON)</h3>
+<p>Save this as <code translate="no">rest_interfaces.py</code>:</p>
+<pre translate="no"><code translate="no">#!/usr/bin/env python3
+&quot;&quot;&quot;RESTCONF: list interface names using the IETF (vendor-neutral) model.&quot;&quot;&quot;
+from getpass import getpass
+import requests
+import urllib3
+
+# Lab only: the router uses a self-signed certificate. In production,
+# install a CA-signed certificate and pass verify=&quot;/path/to/ca.pem&quot;.
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+HOST = &quot;10.0.0.1&quot;
+USER = &quot;john&quot;
+url = f&quot;https://{HOST}/restconf/data/ietf-interfaces:interfaces&quot;
+headers = {&quot;Accept&quot;: &quot;application/yang-data+json&quot;}
+
+resp = requests.get(url, headers=headers, auth=(USER, getpass()), verify=False, timeout=15)
+print(resp.status_code)
+if resp.status_code != 200 or &quot;json&quot; not in resp.headers.get(&quot;Content-Type&quot;, &quot;&quot;):
+    print(&quot;Not JSON yet: is RESTCONF ready? (show platform software yang-management process)&quot;)
+    print(resp.text[:300])
+    raise SystemExit(1)
+
+for interface in resp.json()[&quot;ietf-interfaces:interfaces&quot;][&quot;interface&quot;]:
+    print(interface[&quot;name&quot;])</code></pre>
+<pre translate="no"><code translate="no">python3 rest_interfaces.py</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/netconf-restconf/s05-rest-interfaces.webp" aria-label="Open full-size image: python3 rest_interfaces.py prints status 200 followed by GigabitEthernet1 to GigabitEthernet6 and Loopback0"><img src="/assets/img/ccnp/labs/netconf-restconf/s05-rest-interfaces.webp" width="795" height="217" alt="python3 rest_interfaces.py prints status 200 followed by GigabitEthernet1 to GigabitEthernet6 and Loopback0" loading="lazy" decoding="async"></a><figcaption>python3 rest_interfaces.py prints status 200 followed by GigabitEthernet1 to GigabitEthernet6 and Loopback0. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> <strong><code translate="no">200</code></strong> (OK), then one name per interface. The script didn&#x27;t parse any CLI text: it walked a JSON structure defined by the <code translate="no">ietf-interfaces</code> YANG model, so the same script works on any vendor that supports that model.</p>
+<p>The status-and-content-type check before <code translate="no">resp.json()</code> is deliberate. Without it, an early request fails with a confusing <code translate="no">JSONDecodeError</code> instead of telling you RESTCONF isn&#x27;t ready.</p>
+<h3 id="ospf-cisco-native-model-xml">OSPF (Cisco native model, XML)</h3>
+<p>Save this as <code translate="no">rest_ospf.py</code>:</p>
+<pre translate="no"><code translate="no">#!/usr/bin/env python3
+&quot;&quot;&quot;RESTCONF: read the routing configuration using the Cisco native model, as XML.&quot;&quot;&quot;
+from getpass import getpass
+import requests
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  # lab only
+
+HOST = &quot;10.0.0.1&quot;
+USER = &quot;john&quot;
+url = f&quot;https://{HOST}/restconf/data/Cisco-IOS-XE-native:native/router&quot;
+headers = {&quot;Accept&quot;: &quot;application/yang-data+xml&quot;}
+
+resp = requests.get(url, headers=headers, auth=(USER, getpass()), verify=False, timeout=15)
+print(resp.status_code)
+print(resp.text)</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/netconf-restconf/s06-rest-ospf.webp" aria-label="Open full-size image: python3 rest_ospf.py prints 200 and an XML router element: OSPF process 1, network 10.0.0.0 wildcard 0.0.0.255 area 51, router-id 1.1.1.1"><img src="/assets/img/ccnp/labs/netconf-restconf/s06-rest-ospf.webp" width="810" height="465" alt="python3 rest_ospf.py prints 200 and an XML router element: OSPF process 1, network 10.0.0.0 wildcard 0.0.0.255 area 51, router-id 1.1.1.1" loading="lazy" decoding="async"></a><figcaption>python3 rest_ospf.py prints 200 and an XML router element: OSPF process 1, network 10.0.0.0 wildcard 0.0.0.255 area 51, router-id 1.1.1.1. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li>The <code translate="no">Accept</code> header asked for <strong>XML</strong>, so that&#x27;s what came back: RESTCONF supports both encodings.</li><li>The namespaces show the model: <strong><code translate="no">Cisco-IOS-XE-native</code></strong> with the <strong><code translate="no">Cisco-IOS-XE-ospf</code></strong> sub-model. OSPF process <strong>1</strong>, network <strong>10.0.0.0 0.0.0.255</strong> in <strong>area 51</strong>, router ID <strong>1.1.1.1</strong>. It&#x27;s the same information as <code translate="no">show run | section ospf</code>, but as data a program can trust.</li><li>The <strong>native</strong> model reaches every IOS XE feature; the <strong>IETF</strong> model in the previous script is portable but covers less.</li></ul>
+<h3 id="the-same-read-with-curl">The same read with curl</h3>
+<p>curl is the quickest proof that RESTCONF works, no script needed:</p>
+<pre translate="no"><code translate="no">curl -k -u john -H &quot;Accept: application/yang-data+json&quot; https://10.0.0.1/restconf/data/ietf-interfaces:interfaces</code></pre>
+<p><code translate="no">-u john</code> without a password makes curl prompt for it. <code translate="no">-k</code> skips certificate validation (lab only; Part 5 shows why it&#x27;s needed here).</p>
+<p><strong>Optional write (RESTCONF PATCH).</strong> GET is read-only; PATCH merges a change into a resource. This sets the hostname through the native model, and the router answers <strong>204 No Content</strong> on success:</p>
+<pre translate="no"><code translate="no">curl -k -u john -X PATCH -H &quot;Content-Type: application/yang-data+json&quot; \
+  -d &#x27;{&quot;Cisco-IOS-XE-native:native&quot;: {&quot;hostname&quot;: &quot;R1-SET-BY-RESTCONF&quot;}}&#x27; \
+  https://10.0.0.1/restconf/data/Cisco-IOS-XE-native:native</code></pre>
+<p>Treat API write access like enable access. Change the hostname back afterwards.</p>
+<h2 id="part-4-enable-netconf">Part 4: enable NETCONF</h2>
+<pre translate="no"><code translate="no">configure terminal
+ netconf-yang
+ end</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/netconf-restconf/s07-enable-netconf.webp" aria-label="Open full-size image: Entering netconf-yang in global configuration mode"><img src="/assets/img/ccnp/labs/netconf-restconf/s07-enable-netconf.webp" width="797" height="97" alt="Entering netconf-yang in global configuration mode" loading="lazy" decoding="async"></a><figcaption>Entering netconf-yang in global configuration mode. Select the image to open it full size.</figcaption></figure>
+<p>That&#x27;s the whole configuration. NETCONF rides <strong>SSH on port 830</strong>, so it needs working SSH, <strong>not</strong> the HTTPS server.</p>
+<h3 id="open-a-netconf-session-by-hand">Open a NETCONF session by hand</h3>
+<p>From the Linux host:</p>
+<pre translate="no"><code translate="no">ssh john@10.0.0.1 -p 830 -s netconf</code></pre>
+<p><code translate="no">-p 830</code> is the NETCONF port and <code translate="no">-s netconf</code> asks for the NETCONF <strong>subsystem</strong> instead of a CLI shell.</p>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/netconf-restconf/s09-netconf-hello.webp" aria-label="Open full-size image: ssh to port 830 with the netconf subsystem returns an XML hello with a capabilities list: NETCONF base 1.0 and 1.1, writable-running, rollback-on-error, validate, xpath, notification, interleave, with-defaults and yang-library"><img src="/assets/img/ccnp/labs/netconf-restconf/s09-netconf-hello.webp" width="817" height="530" alt="ssh to port 830 with the netconf subsystem returns an XML hello with a capabilities list: NETCONF base 1.0 and 1.1, writable-running, rollback-on-error, validate, xpath, notification, interleave, with-defaults and yang-library" loading="lazy" decoding="async"></a><figcaption>ssh to port 830 with the netconf subsystem returns an XML hello with a capabilities list: NETCONF base 1.0 and 1.1, writable-running, rollback-on-error, validate, xpath, notification, interleave, with-defaults and yang-library. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> the router opens with a <strong><code translate="no">&lt;hello&gt;</code></strong> listing its <strong>capabilities</strong>:</p>
+<ul><li><strong><code translate="no">base:1.0</code> and <code translate="no">base:1.1</code></strong>: the NETCONF protocol versions it speaks.</li><li><strong><code translate="no">writable-running</code></strong>: edits can go straight to the running configuration.</li><li><strong><code translate="no">rollback-on-error</code></strong> and <strong><code translate="no">validate</code></strong>: a failed change can be undone as a whole, and changes can be checked before they&#x27;re applied.</li><li><strong><code translate="no">notification</code></strong> and <strong><code translate="no">interleave</code></strong>: event streams.</li><li>Further down, hundreds of lines list every <strong>YANG module</strong> the device supports.</li></ul>
+<p>A NETCONF client would now answer with its own <code translate="no">&lt;hello&gt;</code>. You&#x27;re not going to, so press <strong>Ctrl+C</strong>.</p>
+<h3 id="check-the-session-and-the-processes-on-the-router">Check the session and the processes on the router</h3>
+<p>While a session is open:</p>
+<pre translate="no"><code translate="no">show platform software yang-management process
+show netconf-yang sessions</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/netconf-restconf/s08-yang-processes-sessions.webp" aria-label="Open full-size image: All YANG processes Running including ncsshd; show netconf-yang sessions lists one session, ID 24, transport netconf-ssh, user john, source 10.0.0.5"><img src="/assets/img/ccnp/labs/netconf-restconf/s08-yang-processes-sessions.webp" width="850" height="512" alt="All YANG processes Running including ncsshd; show netconf-yang sessions lists one session, ID 24, transport netconf-ssh, user john, source 10.0.0.5" loading="lazy" decoding="async"></a><figcaption>All YANG processes Running including ncsshd; show netconf-yang sessions lists one session, ID 24, transport netconf-ssh, user john, source 10.0.0.5. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong><code translate="no">ncsshd</code> is now Running</strong>: the NETCONF SSH server started when you entered <code translate="no">netconf-yang</code>.</li><li><strong>One session</strong>: transport <strong><code translate="no">netconf-ssh</code></strong>, user <strong><code translate="no">john</code></strong>, from <strong>10.0.0.5</strong>. That&#x27;s the audit view of who is connected over the API.</li><li>The legend lists <strong>global locks</strong> on the running, candidate and startup datastores. Locking is a NETCONF feature RESTCONF doesn&#x27;t have: a client can lock a datastore so nobody else changes it mid-transaction.</li></ul>
+<h3 id="pull-the-whole-running-config-with-ncclient">Pull the whole running config with ncclient</h3>
+<p>Save this as <code translate="no">net_config.py</code>:</p>
+<pre translate="no"><code translate="no">#!/usr/bin/env python3
+&quot;&quot;&quot;NETCONF: pull the full running configuration as XML with ncclient (SSH, port 830).&quot;&quot;&quot;
+from getpass import getpass
+from ncclient import manager
+
+device = {
+    &quot;host&quot;: &quot;10.0.0.1&quot;,
+    &quot;port&quot;: 830,
+    &quot;username&quot;: &quot;john&quot;,
+    &quot;password&quot;: getpass(),
+    &quot;hostkey_verify&quot;: False,          # lab only: verify the SSH host key in production
+    &quot;device_params&quot;: {&quot;name&quot;: &quot;iosxe&quot;},
+}
+
+with manager.connect(**device) as m:
+    reply = m.get_config(source=&quot;running&quot;)
+    print(reply.xml)</code></pre>
+<pre translate="no"><code translate="no">python3 net_config.py</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/netconf-restconf/s10-net-config.webp" aria-label="Open full-size image: python3 net_config.py prints an rpc-reply with a data element containing the Cisco-IOS-XE-native configuration: version 17.3, boot markers, memory and call-home settings"><img src="/assets/img/ccnp/labs/netconf-restconf/s10-net-config.webp" width="821" height="572" alt="python3 net_config.py prints an rpc-reply with a data element containing the Cisco-IOS-XE-native configuration: version 17.3, boot markers, memory and call-home settings" loading="lazy" decoding="async"></a><figcaption>python3 net_config.py prints an rpc-reply with a data element containing the Cisco-IOS-XE-native configuration: version 17.3, boot markers, memory and call-home settings. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li>An <strong><code translate="no">&lt;rpc-reply&gt;</code></strong> to the script&#x27;s <code translate="no">&lt;get-config&gt;</code> RPC, with a <code translate="no">message-id</code> that ties the reply to the request.</li><li>Inside <strong><code translate="no">&lt;data&gt;</code></strong>, the whole running configuration under <strong><code translate="no">Cisco-IOS-XE-native</code></strong>, starting with <code translate="no">&lt;version&gt;17.3&lt;/version&gt;</code>. Everything in <code translate="no">show running-config</code> is here, as structured XML.</li><li>One RPC, one complete, parseable configuration. That&#x27;s why NETCONF is the backbone of automation tools, and why an account that can do this deserves the same protection as an administrator.</li></ul>
+<h2 id="part-5-break-it-on-purpose">Part 5: break it on purpose</h2>
+<h3 id="curl-without-k-the-self-signed-certificate">curl without -k: the self-signed certificate</h3>
+<pre translate="no"><code translate="no">curl -u john -H &quot;Accept: application/yang-data+json&quot; https://10.0.0.1/restconf/data/ietf-interfaces:interfaces</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/netconf-restconf/s12-curl-cert.webp" aria-label="Open full-size image: curl without -k fails with error 60, SSL certificate problem: self-signed certificate; the same command with -k returns the ietf-interfaces JSON for GigabitEthernet1 with address 10.0.0.1 and GigabitEthernet2 disabled"><img src="/assets/img/ccnp/labs/netconf-restconf/s12-curl-cert.webp" srcset="/assets/img/ccnp/labs/netconf-restconf/s12-curl-cert-800.webp 800w, /assets/img/ccnp/labs/netconf-restconf/s12-curl-cert.webp 1270w" sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem" width="1270" height="790" alt="curl without -k fails with error 60, SSL certificate problem: self-signed certificate; the same command with -k returns the ietf-interfaces JSON for GigabitEthernet1 with address 10.0.0.1 and GigabitEthernet2 disabled" loading="lazy" decoding="async"></a><figcaption>curl without -k fails with error 60, SSL certificate problem: self-signed certificate; the same command with -k returns the ietf-interfaces JSON for GigabitEthernet1 with address 10.0.0.1 and GigabitEthernet2 disabled. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong><code translate="no">curl: (60) SSL certificate problem: self-signed certificate</code></strong>: curl refused, because it can&#x27;t verify who signed the router&#x27;s certificate. That&#x27;s TLS doing its job: it would refuse an impostor the same way.</li><li>With <strong><code translate="no">-k</code></strong> the request succeeds and returns the JSON tree: GigabitEthernet1 <strong>enabled</strong> with <strong>10.0.0.1/24</strong>, GigabitEthernet2 <strong>disabled</strong>, and so on.</li><li><code translate="no">-k</code> and <code translate="no">verify=False</code> turn off the protection that makes HTTPS worth using. They&#x27;re acceptable in a lab only. In production, enroll the router in your PKI, point the HTTPS server at that trustpoint (<code translate="no">ip http secure-trustpoint</code>), and validate it in every client.</li></ul>
+<h3 id="other-faults-to-recognize">Other faults to recognize</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">What you see</th><th scope="col">Why</th><th scope="col">Fix</th></tr></thead><tbody><tr><td><code translate="no">JSONDecodeError: Expecting value: line 1 column 1 (char 0)</code> right after enabling RESTCONF</td><td>The YANG processes weren&#x27;t ready, so the router returned an HTML error page, not JSON</td><td><code translate="no">show platform software yang-management process</code>; wait for <code translate="no">nginx</code> and <code translate="no">confd</code>; print the status code and the start of the response before parsing</td></tr><tr><td><code translate="no">401 Unauthorized</code></td><td>Wrong credentials, the HTTP server isn&#x27;t authenticating against your user, or the account isn&#x27;t privilege 15</td><td><code translate="no">ip http authentication local</code> (or AAA); privilege 15 account</td></tr><tr><td><code translate="no">404</code> or empty data</td><td>Wrong module or container name (<code translate="no">ietf-interface:interfaces</code>)</td><td>Names are exact: <code translate="no">ietf-interfaces:interfaces</code></td></tr><tr><td>Script expects JSON, gets XML</td><td><code translate="no">Accept</code> header asks for <code translate="no">+xml</code></td><td>Match the header to what the script parses</td></tr><tr><td>NETCONF connection refused on 830</td><td><code translate="no">netconf-yang</code> not configured, <code translate="no">ncsshd</code> not running, or SSH broken</td><td>Enable it, check the processes, confirm SSH on port 22 works first</td></tr></tbody></table></div>
+<h2 id="harden-it-for-production">Harden it for production</h2>
+<p>The baseline already showed what to fix:</p>
+<pre translate="no"><code translate="no">no ip http server
+ip http secure-server
+ip http tls-version TLSv1.2
+ip http secure-trustpoint &lt;CA-SIGNED-TRUSTPOINT&gt;
+ip http access-class ipv4 AUTOMATION-HOSTS
+ip http authentication aaa
+!
+ip access-list standard AUTOMATION-HOSTS
+ permit 10.10.99.0 0.0.0.255</code></pre>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Finding in this lab</th><th scope="col">Fix</th></tr></thead><tbody><tr><td>Plain HTTP server on port 80</td><td><code translate="no">no ip http server</code></td></tr><tr><td>TLS 1.1 enabled</td><td><code translate="no">ip http tls-version TLSv1.2</code> (or later)</td></tr><tr><td>Self-signed certificate, clients using <code translate="no">-k</code></td><td>CA-signed certificate with <code translate="no">ip http secure-trustpoint</code>; validate in clients</td></tr><tr><td>No access class</td><td><code translate="no">ip http access-class ipv4 &lt;ACL&gt;</code>; VTY ACLs for NETCONF&#x27;s SSH</td></tr><tr><td>Shared admin account</td><td>Dedicated automation accounts through AAA, with command accounting to a SIEM</td></tr><tr><td><code translate="no">hostkey_verify=False</code></td><td>Pin the router&#x27;s SSH host key in the automation host&#x27;s <code translate="no">known_hosts</code></td></tr></tbody></table></div>
+<h2 id="check-yourself">Check yourself</h2>
+<details class="qa"><summary>1. Which one needs ip http secure-server: NETCONF or RESTCONF?</summary>
+<p>RESTCONF. It runs over HTTPS on port 443. NETCONF runs over SSH on port 830 and needs no HTTP server.</p>
+</details>
+<details class="qa"><summary>2. A RESTCONF script fails with JSONDecodeError at char 0 right after you enabled RESTCONF. First command?</summary>
+<p><code translate="no">show platform software yang-management process</code>. If <code translate="no">nginx</code> or <code translate="no">confd</code> aren&#x27;t Running yet, the router is answering with an HTML error page instead of JSON.</p>
+</details>
+<details class="qa"><summary>3. Which encodings does each protocol support?</summary>
+<p>NETCONF: XML. RESTCONF: JSON or XML, chosen with the <code translate="no">Accept</code> and <code translate="no">Content-Type</code> headers.</p>
+</details>
+<details class="qa"><summary>4. What does the NETCONF hello tell you?</summary>
+<p>The protocol versions and features the device supports (base 1.0 and 1.1, writable-running, validate, rollback-on-error, notifications) and every YANG module it implements.</p>
+</details>
+<details class="qa"><summary>5. Why did curl fail without -k, and why is -k dangerous?</summary>
+<p>The router presented a self-signed certificate that curl couldn&#x27;t verify. <code translate="no">-k</code> skips verification entirely, so curl would also accept an attacker&#x27;s certificate. Use a CA-signed certificate and validate it.</p>
+</details>
+<h2 id="answer-config">Answer config</h2>
+<details class="qa"><summary>Show the final config for R1</summary>
+<pre translate="no"><code translate="no">ip http secure-server
+ip http authentication local
+restconf
+netconf-yang</code></pre>
+<p>The lab leaves <code translate="no">ip http server</code> on as found; the hardening section removes it.</p>
+</details>
+<h2 id="exam-mapping">Exam mapping</h2>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">You practiced</th><th scope="col">Exam angle</th><th scope="col">SCOR v2.0</th></tr></thead><tbody><tr><td><code translate="no">ip http secure-server</code> + <code translate="no">restconf</code></td><td>RESTCONF on HTTPS 443</td><td>2.7</td></tr><tr><td><code translate="no">netconf-yang</code>, SSH port 830</td><td>NETCONF transport; no HTTP server needed</td><td>2.7</td></tr><tr><td>IETF vs. native YANG models</td><td>Model-driven programmability</td><td>2.7</td></tr><tr><td>JSON and XML via the <code translate="no">Accept</code> header</td><td>RESTCONF encodings</td><td>2.7</td></tr><tr><td>NETCONF hello and <code translate="no">&lt;get-config&gt;</code></td><td>Capabilities, RPCs, datastores</td><td>2.7</td></tr><tr><td>Certificate error and hardening</td><td>Securing programmability interfaces</td><td>2.7</td></tr></tbody></table></div>
+<p>Drill it with the <a href="/ccnp-security/flashcards#d2">flashcards</a> and the <a href="/ccnp-security/mock-exam#d2">mock exam</a>.</p>
+</div>
+      <footer class="post-end">
+        <section class="practice" aria-labelledby="practice-h">
+          <div><h2 id="practice-h" class="sub-h">Lock it in</h2>
+          <p>Lab done? Drill the commands and the attack-to-defense mapping until they're automatic.</p></div>
+          <p class="practice-links"><a class="btn btn-pri" href="/ccnp-security/flashcards#d2">flashcards <span class="p">d2</span></a><a class="btn btn-sec" href="/ccnp-security/mock-exam#d2">mock exam <span class="p">d2</span></a><a class="btn btn-sec" href="/ccnp-security/secure-network-management">notes</a></p>
+        </section>
+      </footer>
+    </div>
+    <aside class="toc" aria-label="On this page"><span class="toc-title"><span class="h">#</span> show ip route | toc</span><ol><li><a href="#what-you-ll-build">What you&#x27;ll build</a></li><li><a href="#where-to-run-this-lab">Where to run this lab</a></li><li><a href="#topology">Topology</a></li><li><a href="#part-1-baseline">Part 1: baseline</a></li><li><a href="#part-2-enable-restconf">Part 2: enable RESTCONF</a></li><li><a href="#part-3-read-data-with-restconf">Part 3: read data with RESTCONF</a></li><li><a href="#part-4-enable-netconf">Part 4: enable NETCONF</a></li><li><a href="#part-5-break-it-on-purpose">Part 5: break it on purpose</a></li><li><a href="#harden-it-for-production">Harden it for production</a></li><li><a href="#check-yourself">Check yourself</a></li><li><a href="#answer-config">Answer config</a></li><li><a href="#exam-mapping">Exam mapping</a></li></ol></aside>
+  </div>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/ccnp-security">ccnp security</a></li>
+        <li><a href="/ccnp-security/labs">ccnp labs</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Oct 22, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

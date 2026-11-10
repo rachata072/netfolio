@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free SNMPv3 Lab: authPriv Users, Views, snmpwalk and snmpset (SCOR 2.7)</title>
+<meta name="description" content="Free CCNP Security lab: configure SNMPv3 authPriv on IOS XE with ACLs, views, groups and users, then test it with snmpwalk and snmpset from Linux.">
+<link rel="canonical" href="https://breakfixlearn.com/ccnp-security/labs/snmpv3-authpriv-lab">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=629a8f9e5c">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="SNMPv3 Lab: authPriv, snmpwalk and snmpset">
+<meta property="og:description" content="Configure SNMPv3 with SHA and AES on an IOS XE router, poll it from a Linux host with snmpwalk, change its hostname with snmpset, and read every SNMPv3 error.">
+<meta property="og:url" content="https://breakfixlearn.com/ccnp-security/labs/snmpv3-authpriv-lab">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/ccnp-lab-snmpv3-authpriv-lab.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SNMPv3 Lab: authPriv, snmpwalk and snmpset: free CCNP Security lab">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"SNMPv3 Lab: authPriv, snmpwalk and snmpset","description":"Free CCNP Security lab: configure SNMPv3 authPriv on IOS XE with ACLs, views, groups and users, then test it with snmpwalk and snmpset from Linux.","url":"https://breakfixlearn.com/ccnp-security/labs/snmpv3-authpriv-lab","learningResourceType":"Lab exercise","educationalLevel":"Professional","inLanguage":"en","isAccessibleForFree":true,"datePublished":"2026-11-09","dateModified":"2026-11-09","teaches":["Configure secure network management of perimeter security and infrastructure devices such as SNMPv3, NetConf, RestConf, APIs, secure syslog, and NTP with authentication"],"author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"encoding":[]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"CCNP Security","item":"https://breakfixlearn.com/ccnp-security"},{"@type":"ListItem","position":3,"name":"SNMPv3 Lab: authPriv, snmpwalk and snmpset"}]}</script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article class="lecture lab">
+  <header class="post-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/ccnp-security">ccnp-security</a><span aria-hidden="true">/</span><a href="/ccnp-security/labs">labs</a><span aria-hidden="true">/</span><span>snmpv3-authpriv-lab</span></nav>
+      <p class="scard-meta"><span class="sid">Real IOS lab</span><span>Domain 2 Network Security &middot; topics 2.7</span></p>
+      <h1 class="mt-2">SNMPv3 Lab: authPriv, snmpwalk and snmpset</h1>
+      <p class="post-dek">Configure SNMPv3 with SHA and AES on an IOS XE router, poll it from a Linux host with snmpwalk, change its hostname with snmpset, and read every SNMPv3 error.</p>
+      <div class="post-meta"><time datetime="2026-11-09">updated Nov 9, 2026</time><span class="sep">/</span><span>45 to 60 min</span><span class="sep">/</span><span>IOS XE router + Linux with Net-SNMP</span><span class="sep">/</span><span>by Trey</span></div>
+    </div>
+  </header>
+  <div class="wrap post-layout">
+    <div class="post-main">
+      <section class="labdl labenv" aria-labelledby="dl-h">
+        <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">show</span> <span class="a">snmpv3-authpriv-lab environment</span></span>
+        <h2 id="dl-h" class="sub-h">Where to run this lab</h2>
+        <ul class="env-list"><li><b>Cisco Modeling Labs</b> <span>Catalyst 8000V or CSR 1000v routers plus an Ubuntu node. Recommended.</span></li><li><b>DevNet / dCloud</b> <span>IOS XE sandboxes, used from your own Linux machine.</span></li><li><b>Your own gear</b> <span>Any IOS XE router and a Linux VM on the same subnet.</span></li></ul>
+        <p class="side-note">Read the <a href="/ccnp-security/secure-network-management">Secure Network Management: SNMPv3, NETCONF, RESTCONF, NTP &amp; Syslog</a> notes first. Topics: <span class="chip obj d2" title="Configure secure network management of perimeter security and infrastructure devices such as SNMPv3, NetConf, RestConf, APIs, secure syslog, and NTP with authentication">2.7</span></p>
+      </section>
+<details class="toc-mobile"><summary>show ip route | toc (12 sections)</summary><ol><li><a href="#what-you-ll-build">What you&#x27;ll build</a></li><li><a href="#where-to-run-this-lab">Where to run this lab</a></li><li><a href="#topology">Topology</a></li><li><a href="#part-1-baseline">Part 1: baseline</a></li><li><a href="#part-2-build-it-verifying-every-step">Part 2: build it, verifying every step</a></li><li><a href="#part-3-read-from-the-monitoring-host">Part 3: read from the monitoring host</a></li><li><a href="#part-4-write-with-the-read-write-user">Part 4: write with the read-write user</a></li><li><a href="#part-5-break-it-on-purpose">Part 5: break it on purpose</a></li><li><a href="#harden-it-for-production">Harden it for production</a></li><li><a href="#check-yourself">Check yourself</a></li><li><a href="#answer-config">Answer config</a></li><li><a href="#exam-mapping">Exam mapping</a></li></ol></details>
+<div class="prose">
+<h2 id="what-you-ll-build">What you&#x27;ll build</h2>
+<p>SNMPv3 on an IOS XE router, at the <strong>authPriv</strong> level (SHA authentication and AES encryption), locked to one monitoring host. Then you&#x27;ll prove it from a Linux monitoring station with Net-SNMP: read the device description, hostname and interfaces, walk the whole MIB, and finally <strong>change the router&#x27;s hostname over SNMP</strong>, which shows exactly why read-write SNMP needs to be locked down.</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Item</th><th scope="col">Detail</th></tr></thead><tbody><tr><td><strong>Platform</strong></td><td>An IOS XE router and a Linux host with Net-SNMP (see where to run it, below)</td></tr><tr><td><strong>Time</strong></td><td>45 to 60 minutes</td></tr><tr><td><strong>Level</strong></td><td>CCNP Security. You should be comfortable with the IOS CLI and a Linux shell</td></tr><tr><td><strong>You&#x27;ll practice</strong></td><td>SNMP ACLs, views, groups and users; <code translate="no">show snmp user</code>; <code translate="no">snmpwalk</code>, <code translate="no">snmpget</code> and <code translate="no">snmpset</code>; reading SNMPv3 errors</td></tr><tr><td><strong>Exam topic</strong></td><td>2.7 (core)</td></tr><tr><td><strong>Before this</strong></td><td><a href="/ccnp-security/secure-network-management">Secure Network Management notes</a>, especially <a href="/ccnp-security/secure-network-management#snmpv3">SNMPv3</a></td></tr></tbody></table></div>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Part</th><th scope="col">What you do</th><th scope="col">What it proves</th></tr></thead><tbody><tr><td>1 Baseline</td><td>Check SNMP is off</td><td>Clean start</td></tr><tr><td>2 Build</td><td>ACL, views, groups, users</td><td>Each object exists before the next depends on it</td></tr><tr><td>3 Read</td><td><code translate="no">snmpwalk</code> from the monitoring host</td><td>Authentication and encryption work end to end</td></tr><tr><td>4 Write</td><td><code translate="no">snmpset</code> the hostname with the read-write user</td><td>Read-write SNMP is real control over the device</td></tr><tr><td>5 Break</td><td>Wrong keys, wrong level, wrong group, wrong source</td><td>You can name the fault from the error</td></tr></tbody></table></div>
+<h3 id="the-one-thing-to-remember">The one thing to remember</h3>
+<p>SNMPv3 is four objects in a chain: <strong>ACL → view → group → user</strong>, at level <strong>authPriv</strong>. The fastest sanity check is <strong><code translate="no">show snmp user</code></strong>: it shows each user&#x27;s protocols and, crucially, which <strong>group</strong> the user is in.</p>
+<h3 id="think-like-the-defender-first">Think like the defender first</h3>
+<ul><li><strong>Who should be able to poll this router?</strong> One or two monitoring servers, not the whole network. That&#x27;s the ACL.</li><li><strong>What do they need to see?</strong> Usually interface counters and system information, not the whole MIB. That&#x27;s the view. This lab exposes everything to keep it simple; the hardening section narrows it.</li><li><strong>Does anything need to write?</strong> Most monitoring doesn&#x27;t. Every read-write user is a way to change the device without logging in. Part 4 shows how much it can do.</li></ul>
+<h2 id="where-to-run-this-lab">Where to run this lab</h2>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Environment</th><th scope="col">How to set it up</th></tr></thead><tbody><tr><td><strong>Cisco Modeling Labs (CML)</strong></td><td>A Catalyst 8000V (or CSR 1000v / IOSv) router and an Ubuntu node with the <code translate="no">snmp</code> package, on one subnet. Recommended</td></tr><tr><td><strong>Cisco DevNet Sandbox / dCloud</strong></td><td>An always-on or reservable IOS XE sandbox, polled from your own Linux machine over the sandbox VPN</td></tr><tr><td><strong>Your own gear</strong></td><td>Any IOS XE router and a Linux VM with <code translate="no">sudo apt install snmp</code> (Debian / Ubuntu) or <code translate="no">dnf install net-snmp-utils</code> (Red Hat family)</td></tr></tbody></table></div>
+<blockquote><p><strong>Lab values only.</strong> The passphrases and addresses in this lab are training values shown in the screenshots. Never reuse them on real equipment.</p></blockquote>
+<h2 id="topology">Topology</h2>
+<pre translate="no"><code translate="no">  +-----------------------+                 +------------------------+
+  |  Linux host (NMS)     |   10.0.0.0/24   |  Router R1 (IOS XE)    |
+  |  10.0.0.5             | --------------&gt; |  10.0.0.1              |
+  |  snmpwalk / snmpset   |  UDP 161        |  SNMP agent            |
+  +-----------------------+                 +------------------------+</code></pre>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Item</th><th scope="col">Value</th></tr></thead><tbody><tr><td>Router</td><td>R1, 10.0.0.1, IOS XE 17.3</td></tr><tr><td>Monitoring host</td><td>10.0.0.5, Net-SNMP tools</td></tr><tr><td>Read-only user</td><td><code translate="no">ROSNMPUSER</code>: auth SHA <code translate="no">5678MmNnOoPp</code>, priv AES-128 <code translate="no">MnNnOo7890</code></td></tr><tr><td>Read-write user</td><td><code translate="no">RWSNMPUSER</code>: auth SHA <code translate="no">9876QqRrSsTt</code>, priv AES-128 <code translate="no">TtUuVv3456</code></td></tr></tbody></table></div>
+<h2 id="part-1-baseline">Part 1: baseline</h2>
+<p>From the monitoring host, SSH to R1 and confirm SNMP isn&#x27;t configured:</p>
+<pre translate="no"><code translate="no">ssh john@10.0.0.1
+show snmp user
+show running-config | section snmp</code></pre>
+<figure class="post-figure fit"><a href="/assets/img/ccnp/labs/snmpv3/s01-baseline.webp" aria-label="Open full-size image: R1 baseline: show snmp user returns SNMP agent not enabled and show running-config section snmp returns nothing"><img src="/assets/img/ccnp/labs/snmpv3/s01-baseline.webp" width="693" height="235" alt="R1 baseline: show snmp user returns SNMP agent not enabled and show running-config section snmp returns nothing" loading="lazy" decoding="async"></a><figcaption>R1 baseline: show snmp user returns SNMP agent not enabled and show running-config section snmp returns nothing. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> <strong><code translate="no">%SNMP agent not enabled</code></strong> and an empty <code translate="no">section snmp</code>: no SNMP of any version is running. That&#x27;s the safest default, and the state to return to on devices nobody monitors.</p>
+<h2 id="part-2-build-it-verifying-every-step">Part 2: build it, verifying every step</h2>
+<h3 id="step-1-acl-only-the-monitoring-host-may-speak-snmp">Step 1: ACL (only the monitoring host may speak SNMP)</h3>
+<pre translate="no"><code translate="no">configure terminal
+ ip access-list standard SNMP-SERVERS
+  remark SNMP Server #1
+  permit 10.0.0.5
+ end
+show access-lists SNMP-SERVERS</code></pre>
+<figure class="post-figure fit"><a href="/assets/img/ccnp/labs/snmpv3/s02-acl.webp" aria-label="Open full-size image: show access-lists SNMP-SERVERS: standard IP access list with entry 10 permit 10.0.0.5"><img src="/assets/img/ccnp/labs/snmpv3/s02-acl.webp" width="511" height="120" alt="show access-lists SNMP-SERVERS: standard IP access list with entry 10 permit 10.0.0.5" loading="lazy" decoding="async"></a><figcaption>show access-lists SNMP-SERVERS: standard IP access list with entry 10 permit 10.0.0.5. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> one entry, <strong><code translate="no">10 permit 10.0.0.5</code></strong>. Everything else hits the implicit deny. SNMP ACL denies are <strong>silent</strong>: a blocked host simply times out, with no error message to tell an attacker why.</p>
+<h3 id="step-2-views-what-part-of-the-mib-is-visible">Step 2: views (what part of the MIB is visible)</h3>
+<pre translate="no"><code translate="no">configure terminal
+ snmp-server view SNMP-V3-RO-VIEW iso included
+ snmp-server view SNMP-V3-RW-VIEW iso included
+ do show run | include snmp-server view</code></pre>
+<figure class="post-figure fit"><a href="/assets/img/ccnp/labs/snmpv3/s03-views.webp" aria-label="Open full-size image: show run include snmp-server view: SNMP-V3-RO-VIEW and SNMP-V3-RW-VIEW both include the iso subtree"><img src="/assets/img/ccnp/labs/snmpv3/s03-views.webp" width="663" height="70" alt="show run include snmp-server view: SNMP-V3-RO-VIEW and SNMP-V3-RW-VIEW both include the iso subtree" loading="lazy" decoding="async"></a><figcaption>show run include snmp-server view: SNMP-V3-RO-VIEW and SNMP-V3-RW-VIEW both include the iso subtree. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> both views include <strong><code translate="no">iso</code></strong>, the name for OID 1, the root of the tree. In other words, everything. That keeps the lab simple; production views should include only the subtrees the monitoring tool polls.</p>
+<h3 id="step-3-groups-minimum-level-views-and-acl">Step 3: groups (minimum level, views and ACL)</h3>
+<pre translate="no"><code translate="no"> snmp-server group SNMP-V3-RO v3 priv read SNMP-V3-RO-VIEW access SNMP-SERVERS
+ snmp-server group SNMP-V3-RW v3 priv write SNMP-V3-RW-VIEW access SNMP-SERVERS
+ do show snmp group
+ do show snmp user
+ do show run | include snmp-server group</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/snmpv3/s04-groups.webp" aria-label="Open full-size image: Creating both groups with v3 priv; show snmp group and show snmp user still return SNMP agent not enabled, while show run include snmp-server group lists both groups"><img src="/assets/img/ccnp/labs/snmpv3/s04-groups.webp" width="985" height="215" alt="Creating both groups with v3 priv; show snmp group and show snmp user still return SNMP agent not enabled, while show run include snmp-server group lists both groups" loading="lazy" decoding="async"></a><figcaption>Creating both groups with v3 priv; show snmp group and show snmp user still return SNMP agent not enabled, while show run include snmp-server group lists both groups. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li>Both groups are in the running config: <strong>SNMPv3</strong>, minimum level <strong><code translate="no">priv</code></strong> (authPriv), the views, and the ACL.</li><li><strong><code translate="no">show snmp group</code> and <code translate="no">show snmp user</code> still say <code translate="no">%SNMP agent not enabled</code>.</strong> That&#x27;s not a fault. On IOS XE, views and groups don&#x27;t start the SNMP agent; the first <strong>user</strong> (or community) does. Until then, verify from the running config.</li><li>The read-only group has a <code translate="no">read</code> view; the read-write group has a <code translate="no">write</code> view. A group that must both read and write would list both (<code translate="no">read SNMP-V3-RW-VIEW write SNMP-V3-RW-VIEW</code>).</li></ul>
+<h3 id="step-4-users-identity-and-keys">Step 4: users (identity and keys)</h3>
+<pre translate="no"><code translate="no"> snmp-server user ROSNMPUSER SNMP-V3-RO v3 auth sha 5678MmNnOoPp priv aes 128 MnNnOo7890 access SNMP-SERVERS
+ snmp-server user RWSNMPUSER SNMP-V3-RW v3 auth sha 9876QqRrSsTt priv aes 128 TtUuVv3456 access SNMP-SERVERS
+ end
+show snmp user</code></pre>
+<p>Check the group name on each line before you press Enter: putting the read-write user in the read-only group is the classic mistake, and Part 5 shows what it looks like.</p>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/snmpv3/s05-show-snmp-user.webp" aria-label="Open full-size image: show snmp user: ROSNMPUSER and RWSNMPUSER, both with engine ID 8000000903000C1CA33C0000, active access-list SNMP-SERVERS, SHA authentication, AES128 privacy, and group names SNMP-V3-RO and SNMP-V3-RW"><img src="/assets/img/ccnp/labs/snmpv3/s05-show-snmp-user.webp" width="862" height="368" alt="show snmp user: ROSNMPUSER and RWSNMPUSER, both with engine ID 8000000903000C1CA33C0000, active access-list SNMP-SERVERS, SHA authentication, AES128 privacy, and group names SNMP-V3-RO and SNMP-V3-RW" loading="lazy" decoding="async"></a><figcaption>show snmp user: ROSNMPUSER and RWSNMPUSER, both with engine ID 8000000903000C1CA33C0000, active access-list SNMP-SERVERS, SHA authentication, AES128 privacy, and group names SNMP-V3-RO and SNMP-V3-RW. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output, field by field:</strong></p>
+<ul><li><strong>Engine ID <code translate="no">8000000903000C1CA33C0000</code></strong>: the same for both users, because it belongs to the agent. The passphrases were hashed with it to make the real keys. If it ever changes, both users must be recreated.</li><li><strong>storage-type: nonvolatile</strong>: the users survive a reload once the config is saved.</li><li><strong>active access-list: SNMP-SERVERS</strong>: the host restriction is applied to the user too.</li><li><strong>Authentication Protocol: SHA</strong> and <strong>Privacy Protocol: AES128</strong>: authPriv.</li><li><strong>Group-name</strong>: <code translate="no">SNMP-V3-RO</code> for the read-only user and <strong><code translate="no">SNMP-V3-RW</code></strong> for the read-write user. This one field is what catches the most common SNMPv3 mistake.</li></ul>
+<p>Notice what&#x27;s <strong>not</strong> here: the passphrases. SNMPv3 keys never appear in <code translate="no">show running-config</code> or <code translate="no">show snmp user</code>. You confirm a user by testing it, not by reading the key back.</p>
+<h2 id="part-3-read-from-the-monitoring-host">Part 3: read from the monitoring host</h2>
+<p>Each <code translate="no">snmpwalk</code> names the version, the level, the user, and both protocols and passphrases:</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Flag</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td><code translate="no">-v3</code></td><td>SNMP version 3</td></tr><tr><td><code translate="no">-a SHA</code> / <code translate="no">-A</code></td><td>Authentication protocol / passphrase</td></tr><tr><td><code translate="no">-x AES</code> / <code translate="no">-X</code></td><td>Privacy protocol / passphrase</td></tr><tr><td><code translate="no">-u ROSNMPUSER</code></td><td>Username</td></tr><tr><td><code translate="no">-l authPriv</code></td><td>Security level (must meet the group&#x27;s minimum; case doesn&#x27;t matter)</td></tr><tr><td><code translate="no">10.0.0.1 &lt;OID&gt;</code></td><td>Target and the OID to walk</td></tr></tbody></table></div>
+<h3 id="sysdescr-what-is-this-device">sysDescr: what is this device?</h3>
+<pre translate="no"><code translate="no">snmpwalk -v3 -a SHA -A 5678MmNnOoPp -x AES -X MnNnOo7890 -u ROSNMPUSER -l authPriv 10.0.0.1 1.3.6.1.2.1.1.1</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/snmpv3/s06-walk-sysdescr.webp" aria-label="Open full-size image: snmpwalk of 1.3.6.1.2.1.1.1 returns the sysDescr string: Cisco IOS Software Amsterdam, Virtual XE Software, Version 17.3.8a"><img src="/assets/img/ccnp/labs/snmpv3/s06-walk-sysdescr.webp" srcset="/assets/img/ccnp/labs/snmpv3/s06-walk-sysdescr-800.webp 800w, /assets/img/ccnp/labs/snmpv3/s06-walk-sysdescr.webp 1006w" sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem" width="1006" height="170" alt="snmpwalk of 1.3.6.1.2.1.1.1 returns the sysDescr string: Cisco IOS Software Amsterdam, Virtual XE Software, Version 17.3.8a" loading="lazy" decoding="async"></a><figcaption>snmpwalk of 1.3.6.1.2.1.1.1 returns the sysDescr string: Cisco IOS Software Amsterdam, Virtual XE Software, Version 17.3.8a. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> <code translate="no">iso.3.6.1.2.1.1.1.0 = STRING: &quot;Cisco IOS Software [Amsterdam], Virtual XE Software ... Version 17.3.8a&quot;</code>. Two lessons:</p>
+<ul><li>Getting <strong>any</strong> answer means authentication and decryption worked. A wrong key would have failed (Part 5).</li><li>That string is gold for an attacker: platform and <strong>exact software version</strong>, ready to match against published vulnerabilities. That&#x27;s why views matter and why SNMP must never be reachable from untrusted networks.</li></ul>
+<h3 id="sysname-and-interfaces">sysName and interfaces</h3>
+<pre translate="no"><code translate="no">snmpwalk -v3 -a SHA -A 5678MmNnOoPp -x AES -X MnNnOo7890 -u ROSNMPUSER -l authPriv 10.0.0.1 1.3.6.1.2.1.1.5
+snmpwalk -v3 -a SHA -A 5678MmNnOoPp -x AES -X MnNnOo7890 -u ROSNMPUSER -l authPriv 10.0.0.1 1.3.6.1.2.1.31.1.1.1.1</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/snmpv3/s07-walk-sysname.webp" aria-label="Open full-size image: snmpwalk of 1.3.6.1.2.1.1.5 returns sysName R1.cbt.local"><img src="/assets/img/ccnp/labs/snmpv3/s07-walk-sysname.webp" srcset="/assets/img/ccnp/labs/snmpv3/s07-walk-sysname-800.webp 800w, /assets/img/ccnp/labs/snmpv3/s07-walk-sysname.webp 1002w" sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem" width="1002" height="75" alt="snmpwalk of 1.3.6.1.2.1.1.5 returns sysName R1.cbt.local" loading="lazy" decoding="async"></a><figcaption>snmpwalk of 1.3.6.1.2.1.1.5 returns sysName R1.cbt.local. Select the image to open it full size.</figcaption></figure>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/snmpv3/s08-walk-ifname.webp" aria-label="Open full-size image: snmpwalk of the ifName column 1.3.6.1.2.1.31.1.1.1.1 returns Gi1 to Gi6, Vo0 and Nu0"><img src="/assets/img/ccnp/labs/snmpv3/s08-walk-ifname.webp" srcset="/assets/img/ccnp/labs/snmpv3/s08-walk-ifname-800.webp 800w, /assets/img/ccnp/labs/snmpv3/s08-walk-ifname.webp 1008w" sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem" width="1008" height="240" alt="snmpwalk of the ifName column 1.3.6.1.2.1.31.1.1.1.1 returns Gi1 to Gi6, Vo0 and Nu0" loading="lazy" decoding="async"></a><figcaption>snmpwalk of the ifName column 1.3.6.1.2.1.31.1.1.1.1 returns Gi1 to Gi6, Vo0 and Nu0. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong>sysName</strong> (<code translate="no">.1.5.0</code>) is the hostname plus domain.</li><li><strong>ifName</strong> returns one row per interface. The last number of each OID is the <strong>ifIndex</strong> (1 to 8 here), the key SNMP uses for every per-interface counter. <code translate="no">Vo0</code> is a virtual interface and <code translate="no">Nu0</code> is Null0.</li><li><code translate="no">-l authpriv</code> in lowercase works too: Net-SNMP doesn&#x27;t care about case.</li></ul>
+<p>Useful OIDs to try next:</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">OID</th><th scope="col">Object</th><th scope="col">Notes</th></tr></thead><tbody><tr><td><code translate="no">1.3.6.1.2.1.1.3</code></td><td>sysUpTime</td><td>Uptime in hundredths of a second</td></tr><tr><td><code translate="no">1.3.6.1.2.1.2.2.1.8</code></td><td>ifOperStatus</td><td>1 = up, 2 = down</td></tr><tr><td><code translate="no">1.3.6.1.2.1.2.2.1.7</code></td><td>ifAdminStatus</td><td>1 = up, 2 = down (writable)</td></tr><tr><td><code translate="no">1.3.6.1.2.1.2.2.1.10</code> / <code translate="no">.16</code></td><td>ifInOctets / ifOutOctets</td><td>Traffic counters</td></tr></tbody></table></div>
+<p>For a single value, <code translate="no">snmpget</code> is faster (scalars need the <code translate="no">.0</code> instance): <code translate="no">snmpget ... 10.0.0.1 1.3.6.1.2.1.1.5.0</code>. For big tables, <code translate="no">snmpbulkwalk</code> uses GetBulk and is much quicker.</p>
+<h3 id="the-whole-mib">The whole MIB</h3>
+<pre translate="no"><code translate="no">snmpwalk -v3 -a SHA -A 5678MmNnOoPp -x AES -X MnNnOo7890 -u ROSNMPUSER -l authPriv 10.0.0.1 &gt; snmp-fullwalk.txt
+nano snmp-fullwalk.txt</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/snmpv3/s10-full-walk.webp" aria-label="Open full-size image: The full walk saved to snmp-fullwalk.txt and opened in nano: 2440 lines starting with sysDescr, sysObjectID, sysUpTime, sysName and the interface table"><img src="/assets/img/ccnp/labs/snmpv3/s10-full-walk.webp" srcset="/assets/img/ccnp/labs/snmpv3/s10-full-walk-800.webp 800w, /assets/img/ccnp/labs/snmpv3/s10-full-walk.webp 1007w" sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem" width="1007" height="568" alt="The full walk saved to snmp-fullwalk.txt and opened in nano: 2440 lines starting with sysDescr, sysObjectID, sysUpTime, sysName and the interface table" loading="lazy" decoding="async"></a><figcaption>The full walk saved to snmp-fullwalk.txt and opened in nano: 2440 lines starting with sysDescr, sysObjectID, sysUpTime, sysName and the interface table. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> <strong>2440 lines</strong> from one command: system information, uptime (2:59:02), sysName, the interface table and much more. With no OID given, <code translate="no">snmpwalk</code> walks the standard MIB-2 tree; that&#x27;s what <code translate="no">iso included</code> exposed. Imagine that walk run by someone else, and the case for scoped views makes itself.</p>
+<h2 id="part-4-write-with-the-read-write-user">Part 4: write with the read-write user</h2>
+<p>Read-write SNMP isn&#x27;t monitoring; it&#x27;s configuration. Change the router&#x27;s sysName from the monitoring host:</p>
+<pre translate="no"><code translate="no">snmpset -v3 -a SHA -A 9876QqRrSsTt -x AES -X TtUuVv3456 -u RWSNMPUSER -l authPriv 10.0.0.1 1.3.6.1.2.1.1.5.0 s &quot;R1-SET-BY-SNMP&quot;</code></pre>
+<p><code translate="no">s</code> means the value is a string (<code translate="no">i</code> would be an integer). Then look at the router:</p>
+<pre translate="no"><code translate="no">show snmp user
+show run | include hostname</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/snmpv3/s11-snmpset-hostname.webp" aria-label="Open full-size image: After the snmpset, the router prompt reads R1-SET-BY-SNMP; show snmp user still lists both users with RWSNMPUSER in group SNMP-V3-RW, and show run include hostname returns hostname R1-SET-BY-SNMP"><img src="/assets/img/ccnp/labs/snmpv3/s11-snmpset-hostname.webp" width="730" height="347" alt="After the snmpset, the router prompt reads R1-SET-BY-SNMP; show snmp user still lists both users with RWSNMPUSER in group SNMP-V3-RW, and show run include hostname returns hostname R1-SET-BY-SNMP" loading="lazy" decoding="async"></a><figcaption>After the snmpset, the router prompt reads R1-SET-BY-SNMP; show snmp user still lists both users with RWSNMPUSER in group SNMP-V3-RW, and show run include hostname returns hostname R1-SET-BY-SNMP. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong>The prompt itself changed</strong> to <code translate="no">R1-SET-BY-SNMP#</code>, and the running config now says <strong><code translate="no">hostname R1-SET-BY-SNMP</code></strong>. On IOS, sysName is tied to the hostname, so one SNMP packet renamed the device.</li><li><strong>RWSNMPUSER is in <code translate="no">SNMP-V3-RW</code></strong>, the group with the write view. That&#x27;s why the set was allowed.</li></ul>
+<blockquote><p><strong>This is the attack in miniature.</strong> The same write access could set <code translate="no">ifAdminStatus</code> to 2 and shut an interface (<code translate="no">snmpset ... 1.3.6.1.2.1.2.2.1.7.&lt;ifIndex&gt; i 2</code>), or trigger a configuration copy off the device. Read-write SNMP is equivalent to configuration access. Give it only to tools that need it, from hosts that need it.</p></blockquote>
+<p>Put the hostname back when you&#x27;re done: <code translate="no">configure terminal</code>, <code translate="no">hostname R1</code>.</p>
+<h2 id="part-5-break-it-on-purpose">Part 5: break it on purpose</h2>
+<p>Run each of these from the monitoring host, read the error, then fix it.</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Break</th><th scope="col">Command change</th><th scope="col">What you see</th><th scope="col">Why</th></tr></thead><tbody><tr><td>Wrong authentication passphrase</td><td><code translate="no">-A WRONGPASS123</code></td><td><code translate="no">Authentication failure (incorrect password, community or key)</code></td><td>The HMAC doesn&#x27;t verify</td></tr><tr><td>Wrong privacy passphrase</td><td>correct <code translate="no">-A</code>, wrong <code translate="no">-X</code></td><td>Timeout, or a decryption error</td><td>The agent can&#x27;t decrypt the request</td></tr><tr><td>Level below the group&#x27;s minimum</td><td><code translate="no">-l authNoPriv</code> (drop <code translate="no">-x</code> / <code translate="no">-X</code>)</td><td>An error about an unsupported or insufficient security level</td><td>The group requires authPriv</td></tr><tr><td>Source not in the ACL</td><td>Change the ACL to permit another host</td><td><code translate="no">Timeout: No Response</code></td><td>ACL denies are silent</td></tr><tr><td>SNMPv2c attempt</td><td><code translate="no">snmpwalk -v2c -c public 10.0.0.1 1.3.6.1.2.1.1.5</code></td><td><code translate="no">Timeout: No Response</code></td><td>No community exists: only v3 is configured</td></tr><tr><td>Read-write user in the read-only group</td><td>Recreate <code translate="no">RWSNMPUSER</code> with group <code translate="no">SNMP-V3-RO</code>, then <code translate="no">snmpset</code></td><td>Reads still work; the set fails with <code translate="no">notWritable</code> or <code translate="no">noAccess</code></td><td>The group has no write view</td></tr></tbody></table></div>
+<p><strong>Fixing the group mistake</strong> the way a troubleshooter would:</p>
+<pre translate="no"><code translate="no">show snmp user
+configure terminal
+ snmp-server user RWSNMPUSER SNMP-V3-RW v3 auth sha 9876QqRrSsTt priv aes 128 TtUuVv3456 access SNMP-SERVERS
+ end
+show snmp user</code></pre>
+<p><code translate="no">Group-name</code> changes from <code translate="no">SNMP-V3-RO</code> to <code translate="no">SNMP-V3-RW</code>, and the set works again.</p>
+<blockquote><p><strong>Two timeouts, different causes.</strong> &quot;Timeout: No Response&quot; can mean a wrong privacy key, a blocked source, or no matching user. Check the cheap things first: is the host in the ACL (<code translate="no">show access-lists SNMP-SERVERS</code> hit counts), and is the privacy passphrase right?</p></blockquote>
+<h2 id="harden-it-for-production">Harden it for production</h2>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Lab shortcut</th><th scope="col">Production fix</th></tr></thead><tbody><tr><td><code translate="no">iso included</code> views</td><td>Views limited to what&#x27;s polled, e.g. <code translate="no">snmp-server view MON-VIEW system included</code> and <code translate="no">interfaces included</code></td></tr><tr><td>A read-write user</td><td>No RW unless a tool needs it; separate RW user, separate ACL</td></tr><tr><td>AES-128 and SHA-1</td><td>The strongest your release supports (<code translate="no">snmp-server user ?</code>): AES-256 and SHA-2 where available</td></tr><tr><td>Passphrases typed on the command line</td><td>Long, unique passphrases per role, stored in the NMS&#x27;s credential vault</td></tr><tr><td>SNMP reachable from the user network</td><td>Out-of-band management network; UDP 161 filtered everywhere else</td></tr><tr><td>No notifications</td><td>SNMPv3 informs to the NMS: <code translate="no">snmp-server host &lt;nms&gt; informs version 3 priv &lt;user&gt;</code></td></tr></tbody></table></div>
+<h2 id="check-yourself">Check yourself</h2>
+<details class="qa"><summary>1. Why do show snmp group and show snmp user fail after the groups exist?</summary>
+<p>On IOS XE the SNMP agent starts only when the first user or community exists. Views and groups alone don&#x27;t start it, so the operational <code translate="no">show snmp</code> commands report <code translate="no">%SNMP agent not enabled</code> until Step 4.</p>
+</details>
+<details class="qa"><summary>2. A walk with -l authNoPriv fails against these groups. Why?</summary>
+<p>The groups were created with <code translate="no">priv</code>, so authPriv is the minimum. A request at a lower level is refused.</p>
+</details>
+<details class="qa"><summary>3. Reads work for RWSNMPUSER but every snmpset fails. First command?</summary>
+<p><code translate="no">show snmp user</code>. Check the <code translate="no">Group-name</code>: a read-write user created in the read-only group has no write view.</p>
+</details>
+<details class="qa"><summary>4. Why must users be recreated if the engine ID changes?</summary>
+<p>The passphrases are localized: hashed with the engine ID to produce the actual keys. A new engine ID means the stored keys no longer match.</p>
+</details>
+<details class="qa"><summary>5. Why is sysDescr sensitive?</summary>
+<p>It reveals the platform and exact software version, which an attacker can match against known vulnerabilities. Scope views and restrict who can poll.</p>
+</details>
+<h2 id="answer-config">Answer config</h2>
+<details class="qa"><summary>Show the final SNMPv3 config for R1</summary>
+<pre translate="no"><code translate="no">ip access-list standard SNMP-SERVERS
+ remark SNMP Server #1
+ permit 10.0.0.5
+!
+snmp-server view SNMP-V3-RO-VIEW iso included
+snmp-server view SNMP-V3-RW-VIEW iso included
+snmp-server group SNMP-V3-RO v3 priv read SNMP-V3-RO-VIEW access SNMP-SERVERS
+snmp-server group SNMP-V3-RW v3 priv write SNMP-V3-RW-VIEW access SNMP-SERVERS
+snmp-server user ROSNMPUSER SNMP-V3-RO v3 auth sha 5678MmNnOoPp priv aes 128 MnNnOo7890 access SNMP-SERVERS
+snmp-server user RWSNMPUSER SNMP-V3-RW v3 auth sha 9876QqRrSsTt priv aes 128 TtUuVv3456 access SNMP-SERVERS</code></pre>
+<p>Lab values only. SNMPv3 users don&#x27;t appear in <code translate="no">show running-config</code>; they live in the agent&#x27;s user table.</p>
+</details>
+<h2 id="exam-mapping">Exam mapping</h2>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">You practiced</th><th scope="col">Exam angle</th><th scope="col">SCOR v2.0</th></tr></thead><tbody><tr><td>ACL → view → group → user</td><td>SNMPv3 object model (USM, VACM)</td><td>2.7</td></tr><tr><td><code translate="no">v3 priv</code>, SHA + AES</td><td>Security levels; authPriv</td><td>2.7</td></tr><tr><td><code translate="no">show snmp user</code></td><td>Engine ID, protocols, group membership</td><td>2.7</td></tr><tr><td><code translate="no">snmpwalk</code>, <code translate="no">snmpget</code>, <code translate="no">snmpset</code></td><td>Ports, operations, OIDs</td><td>2.7</td></tr><tr><td>Read-write hostname change</td><td>Why RW SNMP is configuration access</td><td>2.7</td></tr></tbody></table></div>
+<p>Drill it with the <a href="/ccnp-security/flashcards#d2">flashcards</a> and the <a href="/ccnp-security/mock-exam#d2">mock exam</a>.</p>
+</div>
+      <footer class="post-end">
+        <section class="practice" aria-labelledby="practice-h">
+          <div><h2 id="practice-h" class="sub-h">Lock it in</h2>
+          <p>Lab done? Drill the commands and the attack-to-defense mapping until they're automatic.</p></div>
+          <p class="practice-links"><a class="btn btn-pri" href="/ccnp-security/flashcards#d2">flashcards <span class="p">d2</span></a><a class="btn btn-sec" href="/ccnp-security/mock-exam#d2">mock exam <span class="p">d2</span></a><a class="btn btn-sec" href="/ccnp-security/secure-network-management">notes</a></p>
+        </section>
+      </footer>
+    </div>
+    <aside class="toc" aria-label="On this page"><span class="toc-title"><span class="h">#</span> show ip route | toc</span><ol><li><a href="#what-you-ll-build">What you&#x27;ll build</a></li><li><a href="#where-to-run-this-lab">Where to run this lab</a></li><li><a href="#topology">Topology</a></li><li><a href="#part-1-baseline">Part 1: baseline</a></li><li><a href="#part-2-build-it-verifying-every-step">Part 2: build it, verifying every step</a></li><li><a href="#part-3-read-from-the-monitoring-host">Part 3: read from the monitoring host</a></li><li><a href="#part-4-write-with-the-read-write-user">Part 4: write with the read-write user</a></li><li><a href="#part-5-break-it-on-purpose">Part 5: break it on purpose</a></li><li><a href="#harden-it-for-production">Harden it for production</a></li><li><a href="#check-yourself">Check yourself</a></li><li><a href="#answer-config">Answer config</a></li><li><a href="#exam-mapping">Exam mapping</a></li></ol></aside>
+  </div>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/ccnp-security">ccnp security</a></li>
+        <li><a href="/ccnp-security/labs">ccnp labs</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Oct 22, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

@@ -1745,6 +1745,317 @@
    ],
    "explanation": "RADIUS uses UDP 1812 (and 1813 for accounting), hides only the password, and returns authentication and authorization together in one Access-Accept.",
    "ref": "management-cis-benchmarks-aaa#tacacs-vs-radius"
+  },
+  {
+   "id": "q2.7-001",
+   "obj": "2.7",
+   "type": "single",
+   "stem": "Which SNMPv3 security level provides both authentication and encryption?",
+   "options": [
+    "noAuthNoPriv",
+    "authNoPriv",
+    "authPriv",
+    "privNoAuth"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "authPriv uses an HMAC for authentication and integrity and AES or DES for privacy. authNoPriv authenticates but leaves the payload readable.",
+   "ref": "secure-network-management#snmpv3-security-levels"
+  },
+  {
+   "id": "q2.7-002",
+   "obj": "2.7",
+   "type": "single",
+   "stem": "An SNMPv3 user can poll the router but every snmpset fails. show snmp user lists the user in group SNMP-V3-RO. What is the cause?",
+   "options": [
+    "The engine ID changed",
+    "The user is in a group without a write view",
+    "The privacy passphrase is wrong",
+    "The SNMP ACL denies the NMS"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A wrong privacy key or ACL deny would break reads too. Reads work, so the user is authenticated; its group simply has no write view.",
+   "ref": "secure-network-management#reading-snmpv3-failures"
+  },
+  {
+   "id": "q2.7-003",
+   "obj": "2.7",
+   "type": "single",
+   "stem": "After an IOS XE router's SNMP engine ID changes, all SNMPv3 users fail authentication. Why?",
+   "options": [
+    "SNMPv3 users are stored in the startup config only",
+    "SNMPv3 keys are localized using the engine ID",
+    "The SNMP ACL is reset",
+    "The views are deleted"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "SNMPv3 passphrases are hashed with the engine ID to create the actual keys. A new engine ID means the users must be recreated.",
+   "ref": "secure-network-management#how-the-pieces-connect"
+  },
+  {
+   "id": "q2.7-004",
+   "obj": "2.7",
+   "type": "single",
+   "stem": "Which SNMPv3 object sets the minimum security level that users must meet?",
+   "options": [
+    "The view",
+    "The group",
+    "The ACL",
+    "The engine ID"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The security level is defined on the group (noauth, auth or priv). Users in a priv group must use authPriv.",
+   "ref": "secure-network-management#how-the-pieces-connect"
+  },
+  {
+   "id": "q2.7-005",
+   "obj": "2.7",
+   "type": "multi",
+   "stem": "Which two statements about NETCONF are true?",
+   "options": [
+    "It runs over SSH on TCP port 830",
+    "It requires ip http secure-server",
+    "It supports a candidate datastore with commit",
+    "It encodes data in JSON only",
+    "It is defined in RFC 8040"
+   ],
+   "answer": [
+    0,
+    2
+   ],
+   "explanation": "NETCONF (RFC 6241) runs over SSH on port 830, encodes data in XML, and supports the candidate datastore with validate and commit. RFC 8040 and the HTTPS server belong to RESTCONF.",
+   "ref": "secure-network-management#netconf",
+   "sample": true
+  },
+  {
+   "id": "q2.7-006",
+   "obj": "2.7",
+   "type": "single",
+   "stem": "Which command enables RESTCONF on IOS XE, in addition to restconf?",
+   "options": [
+    "netconf-yang",
+    "ip http secure-server",
+    "ip ssh version 2",
+    "transport input ssh"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "RESTCONF runs over HTTPS, so the secure HTTP server must be enabled. netconf-yang enables NETCONF, which runs over SSH.",
+   "ref": "secure-network-management#enabling-them-on-ios-xe"
+  },
+  {
+   "id": "q2.7-007",
+   "obj": "2.7",
+   "type": "single",
+   "stem": "Which HTTP method does RESTCONF use to merge a change into an existing resource?",
+   "options": [
+    "GET",
+    "PUT",
+    "PATCH",
+    "POST"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "PATCH merges changes into a resource. PUT creates or replaces it, POST creates a new resource, and GET reads.",
+   "ref": "secure-network-management#restconf"
+  },
+  {
+   "id": "q2.7-008",
+   "obj": "2.7",
+   "type": "single",
+   "stem": "Right after enabling RESTCONF, a Python script fails with JSONDecodeError: Expecting value: line 1 column 1 (char 0). What should the engineer check first?",
+   "options": [
+    "show platform software yang-management process",
+    "show snmp user",
+    "show ntp status",
+    "show crypto pki trustpoint"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "Until nginx and confd are running, RESTCONF returns an HTML error page instead of JSON, and parsing fails at the first character.",
+   "ref": "secure-network-management#enabling-them-on-ios-xe"
+  },
+  {
+   "id": "q2.7-009",
+   "obj": "2.7",
+   "type": "single",
+   "stem": "Which statement describes the difference between standard and native YANG models?",
+   "options": [
+    "Standard models cover every Cisco feature; native models are vendor-neutral",
+    "Standard models are vendor-neutral but cover fewer features; native models expose every platform feature but only on that vendor",
+    "Native models are only used by NETCONF",
+    "Standard models require JSON encoding"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "IETF and OpenConfig models are portable across vendors; Cisco-IOS-XE-native exposes every IOS XE feature but only on Cisco.",
+   "ref": "secure-network-management#from-screen-scraping-to-model-driven-management"
+  },
+  {
+   "id": "q2.7-010",
+   "obj": "2.7",
+   "type": "single",
+   "stem": "In NTP client/server mode with authentication, what does ntp server 10.0.0.2 key 5 configure on the client?",
+   "options": [
+    "The server must authenticate the client with key 5",
+    "The client accepts time from 10.0.0.2 only if it is signed with trusted key 5",
+    "The client serves time to 10.0.0.2 using key 5",
+    "Key 5 encrypts NTP packets"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The client authenticates the server. NTP authentication signs packets with an HMAC; it doesn't encrypt them.",
+   "ref": "secure-network-management#how-authenticated-ntp-works"
+  },
+  {
+   "id": "q2.7-011",
+   "obj": "2.7",
+   "type": "multi",
+   "stem": "An engineer configures ntp server 10.0.0.2 key 5 and ntp authentication-key 5 on a client, but show ntp associations detail never shows authenticated. Which two commands could be missing?",
+   "options": [
+    "ntp authenticate",
+    "ntp trusted-key 5",
+    "ntp master 3",
+    "ntp source GigabitEthernet1",
+    "clock timezone"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "Authentication needs all four pieces: ntp authenticate, the key, ntp trusted-key and the key on the server statement. ntp master and ntp source are server-side options.",
+   "ref": "secure-network-management#how-authenticated-ntp-works"
+  },
+  {
+   "id": "q2.7-012",
+   "obj": "2.7",
+   "type": "single",
+   "stem": "An NTP client shows stratum 16 and show ntp packets reports 12 packets out and 0 in. What is the most likely cause?",
+   "options": [
+    "Key mismatch",
+    "The server is unreachable or UDP 123 is filtered",
+    "The client clock is too far off",
+    "The client is the system peer"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "One-sided traffic means the server isn't answering. A key mismatch would still show replies arriving and being rejected.",
+   "ref": "secure-network-management#verify"
+  },
+  {
+   "id": "q2.7-013",
+   "obj": "2.7",
+   "type": "single",
+   "stem": "A router configured with ntp master 3 serves time to a client. What stratum does the client report once synchronized?",
+   "options": [
+    "2",
+    "3",
+    "4",
+    "16"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "Each hop adds one: the server is stratum 3, so its client is stratum 4.",
+   "ref": "secure-network-management#stratum"
+  },
+  {
+   "id": "q2.7-014",
+   "obj": "2.7",
+   "type": "single",
+   "stem": "Which RFC defines syslog over TLS, and on which port?",
+   "options": [
+    "RFC 5424, UDP 514",
+    "RFC 5425, TCP 6514",
+    "RFC 3164, TCP 6514",
+    "RFC 6587, UDP 6514"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "RFC 5425 defines the TLS transport on TCP 6514. RFC 5424 is the message format; RFC 3164 is legacy BSD syslog.",
+   "ref": "secure-network-management#the-standards"
+  },
+  {
+   "id": "q2.7-015",
+   "obj": "2.7",
+   "type": "single",
+   "stem": "Which command makes an IOS XE router trust a CA certificate for secure syslog, checking it against the pinned fingerprint?",
+   "options": [
+    "crypto pki enroll",
+    "crypto pki import",
+    "crypto pki authenticate",
+    "logging tls-profile"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "crypto pki authenticate installs and validates the CA certificate. enroll creates the device's certificate request, and import installs the signed device certificate.",
+   "ref": "secure-network-management#the-pki-pieces"
+  },
+  {
+   "id": "q2.7-016",
+   "obj": "2.7",
+   "type": "single",
+   "stem": "Secure syslog over TLS stops working after a router's clock is reset to a date years in the past. Why?",
+   "options": [
+    "TLS requires UDP",
+    "The certificates now appear not yet valid",
+    "The syslog severity changed",
+    "RFC 5424 format is rejected"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Certificate validation uses dates. A wrong clock makes valid certificates look not yet valid or expired, so the TLS handshake fails. Authenticated NTP prevents this.",
+   "ref": "secure-network-management#hardening-the-log-pipeline"
+  },
+  {
+   "id": "q2.7-017",
+   "obj": "2.7",
+   "type": "single",
+   "stem": "With logging trap notifications configured, which messages are sent to the syslog server?",
+   "options": [
+    "Only level 5",
+    "Levels 5 to 7",
+    "Levels 0 to 5",
+    "Levels 0 to 4"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "The trap level is a threshold: the device sends that severity and everything more severe, which for notifications (5) is levels 0 to 5.",
+   "ref": "secure-network-management#severity-levels"
+  },
+  {
+   "id": "q2.7-018",
+   "obj": "2.7",
+   "type": "single",
+   "stem": "How do REST API clients authenticate to the Cisco Firewall Management Center API after logging in?",
+   "options": [
+    "By sending an SNMPv3 user in each request",
+    "By sending a token in the X-auth-access-token header",
+    "By using NETCONF on port 830",
+    "By client certificates only"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The client obtains a token from the FMC token endpoint and sends it in the X-auth-access-token header on each request. Tokens expire and must be refreshed.",
+   "ref": "secure-network-management#apis-on-security-devices"
   }
  ]
 }

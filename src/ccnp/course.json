@@ -310,6 +310,25 @@
       ],
       "date": "2026-11-05",
       "order": 15
+    },
+    {
+      "slug": "secure-network-management",
+      "module": "05",
+      "file": "05_secure-network-management.md",
+      "title": "Secure Network Management: SNMPv3, NETCONF, RESTCONF, NTP & Syslog",
+      "seo_title": "SCOR 2.7: SNMPv3, NETCONF vs RESTCONF, NTP Authentication, Secure Syslog",
+      "description": "Free CCNP Security notes for SCOR 350-701 v2.0 topic 2.7: SNMPv3 authPriv, NETCONF vs. RESTCONF and YANG, APIs, authenticated NTP and syslog over TLS.",
+      "dek": "Every management protocol has an insecure past and a secure replacement: SNMPv3 authPriv, NETCONF and RESTCONF over SSH and HTTPS, authenticated NTP and syslog over TLS. How each works, how to configure it on IOS XE, and how to read its failures.",
+      "objectives": [
+        "2.7"
+      ],
+      "supports": [
+        "2.2",
+        "2.5",
+        "2.6"
+      ],
+      "date": "2026-11-09",
+      "order": 17
     }
   ],
   "labs": [
@@ -402,6 +421,102 @@
         {
           "name": "Packet Tracer",
           "note": "Basic AAA only. No debug tacacs, so the troubleshooting half doesn't work."
+        }
+      ]
+    },
+    {
+      "slug": "snmpv3-authpriv-lab",
+      "file": "snmpv3.md",
+      "short": "SNMPv3 lab",
+      "title": "SNMPv3 Lab: authPriv, snmpwalk and snmpset",
+      "cta": "Build SNMPv3 authPriv on IOS XE, walk the router from Linux, then rename it with one snmpset",
+      "seo_title": "Free SNMPv3 Lab: authPriv Users, Views, snmpwalk and snmpset (SCOR 2.7)",
+      "description": "Free CCNP Security lab: configure SNMPv3 authPriv on IOS XE with ACLs, views, groups and users, then test it with snmpwalk and snmpset from Linux.",
+      "dek": "Configure SNMPv3 with SHA and AES on an IOS XE router, poll it from a Linux host with snmpwalk, change its hostname with snmpset, and read every SNMPv3 error.",
+      "time": "45 to 60 min",
+      "tool": "IOS XE router + Linux with Net-SNMP",
+      "lecture": "secure-network-management",
+      "platform": "ios",
+      "objectives": [
+        "2.7"
+      ],
+      "date": "2026-11-09",
+      "environments": [
+        {
+          "name": "Cisco Modeling Labs",
+          "note": "Catalyst 8000V or CSR 1000v routers plus an Ubuntu node. Recommended."
+        },
+        {
+          "name": "DevNet / dCloud",
+          "note": "IOS XE sandboxes, used from your own Linux machine."
+        },
+        {
+          "name": "Your own gear",
+          "note": "Any IOS XE router and a Linux VM on the same subnet."
+        }
+      ]
+    },
+    {
+      "slug": "netconf-restconf-lab",
+      "file": "netconf-restconf.md",
+      "short": "NETCONF / RESTCONF lab",
+      "title": "NETCONF and RESTCONF Lab: YANG Data with curl and Python",
+      "cta": "Turn on RESTCONF and NETCONF, check the YANG processes, then read the router with curl, requests and ncclient",
+      "seo_title": "Free NETCONF and RESTCONF Lab on IOS XE with curl and Python (SCOR 2.7)",
+      "description": "Free CCNP Security lab: enable RESTCONF and NETCONF on IOS XE, verify the YANG processes, and read interfaces, OSPF and the full config with curl and Python.",
+      "dek": "Enable RESTCONF over HTTPS and NETCONF over SSH on IOS XE, confirm the YANG processes are ready, and read live data with curl, Python requests and ncclient.",
+      "time": "45 to 60 min",
+      "tool": "IOS XE router + Linux with Python 3",
+      "lecture": "secure-network-management",
+      "platform": "ios",
+      "objectives": [
+        "2.7"
+      ],
+      "date": "2026-11-09",
+      "environments": [
+        {
+          "name": "Cisco Modeling Labs",
+          "note": "Catalyst 8000V or CSR 1000v routers plus an Ubuntu node. Recommended."
+        },
+        {
+          "name": "DevNet / dCloud",
+          "note": "IOS XE sandboxes, used from your own Linux machine."
+        },
+        {
+          "name": "Your own gear",
+          "note": "Any IOS XE router and a Linux VM on the same subnet."
+        }
+      ]
+    },
+    {
+      "slug": "ntp-authentication-lab",
+      "file": "ntp-auth.md",
+      "short": "NTP lab",
+      "title": "Authenticated NTP Lab: HMAC-SHA-256 Between Two Routers",
+      "cta": "Make one router an authenticated NTP server and watch the other go from stratum 16 to synchronized",
+      "seo_title": "Free NTP Authentication Lab: hmac-sha2-256 on Cisco IOS XE (SCOR 2.7)",
+      "description": "Free CCNP Security lab: configure authenticated NTP with hmac-sha2-256 between two IOS XE routers, verify the sync and the key match, and troubleshoot it.",
+      "dek": "Configure an authenticated NTP server and client on IOS XE, watch the client go from stratum 16 to synchronized, and prove the key match from the debug and association detail.",
+      "time": "30 to 45 min",
+      "tool": "Two IOS XE routers",
+      "lecture": "secure-network-management",
+      "platform": "ios",
+      "objectives": [
+        "2.7"
+      ],
+      "date": "2026-11-09",
+      "environments": [
+        {
+          "name": "Cisco Modeling Labs",
+          "note": "Two Catalyst 8000V, CSR 1000v or IOSv routers on one link. Recommended."
+        },
+        {
+          "name": "DevNet / dCloud",
+          "note": "Any reservable topology with two IOS XE routers."
+        },
+        {
+          "name": "Your own gear",
+          "note": "Two IOS or IOS XE routers; older releases may offer md5 keys only."
         }
       ]
     }

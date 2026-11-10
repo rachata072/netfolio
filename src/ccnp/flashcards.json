@@ -1245,6 +1245,272 @@
    "front": "802.1X fails and ISE Live Logs show nothing at all. First suspects?",
    "back": "The switch never reached ISE: server marked DEAD, routing or ACL blocking UDP 1812, or 802.1X not enabled (`dot1x system-auth-control`). Check `show aaa servers`.",
    "ref": "management-cis-benchmarks-aaa#troubleshooting-network-access-802-1x-and-mab"
+  },
+  {
+   "id": "c2.7-001",
+   "obj": "2.7",
+   "front": "What three properties do secure management protocols add over the old cleartext ones?",
+   "back": "**Confidentiality** (encryption), **integrity** (tamper detection) and **authentication** (proof of who is talking). Then restrict who can reach them and give them trusted time.",
+   "ref": "secure-network-management#how-to-think-about-management-protocols"
+  },
+  {
+   "id": "c2.7-002",
+   "obj": "2.7",
+   "front": "SNMP: MIB vs. OID?",
+   "back": "The **MIB** is the hierarchical database of managed objects; an **OID** is the dotted path to one object in it, e.g. `1.3.6.1.2.1.1.5.0` = sysName.",
+   "ref": "secure-network-management#snmp-in-90-seconds"
+  },
+  {
+   "id": "c2.7-003",
+   "obj": "2.7",
+   "front": "What does the trailing `.0` on an OID mean?",
+   "back": "The **instance** of a scalar (single-value) object. `snmpget` needs it (`...1.1.5.0`); `snmpwalk` walks a subtree with or without it.",
+   "ref": "secure-network-management#snmp-in-90-seconds"
+  },
+  {
+   "id": "c2.7-004",
+   "obj": "2.7",
+   "front": "USM vs. VACM in SNMPv3?",
+   "back": "**USM** (User-based Security Model): users and their authentication and privacy keys. **VACM** (View-based Access Control Model): views and what each group may read or write.",
+   "ref": "secure-network-management#why-only-snmpv3-belongs-in-production"
+  },
+  {
+   "id": "c2.7-005",
+   "obj": "2.7",
+   "front": "SNMPv3 IOS keywords for the three security levels?",
+   "back": "`noauth` = noAuthNoPriv, `auth` = authNoPriv (HMAC), `priv` = **authPriv** (HMAC + AES/DES encryption).",
+   "ref": "secure-network-management#snmpv3-security-levels"
+  },
+  {
+   "id": "c2.7-006",
+   "obj": "2.7",
+   "front": "The four SNMPv3 objects and their order?",
+   "back": "**ACL** (which hosts) → **view** (which MIB subtree) → **group** (minimum level, read/write views, ACL) → **user** (group membership and keys).",
+   "ref": "secure-network-management#how-the-pieces-connect"
+  },
+  {
+   "id": "c2.7-007",
+   "obj": "2.7",
+   "front": "What does the SNMPv3 group's security level set?",
+   "back": "The **minimum** level. A group created with `priv` refuses requests at authNoPriv or noAuthNoPriv.",
+   "ref": "secure-network-management#how-the-pieces-connect"
+  },
+  {
+   "id": "c2.7-008",
+   "obj": "2.7",
+   "front": "What is the SNMPv3 engine ID used for, and what happens if it changes?",
+   "back": "Passphrases are **localized**: hashed with the engine ID to make the real keys. If the engine ID changes, existing users stop working and must be **recreated**.",
+   "ref": "secure-network-management#how-the-pieces-connect"
+  },
+  {
+   "id": "c2.7-009",
+   "obj": "2.7",
+   "front": "`show snmp user` returns `%SNMP agent not enabled` even though views and groups exist. Why?",
+   "back": "On IOS XE, only the first **user** (or community) starts the SNMP agent. Verify views and groups with `show run | include snmp-server` until then.",
+   "ref": "secure-network-management#the-configuration"
+  },
+  {
+   "id": "c2.7-010",
+   "obj": "2.7",
+   "front": "Fastest check when an SNMPv3 user can read but not write?",
+   "back": "`show snmp user`: look at **Group-name**. A read-write user created in the read-only group has no write view.",
+   "ref": "secure-network-management#reading-snmpv3-failures"
+  },
+  {
+   "id": "c2.7-011",
+   "obj": "2.7",
+   "front": "Net-SNMP: `Authentication failure (incorrect password, community or key)`?",
+   "back": "Wrong **authentication** passphrase or protocol (`-A` / `-a`).",
+   "ref": "secure-network-management#reading-snmpv3-failures"
+  },
+  {
+   "id": "c2.7-012",
+   "obj": "2.7",
+   "front": "Net-SNMP: `Timeout: No Response` with SNMPv3. Likely causes?",
+   "back": "Wrong **privacy** passphrase, source **not permitted by the SNMP ACL** (denies are silent), or no matching user.",
+   "ref": "secure-network-management#reading-snmpv3-failures"
+  },
+  {
+   "id": "c2.7-013",
+   "obj": "2.7",
+   "front": "Why is read-write SNMP equivalent to configuration access?",
+   "back": "With a write view, `snmpset` can rename the device (sysName), shut interfaces (ifAdminStatus = 2) or trigger config copies. Give RW only to tools that need it.",
+   "ref": "secure-network-management#snmp-as-an-attack-surface"
+  },
+  {
+   "id": "c2.7-014",
+   "obj": "2.7",
+   "front": "What is YANG?",
+   "back": "A **data modeling language** (RFC 7950) that defines the structure, types and constraints of configuration and state. YANG is the \"what\"; NETCONF and RESTCONF are the \"how\".",
+   "ref": "secure-network-management#from-screen-scraping-to-model-driven-management"
+  },
+  {
+   "id": "c2.7-015",
+   "obj": "2.7",
+   "front": "Standard vs. native YANG models?",
+   "back": "**Standard** (ietf-*, OpenConfig): vendor-neutral, portable, fewer features. **Native** (Cisco-IOS-XE-native): every IOS XE feature, Cisco only.",
+   "ref": "secure-network-management#from-screen-scraping-to-model-driven-management"
+  },
+  {
+   "id": "c2.7-016",
+   "obj": "2.7",
+   "front": "NETCONF: RFC, transport, port, encoding?",
+   "back": "**RFC 6241**, **SSH**, **TCP 830**, **XML**.",
+   "ref": "secure-network-management#netconf"
+  },
+  {
+   "id": "c2.7-017",
+   "obj": "2.7",
+   "front": "What gives NETCONF transactions?",
+   "back": "The **candidate datastore** plus `<validate>` and `<commit>` (and `<lock>`): stage a change set, check it, apply it as one. RESTCONF has no candidate or commit.",
+   "ref": "secure-network-management#netconf"
+  },
+  {
+   "id": "c2.7-018",
+   "obj": "2.7",
+   "front": "What does a NETCONF `<hello>` contain?",
+   "back": "The device's **capabilities**: protocol versions (base 1.0 / 1.1), features (writable-running, validate, rollback-on-error, notifications) and every supported YANG module.",
+   "ref": "secure-network-management#netconf"
+  },
+  {
+   "id": "c2.7-019",
+   "obj": "2.7",
+   "front": "RESTCONF: RFC, transport, port, encodings?",
+   "back": "**RFC 8040**, **HTTPS**, **TCP 443**, **JSON or XML** (`application/yang-data+json` / `+xml`).",
+   "ref": "secure-network-management#restconf"
+  },
+  {
+   "id": "c2.7-020",
+   "obj": "2.7",
+   "front": "RESTCONF HTTP methods and what they do?",
+   "back": "**GET** read, **POST** create, **PUT** create or replace, **PATCH** merge, **DELETE** remove.",
+   "ref": "secure-network-management#restconf"
+  },
+  {
+   "id": "c2.7-021",
+   "obj": "2.7",
+   "front": "RESTCONF URL shape?",
+   "back": "`https://<device>/restconf/data/<module>:<container>`, e.g. `/restconf/data/ietf-interfaces:interfaces`.",
+   "ref": "secure-network-management#restconf"
+  },
+  {
+   "id": "c2.7-022",
+   "obj": "2.7",
+   "front": "Enable NETCONF vs. RESTCONF on IOS XE?",
+   "back": "NETCONF: `netconf-yang`. RESTCONF: `ip http secure-server` + `restconf`. **NETCONF needs no HTTP server.**",
+   "ref": "secure-network-management#enabling-them-on-ios-xe"
+  },
+  {
+   "id": "c2.7-023",
+   "obj": "2.7",
+   "front": "How do you know RESTCONF and NETCONF are ready to answer?",
+   "back": "`show platform software yang-management process`: `nginx` and `confd` Running (RESTCONF), `ncsshd` Running (NETCONF).",
+   "ref": "secure-network-management#enabling-them-on-ios-xe"
+  },
+  {
+   "id": "c2.7-024",
+   "obj": "2.7",
+   "front": "A RESTCONF script fails with `JSONDecodeError ... (char 0)` right after enabling it. Why?",
+   "back": "The YANG processes weren't ready, so the router returned an **HTML error page**, not JSON. Check the processes; print the status code before parsing.",
+   "ref": "secure-network-management#enabling-them-on-ios-xe"
+  },
+  {
+   "id": "c2.7-025",
+   "obj": "2.7",
+   "front": "Four ways to harden RESTCONF on IOS XE?",
+   "back": "`no ip http server`, `ip http tls-version TLSv1.2`, a CA-signed certificate (`ip http secure-trustpoint`), `ip http access-class ipv4 <ACL>`; plus dedicated AAA accounts.",
+   "ref": "secure-network-management#securing-the-programmability-interfaces"
+  },
+  {
+   "id": "c2.7-026",
+   "obj": "2.7",
+   "front": "How does the FMC REST API authenticate requests?",
+   "back": "POST credentials to the token endpoint, then send the token in the **`X-auth-access-token`** header. Tokens expire (30 minutes) and can be refreshed a limited number of times.",
+   "ref": "secure-network-management#apis-on-security-devices"
+  },
+  {
+   "id": "c2.7-027",
+   "obj": "2.7",
+   "front": "NTP stratum 1 vs. 16?",
+   "back": "**1**: directly attached to a reference clock, most authoritative. **16**: **unsynchronized**. Each hop adds 1.",
+   "ref": "secure-network-management#stratum"
+  },
+  {
+   "id": "c2.7-028",
+   "obj": "2.7",
+   "front": "In NTP client/server mode, who authenticates whom?",
+   "back": "The **client authenticates the server**: it accepts time only if the reply is signed with a trusted key.",
+   "ref": "secure-network-management#how-authenticated-ntp-works"
+  },
+  {
+   "id": "c2.7-029",
+   "obj": "2.7",
+   "front": "The four commands for authenticated NTP on a client?",
+   "back": "`ntp authenticate`, `ntp authentication-key <n> hmac-sha2-256 <secret>`, `ntp trusted-key <n>`, `ntp server <ip> key <n>`. All four are required.",
+   "ref": "secure-network-management#how-authenticated-ntp-works"
+  },
+  {
+   "id": "c2.7-030",
+   "obj": "2.7",
+   "front": "What does `ntp master 3` do?",
+   "back": "Makes the device serve time from its **local clock** at stratum 3 (reference `127.127.1.1`). Its clients become stratum 4.",
+   "ref": "secure-network-management#how-authenticated-ntp-works"
+  },
+  {
+   "id": "c2.7-031",
+   "obj": "2.7",
+   "front": "Why must you `clock set` close to the right time before NTP?",
+   "back": "NTP won't step a clock more than about **1000 seconds** off (the panic threshold). Also: `clock set` is **privileged EXEC**, not config mode.",
+   "ref": "secure-network-management#how-authenticated-ntp-works"
+  },
+  {
+   "id": "c2.7-032",
+   "obj": "2.7",
+   "front": "`show ntp associations`: what do `*` and `~` mean, and what is reach 377?",
+   "back": "`*` = system peer (synced to it). `~` = configured. **reach 377** (octal) = all of the last 8 polls answered.",
+   "ref": "secure-network-management#verify"
+  },
+  {
+   "id": "c2.7-033",
+   "obj": "2.7",
+   "front": "`debug ntp all` shows `SHA256-Match: 0`. Meaning?",
+   "back": "The HMAC didn't verify: the **key number, algorithm or secret differ**. The client discards the time.",
+   "ref": "secure-network-management#verify"
+  },
+  {
+   "id": "c2.7-034",
+   "obj": "2.7",
+   "front": "`show ntp packets`: Out climbing, In stays 0?",
+   "back": "The server isn't answering: unreachable, **UDP 123 filtered**, or not serving time.",
+   "ref": "secure-network-management#verify"
+  },
+  {
+   "id": "c2.7-035",
+   "obj": "2.7",
+   "front": "RFC 5424 vs. RFC 5425?",
+   "back": "**5424**: the structured syslog **message format**. **5425**: syslog over **TLS**, **TCP 6514**.",
+   "ref": "secure-network-management#the-standards"
+  },
+  {
+   "id": "c2.7-036",
+   "obj": "2.7",
+   "front": "`logging trap warnings` sends which severities?",
+   "back": "Levels **0 to 4** (emergencies through warnings): the chosen level and everything more severe.",
+   "ref": "secure-network-management#severity-levels"
+  },
+  {
+   "id": "c2.7-037",
+   "obj": "2.7",
+   "front": "`crypto pki authenticate` vs. `enroll` vs. `import`?",
+   "back": "**authenticate**: trust the CA (checked against the pinned fingerprint). **enroll**: create this device's certificate request. **import**: install the signed device certificate.",
+   "ref": "secure-network-management#the-pki-pieces"
+  },
+  {
+   "id": "c2.7-038",
+   "obj": "2.7",
+   "front": "Why does secure syslog depend on NTP?",
+   "back": "TLS certificates have validity dates. A wrong clock makes them look not-yet-valid or expired, and the TLS session fails.",
+   "ref": "secure-network-management#hardening-the-log-pipeline"
   }
  ]
 }
