@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Packet Tracer Lab: TACACS+, RADIUS and Device Hardening (CCNP SCOR 2.6)</title>
+<meta name="description" content="Free CCNP Security Packet Tracer lab: TACACS+ and RADIUS logins with local fallback, SSH, NTP, syslog, OSPF MD5 and switch hardening, plus 7 AAA faults.">
+<link rel="canonical" href="https://breakfixlearn.com/ccnp-security/labs/aaa-device-hardening-packet-tracer">
+<meta name="theme-color" content="#050D18">
+<meta name="color-scheme" content="dark">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=629a8f9e5c">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="breakfixlearn RSS" href="/feed.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="breakfixlearn">
+<meta property="og:locale" content="en_CA">
+<meta property="og:title" content="AAA and Device Hardening Lab (Packet Tracer)">
+<meta property="og:description" content="Take a working two-site network with zero security to a CIS-style baseline, move admin logins onto one AAA server over TACACS+ and RADIUS, watch the packets in Simulation mode, then break it seven ways and explain each result.">
+<meta property="og:url" content="https://breakfixlearn.com/ccnp-security/labs/aaa-device-hardening-packet-tracer">
+<meta property="og:image" content="https://breakfixlearn.com/assets/og/ccnp-lab-aaa-device-hardening-packet-tracer.webp">
+<meta property="og:image:type" content="image/webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AAA and Device Hardening Lab (Packet Tracer): free Packet Tracer lab">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"AAA and Device Hardening Lab (Packet Tracer)","description":"Free CCNP Security Packet Tracer lab: TACACS+ and RADIUS logins with local fallback, SSH, NTP, syslog, OSPF MD5 and switch hardening, plus 7 AAA faults.","url":"https://breakfixlearn.com/ccnp-security/labs/aaa-device-hardening-packet-tracer","learningResourceType":"Lab exercise","educationalLevel":"Professional","inLanguage":"en","isAccessibleForFree":true,"datePublished":"2026-11-11","dateModified":"2026-11-11","teaches":["Troubleshoot AAA for device and network access such as TACACS+ and RADIUS","Describe CIS benchmarks for hardening devices such as Cisco Secure Firewall (FTD) and Cisco IOS XE"],"author":{"@type":"Person","name":"Trey","url":"https://breakfixlearn.com/"},"encoding":[{"@type":"MediaObject","name":"Baseline lab (.pkt)","contentUrl":"https://breakfixlearn.com/ccnp-security/labs/files/aaa-hardening-baseline.pkt","encodingFormat":"application/octet-stream","contentSize":"86 KB","sha256":"302e98a481298393ce591d5a89253be012e821118ea5bbb3d0ed0721af42e19c"},{"@type":"MediaObject","name":"Activity with instructions (.pka)","contentUrl":"https://breakfixlearn.com/ccnp-security/labs/files/aaa-hardening-activity.pka","encodingFormat":"application/octet-stream","contentSize":"398 KB","sha256":"c5e27cb1c3f7b8fae8a59decf2326000000c42883fa4cb1c5266eee69a4c85ee"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://breakfixlearn.com/"},{"@type":"ListItem","position":2,"name":"CCNP Security","item":"https://breakfixlearn.com/ccnp-security"},{"@type":"ListItem","position":3,"name":"AAA and Device Hardening Lab (Packet Tracer)"}]}</script>
+<script src="/js/main.js?v=598c9ba6d2" defer></script>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span><span class="b3">.com</span></span></a>
+    <nav aria-label="Main">
+      <ul class="ports">
+        <li><a class="port" href="/"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">01</span>home</a></li>
+        <li><a class="port" href="/projects"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">02</span>projects</a></li>
+        <li><a class="port" href="/blog"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">03</span>blog</a></li>
+        <li><a class="port" href="/cheat-sheets"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">04</span><span class="lg">cheat </span>sheets</a></li>
+        <li><a class="port" href="/#about"><span class="led" aria-hidden="true"></span><span class="pn" aria-hidden="true">05</span>about</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article class="lecture lab">
+  <header class="post-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">~</a><span aria-hidden="true">/</span><a href="/ccnp-security">ccnp-security</a><span aria-hidden="true">/</span><a href="/ccnp-security/labs">labs</a><span aria-hidden="true">/</span><span>aaa-device-hardening-packet-tracer</span></nav>
+      <p class="scard-meta"><span class="sid">Packet Tracer lab</span><span>Domain 2 Network Security &middot; topics 2.6, 2.5</span></p>
+      <h1 class="mt-2">AAA and Device Hardening Lab (Packet Tracer)</h1>
+      <p class="post-dek">Take a working two-site network with zero security to a CIS-style baseline, move admin logins onto one AAA server over TACACS+ and RADIUS, watch the packets in Simulation mode, then break it seven ways and explain each result.</p>
+      <div class="post-meta"><time datetime="2026-11-11">updated Nov 11, 2026</time><span class="sep">/</span><span>2 to 3 hours</span><span class="sep">/</span><span>Packet Tracer 9.0+</span><span class="sep">/</span><span>by Trey</span></div>
+    </div>
+  </header>
+  <div class="wrap post-layout">
+    <div class="post-main">
+      <section class="labdl" aria-labelledby="dl-h">
+        <span class="cli" aria-hidden="true"><span class="h">edge#</span> <span class="v">copy</span> <span class="a">aaa-device-hardening-packet-tracer flash:</span></span>
+        <h2 id="dl-h" class="sub-h">Download the lab</h2>
+        <ul class="dl-list"><li><a class="dl dl-pri" href="/ccnp-security/labs/files/aaa-hardening-baseline.pkt" download><span class="dl-k">PKT</span><span class="dl-t"><b>Baseline lab (.pkt)</b><span class="dl-m">start here &middot; 86 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li><li><a class="dl" href="/ccnp-security/labs/files/aaa-hardening-activity.pka" download><span class="dl-k">PKA</span><span class="dl-t"><b>Activity with instructions (.pka)</b><span class="dl-m">ungraded &middot; 398 KB</span></span><svg class="dl-i" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg><span class="sr-only">, download</span></a></li></ul>
+        <details class="sums">
+          <summary>Verify your download (SHA-256)</summary>
+          <div class="tbl"><table class="sheet-files"><thead><tr><th scope="col">File</th><th scope="col">SHA-256</th></tr></thead><tbody><tr><td translate="no">aaa-hardening-baseline.pkt</td><td translate="no">302e98a481298393ce591d5a89253be012e821118ea5bbb3d0ed0721af42e19c</td></tr><tr><td translate="no">aaa-hardening-activity.pka</td><td translate="no">c5e27cb1c3f7b8fae8a59decf2326000000c42883fa4cb1c5266eee69a4c85ee</td></tr></tbody></table></div>
+          <p>Compare with <code translate="no">Get-FileHash .\file.pkt -Algorithm SHA256</code> (PowerShell) or <code translate="no">sha256sum file.pkt</code>. Different hash, different file: delete it.</p>
+        </details>
+        <p class="side-note">Read the <a href="/ccnp-security/management-cis-benchmarks-aaa">Management Options, CIS Benchmarks &amp; AAA</a> notes first. Topics: <span class="chip obj d2" title="Troubleshoot AAA for device and network access such as TACACS+ and RADIUS">2.6</span> <span class="chip obj d2" title="Describe CIS benchmarks for hardening devices such as Cisco Secure Firewall (FTD) and Cisco IOS XE">2.5</span></p>
+      </section>
+<details class="toc-mobile"><summary>show ip route | toc (13 sections)</summary><ol><li><a href="#what-you-ll-build">What you&#x27;ll build</a></li><li><a href="#packet-tracer-vs-real-ios">Packet Tracer vs. real IOS</a></li><li><a href="#topology">Topology</a></li><li><a href="#before-you-start-the-baseline-works">Before you start: the baseline works</a></li><li><a href="#part-1-baseline-device-hardening">Part 1: baseline device hardening</a></li><li><a href="#part-2-aaa-with-tacacs-and-radius">Part 2: AAA with TACACS+ and RADIUS</a></li><li><a href="#part-3-network-wide-minimum-security-both-routers">Part 3: network-wide minimum security (both routers)</a></li><li><a href="#part-4-break-and-fix">Part 4: break and fix</a></li><li><a href="#how-this-maps-to-cis-style-hardening">How this maps to CIS-style hardening</a></li><li><a href="#the-same-configuration-on-real-ios-xe">The same configuration on real IOS XE</a></li><li><a href="#check-yourself">Check yourself</a></li><li><a href="#answer-configs">Answer configs</a></li><li><a href="#exam-mapping">Exam mapping</a></li></ol></details>
+<div class="prose">
+<h2 id="what-you-ll-build">What you&#x27;ll build</h2>
+<p>A two-site network that works but was built with no security at all. You&#x27;ll lock down <strong>every</strong> device to a CIS-style baseline, then move administrator logins off local passwords and onto a central <strong>AAA server</strong>: <strong>R1-HQ authenticates with TACACS+</strong>, <strong>R2-BR with RADIUS</strong>, both against the same server and both with a local break-glass account. Finally you&#x27;ll break it seven ways and explain each result.</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Item</th><th scope="col">Detail</th></tr></thead><tbody><tr><td><strong>Tool</strong></td><td>Cisco Packet Tracer 9.0 or later</td></tr><tr><td><strong>Time</strong></td><td>2 to 3 hours</td></tr><tr><td><strong>Level</strong></td><td>CCNP Security. You should be comfortable with the IOS CLI, OSPF and switch ports</td></tr><tr><td><strong>Devices</strong></td><td>Two 2911 routers, two 2960 switches, an AAA server, a management server (NTP and syslog), an admin PC and a branch PC</td></tr><tr><td><strong>You&#x27;ll practice</strong></td><td><code translate="no">aaa new-model</code>, default and named method lists, TACACS+ and RADIUS clients, local fallback, SSH v2, VTY ACLs, <code translate="no">login block-for</code>, authenticated NTP, syslog, OSPF MD5, port security, BPDU Guard, least-functionality servers, Simulation mode</td></tr><tr><td><strong>Exam topics</strong></td><td>2.6 (core), 2.5</td></tr><tr><td><strong>Before this</strong></td><td><a href="/ccnp-security/management-cis-benchmarks-aaa#aaa-for-device-and-network-access">AAA for device and network access</a> and <a href="/ccnp-security/management-cis-benchmarks-aaa#cis-benchmarks-for-hardening-devices">CIS Benchmarks</a> in the notes</td></tr></tbody></table></div>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Part</th><th scope="col">You configure</th><th scope="col">What it proves</th></tr></thead><tbody><tr><td>1 Hardening</td><td>Passwords, SSH v2, VTY ACL, login throttling, banners, switch ports, server services</td><td>Every device meets a minimum baseline before anything else</td></tr><tr><td>2 AAA</td><td>TACACS+ on R1-HQ, RADIUS on R2-BR, local fallback</td><td>Server-only users can log in; the local account is a break-glass path</td></tr><tr><td>3 Network-wide</td><td>Authenticated NTP, syslog, OSPF MD5, passive LAN interfaces</td><td>Trusted time, central logs, a routing protocol that rejects strangers</td></tr><tr><td>4 Break and fix</td><td>Seven challenges</td><td>You can predict and explain each AAA behavior</td></tr></tbody></table></div>
+<h3 id="the-files">The files</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">File</th><th scope="col">What it is</th><th scope="col">How to use it</th></tr></thead><tbody><tr><td><strong>Baseline lab (.pkt)</strong></td><td>The working network: addressing, VLANs and OSPF, with <strong>zero</strong> hardening and no AAA</td><td>Practice freely, and keep an untouched copy so you can start over</td></tr><tr><td><strong>Activity (.pka)</strong></td><td>The same baseline with these instructions built into Packet Tracer&#x27;s activity panel</td><td>Follow the tasks inside Packet Tracer. It&#x27;s <strong>not scored</strong>: the completion bar shows 100% from the start, so prove every task with the Verify checks on this page</td></tr></tbody></table></div>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-hardening-pt/s17-activity.webp" aria-label="Open full-size image: The activity open in Packet Tracer: the topology on the left and the instructions panel on the right, with the exact values table, the addressing table and Part 1, and Completion 100% at the bottom because nothing is scored"><img src="/assets/img/ccnp/labs/aaa-hardening-pt/s17-activity.webp" srcset="/assets/img/ccnp/labs/aaa-hardening-pt/s17-activity-800.webp 800w, /assets/img/ccnp/labs/aaa-hardening-pt/s17-activity.webp 1917w" sizes="(max-width: 64rem) calc(100vw - 2rem), 44rem" width="1917" height="977" alt="The activity open in Packet Tracer: the topology on the left and the instructions panel on the right, with the exact values table, the addressing table and Part 1, and Completion 100% at the bottom because nothing is scored" loading="lazy" decoding="async"></a><figcaption>The activity open in Packet Tracer: the topology on the left and the instructions panel on the right, with the exact values table, the addressing table and Part 1, and Completion 100% at the bottom because nothing is scored. Select the image to open it full size.</figcaption></figure>
+<p>Both files are in the download box on this page, with SHA-256 checksums so you can confirm the download wasn&#x27;t changed.</p>
+<h3 id="the-ideas-you-ll-use">The ideas you&#x27;ll use</h3>
+<p><strong>1. A method list is read left to right.</strong> <code translate="no">aaa authentication login default group tacacs+ local</code> means: ask the TACACS+ server first, and only if that doesn&#x27;t work, check the local database.</p>
+<p><strong>2. &quot;Doesn&#x27;t work&quot; means no answer, not a wrong answer.</strong> This is the rule people get wrong most often:</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">The server...</th><th scope="col">IOS calls it</th><th scope="col">Next method (<code translate="no">local</code>) tried?</th></tr></thead><tbody><tr><td>Is down, unreachable, or sends nothing usable</td><td><strong>ERROR</strong></td><td><strong>Yes</strong></td></tr><tr><td>Answers &quot;reject&quot; (bad password, unknown user)</td><td><strong>FAIL</strong></td><td><strong>No</strong>: the answer is final</td></tr></tbody></table></div>
+<p>So while the server is up, a <strong>local-only</strong> account can&#x27;t log in. The local account is a <strong>break-glass</strong> account for when the AAA server can&#x27;t be reached.</p>
+<p><strong>3. The server knows a router by its source IP.</strong> A router sends AAA packets from the interface that <strong>leads to the server</strong>. R2-BR reaches HQ through Gi0/0, so the AAA server must list R2 as <strong>10.0.12.2</strong>, not its LAN address.</p>
+<p><strong>4. TACACS+ vs. RADIUS:</strong></p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col"></th><th scope="col">TACACS+</th><th scope="col">RADIUS</th></tr></thead><tbody><tr><td>Transport</td><td><strong>TCP 49</strong></td><td><strong>UDP 1812 / 1813</strong> (older gear and Packet Tracer: 1645 / 1646)</td></tr><tr><td>Encrypts</td><td>The <strong>whole packet body</strong></td><td>The <strong>password only</strong></td></tr><tr><td>AAA functions</td><td><strong>Separate</strong>: per-command authorization possible</td><td>Authentication and authorization <strong>combined</strong></td></tr><tr><td>Typical use</td><td><strong>Device administration</strong></td><td><strong>Network access</strong> (VPN, 802.1X, wireless)</td></tr></tbody></table></div>
+<p>R1-HQ uses TACACS+ and R2-BR uses RADIUS so you can compare them side by side, against the same server, the way Cisco ISE serves both in production.</p>
+<h3 id="think-like-the-defender-first">Think like the defender first</h3>
+<p>Before you type anything, answer these for the network in the file:</p>
+<ul><li><strong>Who should be able to manage the routers, and from where?</strong> Only the NOC subnet at HQ (192.168.10.0/24), over SSH. The branch user PC should get nothing.</li><li><strong>What happens when the AAA server dies?</strong> If the answer is &quot;nobody can log in anywhere&quot;, you&#x27;ve built your own outage. Every method list needs a local fallback.</li><li><strong>What else is running that nobody needs?</strong> Every open service on a server, every dynamic switch port and every unused jack is something an attacker can probe.</li></ul>
+<h2 id="packet-tracer-vs-real-ios">Packet Tracer vs. real IOS</h2>
+<p>Every command in this lab runs in Packet Tracer 9.0. A few real-IOS tools aren&#x27;t available or aren&#x27;t reliable there, so the lab uses these replacements:</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Real IOS</th><th scope="col">In this lab</th><th scope="col">Why</th></tr></thead><tbody><tr><td><code translate="no">test aaa group ...</code></td><td>Real SSH logins from ADMIN-PC</td><td>Not reliable in Packet Tracer, and a real login is the true test anyway</td></tr><tr><td><code translate="no">debug tacacs</code>, <code translate="no">debug radius</code>, <code translate="no">debug aaa</code></td><td><strong>Simulation mode</strong> with the TACACS and RADIUS filters</td><td>Watch the actual packets instead</td></tr><tr><td><code translate="no">show aaa servers</code>, <code translate="no">show tacacs</code></td><td>Login behavior and Simulation mode</td><td>Not reliable in Packet Tracer</td></tr><tr><td><code translate="no">tacacs server NAME</code> / <code translate="no">radius server NAME</code> blocks</td><td>Legacy <code translate="no">tacacs-server host</code> and <code translate="no">radius-server host</code> with <code translate="no">key</code></td><td>Long supported in Packet Tracer, same result</td></tr><tr><td><code translate="no">aaa authorization</code>, <code translate="no">aaa accounting</code></td><td>Not configured; users land at <code translate="no">&gt;</code> and use <code translate="no">enable</code></td><td>Packet Tracer&#x27;s AAA server stores only username and password, no privilege levels</td></tr><tr><td>NTP <code translate="no">hmac-sha2-256</code> keys</td><td><code translate="no">ntp authentication-key 1 md5 ...</code></td><td>Packet Tracer&#x27;s NTP server authenticates with MD5</td></tr><tr><td><code translate="no">login block-for</code> and <code translate="no">security passwords min-length</code> on the 2960</td><td>Routers only</td><td>The Packet Tracer 2960 rejects them</td></tr><tr><td><code translate="no">enable algorithm-type scrypt secret</code> (type 9)</td><td>Standard <code translate="no">enable secret</code></td><td>Use type 8 or 9 on real IOS</td></tr><tr><td>VTY lines 5 to 15 on the 2911</td><td><code translate="no">line vty 0 4</code></td><td>Always secure <strong>every</strong> VTY line on real routers</td></tr></tbody></table></div>
+<p>The real-IOS versions of these commands, with <code translate="no">debug tacacs</code> output, are in the <a href="/ccnp-security/labs/aaa-tacacs-configure-troubleshoot">AAA with TACACS+ lab</a>.</p>
+<h2 id="topology">Topology</h2>
+<figure class="post-figure fit"><a href="/assets/img/ccnp/labs/aaa-hardening-pt/s01-topology.webp" aria-label="Open full-size image: Packet Tracer topology: AAA-SRV, MGMT-SRV and ADMIN-PC on switch S1-HQ, S1-HQ to router R1-HQ, R1-HQ to R2-BR over the WAN, R2-BR to switch S2-BR, and BR-PC on S2-BR"><img src="/assets/img/ccnp/labs/aaa-hardening-pt/s01-topology.webp" width="596" height="566" alt="Packet Tracer topology: AAA-SRV, MGMT-SRV and ADMIN-PC on switch S1-HQ, S1-HQ to router R1-HQ, R1-HQ to R2-BR over the WAN, R2-BR to switch S2-BR, and BR-PC on S2-BR" loading="lazy" decoding="async"></a><figcaption>Packet Tracer topology: AAA-SRV, MGMT-SRV and ADMIN-PC on switch S1-HQ, S1-HQ to router R1-HQ, R1-HQ to R2-BR over the WAN, R2-BR to switch S2-BR, and BR-PC on S2-BR. Select the image to open it full size.</figcaption></figure>
+<p>HQ is the NOC and management segment: it holds the AAA server, the management server and the admin PC. The branch is a user site. R2-BR&#x27;s AAA, NTP and syslog traffic all cross the WAN link to reach HQ, which matters in Part 4.</p>
+<h3 id="devices">Devices</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Name</th><th scope="col">Packet Tracer model</th><th scope="col">Role</th></tr></thead><tbody><tr><td>R1-HQ</td><td>2911</td><td>HQ router: <strong>TACACS+</strong> client, OSPF, NTP and syslog client</td></tr><tr><td>R2-BR</td><td>2911</td><td>Branch router: <strong>RADIUS</strong> client, OSPF, NTP and syslog client</td></tr><tr><td>S1-HQ</td><td>2960-24TT</td><td>HQ access switch</td></tr><tr><td>S2-BR</td><td>2960-24TT</td><td>Branch access switch</td></tr><tr><td>AAA-SRV</td><td>Server-PT</td><td>AAA service: TACACS+ for R1, RADIUS for R2</td></tr><tr><td>MGMT-SRV</td><td>Server-PT</td><td>Authenticated NTP and syslog</td></tr><tr><td>ADMIN-PC</td><td>PC-PT</td><td>NOC admin workstation, allowed to manage devices</td></tr><tr><td>BR-PC</td><td>PC-PT</td><td>Branch user, must be <strong>blocked</strong> from device management</td></tr></tbody></table></div>
+<h3 id="cabling">Cabling</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">From</th><th scope="col">Port</th><th scope="col">To</th><th scope="col">Port</th><th scope="col">Cable</th></tr></thead><tbody><tr><td>R1-HQ</td><td>Gi0/0</td><td>R2-BR</td><td>Gi0/0</td><td>Copper cross-over</td></tr><tr><td>R1-HQ</td><td>Gi0/1</td><td>S1-HQ</td><td>Gi0/1</td><td>Copper straight-through</td></tr><tr><td>AAA-SRV</td><td>Fa0</td><td>S1-HQ</td><td>Fa0/1</td><td>Copper straight-through</td></tr><tr><td>MGMT-SRV</td><td>Fa0</td><td>S1-HQ</td><td>Fa0/2</td><td>Copper straight-through</td></tr><tr><td>ADMIN-PC</td><td>Fa0</td><td>S1-HQ</td><td>Fa0/3</td><td>Copper straight-through</td></tr><tr><td>R2-BR</td><td>Gi0/1</td><td>S2-BR</td><td>Gi0/1</td><td>Copper straight-through</td></tr><tr><td>BR-PC</td><td>Fa0</td><td>S2-BR</td><td>Fa0/1</td><td>Copper straight-through</td></tr></tbody></table></div>
+<h3 id="addressing">Addressing</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Device</th><th scope="col">Interface</th><th scope="col">IP / mask</th><th scope="col">Gateway</th></tr></thead><tbody><tr><td>R1-HQ</td><td>Gi0/0 (WAN)</td><td>10.0.12.1 /30</td><td>n/a</td></tr><tr><td>R1-HQ</td><td>Gi0/1 (HQ LAN)</td><td>192.168.10.1 /24</td><td>n/a</td></tr><tr><td>R2-BR</td><td>Gi0/0 (WAN)</td><td>10.0.12.2 /30</td><td>n/a</td></tr><tr><td>R2-BR</td><td>Gi0/1 (branch LAN)</td><td>192.168.20.1 /24</td><td>n/a</td></tr><tr><td>S1-HQ</td><td>VLAN 10 SVI</td><td>192.168.10.2 /24</td><td>192.168.10.1</td></tr><tr><td>S2-BR</td><td>VLAN 20 SVI</td><td>192.168.20.2 /24</td><td>192.168.20.1</td></tr><tr><td>AAA-SRV</td><td>Fa0</td><td>192.168.10.10 /24</td><td>192.168.10.1</td></tr><tr><td>MGMT-SRV</td><td>Fa0</td><td>192.168.10.20 /24</td><td>192.168.10.1</td></tr><tr><td>ADMIN-PC</td><td>Fa0</td><td>192.168.10.50 /24</td><td>192.168.10.1</td></tr><tr><td>BR-PC</td><td>Fa0</td><td>192.168.20.50 /24</td><td>192.168.20.1</td></tr></tbody></table></div>
+<p>OSPF process 1, area 0, router IDs <strong>1.1.1.1</strong> (R1) and <strong>2.2.2.2</strong> (R2). VLAN 10 <code translate="no">HQ-MGMT</code> on S1-HQ, VLAN 20 <code translate="no">BR-USERS</code> on S2-BR; you&#x27;ll add VLAN 999 <code translate="no">PARKING</code> for unused ports.</p>
+<h3 id="values-to-use-exactly">Values to use exactly</h3>
+<p>The devices and servers must agree with each other, so one typo breaks the login.</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Setting</th><th scope="col">Value</th></tr></thead><tbody><tr><td>Domain name</td><td><code translate="no">lab.breakfixlearn.com</code></td></tr><tr><td>Enable secret (all devices)</td><td><code translate="no">Lab!Enable2026</code></td></tr><tr><td>Local fallback user (all devices)</td><td><code translate="no">admin</code> / <code translate="no">Lab!Admin2026</code>, privilege 15</td></tr><tr><td>Minimum password length (routers)</td><td>10</td></tr><tr><td>SSH (routers)</td><td>Version 2, RSA 2048, time-out 60, retries 3</td></tr><tr><td>Login block-for (routers)</td><td>Block 60 s after 3 failures within 30 s</td></tr><tr><td>Banner</td><td><code translate="no">Authorized access only. All activity is logged.</code></td></tr><tr><td>exec-timeout (console and VTY)</td><td><code translate="no">5 0</code></td></tr><tr><td>VTY ACL (routers)</td><td>Standard ACL <code translate="no">VTY-ADMIN</code> permitting <code translate="no">192.168.10.0 0.0.0.255</code></td></tr><tr><td>AAA server</td><td>AAA-SRV, 192.168.10.10</td></tr><tr><td>TACACS+ key (R1-HQ)</td><td><code translate="no">Tac!Key2026</code></td></tr><tr><td>RADIUS key (R2-BR)</td><td><code translate="no">Rad!Key2026</code></td></tr><tr><td>AAA users</td><td><code translate="no">netadmin</code> / <code translate="no">NetAdmin!2026</code>, <code translate="no">noc</code> / <code translate="no">NocUser!2026</code></td></tr><tr><td>VTY method lists</td><td>R1-HQ: <code translate="no">SSH-TAC</code>, R2-BR: <code translate="no">SSH-RAD</code></td></tr><tr><td>NTP</td><td>MGMT-SRV 192.168.10.20, key 1, MD5, <code translate="no">Ntp!Key2026</code></td></tr><tr><td>Syslog server</td><td>192.168.10.20</td></tr><tr><td>OSPF MD5 key (WAN Gi0/0)</td><td>Key 1, <code translate="no">Ospf!Key2026</code></td></tr><tr><td>Unused-port VLAN</td><td>999, named <code translate="no">PARKING</code></td></tr></tbody></table></div>
+<blockquote><p><strong>Lab values only.</strong> These passwords and keys are training values. Never reuse them on real equipment.</p></blockquote>
+<h2 id="before-you-start-the-baseline-works">Before you start: the baseline works</h2>
+<p>Open the file and wait for the link lights to turn green. <strong>Fast Forward Time</strong> (bottom left) speeds up OSPF and spanning tree. Then:</p>
+<pre translate="no"><code translate="no">R1-HQ# show ip ospf neighbor</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-hardening-pt/s02-ospf-baseline.webp" aria-label="Open full-size image: R1-HQ show ip ospf neighbor: neighbor 2.2.2.2, priority 1, FULL/DR, address 10.0.12.2 on GigabitEthernet0/0"><img src="/assets/img/ccnp/labs/aaa-hardening-pt/s02-ospf-baseline.webp" width="820" height="75" alt="R1-HQ show ip ospf neighbor: neighbor 2.2.2.2, priority 1, FULL/DR, address 10.0.12.2 on GigabitEthernet0/0" loading="lazy" decoding="async"></a><figcaption>R1-HQ show ip ospf neighbor: neighbor 2.2.2.2, priority 1, FULL/DR, address 10.0.12.2 on GigabitEthernet0/0. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> neighbor <strong>2.2.2.2</strong> is <strong>FULL</strong>: R1 and R2 have exchanged their routing databases over the WAN, so each site can reach the other. R2 is the DR on this link.</p>
+<p>From <strong>ADMIN-PC → Desktop → Command Prompt</strong>:</p>
+<pre translate="no"><code translate="no">ping 192.168.20.50</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-hardening-pt/s03-ping-baseline.webp" aria-label="Open full-size image: ADMIN-PC pinging BR-PC at 192.168.20.50: the first request times out, then three replies with TTL 126"><img src="/assets/img/ccnp/labs/aaa-hardening-pt/s03-ping-baseline.webp" width="950" height="516" alt="ADMIN-PC pinging BR-PC at 192.168.20.50: the first request times out, then three replies with TTL 126" loading="lazy" decoding="async"></a><figcaption>ADMIN-PC pinging BR-PC at 192.168.20.50: the first request times out, then three replies with TTL 126. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> the first ping times out while the routers resolve ARP; the next three reply. <strong>TTL 126</strong> means two routers were crossed (128 minus 2). The network works. It just isn&#x27;t secure: anyone can Telnet to anything, every switch port negotiates, and the routers still use no passwords at all.</p>
+<h2 id="part-1-baseline-device-hardening">Part 1: baseline device hardening</h2>
+<h3 id="routers-r1-hq-then-repeat-on-r2-br">Routers (R1-HQ, then repeat on R2-BR)</h3>
+<p><strong>Passwords and the local break-glass account:</strong></p>
+<pre translate="no"><code translate="no">enable
+configure terminal
+security passwords min-length 10
+enable secret Lab!Enable2026
+service password-encryption
+username admin privilege 15 secret Lab!Admin2026</code></pre>
+<ul><li><strong><code translate="no">min-length 10</code> comes first.</strong> It only checks passwords set after it. Try a 9-character password afterwards and it&#x27;s rejected, which proves the control works.</li><li><strong><code translate="no">enable secret</code></strong>, never <code translate="no">enable password</code>: the secret is stored as a hash.</li><li><strong><code translate="no">service password-encryption</code></strong> obscures any plaintext passwords and keys left in the config as type 7. Type 7 is reversible, so it only stops shoulder-surfing, but CIS benchmarks still expect it.</li><li><strong><code translate="no">admin</code> is the break-glass account.</strong> Once AAA is on, it works only when the server can&#x27;t be reached (idea 2).</li></ul>
+<p><strong>SSH, login throttling and the banner:</strong></p>
+<pre translate="no"><code translate="no">ip domain-name lab.breakfixlearn.com
+crypto key generate rsa modulus 2048
+ip ssh version 2
+ip ssh time-out 60
+ip ssh authentication-retries 3
+login block-for 60 attempts 3 within 30
+banner motd #Authorized access only. All activity is logged.#</code></pre>
+<ul><li><strong>The RSA key needs a hostname and domain name first</strong>: they form the key&#x27;s name.</li><li><strong>SSH version 2 only</strong>, with a 60-second negotiation window and 3 password tries per session.</li><li><strong><code translate="no">login block-for</code></strong>: 3 failures within 30 seconds puts the router in <strong>quiet mode</strong> for 60 seconds, refusing remote logins. That throttles password guessing.</li><li><strong>The banner</strong> is a legal &quot;authorized use only&quot; notice. It never names the company or the device.</li></ul>
+<p><strong>The management ACL:</strong></p>
+<pre translate="no"><code translate="no">ip access-list standard VTY-ADMIN
+ permit 192.168.10.0 0.0.0.255
+ exit</code></pre>
+<p>Only the HQ NOC subnet may <strong>open</strong> a management session. Everything else hits the implicit deny.</p>
+<p><strong>AAA on, with local first, and the lines locked down:</strong></p>
+<pre translate="no"><code translate="no">aaa new-model
+aaa authentication login default local
+line console 0
+ login authentication default
+ exec-timeout 5 0
+ logging synchronous
+line vty 0 4
+ login authentication default
+ transport input ssh
+ exec-timeout 5 0
+ access-class VTY-ADMIN in
+ end</code></pre>
+<ul><li><strong><code translate="no">aaa new-model</code></strong> switches the router to AAA: from now on, method lists decide how every login works.</li><li>For now the <strong>default</strong> list is only <code translate="no">local</code>. Part 2 puts a server in front of it.</li><li><strong><code translate="no">exec-timeout 5 0</code></strong> logs out idle sessions after 5 minutes, <strong><code translate="no">transport input ssh</code></strong> turns Telnet off, and <strong><code translate="no">access-class</code></strong> applies the ACL to the VTY lines.</li></ul>
+<p><strong>Repeat everything above on R2-BR.</strong></p>
+<p><strong>Checkpoint 1a.</strong> From ADMIN-PC: <code translate="no">ssh -l admin 192.168.10.1</code> and <code translate="no">ssh -l admin 10.0.12.2</code> both log in with <code translate="no">Lab!Admin2026</code>. On a router, <code translate="no">show ip ssh</code> reports <strong>SSH Enabled - version 2.0</strong>.</p>
+<h3 id="switches-s1-hq-then-s2-br">Switches (S1-HQ, then S2-BR)</h3>
+<p><strong>Management access:</strong></p>
+<pre translate="no"><code translate="no">enable
+configure terminal
+enable secret Lab!Enable2026
+service password-encryption
+username admin privilege 15 secret Lab!Admin2026
+ip domain-name lab.breakfixlearn.com
+crypto key generate rsa modulus 2048
+ip ssh version 2
+banner motd #Authorized access only. All activity is logged.#
+line console 0
+ login local
+ exec-timeout 5 0
+ logging synchronous
+line vty 0 15
+ login local
+ transport input ssh
+ exec-timeout 5 0
+ exit</code></pre>
+<p>The switches use plain <code translate="no">login local</code>: in this lab only the routers are AAA clients. <code translate="no">security passwords min-length</code> and <code translate="no">login block-for</code> are left out because the Packet Tracer 2960 rejects them.</p>
+<p><strong>Layer 2 minimum security (S1-HQ):</strong></p>
+<pre translate="no"><code translate="no">vlan 999
+ name PARKING
+ exit
+interface GigabitEthernet0/1
+ description Uplink to R1-HQ
+ switchport mode access
+ switchport nonegotiate
+ exit
+interface range FastEthernet0/1 - 3
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security maximum 1
+ switchport port-security mac-address sticky
+ switchport port-security violation shutdown
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ no cdp enable
+ exit
+interface range FastEthernet0/4 - 24
+ switchport mode access
+ switchport access vlan 999
+ shutdown
+ exit
+interface GigabitEthernet0/2
+ switchport mode access
+ switchport access vlan 999
+ shutdown
+ exit
+interface vlan 1
+ shutdown
+ end</code></pre>
+<ul><li><strong><code translate="no">switchport mode access</code> before <code translate="no">nonegotiate</code> and port security.</strong> Both need a fixed mode; the other order errors out.</li><li><strong>The baseline ports were left in DTP dynamic mode</strong>, so an attacker&#x27;s device could negotiate a trunk. <code translate="no">mode access</code> plus <code translate="no">nonegotiate</code> closes that.</li><li><strong>Port security, maximum 1, sticky</strong>: each host port learns one MAC address and shuts down if a different device appears.</li><li><strong>PortFast and BPDU Guard</strong> on host ports only: a switch plugged into a host port gets shut down.</li><li><strong>Unused ports</strong> are parked in a dead VLAN <strong>and</strong> shut, so plugging into a spare jack gets nothing.</li><li><strong>The VLAN 1 SVI is shut</strong>: VLAN 1 carries nothing here, so it shouldn&#x27;t have a management address waiting.</li></ul>
+<p><strong>S2-BR:</strong> the same, with host port <strong>Fa0/1</strong> and unused ports <strong>Fa0/2 to 24</strong> and <strong>Gi0/2</strong>; the uplink description is <code translate="no">Uplink to R2-BR</code>.</p>
+<p><strong>Checkpoint 1b.</strong> On S1-HQ:</p>
+<pre translate="no"><code translate="no">show port-security
+show interfaces status
+show ip ssh</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-hardening-pt/s16-switch-hardening.webp" aria-label="Open full-size image: S1-HQ: show port-security lists Fa0/1 to Fa0/3 with maximum 1 and action Shutdown; show interfaces status shows Fa0/1 to 3 and Gi0/1 connected in VLAN 10 and every other port disabled in VLAN 999; show ip ssh reports SSH Enabled version 2.0"><img src="/assets/img/ccnp/labs/aaa-hardening-pt/s16-switch-hardening.webp" width="751" height="597" alt="S1-HQ: show port-security lists Fa0/1 to Fa0/3 with maximum 1 and action Shutdown; show interfaces status shows Fa0/1 to 3 and Gi0/1 connected in VLAN 10 and every other port disabled in VLAN 999; show ip ssh reports SSH Enabled version 2.0" loading="lazy" decoding="async"></a><figcaption>S1-HQ: show port-security lists Fa0/1 to Fa0/3 with maximum 1 and action Shutdown; show interfaces status shows Fa0/1 to 3 and Gi0/1 connected in VLAN 10 and every other port disabled in VLAN 999; show ip ssh reports SSH Enabled version 2.0. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong>Fa0/1 to Fa0/3</strong> each allow <strong>1</strong> secure address with action <strong>Shutdown</strong>. Fa0/1 and Fa0/2 have already learned their server&#x27;s MAC (current count 1). Fa0/3 shows 0 until ADMIN-PC sends traffic, then sticks.</li><li><strong>Fa0/4 to Fa0/24 and Gi0/2</strong> are <strong>disabled</strong> in VLAN <strong>999</strong>. Only the four ports with a job are connected.</li><li><strong>Gi0/1</strong> shows its description, <code translate="no">Uplink to R1-HQ</code>: labelled ports make audits faster.</li><li><strong>SSH Enabled - version 2.0</strong>. The authentication timeout is the switch default (120 seconds) because the time-out and retry settings were applied on the routers.</li></ul>
+<p>From ADMIN-PC, <code translate="no">ssh -l admin 192.168.10.2</code> reaches S1-HQ.</p>
+<h3 id="servers-services-tab">Servers (Services tab)</h3>
+<p><strong>Least functionality:</strong> turn <strong>Off</strong> every service a server doesn&#x27;t need. Every running service is something an attacker can probe.</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Server</th><th scope="col">Keep On</th><th scope="col">Turn Off</th></tr></thead><tbody><tr><td>AAA-SRV</td><td><strong>AAA</strong></td><td>HTTP, HTTPS, DHCP, DHCPv6, TFTP, DNS, SYSLOG, NTP, EMAIL, FTP and any others your build shows</td></tr><tr><td>MGMT-SRV</td><td><strong>NTP</strong>, <strong>SYSLOG</strong></td><td>Everything else</td></tr></tbody></table></div>
+<h2 id="part-2-aaa-with-tacacs-and-radius">Part 2: AAA with TACACS+ and RADIUS</h2>
+<h3 id="step-2-1-the-aaa-server">Step 2.1: the AAA server</h3>
+<p>On <strong>AAA-SRV → Services → AAA</strong>, turn the service <strong>On</strong> and add two clients, then two users:</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Client Name</th><th scope="col">Client IP</th><th scope="col">Secret</th><th scope="col">ServerType</th></tr></thead><tbody><tr><td><code translate="no">R1-HQ</code></td><td><code translate="no">192.168.10.1</code></td><td><code translate="no">Tac!Key2026</code></td><td>Tacacs</td></tr><tr><td><code translate="no">R2-BR</code></td><td><strong><code translate="no">10.0.12.2</code></strong></td><td><code translate="no">Rad!Key2026</code></td><td>Radius</td></tr></tbody></table></div>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-hardening-pt/s04-aaa-server.webp" aria-label="Open full-size image: AAA-SRV AAA service On, RADIUS port 1645, clients R2-BR at 10.0.12.2 type Radius and R1-HQ at 192.168.10.1 type Tacacs with their keys, and users netadmin and noc"><img src="/assets/img/ccnp/labs/aaa-hardening-pt/s04-aaa-server.webp" width="947" height="996" alt="AAA-SRV AAA service On, RADIUS port 1645, clients R2-BR at 10.0.12.2 type Radius and R1-HQ at 192.168.10.1 type Tacacs with their keys, and users netadmin and noc" loading="lazy" decoding="async"></a><figcaption>AAA-SRV AAA service On, RADIUS port 1645, clients R2-BR at 10.0.12.2 type Radius and R1-HQ at 192.168.10.1 type Tacacs with their keys, and users netadmin and noc. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li><strong>One server, two protocols.</strong> R1-HQ is a <strong>Tacacs</strong> client and R2-BR a <strong>Radius</strong> client, each with its own shared secret. That&#x27;s how Cisco ISE works in production.</li><li><strong>R2-BR&#x27;s client IP is 10.0.12.2, its WAN address.</strong> R2&#x27;s packets to 192.168.10.10 leave through Gi0/0, so that&#x27;s the source address the server sees (idea 3). Enter 192.168.20.1 instead and RADIUS fails: that&#x27;s Challenge 4.</li><li><strong>Radius Port 1645</strong>: Packet Tracer&#x27;s server listens on the legacy RADIUS port. Real deployments use <strong>1812</strong> (and 1813 for accounting). When a real RADIUS setup fails, a port mismatch between device and server is worth checking.</li><li>The users exist <strong>only</strong> on the server, which is how you&#x27;ll prove the server is doing the authentication.</li></ul>
+<blockquote><p><strong>One typo in this screenshot.</strong> The <code translate="no">noc</code> password reads <code translate="no">NocUer!2026</code>, a typo made while building the lab. Use <code translate="no">NocUser!2026</code> from the values table when you add the user, and log in with what you typed.</p></blockquote>
+<h3 id="step-2-2-r1-hq-uses-tacacs">Step 2.2: R1-HQ uses TACACS+</h3>
+<pre translate="no"><code translate="no">configure terminal
+tacacs-server host 192.168.10.10
+tacacs-server key Tac!Key2026
+aaa authentication login default group tacacs+ local
+aaa authentication login SSH-TAC group tacacs+ local
+line vty 0 4
+ login authentication SSH-TAC
+ end</code></pre>
+<ul><li>Re-entering the <strong>default</strong> list replaces the Part 1 <code translate="no">local</code> version: the console now asks TACACS+ first, then local.</li><li><strong><code translate="no">SSH-TAC</code></strong> is a <strong>named list</strong> for the VTY lines. It has the same methods today, but each access path now has its own policy, so you could change remote logins later without touching the console break-glass path.</li></ul>
+<blockquote><p><strong>Lockout safety:</strong> stay logged in on the console while you change AAA, and test SSH from ADMIN-PC before you log out. It&#x27;s a habit worth keeping on real equipment.</p></blockquote>
+<h3 id="step-2-3-r2-br-uses-radius">Step 2.3: R2-BR uses RADIUS</h3>
+<pre translate="no"><code translate="no">configure terminal
+radius-server host 192.168.10.10
+radius-server key Rad!Key2026
+aaa authentication login default group radius local
+aaa authentication login SSH-RAD group radius local
+line vty 0 4
+ login authentication SSH-RAD
+ end</code></pre>
+<h3 id="checkpoint-2-server-only-users-can-log-in">Checkpoint 2: server-only users can log in</h3>
+<p>From ADMIN-PC:</p>
+<pre translate="no"><code translate="no">ssh -l netadmin 192.168.10.1
+enable
+show users</code></pre>
+<figure class="post-figure fit"><a href="/assets/img/ccnp/labs/aaa-hardening-pt/s06-tacacs-login.webp" aria-label="Open full-size image: ADMIN-PC SSH to 192.168.10.1 as netadmin lands at R1-HQ&gt;, and show users lists vty 0 owned by netadmin"><img src="/assets/img/ccnp/labs/aaa-hardening-pt/s06-tacacs-login.webp" width="598" height="142" alt="ADMIN-PC SSH to 192.168.10.1 as netadmin lands at R1-HQ&gt;, and show users lists vty 0 owned by netadmin" loading="lazy" decoding="async"></a><figcaption>ADMIN-PC SSH to 192.168.10.1 as netadmin lands at R1-HQ&gt;, and show users lists vty 0 owned by netadmin. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> <code translate="no">netadmin</code> landed at <strong><code translate="no">R1-HQ&gt;</code></strong>, and <code translate="no">show users</code> shows the VTY line owned by <strong>netadmin</strong>. <code translate="no">netadmin</code> has no local account on R1, so only the TACACS+ server could have authenticated it. It lands at <code translate="no">&gt;</code> (user EXEC) and needs <code translate="no">enable</code>, because Packet Tracer&#x27;s AAA server can&#x27;t hand out privilege levels; on real IOS, <code translate="no">aaa authorization exec</code> would.</p>
+<pre translate="no"><code translate="no">ssh -l noc 10.0.12.2
+enable
+show users</code></pre>
+<figure class="post-figure fit"><a href="/assets/img/ccnp/labs/aaa-hardening-pt/s09-radius-login.webp" aria-label="Open full-size image: ADMIN-PC SSH to 10.0.12.2 as noc lands at R2-BR&gt;, enable works, and show users lists vty 0 owned by noc"><img src="/assets/img/ccnp/labs/aaa-hardening-pt/s09-radius-login.webp" width="631" height="150" alt="ADMIN-PC SSH to 10.0.12.2 as noc lands at R2-BR&gt;, enable works, and show users lists vty 0 owned by noc" loading="lazy" decoding="async"></a><figcaption>ADMIN-PC SSH to 10.0.12.2 as noc lands at R2-BR&gt;, enable works, and show users lists vty 0 owned by noc. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> the same result on R2-BR, this time over <strong>RADIUS</strong>: VTY 0 belongs to <strong>noc</strong>, another server-only user.</p>
+<h3 id="see-the-aaa-packets-in-simulation-mode">See the AAA packets in Simulation mode</h3>
+<p>Packet Tracer&#x27;s replacement for <code translate="no">debug</code>:</p>
+<ol><li>Click <strong>Simulation</strong> (bottom right).</li><li><strong>Edit Filters</strong>: clear everything, then tick <strong>TACACS</strong> and <strong>SSH</strong> (or <strong>RADIUS</strong> and <strong>SSH</strong>).</li><li>Start the SSH login from ADMIN-PC, then press <strong>Capture / Forward</strong> repeatedly.</li><li>Click an envelope to open its PDU, and check the source IP. Click <strong>Realtime</strong> to go back.</li></ol>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-hardening-pt/s08-sim-tacacs.webp" aria-label="Open full-size image: Simulation mode with the SSH and TACACS filters: the event list shows packets passing between ADMIN-PC, S1-HQ and R1-HQ during the netadmin login"><img src="/assets/img/ccnp/labs/aaa-hardening-pt/s08-sim-tacacs.webp" width="953" height="836" alt="Simulation mode with the SSH and TACACS filters: the event list shows packets passing between ADMIN-PC, S1-HQ and R1-HQ during the netadmin login" loading="lazy" decoding="async"></a><figcaption>Simulation mode with the SSH and TACACS filters: the event list shows packets passing between ADMIN-PC, S1-HQ and R1-HQ during the netadmin login. Select the image to open it full size.</figcaption></figure>
+<figure class="post-figure fit"><a href="/assets/img/ccnp/labs/aaa-hardening-pt/s08-tacacs-pdu.webp" aria-label="Open full-size image: Inbound PDU details at S1-HQ: a TCP segment carrying a TACACS header with major version 12, minor version 1, type 1, sequence number 6, session ID 3, and an encrypted data field"><img src="/assets/img/ccnp/labs/aaa-hardening-pt/s08-tacacs-pdu.webp" width="580" height="577" alt="Inbound PDU details at S1-HQ: a TCP segment carrying a TACACS header with major version 12, minor version 1, type 1, sequence number 6, session ID 3, and an encrypted data field" loading="lazy" decoding="async"></a><figcaption>Inbound PDU details at S1-HQ: a TCP segment carrying a TACACS header with major version 12, minor version 1, type 1, sequence number 6, session ID 3, and an encrypted data field. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong></p>
+<ul><li>The SSH session goes ADMIN-PC → R1-HQ, and <strong>R1-HQ opens its own conversation with AAA-SRV</strong> to check the password. The PC never talks to the AAA server.</li><li>The PDU shows <strong>TCP</strong> fields (sequence and acknowledgement numbers, window) wrapped around a <strong>TACACS</strong> header: TACACS+ rides <strong>TCP</strong>.</li><li><strong>TYPE 1</strong> is an authentication packet, and the body is <strong>ENCRYPTED DATA</strong>: TACACS+ encrypts the whole payload with the shared key. A RADIUS packet would show the username in clear and hide only the password.</li></ul>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-hardening-pt/s09-sim-radius.webp" aria-label="Open full-size image: Simulation mode with the RADIUS and SSH filters during the noc login: events pass from R2-BR through R1-HQ and S1-HQ to AAA-SRV and back"><img src="/assets/img/ccnp/labs/aaa-hardening-pt/s09-sim-radius.webp" width="918" height="687" alt="Simulation mode with the RADIUS and SSH filters during the noc login: events pass from R2-BR through R1-HQ and S1-HQ to AAA-SRV and back" loading="lazy" decoding="async"></a><figcaption>Simulation mode with the RADIUS and SSH filters during the noc login: events pass from R2-BR through R1-HQ and S1-HQ to AAA-SRV and back. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> the RADIUS exchange crosses the whole network: <strong>R2-BR → R1-HQ → S1-HQ → AAA-SRV</strong> and back. Open one of R2-BR&#x27;s packets and the source is <strong>10.0.12.2</strong>, the WAN interface, which is why the server&#x27;s client entry must use that address. It also means <strong>R2&#x27;s logins depend on OSPF</strong>: Challenge 7.</p>
+<h2 id="part-3-network-wide-minimum-security-both-routers">Part 3: network-wide minimum security (both routers)</h2>
+<h3 id="authenticated-ntp">Authenticated NTP</h3>
+<p>On <strong>MGMT-SRV → Services → NTP</strong>: On, Authentication <strong>Enable</strong>, Key <strong>1</strong>, Password <strong><code translate="no">Ntp!Key2026</code></strong>.</p>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-hardening-pt/s05-ntp-server.webp" aria-label="Open full-size image: MGMT-SRV NTP service On with authentication enabled, key 1, password Ntp!Key2026, and the server calendar set to November 2026"><img src="/assets/img/ccnp/labs/aaa-hardening-pt/s05-ntp-server.webp" width="933" height="1000" alt="MGMT-SRV NTP service On with authentication enabled, key 1, password Ntp!Key2026, and the server calendar set to November 2026" loading="lazy" decoding="async"></a><figcaption>MGMT-SRV NTP service On with authentication enabled, key 1, password Ntp!Key2026, and the server calendar set to November 2026. Select the image to open it full size.</figcaption></figure>
+<p>Then on each router:</p>
+<pre translate="no"><code translate="no">configure terminal
+ntp authentication-key 1 md5 Ntp!Key2026
+ntp trusted-key 1
+ntp authenticate
+ntp server 192.168.10.20
+ntp update-calendar
+end</code></pre>
+<ul><li>The key number and password must match the server exactly.</li><li><code translate="no">ntp update-calendar</code> keeps the router&#x27;s hardware calendar in step with NTP, so the time survives a reload.</li><li>Packet Tracer&#x27;s NTP server uses <strong>MD5</strong>. On real IOS XE use <code translate="no">hmac-sha2-256</code> and add <code translate="no">key 1</code> to the <code translate="no">ntp server</code> line, as in the <a href="/ccnp-security/labs/ntp-authentication-lab">authenticated NTP lab</a>.</li></ul>
+<pre translate="no"><code translate="no">show ntp status
+show clock</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-hardening-pt/s13-ntp-status.webp" aria-label="Open full-size image: R1-HQ show ntp status: clock is synchronized, stratum 2, reference is 192.168.10.20, offset 0.00 msec; show clock 12:07:40 UTC Tue Nov 10 2026"><img src="/assets/img/ccnp/labs/aaa-hardening-pt/s13-ntp-status.webp" width="863" height="150" alt="R1-HQ show ntp status: clock is synchronized, stratum 2, reference is 192.168.10.20, offset 0.00 msec; show clock 12:07:40 UTC Tue Nov 10 2026" loading="lazy" decoding="async"></a><figcaption>R1-HQ show ntp status: clock is synchronized, stratum 2, reference is 192.168.10.20, offset 0.00 msec; show clock 12:07:40 UTC Tue Nov 10 2026. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> <strong>Clock is synchronized</strong>, <strong>stratum 2</strong>, <strong>reference 192.168.10.20</strong>. MGMT-SRV acts as a stratum 1 source, so R1 is one hop below. <code translate="no">show clock</code> now reports the real date, which every log message, certificate check and lockout timer depends on.</p>
+<h3 id="syslog-with-timestamps">Syslog with timestamps</h3>
+<pre translate="no"><code translate="no">configure terminal
+service timestamps log datetime msec
+logging host 192.168.10.20
+end</code></pre>
+<p>Generate a message: enter <code translate="no">configure terminal</code> and then <code translate="no">end</code> on a router. Then open <strong>MGMT-SRV → Services → SYSLOG</strong>.</p>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-hardening-pt/s14-syslog.webp" aria-label="Open full-size image: MGMT-SRV syslog table: two messages from host 10.0.12.2 timestamped 03.01.1993, SYS-5-CONFIG_I Configured from console by console and SYS-6-LOGGINGHOST_STARTSTOP"><img src="/assets/img/ccnp/labs/aaa-hardening-pt/s14-syslog.webp" width="951" height="1000" alt="MGMT-SRV syslog table: two messages from host 10.0.12.2 timestamped 03.01.1993, SYS-5-CONFIG_I Configured from console by console and SYS-6-LOGGINGHOST_STARTSTOP" loading="lazy" decoding="async"></a><figcaption>MGMT-SRV syslog table: two messages from host 10.0.12.2 timestamped 03.01.1993, SYS-5-CONFIG_I Configured from console by console and SYS-6-LOGGINGHOST_STARTSTOP. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output, as an investigator would:</strong></p>
+<ul><li><strong>HostName 10.0.12.2</strong>: these messages came from <strong>R2-BR</strong>, identified by its <strong>WAN</strong> address, the same exit-interface rule as AAA.</li><li><strong><code translate="no">%SYS-5-CONFIG_I: Configured from console by console</code></strong>: a configuration change, logged centrally, where an attacker who wipes the router&#x27;s local log can&#x27;t erase it.</li><li><strong><code translate="no">%SYS-6-LOGGINGHOST_STARTSTOP</code></strong>: logging to the host started.</li><li><strong>The time is 03.01.1993.</strong> These messages were sent <strong>before R2&#x27;s clock had synchronized</strong>, so they carry Packet Tracer&#x27;s default date. In an incident, a log line with the wrong time is almost useless. That&#x27;s why NTP comes before syslog, and why you check <code translate="no">show ntp status</code> on every device.</li></ul>
+<h3 id="ospf-authentication-and-a-passive-lan">OSPF authentication and a passive LAN</h3>
+<p>Do this from each router&#x27;s <strong>console</strong>: the adjacency drops until both ends match, and with it R2&#x27;s path to the AAA server.</p>
+<pre translate="no"><code translate="no">configure terminal
+interface GigabitEthernet0/0
+ ip ospf authentication message-digest
+ ip ospf message-digest-key 1 md5 Ospf!Key2026
+ no cdp enable
+ exit
+router ospf 1
+ passive-interface GigabitEthernet0/1
+ end</code></pre>
+<ul><li><strong>MD5 authentication</strong> means a rogue router on the link can&#x27;t form an adjacency and inject routes.</li><li><strong><code translate="no">passive-interface</code></strong> stops OSPF hellos going out to the user LAN, where nobody should be speaking OSPF.</li><li><strong><code translate="no">no cdp enable</code></strong> on the WAN stops the router advertising its model and software version to the link.</li></ul>
+<pre translate="no"><code translate="no">show ip ospf interface GigabitEthernet0/0
+show ip ospf neighbor</code></pre>
+<figure class="post-figure"><a href="/assets/img/ccnp/labs/aaa-hardening-pt/s15-ospf-auth.webp" aria-label="Open full-size image: R1-HQ show ip ospf interface Gi0/0: area 0, BDR, neighbor 2.2.2.2 is the DR, message digest authentication enabled, youngest key id is 1; show ip ospf neighbor: 2.2.2.2 FULL/DR"><img src="/assets/img/ccnp/labs/aaa-hardening-pt/s15-ospf-auth.webp" width="751" height="362" alt="R1-HQ show ip ospf interface Gi0/0: area 0, BDR, neighbor 2.2.2.2 is the DR, message digest authentication enabled, youngest key id is 1; show ip ospf neighbor: 2.2.2.2 FULL/DR" loading="lazy" decoding="async"></a><figcaption>R1-HQ show ip ospf interface Gi0/0: area 0, BDR, neighbor 2.2.2.2 is the DR, message digest authentication enabled, youngest key id is 1; show ip ospf neighbor: 2.2.2.2 FULL/DR. Select the image to open it full size.</figcaption></figure>
+<p><strong>Read the output:</strong> <strong>Message digest authentication enabled</strong>, <strong>youngest key id is 1</strong>, and the neighbor is back to <strong>FULL</strong>. Both routers agree on the key. <code translate="no">Youngest key id</code> matters during key rotation: OSPF sends with the newest key while both are configured.</p>
+<h2 id="part-4-break-and-fix">Part 4: break and fix</h2>
+<p>Predict each result <strong>before</strong> you test it, then restore the change before starting the next challenge.</p>
+<h3 id="c1-log-in-as-admin-while-aaa-srv-is-up">C1: log in as admin while AAA-SRV is up</h3>
+<pre translate="no"><code translate="no">ssh -l admin 192.168.10.1</code></pre>
+<figure class="post-figure fit"><a href="/assets/img/ccnp/labs/aaa-hardening-pt/s07-admin-rejected.webp" aria-label="Open full-size image: ADMIN-PC SSH to 192.168.10.1 as admin twice: both attempts return % Login invalid"><img src="/assets/img/ccnp/labs/aaa-hardening-pt/s07-admin-rejected.webp" width="470" height="143" alt="ADMIN-PC SSH to 192.168.10.1 as admin twice: both attempts return % Login invalid" loading="lazy" decoding="async"></a><figcaption>ADMIN-PC SSH to 192.168.10.1 as admin twice: both attempts return % Login invalid. Select the image to open it full size.</figcaption></figure>
+<details class="qa"><summary>Why is a valid local account rejected?</summary>
+<p>The server is reachable and answers &quot;I don&#x27;t know this user&quot;. That&#x27;s a <strong>FAIL</strong>, a final answer, so IOS never tries <code translate="no">local</code>. The local account is for when the server <strong>can&#x27;t be reached</strong>, not a second chance after a rejection. If a reject fell through to local, an attacker could keep guessing against the weakest password store on the device.</p>
+</details>
+<h3 id="c2-turn-the-aaa-service-off">C2: turn the AAA service off</h3>
+<p>On AAA-SRV, set the AAA service <strong>Off</strong>. Then SSH as <code translate="no">netadmin</code>, then as <code translate="no">admin</code>.</p>
+<figure class="post-figure fit"><a href="/assets/img/ccnp/labs/aaa-hardening-pt/s10-local-fallback.webp" aria-label="Open full-size image: With the AAA service off, ADMIN-PC SSH to 192.168.10.1 as admin succeeds and lands at R1-HQ&gt;"><img src="/assets/img/ccnp/labs/aaa-hardening-pt/s10-local-fallback.webp" width="582" height="85" alt="With the AAA service off, ADMIN-PC SSH to 192.168.10.1 as admin succeeds and lands at R1-HQ&gt;" loading="lazy" decoding="async"></a><figcaption>With the AAA service off, ADMIN-PC SSH to 192.168.10.1 as admin succeeds and lands at R1-HQ&gt;. Select the image to open it full size.</figcaption></figure>
+<details class="qa"><summary>Which one works now, and why?</summary>
+<p><code translate="no">netadmin</code> <strong>fails</strong>: it exists only on the server, and the server isn&#x27;t answering. <code translate="no">admin</code> <strong>works</strong>: no answer is an <strong>ERROR</strong>, so IOS moves to the next method, <code translate="no">local</code>. This is why every method list ends with <code translate="no">local</code>. Without it, a dead AAA server locks every administrator out of every device. Turn the AAA service back <strong>On</strong>.</p>
+</details>
+<h3 id="c3-wrong-tacacs-key-on-r1-hq">C3: wrong TACACS+ key on R1-HQ</h3>
+<pre translate="no"><code translate="no">configure terminal
+tacacs-server key WrongKey2026
+end</code></pre>
+<p>Try <code translate="no">netadmin</code>, then <code translate="no">admin</code>.</p>
+<details class="qa"><summary>What happens when the router and server don&#x27;t share a secret?</summary>
+<p><code translate="no">netadmin</code> <strong>fails</strong>. With different keys, neither side can read the other&#x27;s packets, so the router gets no usable reply. That counts as an ERROR, so the local <code translate="no">admin</code> account works again. One typo in the shared key breaks AAA for <strong>every</strong> user on that device. Restore <code translate="no">Tac!Key2026</code>.</p>
+</details>
+<h3 id="c4-wrong-client-ip-for-r2-br-on-the-server">C4: wrong client IP for R2-BR on the server</h3>
+<p>On AAA-SRV, change R2-BR&#x27;s client IP to <code translate="no">192.168.20.1</code>. Try <code translate="no">noc</code> on R2.</p>
+<details class="qa"><summary>Why does the server ignore R2 now?</summary>
+<p>R2&#x27;s requests arrive from <strong>10.0.12.2</strong>, an address the server has no client entry for. RADIUS servers <strong>silently discard</strong> requests from unknown clients (RFC 2865). <code translate="no">noc</code> fails, and because the router hears nothing back, <code translate="no">admin</code> falls back to local. The source IP is the <strong>exit interface toward the server</strong>. Restore <code translate="no">10.0.12.2</code>.</p>
+</details>
+<h3 id="c5-manage-r2-br-from-the-branch-pc">C5: manage R2-BR from the branch PC</h3>
+<p>From <strong>BR-PC</strong>:</p>
+<pre translate="no"><code translate="no">ssh -l admin 192.168.20.1
+telnet 192.168.20.1</code></pre>
+<figure class="post-figure fit"><a href="/assets/img/ccnp/labs/aaa-hardening-pt/s11-brpc-refused.webp" aria-label="Open full-size image: BR-PC: ssh -l admin 192.168.20.1 and telnet 192.168.20.1 both return Connection refused by remote host"><img src="/assets/img/ccnp/labs/aaa-hardening-pt/s11-brpc-refused.webp" width="347" height="88" alt="BR-PC: ssh -l admin 192.168.20.1 and telnet 192.168.20.1 both return Connection refused by remote host" loading="lazy" decoding="async"></a><figcaption>BR-PC: ssh -l admin 192.168.20.1 and telnet 192.168.20.1 both return Connection refused by remote host. Select the image to open it full size.</figcaption></figure>
+<details class="qa"><summary>Which two controls block these?</summary>
+<p>SSH is refused by the <strong>VTY access-class</strong>: 192.168.20.50 isn&#x27;t in <code translate="no">VTY-ADMIN</code>. Telnet is refused by <strong><code translate="no">transport input ssh</code></strong> and by the ACL. Two independent layers: management only from the management subnet, and only over an encrypted protocol. In production, management would sit on a dedicated out-of-band network.</p>
+</details>
+<h3 id="c6-trigger-login-throttling">C6: trigger login throttling</h3>
+<p>From ADMIN-PC, fail R1-HQ&#x27;s password <strong>3 times within 30 seconds</strong> (as many SSH attempts as you need). Then on R1-HQ&#x27;s console:</p>
+<pre translate="no"><code translate="no">show login</code></pre>
+<figure class="post-figure fit"><a href="/assets/img/ccnp/labs/aaa-hardening-pt/s12-quiet-mode.webp" aria-label="Open full-size image: R1-HQ show login: router enabled to watch for login attacks, more than 3 failures in 30 seconds disables logins for 60 seconds; router presently in Quiet-Mode for 49 more seconds, denying logins from all sources"><img src="/assets/img/ccnp/labs/aaa-hardening-pt/s12-quiet-mode.webp" width="536" height="178" alt="R1-HQ show login: router enabled to watch for login attacks, more than 3 failures in 30 seconds disables logins for 60 seconds; router presently in Quiet-Mode for 49 more seconds, denying logins from all sources" loading="lazy" decoding="async"></a><figcaption>R1-HQ show login: router enabled to watch for login attacks, more than 3 failures in 30 seconds disables logins for 60 seconds; router presently in Quiet-Mode for 49 more seconds, denying logins from all sources. Select the image to open it full size.</figcaption></figure>
+<details class="qa"><summary>What state is the router in, and for how long?</summary>
+<p><strong>Quiet-Mode</strong>: for <strong>60 seconds</strong> (49 left in the screenshot) the router is <strong>denying logins from all sources</strong>, even with correct credentials. That throttles password guessing to a crawl. The console is unaffected. Note the line <strong>No Quiet-Mode access list has been configured</strong>: on real IOS, <code translate="no">login quiet-mode access-class &lt;ACL&gt;</code> lets the NOC subnet still log in during quiet mode, so an attacker can&#x27;t use the throttle to lock administrators out.</p>
+</details>
+<h3 id="c7-break-ospf-watch-aaa-fail">C7: break OSPF, watch AAA fail</h3>
+<p>On R2-BR only, change the OSPF key:</p>
+<pre translate="no"><code translate="no">configure terminal
+interface GigabitEthernet0/0
+ ip ospf message-digest-key 1 md5 WrongOspf2026
+ end</code></pre>
+<p>Wait for the neighbor to drop, then try <code translate="no">noc</code> on R2-BR&#x27;s console.</p>
+<details class="qa"><summary>How did a routing fault change AAA?</summary>
+<p>The adjacency drops, R2 loses its route to 192.168.10.0/24, and <strong>RADIUS can&#x27;t reach AAA-SRV</strong>. <code translate="no">noc</code> fails; <code translate="no">admin</code> works through the local fallback. NTP and syslog from R2 stop too. Management depends on the control plane: when routing breaks, the local fallback account is the only way in. Restore the key and watch the neighbor return to FULL.</p>
+</details>
+<h2 id="how-this-maps-to-cis-style-hardening">How this maps to CIS-style hardening</h2>
+<p>The CIS benchmarks for Cisco IOS group recommendations by the three planes. This lab touches each one:</p>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Plane</th><th scope="col">What you configured</th></tr></thead><tbody><tr><td><strong>Management</strong></td><td><code translate="no">aaa new-model</code> with server-based login and local fallback, <code translate="no">enable secret</code>, minimum password length, <code translate="no">service password-encryption</code>, SSH v2 only (2048-bit key, time-out, retries), VTY <code translate="no">access-class</code>, <code translate="no">exec-timeout</code>, <code translate="no">login block-for</code>, banner, least-functionality servers</td></tr><tr><td><strong>Control</strong></td><td>Authenticated NTP, central syslog with timestamps, OSPF MD5 authentication, <code translate="no">passive-interface</code>, CDP off on the WAN</td></tr><tr><td><strong>Data / Layer 2</strong></td><td>Port security, PortFast and BPDU Guard, DTP disabled, unused ports parked and shut, VLAN 1 SVI shut</td></tr></tbody></table></div>
+<h2 id="the-same-configuration-on-real-ios-xe">The same configuration on real IOS XE</h2>
+<p>What changes when you build this on production gear:</p>
+<pre translate="no"><code translate="no">username admin privilege 15 algorithm-type scrypt secret &lt;strong-password&gt;
+aaa new-model
+!
+tacacs server ISE-1
+ address ipv4 192.168.10.10
+ key &lt;long-unique-key&gt;
+aaa group server tacacs+ ADMIN-TAC
+ server name ISE-1
+ ip tacacs source-interface Loopback0
+aaa authentication login SSH-TAC group ADMIN-TAC local
+aaa authorization exec SSH-TAC group ADMIN-TAC local
+aaa accounting commands 15 default start-stop group ADMIN-TAC
+!
+radius server ISE-1-RAD
+ address ipv4 192.168.10.10 auth-port 1812 acct-port 1813
+ key &lt;long-unique-key&gt;
+!
+login quiet-mode access-class VTY-ADMIN
+ntp authentication-key 1 hmac-sha2-256 &lt;ntp-key&gt;
+ntp server 192.168.10.20 key 1
+line vty 0 15
+ login authentication SSH-TAC
+ authorization exec SSH-TAC
+ transport input ssh
+ access-class VTY-ADMIN in</code></pre>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Packet Tracer</th><th scope="col">Real IOS XE</th></tr></thead><tbody><tr><td><code translate="no">tacacs-server host</code> / <code translate="no">key</code></td><td>Named <code translate="no">tacacs server</code> blocks in a server group</td></tr><tr><td>Router sources AAA from the exit interface</td><td><code translate="no">ip tacacs source-interface Loopback0</code>: one stable address, whatever the path</td></tr><tr><td>Users land at <code translate="no">&gt;</code> and use <code translate="no">enable</code></td><td><code translate="no">aaa authorization exec</code> returns privilege 15 from the server</td></tr><tr><td>No accounting</td><td><code translate="no">aaa accounting commands 15</code>: every privileged command logged</td></tr><tr><td>RADIUS on 1645</td><td>1812 / 1813</td></tr><tr><td>MD5 NTP</td><td><code translate="no">hmac-sha2-256</code></td></tr><tr><td><code translate="no">enable secret</code> (type 5)</td><td><code translate="no">algorithm-type scrypt</code> (type 9)</td></tr></tbody></table></div>
+<h2 id="check-yourself">Check yourself</h2>
+<details class="qa"><summary>1. Why must aaa new-model come before any aaa authentication line?</summary>
+<p><code translate="no">aaa new-model</code> turns on the AAA framework. Until it&#x27;s entered, the <code translate="no">aaa authentication</code> commands aren&#x27;t available. Once it is, every login path follows the method lists, so the local admin account must exist first.</p>
+</details>
+<details class="qa"><summary>2. The AAA server is up. Can the local admin account log in?</summary>
+<p>No. The server answers with a reject, a FAIL, and IOS doesn&#x27;t try the next method. Local is used only when the server can&#x27;t be reached (ERROR).</p>
+</details>
+<details class="qa"><summary>3. Why does the AAA server list R2-BR as 10.0.12.2?</summary>
+<p>R2 sends its AAA packets out of the interface toward the server, Gi0/0, so their source address is 10.0.12.2. The server identifies clients by source IP.</p>
+</details>
+<details class="qa"><summary>4. What did Simulation mode show about TACACS+?</summary>
+<p>It rides TCP, and the body of the packet is encrypted with the shared key. Only the router talks to the AAA server; the admin PC never does.</p>
+</details>
+<details class="qa"><summary>5. Why did R2&#x27;s syslog messages show a 1993 date?</summary>
+<p>They were sent before R2&#x27;s clock had synchronized with NTP, so they carried Packet Tracer&#x27;s default date. Logs are only useful once every device has trusted time.</p>
+</details>
+<details class="qa"><summary>6. How can a routing problem lock users out of a router?</summary>
+<p>R2-BR reaches the AAA server across the OSPF network. If routing fails, the server is unreachable, server-only users can&#x27;t log in, and only the local fallback account works.</p>
+</details>
+<h2 id="answer-configs">Answer configs</h2>
+<p>Try every part before opening these.</p>
+<details class="qa"><summary>Show the final R1-HQ config (TACACS+ client)</summary>
+<pre translate="no"><code translate="no">configure terminal
+security passwords min-length 10
+enable secret Lab!Enable2026
+service password-encryption
+username admin privilege 15 secret Lab!Admin2026
+ip domain-name lab.breakfixlearn.com
+crypto key generate rsa modulus 2048
+ip ssh version 2
+ip ssh time-out 60
+ip ssh authentication-retries 3
+login block-for 60 attempts 3 within 30
+banner motd #Authorized access only. All activity is logged.#
+ip access-list standard VTY-ADMIN
+ permit 192.168.10.0 0.0.0.255
+ exit
+aaa new-model
+tacacs-server host 192.168.10.10
+tacacs-server key Tac!Key2026
+aaa authentication login default group tacacs+ local
+aaa authentication login SSH-TAC group tacacs+ local
+line console 0
+ login authentication default
+ exec-timeout 5 0
+ logging synchronous
+ exit
+line vty 0 4
+ login authentication SSH-TAC
+ transport input ssh
+ exec-timeout 5 0
+ access-class VTY-ADMIN in
+ exit
+ntp authentication-key 1 md5 Ntp!Key2026
+ntp trusted-key 1
+ntp authenticate
+ntp server 192.168.10.20
+ntp update-calendar
+service timestamps log datetime msec
+logging host 192.168.10.20
+interface GigabitEthernet0/0
+ ip ospf authentication message-digest
+ ip ospf message-digest-key 1 md5 Ospf!Key2026
+ no cdp enable
+ exit
+router ospf 1
+ passive-interface GigabitEthernet0/1
+ end
+write memory</code></pre>
+</details>
+<details class="qa"><summary>Show the final R2-BR config (RADIUS client)</summary>
+<pre translate="no"><code translate="no">configure terminal
+security passwords min-length 10
+enable secret Lab!Enable2026
+service password-encryption
+username admin privilege 15 secret Lab!Admin2026
+ip domain-name lab.breakfixlearn.com
+crypto key generate rsa modulus 2048
+ip ssh version 2
+ip ssh time-out 60
+ip ssh authentication-retries 3
+login block-for 60 attempts 3 within 30
+banner motd #Authorized access only. All activity is logged.#
+ip access-list standard VTY-ADMIN
+ permit 192.168.10.0 0.0.0.255
+ exit
+aaa new-model
+radius-server host 192.168.10.10
+radius-server key Rad!Key2026
+aaa authentication login default group radius local
+aaa authentication login SSH-RAD group radius local
+line console 0
+ login authentication default
+ exec-timeout 5 0
+ logging synchronous
+ exit
+line vty 0 4
+ login authentication SSH-RAD
+ transport input ssh
+ exec-timeout 5 0
+ access-class VTY-ADMIN in
+ exit
+ntp authentication-key 1 md5 Ntp!Key2026
+ntp trusted-key 1
+ntp authenticate
+ntp server 192.168.10.20
+ntp update-calendar
+service timestamps log datetime msec
+logging host 192.168.10.20
+interface GigabitEthernet0/0
+ ip ospf authentication message-digest
+ ip ospf message-digest-key 1 md5 Ospf!Key2026
+ no cdp enable
+ exit
+router ospf 1
+ passive-interface GigabitEthernet0/1
+ end
+write memory</code></pre>
+</details>
+<details class="qa"><summary>Show the final S1-HQ config</summary>
+<pre translate="no"><code translate="no">configure terminal
+enable secret Lab!Enable2026
+service password-encryption
+username admin privilege 15 secret Lab!Admin2026
+ip domain-name lab.breakfixlearn.com
+crypto key generate rsa modulus 2048
+ip ssh version 2
+banner motd #Authorized access only. All activity is logged.#
+line console 0
+ login local
+ exec-timeout 5 0
+ logging synchronous
+ exit
+line vty 0 15
+ login local
+ transport input ssh
+ exec-timeout 5 0
+ exit
+vlan 999
+ name PARKING
+ exit
+interface GigabitEthernet0/1
+ description Uplink to R1-HQ
+ switchport mode access
+ switchport nonegotiate
+ exit
+interface range FastEthernet0/1 - 3
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security maximum 1
+ switchport port-security mac-address sticky
+ switchport port-security violation shutdown
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ no cdp enable
+ exit
+interface range FastEthernet0/4 - 24
+ switchport mode access
+ switchport access vlan 999
+ shutdown
+ exit
+interface GigabitEthernet0/2
+ switchport mode access
+ switchport access vlan 999
+ shutdown
+ exit
+interface vlan 1
+ shutdown
+ end
+write memory</code></pre>
+<p>S2-BR is the same with host port <strong>Fa0/1</strong>, unused ports <strong>Fa0/2 to 24</strong> and <strong>Gi0/2</strong>, and the uplink description <code translate="no">Uplink to R2-BR</code>.</p>
+</details>
+<details class="qa"><summary>Show the server settings</summary>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Server</th><th scope="col">Setting</th></tr></thead><tbody><tr><td>AAA-SRV</td><td>Every service Off except <strong>AAA</strong> (On). Clients <code translate="no">R1-HQ</code> 192.168.10.1 <code translate="no">Tac!Key2026</code> Tacacs, <code translate="no">R2-BR</code> 10.0.12.2 <code translate="no">Rad!Key2026</code> Radius. Users <code translate="no">netadmin</code> / <code translate="no">NetAdmin!2026</code>, <code translate="no">noc</code> / <code translate="no">NocUser!2026</code></td></tr><tr><td>MGMT-SRV</td><td>Every service Off except <strong>NTP</strong> (On, authentication Enable, key 1, <code translate="no">Ntp!Key2026</code>) and <strong>SYSLOG</strong> (On)</td></tr></tbody></table></div>
+</details>
+<h3 id="final-verification-checklist">Final verification checklist</h3>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">Check</th><th scope="col">Command or action</th><th scope="col">Expected</th></tr></thead><tbody><tr><td>TACACS+ login (R1)</td><td>ADMIN-PC: <code translate="no">ssh -l netadmin 192.168.10.1</code></td><td><code translate="no">R1-HQ&gt;</code></td></tr><tr><td>RADIUS login (R2)</td><td>ADMIN-PC: <code translate="no">ssh -l noc 10.0.12.2</code></td><td><code translate="no">R2-BR&gt;</code></td></tr><tr><td>Reject isn&#x27;t fallback</td><td>ADMIN-PC: <code translate="no">ssh -l admin 192.168.10.1</code> with the server up</td><td>Rejected</td></tr><tr><td>Fallback works</td><td>AAA service Off, then <code translate="no">ssh -l admin 192.168.10.1</code></td><td>Accepted (turn AAA back On)</td></tr><tr><td>VTY ACL</td><td>BR-PC: <code translate="no">ssh -l admin 192.168.20.1</code></td><td>Refused</td></tr><tr><td>SSH only</td><td><code translate="no">telnet 192.168.10.1</code></td><td>Refused</td></tr><tr><td>Login throttling</td><td>3 bad passwords in 30 s, then <code translate="no">show login</code></td><td>Quiet-Mode for 60 s</td></tr><tr><td>NTP</td><td><code translate="no">show ntp status</code></td><td>Synchronized, reference 192.168.10.20</td></tr><tr><td>Syslog</td><td><code translate="no">configure terminal</code> / <code translate="no">end</code>, then MGMT-SRV SYSLOG</td><td><code translate="no">%SYS-5-CONFIG_I</code> with the current date</td></tr><tr><td>OSPF authentication</td><td><code translate="no">show ip ospf interface Gi0/0</code>, <code translate="no">show ip ospf neighbor</code></td><td>Message digest enabled, FULL</td></tr><tr><td>SSH v2</td><td><code translate="no">show ip ssh</code></td><td><code translate="no">SSH Enabled - version 2.0</code></td></tr><tr><td>Switch ports</td><td><code translate="no">show port-security</code>, <code translate="no">show interfaces status</code></td><td>Host ports secured, unused ports disabled in VLAN 999</td></tr><tr><td>Servers</td><td>Each Services tab</td><td>Only the required services On</td></tr></tbody></table></div>
+<h2 id="exam-mapping">Exam mapping</h2>
+<div class="int-table-scroll"><table><thead><tr><th scope="col">You configured</th><th scope="col">Exam angle</th><th scope="col">SCOR v2.0</th></tr></thead><tbody><tr><td><code translate="no">aaa new-model</code>, default and named method lists</td><td>Method lists, order, where they apply</td><td>2.6</td></tr><tr><td>TACACS+ on R1, RADIUS on R2</td><td>TACACS+ vs. RADIUS: transport, encryption, use cases</td><td>2.6</td></tr><tr><td>Local fallback, C1 to C4, C7</td><td>ERROR vs. FAIL; troubleshooting AAA by layer</td><td>2.6</td></tr><tr><td>Client IP = exit interface</td><td>Device trust: source IP and shared key</td><td>2.6</td></tr><tr><td>SSH v2, ACLs, throttling, banners, passwords</td><td>CIS management-plane recommendations</td><td>2.5</td></tr><tr><td>NTP, syslog, OSPF MD5, Layer 2 controls</td><td>CIS control- and data-plane recommendations</td><td>2.5</td></tr></tbody></table></div>
+<p>Drill it with the <a href="/ccnp-security/flashcards#d2">flashcards</a> and the <a href="/ccnp-security/mock-exam#d2">mock exam</a>.</p>
+</div>
+      <footer class="post-end">
+        <section class="practice" aria-labelledby="practice-h">
+          <div><h2 id="practice-h" class="sub-h">Lock it in</h2>
+          <p>Lab done? Drill the commands and the attack-to-defense mapping until they're automatic.</p></div>
+          <p class="practice-links"><a class="btn btn-pri" href="/ccnp-security/flashcards#d2">flashcards <span class="p">d2</span></a><a class="btn btn-sec" href="/ccnp-security/mock-exam#d2">mock exam <span class="p">d2</span></a><a class="btn btn-sec" href="/ccnp-security/management-cis-benchmarks-aaa">notes</a></p>
+        </section>
+      </footer>
+    </div>
+    <aside class="toc" aria-label="On this page"><span class="toc-title"><span class="h">#</span> show ip route | toc</span><ol><li><a href="#what-you-ll-build">What you&#x27;ll build</a></li><li><a href="#packet-tracer-vs-real-ios">Packet Tracer vs. real IOS</a></li><li><a href="#topology">Topology</a></li><li><a href="#before-you-start-the-baseline-works">Before you start: the baseline works</a></li><li><a href="#part-1-baseline-device-hardening">Part 1: baseline device hardening</a></li><li><a href="#part-2-aaa-with-tacacs-and-radius">Part 2: AAA with TACACS+ and RADIUS</a></li><li><a href="#part-3-network-wide-minimum-security-both-routers">Part 3: network-wide minimum security (both routers)</a></li><li><a href="#part-4-break-and-fix">Part 4: break and fix</a></li><li><a href="#how-this-maps-to-cis-style-hardening">How this maps to CIS-style hardening</a></li><li><a href="#the-same-configuration-on-real-ios-xe">The same configuration on real IOS XE</a></li><li><a href="#check-yourself">Check yourself</a></li><li><a href="#answer-configs">Answer configs</a></li><li><a href="#exam-mapping">Exam mapping</a></li></ol></aside>
+  </div>
+</article>
+</main>
+<footer class="ftr">
+  <div class="wrap ftr-grid">
+    <div>
+      <a class="brand" href="/" aria-label="breakfixlearn home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="1.5" y="7" width="29" height="18" rx="3.5" fill="#0D274D" stroke="#049FD9" stroke-width="1.5"/><rect x="6" y="14" width="4" height="4" rx="0.8" fill="#6CC04A"/><rect x="12" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="18" y="14" width="4" height="4" rx="0.8" fill="#049FD9"/><rect x="24" y="14" width="3" height="4" rx="0.8" fill="#22497A"/><path d="M6 11h7" stroke="#00BCEB" stroke-width="1.2" stroke-linecap="round"/></svg><span translate="no"><span class="b1">breakfix</span><span class="b2">learn</span></span></a>
+      <p>Build it, break it, fix it, learn it. Network and security lab notes by Trey, written by hand in Vancouver, BC.</p>
+    </div>
+    <nav aria-label="Site">
+      <h2>site</h2>
+      <ul>
+        <li><a href="/projects">projects</a></li>
+        <li><a href="/blog">blog</a></li>
+        <li><a href="/cheat-sheets">cheat sheets</a></li>
+        <li><a href="/ccnp-security">ccnp security</a></li>
+        <li><a href="/ccnp-security/labs">ccnp labs</a></li>
+        <li><a href="/#about">about</a></li>
+        <li><a href="/privacy">privacy</a></li>
+        <li><a href="/feed.xml">rss feed</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Elsewhere">
+      <h2>elsewhere</h2>
+      <ul>
+        <li><a href="https://github.com/rachata072" rel="me noopener" target="_blank">github</a></li>
+        <li><a href="https://www.linkedin.com/in/treywcp/" rel="me noopener" target="_blank">linkedin</a></li>
+        <li><a href="mailto:treyrct858@gmail.com">email</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap"><div class="ftr-base">
+    <span>&copy; 2026 Trey &middot; built by hand &middot; no cookies &middot; no trackers</span>
+    <span><span class="ok" aria-hidden="true">&#9679;</span> last config change Oct 22, 2026 &middot; uptime: learning since 2024</span>
+  </div></div>
+</footer>
+</body>
+</html>

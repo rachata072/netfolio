@@ -543,6 +543,9 @@ AAA protects the management plane, so the AAA path itself has to be protected:
 | Single AAA server | One failure, total lockout or open fallback | Two or more servers in a group |
 | No accounting | Nobody can say who changed what | `aaa accounting exec` and `commands 15` sent to the server and a SIEM |
 | Over-trusted AAA server | A compromised server can grant level 15 everywhere | Harden and monitor the server; least-privilege command sets |
+| Unlimited password guessing | An attacker can try passwords at line speed | `login block-for 60 attempts 3 within 30` (quiet mode), plus `login quiet-mode access-class <ACL>` so the NOC can still log in |
+| Short local passwords | The break-glass account is the easiest way in when AAA is down | `security passwords min-length 10`, entered **before** the passwords, because it only checks passwords set after it |
+| Device source IP not registered on the server | The server won't answer a client it doesn't know (RADIUS servers **silently discard** the request), so the device sees a timeout, as if the server were down | Register the IP the device actually sends from (its exit interface, or a fixed loopback with `ip tacacs source-interface`) |
 
 ## AAA: exam traps
 
@@ -582,6 +585,9 @@ AAA protects the management plane, so the AAA path itself has to be protected:
 
 ---
 
-# Lab for this module
+# Labs for this module
 
-Put the AAA half into practice in the [AAA with TACACS+ lab](/ccnp-security/labs/aaa-tacacs-configure-troubleshoot): build TACACS+ login with a local fallback on a real IOS router, prove a server-only user can log in, then break it three ways (wrong key, wrong password, wrong server IP) and read each fault straight from `debug tacacs`.
+Two labs put the AAA half into practice, one in Packet Tracer and one on real IOS:
+
+1. [AAA and device hardening lab (Packet Tracer)](/ccnp-security/labs/aaa-device-hardening-packet-tracer): harden a two-site network to a CIS-style baseline, then move admin logins to a central server, TACACS+ on one router and RADIUS on the other, each with a local fallback. Downloadable `.pkt` and `.pka`.
+2. [AAA with TACACS+ lab (real IOS)](/ccnp-security/labs/aaa-tacacs-configure-troubleshoot): build TACACS+ login with a local fallback on a real IOS router, prove a server-only user can log in, then break it three ways (wrong key, wrong password, wrong server IP) and read each fault straight from `debug tacacs`.

@@ -1093,6 +1093,20 @@
    "ref": "management-cis-benchmarks-aaa#from-benchmark-to-fleet-harden-audit-monitor-drift"
   },
   {
+   "id": "c2.5-013",
+   "obj": "2.5",
+   "front": "`login block-for 60 attempts 3 within 30`?",
+   "back": "After **3 failed logins within 30 s**, the device enters **quiet mode** and refuses all remote logins for **60 s**. Add `login quiet-mode access-class <ACL>` so the NOC can still log in during an attack.",
+   "ref": "management-cis-benchmarks-aaa#hardening-the-aaa-path"
+  },
+  {
+   "id": "c2.5-014",
+   "obj": "2.5",
+   "front": "Why enter `security passwords min-length 10` before setting passwords?",
+   "back": "It only checks passwords set **after** it. Existing short passwords stay in the config until they're changed.",
+   "ref": "management-cis-benchmarks-aaa#hardening-the-aaa-path"
+  },
+  {
    "id": "c2.6-001",
    "obj": "2.6",
    "front": "Authentication, authorization, accounting in one line each?",
@@ -1245,6 +1259,20 @@
    "front": "802.1X fails and ISE Live Logs show nothing at all. First suspects?",
    "back": "The switch never reached ISE: server marked DEAD, routing or ACL blocking UDP 1812, or 802.1X not enabled (`dot1x system-auth-control`). Check `show aaa servers`.",
    "ref": "management-cis-benchmarks-aaa#troubleshooting-network-access-802-1x-and-mab"
+  },
+  {
+   "id": "c2.6-023",
+   "obj": "2.6",
+   "front": "Which source IP does a router use for AAA requests by default, and why does it matter?",
+   "back": "The IP of the **exit interface toward the server**. The server identifies clients by source IP, so that address (or a fixed loopback set with `ip tacacs source-interface`) must be the one registered on the server.",
+   "ref": "management-cis-benchmarks-aaa#hardening-the-aaa-path"
+  },
+  {
+   "id": "c2.6-024",
+   "obj": "2.6",
+   "front": "A RADIUS request arrives from an IP the server has no client entry for. What happens?",
+   "back": "The server **silently discards** it (RFC 2865). The device hears nothing, treats it as an **error**, and falls back to the next method, usually `local`.",
+   "ref": "management-cis-benchmarks-aaa#hardening-the-aaa-path"
   },
   {
    "id": "c2.7-001",

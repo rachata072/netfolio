@@ -1538,6 +1538,24 @@
    "ref": "management-cis-benchmarks-aaa#ftd-vs-ios-xe-where-the-hardening-lives"
   },
   {
+   "id": "q2.5-008",
+   "obj": "2.5",
+   "type": "multi",
+   "stem": "A router is configured with login block-for 60 attempts 3 within 30. Which two statements are true?",
+   "options": [
+    "After three failed logins within 30 seconds, the router refuses remote logins for 60 seconds",
+    "Only the source IP that failed is blocked",
+    "login quiet-mode access-class can let a management subnet log in during quiet mode",
+    "The console is locked for 60 seconds as well"
+   ],
+   "answer": [
+    0,
+    2
+   ],
+   "explanation": "Quiet mode blocks remote logins from every source, which is why an exception ACL for the NOC subnet is a good idea. The console isn't affected.",
+   "ref": "management-cis-benchmarks-aaa#hardening-the-aaa-path"
+  },
+  {
    "id": "q2.6-001",
    "obj": "2.6",
    "type": "multi",
@@ -1745,6 +1763,23 @@
    ],
    "explanation": "RADIUS uses UDP 1812 (and 1813 for accounting), hides only the password, and returns authentication and authorization together in one Access-Accept.",
    "ref": "management-cis-benchmarks-aaa#tacacs-vs-radius"
+  },
+  {
+   "id": "q2.6-013",
+   "obj": "2.6",
+   "type": "single",
+   "stem": "A branch router reaches its RADIUS server across a WAN link. The server's client entry for the router uses the router's LAN address. Server-only users can't log in, but the local fallback account works. What is the most likely cause?",
+   "options": [
+    "The RADIUS shared key contains a special character",
+    "The router sends requests from its WAN exit interface, so the server ignores them as coming from an unknown client",
+    "The server rejects every user because the method list is missing local",
+    "RADIUS can't cross a routed WAN link"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A router sources AAA packets from the interface that leads to the server. The server sees the WAN address, finds no client entry, and discards the request. No answer is an error, so the local method is tried. Register the real source IP, or fix it with a loopback and a source-interface command.",
+   "ref": "management-cis-benchmarks-aaa#hardening-the-aaa-path"
   },
   {
    "id": "q2.7-001",

@@ -48,7 +48,7 @@ Before you type, answer three questions about the router's management plane:
 
 # Where to run this lab
 
-This lab needs **real IOS behavior**: an actual TACACS+ exchange, real rejects, and `debug tacacs` output. Packet Tracer can configure basic AAA with its AAA server device, but it has no `debug tacacs`, so the troubleshooting half of the lab doesn't work there.
+This lab needs **real IOS behavior**: an actual TACACS+ exchange, real rejects, and `debug tacacs` output. Packet Tracer can configure basic AAA with its AAA server device, but it has no `debug tacacs`, so the troubleshooting half of the lab doesn't work there. No real IOS gear? The [AAA and device hardening lab](/ccnp-security/labs/aaa-device-hardening-packet-tracer) covers TACACS+ and RADIUS logins, local fallback and Simulation-mode packet views entirely in Packet Tracer.
 
 | Environment | How to set it up |
 |---|---|

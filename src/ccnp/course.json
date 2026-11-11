@@ -425,6 +425,36 @@
       ]
     },
     {
+      "slug": "aaa-device-hardening-packet-tracer",
+      "file": "aaa-hardening-pt.md",
+      "lecture": "management-cis-benchmarks-aaa",
+      "title": "AAA and Device Hardening Lab (Packet Tracer)",
+      "short": "AAA hardening lab",
+      "cta": "Harden two sites, log in with TACACS+ and RADIUS against one server, then break AAA seven ways",
+      "seo_title": "Free Packet Tracer Lab: TACACS+, RADIUS and Device Hardening (CCNP SCOR 2.6)",
+      "description": "Free CCNP Security Packet Tracer lab: TACACS+ and RADIUS logins with local fallback, SSH, NTP, syslog, OSPF MD5 and switch hardening, plus 7 AAA faults.",
+      "dek": "Take a working two-site network with zero security to a CIS-style baseline, move admin logins onto one AAA server over TACACS+ and RADIUS, watch the packets in Simulation mode, then break it seven ways and explain each result.",
+      "objectives": [
+        "2.6",
+        "2.5"
+      ],
+      "date": "2026-11-11",
+      "time": "2 to 3 hours",
+      "tool": "Packet Tracer 9.0+",
+      "downloads": [
+        {
+          "file": "aaa-hardening-baseline.pkt",
+          "label": "Baseline lab (.pkt)",
+          "note": "start here"
+        },
+        {
+          "file": "aaa-hardening-activity.pka",
+          "label": "Activity with instructions (.pka)",
+          "note": "ungraded"
+        }
+      ]
+    },
+    {
       "slug": "snmpv3-authpriv-lab",
       "file": "snmpv3.md",
       "short": "SNMPv3 lab",
