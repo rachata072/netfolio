@@ -1,6 +1,370 @@
 {
  "cards": [
   {
+   "id": "c1.1-001",
+   "obj": "1.1",
+   "front": "Threat vs. vulnerability vs. exploit?",
+   "back": "**Threat**: a potential danger (attacker, malware, disaster). **Vulnerability**: a weakness you can fix. **Exploit**: the method or code that uses the weakness.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-core-terms"
+  },
+  {
+   "id": "c1.1-002",
+   "obj": "1.1",
+   "front": "The six links of an attack chain?",
+   "back": "**Actor → vector → vulnerability → exploit → payload → impact** on C, I or A. Break any link and the attack fails.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#every-attack-is-a-chain"
+  },
+  {
+   "id": "c1.1-003",
+   "obj": "1.1",
+   "front": "Virus vs. worm vs. Trojan?",
+   "back": "**Virus**: needs a host file and a user. **Worm**: spreads by itself, no user. **Trojan**: disguised as legitimate software, doesn't replicate.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-four-classic-families"
+  },
+  {
+   "id": "c1.1-004",
+   "obj": "1.1",
+   "front": "What does a rootkit do, and the reliable fix?",
+   "back": "Hides deep in the OS, boot process or firmware for **stealth and persistence**. The reliable fix is a **reimage**; Secure Boot helps prevent it.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-four-classic-families"
+  },
+  {
+   "id": "c1.1-005",
+   "obj": "1.1",
+   "front": "Fileless malware?",
+   "back": "Runs **in memory** using built-in tools such as PowerShell and WMI (\"living off the land\"), leaving little on disk to scan.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#other-families-you-ll-meet-in-scenarios"
+  },
+  {
+   "id": "c1.1-006",
+   "obj": "1.1",
+   "front": "Why does DNS-layer security stop so much malware?",
+   "back": "Bots beacon to **C2 domains**. If the callback domain never resolves (Umbrella, Secure Access), the malware never gets its instructions.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#other-families-you-ll-meet-in-scenarios"
+  },
+  {
+   "id": "c1.1-007",
+   "obj": "1.1",
+   "front": "Malware vs. payload?",
+   "back": "Malware is the **vehicle**; the payload is the **mission** (encrypt, steal, create accounts, open C2).",
+   "ref": "attack-threats-vulnerabilities-cia-triad#vector-exploit-delivery-payload"
+  },
+  {
+   "id": "c1.1-008",
+   "obj": "1.1",
+   "front": "Retrospective security (Secure Endpoint)?",
+   "back": "When a file judged clean is later reclassified as malicious, Secure Endpoint flags every endpoint that has it and shows where it spread.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#defense-in-depth-against-malware-the-cisco-map"
+  },
+  {
+   "id": "c1.1-009",
+   "obj": "1.1",
+   "front": "DoS vs. DDoS: the defining difference?",
+   "back": "**DDoS comes from many distributed sources** (usually a botnet under C2), so blocking one IP doesn't work.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#dos-and-ddos"
+  },
+  {
+   "id": "c1.1-010",
+   "obj": "1.1",
+   "front": "What does a SYN flood exhaust?",
+   "back": "The server's **half-open (embryonic) connection backlog**, so real users' SYNs are dropped.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#syn-flood-and-reflection-side-by-side"
+  },
+  {
+   "id": "c1.1-011",
+   "obj": "1.1",
+   "front": "Four SYN flood defenses?",
+   "back": "**SYN cookies**, **TCP Intercept** (IOS), **embryonic connection limits** (FTD/ASA), **anti-spoofing** (uRPF / BCP 38).",
+   "ref": "attack-threats-vulnerabilities-cia-triad#dos-defenses"
+  },
+  {
+   "id": "c1.1-012",
+   "obj": "1.1",
+   "front": "Reflection and amplification: the three ingredients?",
+   "back": "**UDP** (no handshake), a **spoofed victim source address**, and **open reflectors** that send a bigger reply than the request.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#syn-flood-and-reflection-side-by-side"
+  },
+  {
+   "id": "c1.1-013",
+   "obj": "1.1",
+   "front": "Volumetric vs. protocol vs. application-layer DoS?",
+   "back": "**Volumetric** fills bandwidth (UDP floods, amplification). **Protocol** exhausts state tables (SYN flood). **Layer 7** exhausts the app (HTTP floods, Slowloris).",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-three-dos-categories"
+  },
+  {
+   "id": "c1.1-014",
+   "obj": "1.1",
+   "front": "Which feature stops ARP spoofing, and what does it depend on?",
+   "back": "**Dynamic ARP Inspection**, which checks ARP against the **DHCP snooping** binding table.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#other-ways-to-get-on-path-and-what-stops-each-one"
+  },
+  {
+   "id": "c1.1-015",
+   "obj": "1.1",
+   "front": "What stops SSL stripping, including on the first visit?",
+   "back": "**HSTS**, and the **HSTS preload list** for the very first visit.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#ssl-stripping"
+  },
+  {
+   "id": "c1.1-016",
+   "obj": "1.1",
+   "front": "Event vs. incident vs. breach?",
+   "back": "**Event**: anything observable. **Incident**: an event that violates policy or threatens CIA. **Breach**: an incident with confirmed unauthorized data access.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#data-breaches"
+  },
+  {
+   "id": "c1.1-017",
+   "obj": "1.1",
+   "front": "Password spraying vs. credential stuffing?",
+   "back": "**Spraying**: one common password tried across many accounts (dodges lockout). **Stuffing**: leaked username and password pairs from other breaches (exploits reuse).",
+   "ref": "attack-threats-vulnerabilities-cia-triad#four-password-attacks-you-must-not-mix-up"
+  },
+  {
+   "id": "c1.1-018",
+   "obj": "1.1",
+   "front": "How does AiTM phishing (Evilginx) beat push MFA?",
+   "back": "A reverse proxy relays the password and MFA approval, then **captures the session token** the real site issues. The attacker replays the token.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#token-theft-and-adversary-in-the-middle-phishing"
+  },
+  {
+   "id": "c1.1-019",
+   "obj": "1.1",
+   "front": "Why does FIDO2 / passkey MFA stop AiTM?",
+   "back": "The credential is **bound to the real site's origin**, so it can't be used through a lookalike proxy domain.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#defending-against-credential-theft"
+  },
+  {
+   "id": "c1.1-020",
+   "obj": "1.1",
+   "front": "What is a CRQC?",
+   "back": "A **cryptographically relevant quantum computer**: one able to break today's public-key crypto. PQC is the defense against it.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#what-the-threat-actually-is"
+  },
+  {
+   "id": "c1.1-021",
+   "obj": "1.1",
+   "front": "Shor's vs. Grover's algorithm?",
+   "back": "**Shor's breaks** asymmetric crypto (RSA, DH, ECC). **Grover's only weakens** symmetric crypto and hashes: use AES-256 and SHA-384+.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#why-quantum-computers-break-some-crypto-and-not-others"
+  },
+  {
+   "id": "c1.1-022",
+   "obj": "1.1",
+   "front": "Harvest now, decrypt later?",
+   "back": "Adversaries **record encrypted traffic today** and decrypt it once a quantum computer can break the key exchange. Long-lived secrets are already at risk.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#why-it-s-a-problem-today"
+  },
+  {
+   "id": "c1.1-023",
+   "obj": "1.1",
+   "front": "Mosca's rule?",
+   "back": "If **X** (years data must stay secret) + **Y** (years to migrate) > **Z** (years until a CRQC), you're already late.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#why-it-s-a-problem-today"
+  },
+  {
+   "id": "c1.1-024",
+   "obj": "1.1",
+   "front": "ML-KEM, ML-DSA, SLH-DSA?",
+   "back": "**ML-KEM** (FIPS 203): key encapsulation. **ML-DSA** (FIPS 204): signatures. **SLH-DSA** (FIPS 205): hash-based backup signatures.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-nist-standards"
+  },
+  {
+   "id": "c1.1-025",
+   "obj": "1.1",
+   "front": "Hybrid key exchange?",
+   "back": "A **classical and a post-quantum** key exchange combined (for example X25519 + ML-KEM-768), so the session is safe if **either** holds.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#what-migration-looks-like"
+  },
+  {
+   "id": "c1.1-026",
+   "obj": "1.1",
+   "front": "PQC vs. QKD?",
+   "back": "**PQC**: new math algorithms in software on existing networks. **QKD**: physics-based key distribution needing dedicated hardware.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#what-migration-looks-like"
+  },
+  {
+   "id": "c1.1-027",
+   "obj": "1.1",
+   "front": "Data poisoning vs. evasion?",
+   "back": "**Poisoning** corrupts training data (training time). **Evasion** feeds a perturbed input to a running model (inference time).",
+   "ref": "attack-threats-vulnerabilities-cia-triad#attacks-on-machine-learning-models"
+  },
+  {
+   "id": "c1.1-028",
+   "obj": "1.1",
+   "front": "Model inversion vs. model stealing?",
+   "back": "**Inversion** rebuilds private **training data** from outputs. **Stealing / extraction** clones the **model** by querying it.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#attacks-on-machine-learning-models"
+  },
+  {
+   "id": "c1.1-029",
+   "obj": "1.1",
+   "front": "AI backdoor (trojan)?",
+   "back": "Hidden behavior **planted during training** that fires only on the attacker's **secret trigger** at inference.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#attacks-on-machine-learning-models"
+  },
+  {
+   "id": "c1.1-030",
+   "obj": "1.1",
+   "front": "Threats by environment: the rule?",
+   "back": "**Threats follow where the service lives.** SQL injection hits the database wherever it runs; the on-prem and cloud lists are tendencies.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#threats-by-environment-on-premises-cloud-hybrid"
+  },
+  {
+   "id": "c1.1-031",
+   "obj": "1.1",
+   "front": "Why do breaches, APIs and stolen credentials cluster under cloud?",
+   "back": "The **shared responsibility model**: the customer still owns identity, data and configuration, which is where most cloud incidents happen.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#threats-by-environment-on-premises-cloud-hybrid"
+  },
+  {
+   "id": "c1.1-032",
+   "obj": "1.1",
+   "front": "CIA and DAD?",
+   "back": "Confidentiality ↔ **Disclosure**. Integrity ↔ **Alteration**. Availability ↔ **Destruction / denial**.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#dad-and-the-balance"
+  },
+  {
+   "id": "c1.1-033",
+   "obj": "1.1",
+   "front": "Hash vs. HMAC vs. digital signature?",
+   "back": "**Hash**: integrity. **HMAC**: integrity + authenticity (shared key). **Signature**: integrity + authenticity + **non-repudiation** (private key).",
+   "ref": "attack-threats-vulnerabilities-cia-triad#integrity-keep-it-trustworthy"
+  },
+  {
+   "id": "c1.1-034",
+   "obj": "1.1",
+   "front": "RTO vs. RPO?",
+   "back": "**RTO**: how fast you must be back up. **RPO**: how much data, measured in time, you can afford to lose.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#availability-keep-it-reachable"
+  },
+  {
+   "id": "c1.2-001",
+   "obj": "1.2",
+   "front": "CVE vs. CVSS?",
+   "back": "**CVE** identifies one specific vulnerability. **CVSS** scores its severity from 0.0 to 10.0 (Critical is 9.0 to 10.0).",
+   "ref": "attack-threats-vulnerabilities-cia-triad#identifying-vulnerabilities-cve-and-cvss"
+  },
+  {
+   "id": "c1.2-002",
+   "obj": "1.2",
+   "front": "Why isn't the CVSS score enough to prioritize?",
+   "back": "Severity isn't risk. Add **known exploitation (CISA KEV)**, **exploit likelihood (EPSS)** and the asset's **exposure and value**.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#prioritizing-severity-isn-t-the-same-as-risk"
+  },
+  {
+   "id": "c1.2-003",
+   "obj": "1.2",
+   "front": "Buffer overflow: what happens, and the mitigations?",
+   "back": "Input overruns a buffer and overwrites memory such as a return address: **code execution or a crash**. Bounds checking fixes it; **ASLR, DEP/NX** and stack canaries mitigate.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-vulnerability-classes-in-the-blueprint"
+  },
+  {
+   "id": "c1.2-004",
+   "obj": "1.2",
+   "front": "Path traversal?",
+   "back": "User input such as `../../etc/passwd` escapes the intended folder. Fix: **canonicalize** the path and allow-list file names.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-vulnerability-classes-in-the-blueprint"
+  },
+  {
+   "id": "c1.2-005",
+   "obj": "1.2",
+   "front": "XSS vs. CSRF?",
+   "back": "**XSS**: the site serves the attacker's **script** to the victim's browser. **CSRF**: the victim's browser sends a **forged request** the site trusts because of the cookie.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-vulnerability-classes-in-the-blueprint"
+  },
+  {
+   "id": "c1.2-006",
+   "obj": "1.2",
+   "front": "Fixes for SQLi, XSS and CSRF?",
+   "back": "SQLi: **parameterized queries**. XSS: **output encoding** + CSP. CSRF: **anti-CSRF tokens** + **SameSite** cookies.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-vulnerability-classes-in-the-blueprint"
+  },
+  {
+   "id": "c1.2-007",
+   "obj": "1.2",
+   "front": "What counts as missing encryption ciphers?",
+   "back": "Cleartext protocols (Telnet, HTTP, SNMPv1/v2c) and weak ciphers (DES, 3DES, RC4, MD5, old SSL/TLS).",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-vulnerability-classes-in-the-blueprint"
+  },
+  {
+   "id": "c1.2-008",
+   "obj": "1.2",
+   "front": "OWASP Top 10 (2025) number one?",
+   "back": "**A01 Broken Access Control**: users act outside their permissions.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-owasp-top-10"
+  },
+  {
+   "id": "c1.2-009",
+   "obj": "1.2",
+   "front": "BOLA (API1)?",
+   "back": "**Broken Object Level Authorization**: the API checks you're logged in but not that the object is yours (change the ID, read another user's record). Also called IDOR.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-owasp-api-security-top-10"
+  },
+  {
+   "id": "c1.2-010",
+   "obj": "1.2",
+   "front": "Excessive data exposure: which API risk, and where do you fix it?",
+   "back": "**API3** (broken object property level authorization). Fix it **on the server** by returning only the fields the client needs.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-owasp-api-security-top-10"
+  },
+  {
+   "id": "c1.2-011",
+   "obj": "1.2",
+   "front": "Shadow vs. zombie APIs?",
+   "back": "**Shadow**: undocumented endpoints. **Zombie**: old versions still running. Both are **API9, improper inventory management**.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-owasp-api-security-top-10"
+  },
+  {
+   "id": "c1.2-012",
+   "obj": "1.2",
+   "front": "API key vs. OAuth 2.0 token?",
+   "back": "An **API key** identifies an **application** and is long-lived. An **OAuth 2.0 access token** is **scoped and short-lived**.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#authentication-and-authorization-for-apis"
+  },
+  {
+   "id": "c1.3-001",
+   "obj": "1.3",
+   "front": "Direct vs. indirect prompt injection?",
+   "back": "**Direct**: the attacker types the instructions. **Indirect**: instructions are **hidden in content the model reads** (a web page, email, retrieved document).",
+   "ref": "attack-threats-vulnerabilities-cia-triad#prompt-injection"
+  },
+  {
+   "id": "c1.3-002",
+   "obj": "1.3",
+   "front": "System prompt leakage: the real fix?",
+   "back": "Assume the prompt **will** leak: keep **secrets and permission checks out of it** and enforce them in the application and data layer.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#system-prompt-leakage"
+  },
+  {
+   "id": "c1.3-003",
+   "obj": "1.3",
+   "front": "Vector and embedding weaknesses?",
+   "back": "RAG pipeline flaws: **poisoned documents**, retrieval that **ignores user permissions**, cross-tenant leakage, embedding inversion.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#vector-and-embedding-weaknesses"
+  },
+  {
+   "id": "c1.3-004",
+   "obj": "1.3",
+   "front": "LLM supply chain risks?",
+   "back": "Malicious or backdoored **models, datasets, adapters and plugins**; pickle files that run code on load. Use trusted registries, signing and safe formats.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#ai-supply-chain"
+  },
+  {
+   "id": "c1.3-005",
+   "obj": "1.3",
+   "front": "Excessive agency (LLM06)?",
+   "back": "An LLM agent with **more tools, permissions or autonomy** than it needs. Fix: least privilege and **human approval** for sensitive actions.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-rest-of-the-owasp-top-10-for-llm-applications"
+  },
+  {
+   "id": "c1.3-006",
+   "obj": "1.3",
+   "front": "The one fact behind most LLM vulnerabilities?",
+   "back": "**An LLM can't reliably tell instructions from data.** Treat input and output as untrusted; enforce security outside the model.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#vulnerabilities-in-llm-applications"
+  },
+  {
    "id": "c2.1-001",
    "obj": "2.1",
    "front": "What is the one deciding question for whether a security device can block traffic?",

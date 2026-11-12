@@ -1,6 +1,474 @@
 {
  "questions": [
   {
+   "id": "q1.1-001",
+   "obj": "1.1",
+   "type": "single",
+   "stem": "Malware spreads to hundreds of hosts overnight. No user opened a file or clicked a link, and every infected host was missing the same SMB patch. Which type of malware is this?",
+   "options": [
+    "Virus",
+    "Trojan",
+    "Worm",
+    "Rootkit"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "A worm is standalone and spreads by itself by exploiting a network service, with no user interaction. A virus needs a host file and a user; a Trojan needs the user to install it; a rootkit hides rather than spreads.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-four-classic-families",
+   "sample": true
+  },
+  {
+   "id": "q1.1-002",
+   "obj": "1.1",
+   "type": "single",
+   "stem": "A hard-coded administrator password is found in an IoT camera's firmware. How is it classified?",
+   "options": [
+    "A threat",
+    "A vulnerability",
+    "An exploit",
+    "A payload"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A weakness in the product is a vulnerability. The botnet operator would be the threat actor, and a script that logs in with the password would be the exploit.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-core-terms"
+  },
+  {
+   "id": "q1.1-003",
+   "obj": "1.1",
+   "type": "multi",
+   "stem": "A web server can't accept new connections, and netstat shows thousands of half-open connections from random source IPs. Which two controls directly mitigate this attack?",
+   "options": [
+    "SYN cookies",
+    "HSTS",
+    "TCP Intercept",
+    "Dynamic ARP Inspection",
+    "DNSSEC"
+   ],
+   "answer": [
+    0,
+    2
+   ],
+   "explanation": "This is a SYN flood. SYN cookies stop the server reserving state for half-open connections, and TCP Intercept completes the handshake on the server's behalf. HSTS, DAI and DNSSEC address other attacks.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#dos-defenses"
+  },
+  {
+   "id": "q1.1-004",
+   "obj": "1.1",
+   "type": "single",
+   "stem": "Which set of conditions describes a reflection and amplification attack?",
+   "options": [
+    "TCP, the attacker's real source address, and a botnet",
+    "UDP, a spoofed victim source address, and open reflectors that send larger replies",
+    "ICMP, a forged ARP reply, and a rogue default gateway",
+    "HTTP, slow headers, and many open connections"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Amplification relies on UDP's lack of a handshake, the victim's address spoofed as the source, and reflectors such as DNS, NTP or memcached that answer with much more data than they received.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#syn-flood-and-reflection-side-by-side"
+  },
+  {
+   "id": "q1.1-005",
+   "obj": "1.1",
+   "type": "single",
+   "stem": "Which statement about DDoS is true?",
+   "options": [
+    "It always uses TCP",
+    "It comes from many distributed sources, often a botnet",
+    "Blocking the attacker's IP address stops it",
+    "It mainly targets confidentiality"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The defining feature of DDoS is many distributed sources under command and control. UDP amplification is common, blocking one IP doesn't help, and it targets availability.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#dos-and-ddos"
+  },
+  {
+   "id": "q1.1-006",
+   "obj": "1.1",
+   "type": "single",
+   "stem": "A user on public Wi-Fi logs in to a bank that uses HTTPS, yet an attacker on the same network captures the password in cleartext. Which server-side control best prevents this?",
+   "options": [
+    "A stronger TLS certificate",
+    "HSTS with the site on the preload list",
+    "SYN cookies",
+    "Port security on the access switch"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "This is SSL stripping: the attacker keeps the victim on plain HTTP. HSTS tells browsers to use only HTTPS, and the preload list protects even the first visit. A certificate alone doesn't help if the victim is never upgraded.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#ssl-stripping"
+  },
+  {
+   "id": "q1.1-007",
+   "obj": "1.1",
+   "type": "single",
+   "stem": "An attacker tries the password Winter2026! once against each of 5,000 accounts. Which attack is this?",
+   "options": [
+    "Brute force",
+    "Credential stuffing",
+    "Password spraying",
+    "Dictionary attack against one account"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "Password spraying tries one common password across many accounts, staying under each account's lockout threshold. Credential stuffing uses leaked username and password pairs.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#four-password-attacks-you-must-not-mix-up"
+  },
+  {
+   "id": "q1.1-008",
+   "obj": "1.1",
+   "type": "single",
+   "stem": "Users have push MFA, but an attacker logs in as a user after the user approved a push on a lookalike login page that relayed everything to the real site. Which control would have prevented the session from being stolen?",
+   "options": [
+    "Longer passwords",
+    "SMS one-time codes",
+    "FIDO2 / WebAuthn passkeys",
+    "Password expiry every 30 days"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "This is adversary-in-the-middle phishing: the proxy relays the password and the push, then captures the session token. FIDO2 credentials are bound to the real site's origin, so they can't be used through the proxy. SMS codes can be relayed just like pushes.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#defending-against-credential-theft",
+   "sample": true
+  },
+  {
+   "id": "q1.1-009",
+   "obj": "1.1",
+   "type": "single",
+   "stem": "Which algorithm would allow a quantum computer to break RSA and elliptic-curve cryptography?",
+   "options": [
+    "Grover's algorithm",
+    "Shor's algorithm",
+    "AES-256",
+    "SHA-384"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Shor's algorithm solves factoring and discrete logarithms, breaking RSA, Diffie-Hellman and ECC. Grover's algorithm only weakens symmetric crypto and hashes.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#why-quantum-computers-break-some-crypto-and-not-others"
+  },
+  {
+   "id": "q1.1-010",
+   "obj": "1.1",
+   "type": "single",
+   "stem": "Why is encrypted traffic captured today a post-quantum risk even though no quantum computer can break it yet?",
+   "options": [
+    "Quantum computers can already break AES-256",
+    "The traffic can be stored now and decrypted later once the key exchange can be broken",
+    "TLS 1.3 uses no key exchange",
+    "Captured traffic expires after 30 days"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Harvest now, decrypt later: an adversary keeps the ciphertext and breaks the classical key exchange when a cryptographically relevant quantum computer exists. Long-lived secrets are already exposed.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#why-it-s-a-problem-today"
+  },
+  {
+   "id": "q1.1-011",
+   "obj": "1.1",
+   "type": "single",
+   "stem": "Which NIST post-quantum standard is used for key encapsulation (agreeing on a shared key)?",
+   "options": [
+    "ML-DSA (FIPS 204)",
+    "SLH-DSA (FIPS 205)",
+    "ML-KEM (FIPS 203)",
+    "SHA-3"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "ML-KEM, from CRYSTALS-Kyber, is the key encapsulation standard. ML-DSA and SLH-DSA are digital signature standards.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-nist-standards"
+  },
+  {
+   "id": "q1.1-012",
+   "obj": "1.1",
+   "type": "single",
+   "stem": "An attacker compromises the training pipeline of an endpoint-protection model and teaches it that one malware family is benign. What is this attack?",
+   "options": [
+    "Model inversion",
+    "Targeted data poisoning",
+    "Evasion with an adversarial example",
+    "Model extraction"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Corrupting training data to bias one specific decision is targeted data poisoning, a training-time attack. Inversion, evasion and extraction all happen against a running model.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#attacks-on-machine-learning-models"
+  },
+  {
+   "id": "q1.1-013",
+   "obj": "1.1",
+   "type": "single",
+   "stem": "An attacker repeatedly queries a deployed model and reconstructs private records it was trained on. What is this attack?",
+   "options": [
+    "Model stealing",
+    "Membership inference only",
+    "Model inversion",
+    "Data poisoning"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "Model inversion uses a model's outputs to rebuild training data. Model stealing clones the model itself; membership inference only decides whether a given record was in the training set.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#attacks-on-machine-learning-models"
+  },
+  {
+   "id": "q1.1-014",
+   "obj": "1.1",
+   "type": "single",
+   "stem": "A company's database runs in a public cloud and is hit by SQL injection. How should this threat be classified?",
+   "options": [
+    "On-premises, because SQL injection is an on-premises threat",
+    "Cloud, because threats follow where the service lives",
+    "Hybrid, because SQL is used everywhere",
+    "Neither, because SQL injection is a vulnerability"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Threats follow where the targeted service resides. The usual on-premises and cloud lists are tendencies, not rules.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#threats-by-environment-on-premises-cloud-hybrid"
+  },
+  {
+   "id": "q1.1-015",
+   "obj": "1.1",
+   "type": "single",
+   "stem": "Which mechanism provides integrity, authenticity and non-repudiation?",
+   "options": [
+    "A SHA-256 checksum",
+    "An HMAC",
+    "A digital signature",
+    "AES-256 encryption"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "A digital signature uses the sender's private key, so it proves the data is unchanged, who produced it, and that they can't deny it. An HMAC uses a shared key, so either party could have produced it. A bare hash gives integrity only.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#integrity-keep-it-trustworthy"
+  },
+  {
+   "id": "q1.1-016",
+   "obj": "1.1",
+   "type": "single",
+   "stem": "Ransomware encrypts a hospital's file servers. Which CIA property is primarily lost?",
+   "options": [
+    "Confidentiality",
+    "Integrity",
+    "Availability",
+    "Non-repudiation"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "Ransomware makes data unusable, so availability is the primary loss. Double-extortion variants also steal data first, adding a confidentiality loss.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#availability-keep-it-reachable"
+  },
+  {
+   "id": "q1.2-001",
+   "obj": "1.2",
+   "type": "single",
+   "stem": "Which pairing of identifier and severity score is correct?",
+   "options": [
+    "CVSS identifies a flaw; CVE scores it",
+    "CVE identifies a flaw; CVSS scores its severity",
+    "CWE scores a flaw; CVE ranks exploits",
+    "EPSS identifies a flaw; KEV scores it"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A CVE ID such as CVE-2021-44228 names one specific vulnerability. CVSS gives it a 0.0 to 10.0 severity score.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#identifying-vulnerabilities-cve-and-cvss"
+  },
+  {
+   "id": "q1.2-002",
+   "obj": "1.2",
+   "type": "single",
+   "stem": "A scanner reports a CVSS 9.8 flaw on an isolated lab server and a CVSS 7.5 flaw on the internet-facing VPN that appears in the CISA Known Exploited Vulnerabilities catalog. What should be patched first?",
+   "options": [
+    "The lab server, because its CVSS score is higher",
+    "The VPN, because it is exposed and actively exploited",
+    "Both at the next quarterly window",
+    "Neither until EPSS reaches 100%"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Severity isn't risk. Known exploitation and internet exposure make the VPN the priority even with a lower base score.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#prioritizing-severity-isn-t-the-same-as-risk"
+  },
+  {
+   "id": "q1.2-003",
+   "obj": "1.2",
+   "type": "single",
+   "stem": "A logged-in user visits a forum page that contains a hidden form posting to their bank, and the bank changes the account's email address. Which vulnerability did the bank have?",
+   "options": [
+    "Stored XSS",
+    "Cross-site request forgery",
+    "SQL injection",
+    "Path traversal"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The victim's browser sent a forged request and the bank trusted it because the session cookie came along. Anti-CSRF tokens and SameSite cookies prevent it.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-vulnerability-classes-in-the-blueprint"
+  },
+  {
+   "id": "q1.2-004",
+   "obj": "1.2",
+   "type": "multi",
+   "stem": "Which two controls mitigate the exploitation of buffer overflow vulnerabilities?",
+   "options": [
+    "ASLR",
+    "HSTS",
+    "DEP / NX",
+    "SameSite cookies",
+    "DHCP snooping"
+   ],
+   "answer": [
+    0,
+    2
+   ],
+   "explanation": "ASLR randomizes memory layout and DEP/NX stops data memory from executing, making overflow exploits much harder. Bounds checking and patching remove the bug itself.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-vulnerability-classes-in-the-blueprint"
+  },
+  {
+   "id": "q1.2-005",
+   "obj": "1.2",
+   "type": "single",
+   "stem": "A request for /download?file=../../../../etc/passwd returns the server's password file. Which vulnerability is this?",
+   "options": [
+    "Cross-site scripting",
+    "Path traversal",
+    "Buffer overflow",
+    "Broken function level authorization"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Path traversal uses ../ sequences to escape the intended directory. Fix it by canonicalizing paths and allow-listing file names.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-vulnerability-classes-in-the-blueprint"
+  },
+  {
+   "id": "q1.2-006",
+   "obj": "1.2",
+   "type": "single",
+   "stem": "Changing /api/invoices/5001 to /api/invoices/5002 returns another customer's invoice to an authenticated user. Which OWASP API Security risk is this?",
+   "options": [
+    "API2 Broken Authentication",
+    "API1 Broken Object Level Authorization",
+    "API4 Unrestricted Resource Consumption",
+    "API9 Improper Inventory Management"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The user is authenticated, but the API never checks that the invoice belongs to them. That's BOLA, also called IDOR, and it's fixed with a per-object authorization check.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-owasp-api-security-top-10"
+  },
+  {
+   "id": "q1.2-007",
+   "obj": "1.2",
+   "type": "single",
+   "stem": "An API response includes ssn and internalNotes fields that the mobile app never displays. Where must this be fixed?",
+   "options": [
+    "In the mobile app, by hiding the fields",
+    "On the server, by returning only the fields the client needs",
+    "In the WAF, by blocking GET requests",
+    "In DNS, by blocking the API domain"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "This is excessive data exposure (API3). Attackers read the raw response, so hiding fields in the app does nothing; the server must filter them.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#the-owasp-api-security-top-10"
+  },
+  {
+   "id": "q1.3-001",
+   "obj": "1.3",
+   "type": "single",
+   "stem": "An AI email assistant summarizes a user's inbox. One email contains hidden text telling it to forward invoices to an outside address, and it does. Which vulnerability is this?",
+   "options": [
+    "Direct prompt injection",
+    "Indirect prompt injection",
+    "Model inversion",
+    "Data poisoning"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The instructions were hidden in content the model read, not typed by the attacker into the chat, so this is indirect prompt injection. Its impact came from excessive agency: the assistant could send email without approval.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#prompt-injection",
+   "sample": true
+  },
+  {
+   "id": "q1.3-002",
+   "obj": "1.3",
+   "type": "single",
+   "stem": "A chatbot's system prompt contains a database password and the rule \"only show salary data to HR users\". What is the correct fix?",
+   "options": [
+    "Tell the model more firmly never to reveal its instructions",
+    "Remove the secret from the prompt and enforce the HR rule in the application and data layer",
+    "Encrypt the system prompt with AES-256",
+    "Use a larger model"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Assume the system prompt will leak (LLM07). Secrets must not be in it, and authorization must be enforced outside the model.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#system-prompt-leakage"
+  },
+  {
+   "id": "q1.3-003",
+   "obj": "1.3",
+   "type": "single",
+   "stem": "An internal RAG assistant quotes from a compensation file that the asking employee has no permission to open. Which weakness is this?",
+   "options": [
+    "Unbounded consumption",
+    "Vector and embedding weaknesses: retrieval ignores document permissions",
+    "Model extraction",
+    "Improper output handling"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The retrieval step must enforce the user's own permissions, or the model will quote any chunk it retrieves. This falls under LLM08, vector and embedding weaknesses.",
+   "ref": "attack-threats-vulnerabilities-cia-triad#vector-and-embedding-weaknesses"
+  },
+  {
+   "id": "q1.3-004",
+   "obj": "1.3",
+   "type": "multi",
+   "stem": "Which two practices reduce AI supply chain risk?",
+   "options": [
+    "Loading models from trusted, signed sources",
+    "Storing the system prompt in the vector database",
+    "Preferring safe model formats such as safetensors over pickle",
+    "Raising the model's temperature",
+    "Disabling HSTS"
+   ],
+   "answer": [
+    0,
+    2
+   ],
+   "explanation": "Signed models from trusted registries and safe file formats that can't run code on load reduce supply chain risk (LLM03).",
+   "ref": "attack-threats-vulnerabilities-cia-triad#ai-supply-chain"
+  },
+  {
    "id": "q2.1-001",
    "obj": "2.1",
    "type": "single",
