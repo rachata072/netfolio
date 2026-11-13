@@ -291,7 +291,7 @@
     1
    ],
    "explanation": "A CVE ID such as CVE-2021-44228 names one specific vulnerability. CVSS gives it a 0.0 to 10.0 severity score.",
-   "ref": "attack-threats-vulnerabilities-cia-triad#identifying-vulnerabilities-cve-and-cvss"
+   "ref": "security-vulnerabilities-exploits#four-naming-and-scoring-systems"
   },
   {
    "id": "q1.2-002",
@@ -308,7 +308,7 @@
     1
    ],
    "explanation": "Severity isn't risk. Known exploitation and internet exposure make the VPN the priority even with a lower base score.",
-   "ref": "attack-threats-vulnerabilities-cia-triad#prioritizing-severity-isn-t-the-same-as-risk"
+   "ref": "security-vulnerabilities-exploits#prioritizing-severity-isn-t-risk"
   },
   {
    "id": "q1.2-003",
@@ -325,7 +325,7 @@
     1
    ],
    "explanation": "The victim's browser sent a forged request and the bank trusted it because the session cookie came along. Anti-CSRF tokens and SameSite cookies prevent it.",
-   "ref": "attack-threats-vulnerabilities-cia-triad#the-vulnerability-classes-in-the-blueprint"
+   "ref": "security-vulnerabilities-exploits#cross-site-request-forgery-csrf"
   },
   {
    "id": "q1.2-004",
@@ -344,7 +344,7 @@
     2
    ],
    "explanation": "ASLR randomizes memory layout and DEP/NX stops data memory from executing, making overflow exploits much harder. Bounds checking and patching remove the bug itself.",
-   "ref": "attack-threats-vulnerabilities-cia-triad#the-vulnerability-classes-in-the-blueprint"
+   "ref": "security-vulnerabilities-exploits#buffer-overflow"
   },
   {
    "id": "q1.2-005",
@@ -361,7 +361,7 @@
     1
    ],
    "explanation": "Path traversal uses ../ sequences to escape the intended directory. Fix it by canonicalizing paths and allow-listing file names.",
-   "ref": "attack-threats-vulnerabilities-cia-triad#the-vulnerability-classes-in-the-blueprint"
+   "ref": "security-vulnerabilities-exploits#path-traversal"
   },
   {
    "id": "q1.2-006",
@@ -398,6 +398,232 @@
    "ref": "attack-threats-vulnerabilities-cia-triad#the-owasp-api-security-top-10"
   },
   {
+   "id": "q1.2-008",
+   "obj": "1.2",
+   "type": "single",
+   "stem": "A vendor discloses a hard-coded SSH credential in a firewall's firmware. The fixed release ships next week. What is the best action now?",
+   "options": [
+    "Change the hard-coded password from the CLI",
+    "Restrict SSH and HTTPS management access to the management network with an ACL",
+    "Disable logging on the firewall",
+    "Increase the SSH key size to 4096 bits"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A hard-coded credential can't be changed or disabled without the vendor fix. Removing the path to it, by keeping management interfaces off untrusted networks, is the mitigation you can apply immediately.",
+   "ref": "security-vulnerabilities-exploits#weak-and-hard-coded-passwords"
+  },
+  {
+   "id": "q1.2-009",
+   "obj": "1.2",
+   "type": "single",
+   "stem": "Which pairing describes CWE and CVE correctly?",
+   "options": [
+    "CWE scores a flaw; CVE ranks exploits",
+    "CWE is a weakness type; CVE is one specific flaw in one product",
+    "CWE is a web risk list; CVE is a severity score",
+    "They are two names for the same identifier"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "CWE catalogs root-cause weakness types such as CWE-89 SQL injection. A CVE identifies a single vulnerability in a specific product, which is an instance of some CWE.",
+   "ref": "security-vulnerabilities-exploits#four-naming-and-scoring-systems",
+   "sample": true
+  },
+  {
+   "id": "q1.2-010",
+   "obj": "1.2",
+   "type": "single",
+   "stem": "Which control fixes a stack buffer overflow rather than only mitigating it?",
+   "options": [
+    "ASLR",
+    "A stack canary",
+    "Bounds checking on the copy",
+    "DEP / NX"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "Bounds checking stops the copy at the buffer size, so the overflow can't happen. ASLR, canaries and DEP/NX make exploitation harder but leave the bug in place.",
+   "ref": "security-vulnerabilities-exploits#defenses-from-fix-to-mitigation"
+  },
+  {
+   "id": "q1.2-011",
+   "obj": "1.2",
+   "type": "single",
+   "stem": "An attacker exploits a path traversal flaw and retrieves /etc/passwd from a Linux web server. What have they most likely obtained?",
+   "options": [
+    "Every user's password hash",
+    "A list of accounts, user IDs, home directories and shells",
+    "The server's private TLS key",
+    "Root access to the server"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "On modern Linux, /etc/passwd is world-readable and holds account details only. Password hashes are in /etc/shadow, which a web process normally can't read. It's reconnaissance, not a credential dump.",
+   "ref": "security-vulnerabilities-exploits#path-traversal"
+  },
+  {
+   "id": "q1.2-012",
+   "obj": "1.2",
+   "type": "single",
+   "stem": "A filter blocks the string ../ but an attacker succeeds with ..%2f..%2f. What is the most robust fix?",
+   "options": [
+    "Add %2f to the blocklist",
+    "Allow-list expected file names and verify the canonical path stays inside the base folder",
+    "Rename the download folder",
+    "Switch the site to HTTP/2"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Blocklists miss encodings. Allow-listing plus canonicalizing the final path and checking it's inside the intended directory defeats every encoding trick.",
+   "ref": "security-vulnerabilities-exploits#path-traversal"
+  },
+  {
+   "id": "q1.2-013",
+   "obj": "1.2",
+   "type": "single",
+   "stem": "A forum post containing a script runs in the browser of every user who opens the thread. Which XSS type is this?",
+   "options": [
+    "Reflected",
+    "DOM-based",
+    "Stored",
+    "Blind"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "The payload is saved on the server and served to everyone who views the page, which is stored (persistent) XSS.",
+   "ref": "security-vulnerabilities-exploits#cross-site-scripting-xss"
+  },
+  {
+   "id": "q1.2-014",
+   "obj": "1.2",
+   "type": "multi",
+   "stem": "Which two controls most directly reduce the impact of cross-site scripting?",
+   "options": [
+    "Context-aware output encoding",
+    "Content Security Policy",
+    "Anti-CSRF tokens",
+    "Parameterized SQL queries",
+    "Larger RSA keys"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "Output encoding stops user content running as script, and a strict CSP stops the browser running unapproved scripts. CSRF tokens and parameterized queries address different flaws.",
+   "ref": "security-vulnerabilities-exploits#cross-site-scripting-xss"
+  },
+  {
+   "id": "q1.2-015",
+   "obj": "1.2",
+   "type": "single",
+   "stem": "Typing ' OR 1=1 -- into a login form's username field logs the attacker in. What does the -- do?",
+   "options": [
+    "It ends the SQL statement with an error",
+    "It comments out the rest of the query, including the password check",
+    "It encrypts the password field",
+    "It starts a second query"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The quote closes the username string, OR 1=1 is always true, and -- turns the remainder of the query into a comment so the password condition is never evaluated.",
+   "ref": "security-vulnerabilities-exploits#sql-injection"
+  },
+  {
+   "id": "q1.2-016",
+   "obj": "1.2",
+   "type": "single",
+   "stem": "A web page shows no query results or errors, but the attacker extracts data by watching whether responses take five seconds longer. What is this?",
+   "options": [
+    "Reflected XSS",
+    "Time-based blind SQL injection",
+    "CSRF",
+    "Path traversal"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Blind SQL injection infers answers from page behavior; the time-based variant uses deliberate delays to signal true or false.",
+   "ref": "security-vulnerabilities-exploits#sql-injection"
+  },
+  {
+   "id": "q1.2-017",
+   "obj": "1.2",
+   "type": "single",
+   "stem": "A vendor released a patch three months ago, and attackers are now exploiting unpatched systems. What is this called?",
+   "options": [
+    "A zero-day",
+    "An n-day",
+    "A logic bomb",
+    "A false positive"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A known and patched flaw that's still exploited on systems without the patch is an n-day. Most breaches use n-days rather than zero-days.",
+   "ref": "security-vulnerabilities-exploits#zero-days-and-the-life-of-a-vulnerability"
+  },
+  {
+   "id": "q1.2-018",
+   "obj": "1.2",
+   "type": "multi",
+   "stem": "A zero-day is being exploited and no patch exists. Which two measures still help?",
+   "options": [
+    "Behavior-based detection on endpoints and the network",
+    "Waiting for the CVE to receive a CVSS score",
+    "Virtual patching with an IPS or WAF rule",
+    "Disabling all logging to save resources",
+    "Sorting the vulnerability list by CVE number"
+   ],
+   "answer": [
+    0,
+    2
+   ],
+   "explanation": "Without a patch or signature, behavior-based detection and virtual patching (plus attack-surface reduction and segmentation) reduce the chance and impact of exploitation.",
+   "ref": "security-vulnerabilities-exploits#zero-days-and-the-life-of-a-vulnerability"
+  },
+  {
+   "id": "q1.2-019",
+   "obj": "1.2",
+   "type": "single",
+   "stem": "Which change happened between the OWASP Top 10 2021 and 2025 lists?",
+   "options": [
+    "Injection became number one",
+    "Server-side request forgery was merged into Broken Access Control",
+    "Cryptographic Failures was removed",
+    "XSS became its own category again"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "In 2025, SSRF moved into A01 Broken Access Control, Software Supply Chain Failures became A03, and Mishandling of Exceptional Conditions is the new A10. Broken Access Control is still number one, and XSS stays under Injection.",
+   "ref": "security-vulnerabilities-exploits#the-owasp-top-10"
+  },
+  {
+   "id": "q1.2-020",
+   "obj": "1.2",
+   "type": "single",
+   "stem": "A VPN appliance that has never been upgraded only offers DES and 3DES. Which OWASP 2025 category and fix apply?",
+   "options": [
+    "A05 Injection; parameterized queries",
+    "A04 Cryptographic Failures; upgrade the software to get AES and disable the weak ciphers",
+    "A07 Authentication Failures; enable MFA",
+    "A09 Logging failures; send logs to syslog"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Missing or weak ciphers are cryptographic failures. DES is broken and 3DES deprecated; the fix is upgrading to software that supports AES and removing the weak options.",
+   "ref": "security-vulnerabilities-exploits#missing-or-weak-encryption"
+  },
+  {
    "id": "q1.3-001",
    "obj": "1.3",
    "type": "single",
@@ -412,7 +638,7 @@
     1
    ],
    "explanation": "The instructions were hidden in content the model read, not typed by the attacker into the chat, so this is indirect prompt injection. Its impact came from excessive agency: the assistant could send email without approval.",
-   "ref": "attack-threats-vulnerabilities-cia-triad#prompt-injection",
+   "ref": "security-vulnerabilities-exploits#prompt-injection",
    "sample": true
   },
   {
@@ -430,7 +656,7 @@
     1
    ],
    "explanation": "Assume the system prompt will leak (LLM07). Secrets must not be in it, and authorization must be enforced outside the model.",
-   "ref": "attack-threats-vulnerabilities-cia-triad#system-prompt-leakage"
+   "ref": "security-vulnerabilities-exploits#system-prompt-leakage"
   },
   {
    "id": "q1.3-003",
@@ -447,7 +673,7 @@
     1
    ],
    "explanation": "The retrieval step must enforce the user's own permissions, or the model will quote any chunk it retrieves. This falls under LLM08, vector and embedding weaknesses.",
-   "ref": "attack-threats-vulnerabilities-cia-triad#vector-and-embedding-weaknesses"
+   "ref": "security-vulnerabilities-exploits#vector-and-embedding-weaknesses"
   },
   {
    "id": "q1.3-004",
@@ -466,7 +692,58 @@
     2
    ],
    "explanation": "Signed models from trusted registries and safe file formats that can't run code on load reduce supply chain risk (LLM03).",
-   "ref": "attack-threats-vulnerabilities-cia-triad#ai-supply-chain"
+   "ref": "security-vulnerabilities-exploits#ai-supply-chain"
+  },
+  {
+   "id": "q1.3-005",
+   "obj": "1.3",
+   "type": "single",
+   "stem": "A support chatbot's answers are inserted into the web page without encoding, and an attacker gets the model to output a script tag that runs in users' browsers. Which OWASP LLM risk is this?",
+   "options": [
+    "LLM03 Supply Chain",
+    "LLM05 Improper Output Handling",
+    "LLM07 System Prompt Leakage",
+    "LLM10 Unbounded Consumption"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Model output was trusted and passed to the browser unchecked, turning a prompt injection into XSS. Treat model output like user input and encode it.",
+   "ref": "security-vulnerabilities-exploits#the-owasp-top-10-for-llm-applications"
+  },
+  {
+   "id": "q1.3-006",
+   "obj": "1.3",
+   "type": "single",
+   "stem": "A team downloads a model file in Python pickle format from a public hub. What is the specific risk of loading it?",
+   "options": [
+    "It may use too much GPU memory",
+    "Loading it can execute arbitrary code",
+    "It can't be used for RAG",
+    "It disables TLS on the server"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Pickle files can run code when deserialized. Prefer safe formats such as safetensors, verify provenance and scan models before loading them.",
+   "ref": "security-vulnerabilities-exploits#ai-supply-chain"
+  },
+  {
+   "id": "q1.3-007",
+   "obj": "1.3",
+   "type": "single",
+   "stem": "Which statement best defines an embedding?",
+   "options": [
+    "An encrypted copy of a document",
+    "A vector produced by a model so that content with similar meaning sits close together",
+    "The system prompt stored inside the model",
+    "A firewall rule for AI traffic"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "An embedding is the numeric vector a model assigns to content, placed so that similar meanings are near each other. Vector databases store and search them.",
+   "ref": "security-vulnerabilities-exploits#vector-and-embedding-weaknesses"
   },
   {
    "id": "q2.1-001",

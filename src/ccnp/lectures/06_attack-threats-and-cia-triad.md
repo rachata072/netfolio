@@ -1,12 +1,10 @@
-# Attack Threats, Vulnerabilities & the CIA Triad
+# Attack Threats & the CIA Triad
 
 > **CCNP Security · SCOR 350-701 v2.0 · Domain 1.0 Security Concepts**
 >
 > **1.1** Explain attack threats against on-premises, hybrid, and cloud environments such as viruses, trojans, DoS/DDoS, phishing, rootkits, man-in-the-middle, malware, data breaches, insecure APIs, compromised credentials, PQC, and AI
 >
-> **1.2** Describe security vulnerabilities and exploits such as software bugs, weak and/or hardcoded passwords, OWASP top ten, missing encryption ciphers, buffer overflow, path traversal, cross-site scripting/forgery, SQL injection, and identification and prioritization using CVEs and CVSS scores
->
-> **1.3** Describe vulnerabilities in AI/LLM models such as prompt injection, system prompt leakage, vector and embedding weaknesses, and supply chain
+> The weaknesses these attacks use (topics **1.2** and **1.3**) are in [Security Vulnerabilities & Exploits](/ccnp-security/security-vulnerabilities-exploits).
 
 ---
 
@@ -324,83 +322,14 @@ Every breach is an incident; not every incident is a breach.
 
 # Vulnerabilities and exploits
 
-Topic 1.2 asks you to recognize the common **classes** of vulnerability, the exploit that goes with each, and how vulnerabilities are **identified and prioritized**. For each class, learn three things: what the mistake is, what the attacker sends, and what fixes it.
+Every attack above needs a **vulnerability** to work on, and topic 1.2 has its own page: [Security Vulnerabilities & Exploits](/ccnp-security/security-vulnerabilities-exploits). It covers software bugs, weak and hard-coded passwords, missing encryption, the OWASP Top 10, buffer overflow, path traversal, XSS, CSRF, SQL injection, zero-days, and how CVE and CVSS are used to identify and prioritize. The short version of the vocabulary:
 
-## The vulnerability classes in the blueprint
-
-| Class | The mistake | What the attacker sends | Fix |
-|---|---|---|---|
-| **Software bug** | Any coding error with a security effect | Whatever triggers it | Secure development, testing, **patching** |
-| **Weak or hard-coded password** | Default, guessable or built-in credentials | A login with the known password | Unique strong passwords, no shipped defaults, MFA, secrets vaults |
-| **Missing or weak encryption ciphers** | Cleartext protocols or outdated ciphers | Nothing: they just read or alter the traffic | TLS 1.2/1.3, AES-GCM, SHA-2; turn off Telnet, HTTP, SNMPv1/v2c, DES, 3DES, RC4, MD5 |
-| **Buffer overflow** | Writing more data into a memory buffer than it holds | Over-long input that overwrites nearby memory, such as a return address | Bounds checking, memory-safe languages, **ASLR**, **DEP/NX**, stack canaries, patching |
-| **Path traversal** | Building a file path from user input | `../../../etc/passwd` | Canonicalize the path, allow-list file names, run with least privilege |
-| **SQL injection** | Building a query from user input | `' OR '1'='1` in a login field | **Parameterized queries**, input validation, least-privilege DB account |
-| **Cross-site scripting (XSS)** | Echoing user input into a page without encoding | `<script>` stored in a profile or reflected in a link | **Output encoding**, input validation, **Content Security Policy** |
-| **Cross-site request forgery (CSRF)** | Trusting a request just because the browser sent the session cookie | A hidden form on another site that submits "change my email" while the victim is logged in | **Anti-CSRF tokens**, **SameSite** cookies, re-authentication for sensitive actions |
-
-How to keep XSS and CSRF apart, since the names are so close:
-
-- **XSS** runs the **attacker's script in the victim's browser**. The site is tricked into **serving** malicious code.
-- **CSRF** makes the **victim's browser send a request** the victim didn't intend. The site is tricked into **trusting** a request just because the cookie came with it. No script has to run on the target site.
-
-> **A Cisco example of path traversal:** `CVE-2020-3452` let an unauthenticated attacker read files from the web services interface of Cisco ASA and FTD by sending crafted `../` sequences. It's a reminder that security appliances are software too, and their own management and VPN interfaces need patching.
-
-**Buffer overflow, made concrete.** A function reserves 64 bytes on the stack for a username and copies the input in without checking its length. Send 200 bytes and the extra bytes overwrite whatever sits next to the buffer, including the **return address** that tells the CPU where to go when the function ends. Point it at the attacker's code and you have **remote code execution**; get it wrong and you have a crash, which is a **DoS**. ASLR (random memory layout) and DEP/NX (data memory can't execute) make the exploit much harder; bounds checking removes the bug.
-
-## The OWASP Top 10
-
-The **OWASP Top 10** is the industry's awareness list of the most critical **web application** risks. SCOR names it directly. The current edition is **2025**:
-
-| ID | Risk | What it means |
-|---|---|---|
-| A01 | **Broken Access Control** | Users can act outside their permissions, such as reading another user's records |
-| A02 | **Security Misconfiguration** | Default settings, verbose errors, open cloud storage, unneeded features left on |
-| A03 | **Software Supply Chain Failures** | Compromised or vulnerable dependencies, build systems and update channels |
-| A04 | **Cryptographic Failures** | Missing or weak encryption of sensitive data |
-| A05 | **Injection** | SQL, OS command and other injection, including XSS |
-| A06 | **Insecure Design** | Security flaws in the design itself, which perfect code can't fix |
-| A07 | **Authentication Failures** | Weak login, session and credential handling |
-| A08 | **Software or Data Integrity Failures** | Trusting updates, data or code without checking their integrity |
-| A09 | **Security Logging & Alerting Failures** | Attacks happen and nobody notices |
-| A10 | **Mishandling of Exceptional Conditions** | Errors and edge cases that fail open or leak information |
-
-You don't need the numbers. You do need to recognize the categories in a scenario: "a user changed the ID in the URL and saw another customer's order" is **broken access control**; "the login query was built by string concatenation" is **injection**. The 2021 edition is still widely quoted; its main differences are that XSS was already folded into injection there, and supply chain sat inside "Vulnerable and Outdated Components".
-
-## Identifying vulnerabilities: CVE and CVSS
-
-| | CVE | CVSS |
-|---|---|---|
-| What it is | A public **identifier** for one specific vulnerability | A **severity score** from 0.0 to 10.0 |
-| Example | `CVE-2021-44228` (Log4Shell) | **10.0 Critical** |
-| Run by | The CVE Program (MITRE, with CVE Numbering Authorities such as Cisco PSIRT) | FIRST (the current version is **CVSS v4.0**) |
-| Answers | "**Which** flaw are we talking about?" | "**How bad** is it?" |
-
-CVSS severity ratings: **None** 0.0 · **Low** 0.1 to 3.9 · **Medium** 4.0 to 6.9 · **High** 7.0 to 8.9 · **Critical** 9.0 to 10.0.
-
-The **base score** describes the flaw itself: how it's reached (network or local), how complex the attack is, whether privileges or user interaction are needed, and the impact on confidentiality, integrity and availability. CVSS also has **threat** and **environmental** metrics that adjust the score for whether the flaw is being exploited and how important the affected system is to **you**.
-
-## Prioritizing: severity isn't the same as risk
-
-Most organizations have thousands of open CVEs and can't patch them all this week. A critical score on an isolated lab server matters less than a high score on your internet-facing VPN. Good prioritization combines several signals:
-
-| Signal | Question it answers |
+| Term | What it is |
 |---|---|
-| **CVSS base score** | How bad could it be? |
-| **CISA KEV catalog** (Known Exploited Vulnerabilities) | Is anyone **actually exploiting** it right now? |
-| **EPSS** (Exploit Prediction Scoring System, from FIRST) | How **likely** is exploitation in the next 30 days? |
-| **Asset exposure and value** | Is the system internet-facing? What data or service does it hold? |
-| **Vendor advisory** (for example, a Cisco PSIRT Security Advisory) | Which releases are affected and fixed, and is there a workaround? |
-
-A sensible order: **known-exploited on exposed systems first**, then high-likelihood and high-severity on exposed or critical systems, then the rest on a normal patch cycle. If you can't patch, **mitigate**: an ACL, an IPS rule, turning off the vulnerable feature, or segmentation.
-
-**Exam traps**
-
-- **CVE identifies; CVSS scores.** Don't swap them.
-- **XSS** runs script in the victim's browser; **CSRF** sends a forged request from it.
-- **Parameterized queries** fix SQL injection; **output encoding** fixes XSS; **tokens and SameSite cookies** fix CSRF.
-- **Buffer overflow** can mean code execution **or** a crash (DoS). ASLR and DEP/NX are mitigations, not fixes.
-- **Severity isn't priority.** Known exploitation and exposure decide what gets patched first.
+| **CWE** | A **type** of weakness, such as CWE-89 SQL injection |
+| **CVE** | **One specific vulnerability** in one product, such as `CVE-2017-0144` |
+| **CVSS** | Its **severity score**, 0.0 to 10.0 |
+| **Zero-day** | A vulnerability exploited before a patch exists |
 
 ---
 
@@ -638,7 +567,7 @@ On Cisco gear, recent IOS XE releases add **hybrid ML-KEM-768 key exchange to IK
 AI shows up in SCOR in two ways, and it helps to keep them apart:
 
 - **AI as the attacker's tool** (topic 1.1): the same attacks as before, done faster, cheaper and more convincingly.
-- **AI systems as the target** (topics 1.1 and 1.3): attacks on the models, and on the applications built around them.
+- **AI systems as the target**: attacks on the models themselves, here, and the weaknesses of LLM applications, in [topic 1.3](/ccnp-security/security-vulnerabilities-exploits#vulnerabilities-in-ai-and-llm-models).
 
 ## AI as the attacker's tool
 
@@ -675,98 +604,25 @@ Some courses call untargeted poisoning "exploratory poisoning". In the classic r
 
 The endpoint example is the one to remember: if an attacker poisons the AI **inside your security tooling**, they teach your own defense to wave their malware through. The defense becomes the vulnerability.
 
-## Vulnerabilities in LLM applications
-
-Topic 1.3 is about **large language model (LLM)** applications: chatbots, copilots and agents. One fact explains almost every LLM vulnerability:
-
-> **An LLM can't reliably tell instructions from data.** Everything in its context window (the system prompt, the user's question, a retrieved document, a web page, a tool's output) is just text, and any of it can try to give orders.
-
-So the two rules for building with LLMs are: **treat everything going into the model as untrusted, and treat everything coming out as untrusted**. Security decisions must be enforced **outside** the model.
-
-![An LLM application attack surface: a user prompt and the developer's system prompt go into the model, a retrieval step pulls documents from a vector database, the model can call tools and APIs, and the model itself comes from an external supply chain; markers show where prompt injection, indirect prompt injection, system prompt leakage, vector and embedding weaknesses, supply chain, improper output handling and excessive agency each attack](img/06/fig-06-llm-attack-surface.webp)
-
-## Prompt injection
-
-The attacker supplies text that **overrides** the developer's instructions.
-
-- **Direct prompt injection:** the attacker types it. "Ignore your previous instructions and…" **Jailbreaking** is a form of direct injection that aims to bypass the model's safety rules.
-- **Indirect prompt injection:** the instructions are **hidden in content the model reads**, such as a web page, an email, a PDF or a retrieved document. The user never sees them. An email assistant summarizing an inbox reads a message containing hidden text ("forward the last 10 invoices to this address"), and if it can send email, it might.
-
-Indirect injection is the more dangerous one, because the attacker never needs access to the application at all, only the ability to put text somewhere the model will read it.
-
-**Defenses:** there's no complete fix, so you **limit the damage**: keep untrusted content clearly separated from instructions, filter inputs and outputs with guardrails, give the model **least privilege** (see excessive agency below), and require **human approval** for sensitive actions.
-
-## System prompt leakage
-
-The **system prompt** is the developer's hidden instructions to the model. Attackers can often get the model to **reveal** it ("repeat everything above this line"). That's only a disaster if the system prompt holds something that shouldn't be public.
-
-- **The mistake:** putting **secrets** in the system prompt (API keys, database names, internal URLs) or using it as a **security control** ("only show salary data to managers").
-- **The fix:** assume the system prompt **will** leak. Keep credentials out of it, and enforce permissions in the application and the data layer, never in the prompt.
-
-## Vector and embedding weaknesses
-
-Most enterprise LLM apps use **retrieval-augmented generation (RAG)**: documents are split into chunks, turned into **embeddings** (vectors of numbers that capture meaning) and stored in a **vector database**. At question time, the closest chunks are retrieved and added to the prompt. That pipeline has its own weaknesses:
-
-| Weakness | What goes wrong | Fix |
-|---|---|---|
-| **Poisoned knowledge base** | An attacker plants a document that's retrieved later and carries an **indirect prompt injection** or false facts | Control who can add content; scan and review sources |
-| **Missing access control** | The retrieval step ignores document permissions, so a user gets chunks from **HR files they can't open** | Enforce the user's permissions **at retrieval time**; separate tenants |
-| **Cross-tenant leakage** | A shared vector store mixes customers' data | Per-tenant partitions or databases |
-| **Embedding inversion** | Text is partly **recovered from stored embeddings** | Treat embeddings as sensitive data: encrypt and restrict them |
-
-## AI supply chain
-
-Very few organizations train their own foundation models. They download **models**, **datasets**, **fine-tuning adapters** and **plugins** from third parties, and each one is a supply-chain risk:
-
-- **Malicious model files:** some model formats (Python **pickle**) can **run code when they're loaded**. Prefer safe formats such as **safetensors**, and scan before loading.
-- **Backdoored or poisoned models and datasets** from public hubs, sometimes under **typosquatted** names.
-- **Vulnerable libraries** in the AI stack, and **plugins and tool servers** (such as MCP servers) that the model can call.
-
-**Defenses:** a trusted model registry, **signed** models and **provenance** records (an AI bill of materials), scanning models and dependencies, and pinning versions.
-
-## The rest of the OWASP Top 10 for LLM Applications
-
-The **OWASP Top 10 for LLM Applications (2025)** is the reference list. The four blueprint items are in it, alongside six more you should recognize:
-
-| ID | Risk | In one line |
-|---|---|---|
-| **LLM01** | **Prompt Injection** | Input that overrides the developer's instructions, directly or hidden in content |
-| LLM02 | Sensitive Information Disclosure | The model reveals personal data, secrets or confidential training data |
-| **LLM03** | **Supply Chain** | Compromised models, datasets, adapters and plugins |
-| LLM04 | Data and Model Poisoning | Manipulated training or fine-tuning data, or planted backdoors |
-| LLM05 | Improper Output Handling | The app passes model output to a browser, shell or database **unchecked**, so you get XSS, injection or code execution |
-| LLM06 | Excessive Agency | The model can **act** (send email, run code, change records) with more permissions or autonomy than it needs |
-| **LLM07** | **System Prompt Leakage** | Hidden instructions are revealed; damage depends on what was in them |
-| **LLM08** | **Vector and Embedding Weaknesses** | RAG pipelines that leak data or can be poisoned |
-| LLM09 | Misinformation | Confident, wrong output (hallucination) that people act on |
-| LLM10 | Unbounded Consumption | No limits on usage, so cost blow-ups, denial of service or model extraction |
-
-**Excessive agency** is what turns prompt injection from embarrassing into dangerous. A chatbot that can only answer questions leaks text; an **agent** that can send email, call APIs and change records can be steered into **doing** things. Give agents the fewest tools and the narrowest permissions possible, and require a human to approve anything destructive or irreversible.
-
-## Defending AI systems
+## Defending against attacks on models
 
 | Control | Protects against |
 |---|---|
-| **Data provenance and validation** for training and RAG content | Poisoning, poisoned knowledge bases |
-| **Model supply-chain controls**: trusted registries, signing, scanning, safe formats | Malicious and backdoored models |
-| **Guardrails on input and output** | Prompt injection, data leakage, harmful output |
-| **Authorization outside the model**, enforced at retrieval and at every tool call | Prompt-based privilege escalation, RAG data leakage |
-| **Least privilege and human approval for agents** | Excessive agency |
-| **Rate limits and monitoring** | Extraction, inversion, unbounded consumption |
-| **Red teaming** before release | All of the above, found before attackers find them |
+| **Data provenance and validation** for training data | Poisoning |
+| **Model supply-chain controls**: trusted registries, signed models, scanning | Backdoored models |
+| **Adversarial training** and robustness testing | Evasion |
+| **Rate limits, output filtering and monitoring** | Inversion, membership inference, extraction |
+| **AI red teaming** before release | All of the above |
 
-**Cisco's answer is Cisco AI Defense.** It discovers the AI applications, models and agents in use (**AI inventory**), tests models with automated **AI red teaming** before they go live, applies **runtime guardrails** to prompts and responses, scans models and tool servers for **supply-chain risk**, and controls what agents may do. Cisco Secure Access adds controls on which public AI services employees may use and what data they may send to them (AI guardrails are topic 4.4).
+## LLM applications
 
-**Frameworks the exam may name:** the **OWASP Top 10 for LLM Applications**, **MITRE ATLAS** (the ATT&CK-style knowledge base of attacks on AI systems) and the **NIST AI Risk Management Framework (AI RMF)**.
+**Large language model (LLM)** applications, such as chatbots, copilots and agents, add their own weaknesses: **prompt injection**, **system prompt leakage**, **vector and embedding weaknesses** in retrieval systems, and the **AI supply chain**. They're topic 1.3, covered with the OWASP Top 10 for LLM Applications in [vulnerabilities in AI and LLM models](/ccnp-security/security-vulnerabilities-exploits#vulnerabilities-in-ai-and-llm-models). Cisco's product for both kinds of AI risk is **Cisco AI Defense**.
 
 **Exam traps**
 
 - **Poisoning happens at training time.** **Evasion, inversion, membership inference and extraction** happen at inference time. A **backdoor** is planted in training and **triggered** at inference.
 - **Model inversion** targets the **training data**; **model stealing** targets the **model**.
-- **Indirect prompt injection** hides instructions in content the model reads; the attacker never talks to the model directly.
-- **The system prompt isn't a security boundary.** Assume it leaks; keep secrets and permission checks out of it.
-- **RAG must enforce the user's own permissions at retrieval**, or the model will happily quote documents the user can't open.
-- **Excessive agency** is too many tools or permissions; the fix is least privilege plus human approval.
+- **Targeted** poisoning biases one decision; **untargeted** poisoning wrecks overall accuracy.
 
 ---
 
@@ -904,10 +760,6 @@ Two more facts:
 | On-path (MITM) | Attacker in the traffic flow | **Confidentiality + integrity** | Encryption, DAI, DHCP snooping |
 | SSL stripping | HTTPS downgraded to HTTP | Confidentiality | **HSTS** + preload |
 | Data breach | Unauthorized data access | **Confidentiality** | MFA, DLP, encryption, least privilege |
-| SQL injection | Input becomes query code | Integrity + confidentiality | Parameterized queries, validation, WAF |
-| XSS / CSRF | Script in, or forged request from, the victim's browser | Confidentiality, integrity | Output encoding, CSP / anti-CSRF tokens, SameSite |
-| Buffer overflow | Input overruns memory | All three | Bounds checks, ASLR, DEP/NX, patching |
-| Path traversal | `../` escapes the intended folder | Confidentiality | Canonicalize paths, allow-list |
 | BOLA / IDOR | Another user's object | Confidentiality | Per-object authorization |
 | Excessive data exposure | API returns too many fields | Confidentiality | Server-side field filtering |
 | Password spraying / stuffing | One password × many users / leaked pairs | Confidentiality | MFA, unique passwords, breached-password checks |
@@ -916,10 +768,6 @@ Two more facts:
 | Data poisoning | Corrupted training data | Integrity (+ availability) | Data provenance and validation |
 | Evasion | Perturbed input fools the model | Integrity | Adversarial training, robustness testing |
 | Inversion / extraction | Rebuild training data / clone the model | Confidentiality | Rate limits, output filtering, access control |
-| Prompt injection | Input overrides instructions | Integrity (+ confidentiality) | Guardrails, least privilege, human approval |
-| System prompt leakage | Hidden instructions revealed | Confidentiality | No secrets or permission checks in prompts |
-| Vector / embedding weakness | RAG leaks or is poisoned | Confidentiality, integrity | Permission-aware retrieval, tenant separation |
-| AI supply chain | Malicious model, dataset or plugin | All three | Trusted registries, signing, scanning |
 
 ---
 
@@ -955,91 +803,61 @@ Hard-coded password = **vulnerability**. Botnet operator = **threat actor**. The
 
 </details>
 
-<details><summary>6. Your scanner reports a CVSS 9.8 flaw on an isolated lab server and a CVSS 7.5 flaw on your internet-facing VPN that appears in the CISA KEV catalog. Which do you patch first, and why?</summary>
-
-The **VPN**. The KEV listing means it's **actively exploited**, and the device is **exposed** to the internet. CVSS measures severity, not risk; exploitation and exposure decide priority.
-
-</details>
-
-<details><summary>7. A logged-in user visits a forum, and their bank account's email address changes without them doing anything. The forum page contained a hidden form that posted to the bank. XSS or CSRF, and what fixes it?</summary>
-
-**CSRF**: the victim's browser sent a forged request and the bank trusted it because the session cookie came along. Fix it with **anti-CSRF tokens**, **SameSite** cookies, and re-authentication for sensitive changes.
-
-</details>
-
-<details><summary>8. Changing /api/invoices/5001 to /api/invoices/5002 returns another customer's invoice, even though you're logged in as yourself. Name the weakness and the fix.</summary>
+<details><summary>6. Changing /api/invoices/5001 to /api/invoices/5002 returns another customer's invoice, even though you're logged in as yourself. Name the weakness and the fix.</summary>
 
 **Broken Object Level Authorization (BOLA, also called IDOR)**, OWASP API1. The API authenticated you but didn't check the invoice belongs to you. The fix is a **per-object authorization check** on every request.
 
 </details>
 
-<details><summary>9. An API returns a user's balance correctly, but the JSON also includes ssn and internalNotes, which the app never displays. Which weakness, and where must it be fixed?</summary>
+<details><summary>7. An API returns a user's balance correctly, but the JSON also includes ssn and internalNotes, which the app never displays. Which weakness, and where must it be fixed?</summary>
 
 **Excessive data exposure** (OWASP API3, broken object property level authorization). It must be fixed **on the server**, by returning only the fields the client needs. Hiding fields in the app doesn't help, because an attacker reads the raw response.
 
 </details>
 
-<details><summary>10. An attacker tries the single password Winter2026! against 5,000 usernames, once each. Name the attack and explain why only once each.</summary>
+<details><summary>8. An attacker tries the single password Winter2026! against 5,000 usernames, once each. Name the attack and explain why only once each.</summary>
 
 **Password spraying**. One attempt per account stays under the **lockout threshold**, so no accounts lock and the attack goes unnoticed.
 
 </details>
 
-<details><summary>11. The company rolled out push MFA, yet an attacker logged in as a user who approved nothing that day. The session came from a stolen cookie. What happened, and what would have stopped it?</summary>
+<details><summary>9. The company rolled out push MFA, yet an attacker logged in as a user who approved nothing that day. The session came from a stolen cookie. What happened, and what would have stopped it?</summary>
 
 **Session token theft**, most likely captured earlier by an **AiTM phishing proxy** such as Evilginx and then replayed. **Phishing-resistant MFA (FIDO2, WebAuthn, passkeys)** would have stopped the original capture, because it's bound to the real site's origin. Short token lifetimes would limit the replay.
 
 </details>
 
-<details><summary>12. Which is broken by a quantum computer, RSA-2048 or AES-256, and by which algorithm?</summary>
+<details><summary>10. Which is broken by a quantum computer, RSA-2048 or AES-256, and by which algorithm?</summary>
 
 **RSA-2048**, by **Shor's algorithm**. AES-256 is only weakened by Grover's algorithm and remains safe. Asymmetric key exchange and signatures are the priority to replace.
 
 </details>
 
-<details><summary>13. No quantum computer can break today's encryption. Why is encrypted traffic captured today still a post-quantum concern?</summary>
+<details><summary>11. No quantum computer can break today's encryption. Why is encrypted traffic captured today still a post-quantum concern?</summary>
 
 **Harvest now, decrypt later.** The ciphertext is stored now and decrypted once a quantum computer exists, so anything that must stay secret for years is already exposed. By Mosca's rule, if the secrecy period plus the migration time is longer than the time until a quantum computer, you're already late.
 
 </details>
 
-<details><summary>14. An attacker gets into the training pipeline of a vendor's endpoint-protection model and teaches it that one malware family is benign. Name the attack and when it happens.</summary>
+<details><summary>12. An attacker gets into the training pipeline of a vendor's endpoint-protection model and teaches it that one malware family is benign. Name the attack and when it happens.</summary>
 
 **Targeted data poisoning**, a **training-time** attack. It biases the model toward one specific wrong decision, turning the defender's own AI into the weakness.
 
 </details>
 
-<details><summary>15. One attacker queries a model repeatedly to rebuild private details of its training data. Another queries it to build a working copy of the model. Name each.</summary>
+<details><summary>13. One attacker queries a model repeatedly to rebuild private details of its training data. Another queries it to build a working copy of the model. Name each.</summary>
 
 The first is **model inversion** (it targets the **training data**). The second is **model stealing or extraction** (it targets the **model**). Both are inference-time, query-based attacks.
 
 </details>
 
-<details><summary>16. An AI email assistant summarizes a user's inbox. One email contains hidden white-on-white text telling it to forward recent invoices to an outside address, and it does. Name the vulnerability, and the two OWASP LLM risks that made the damage possible.</summary>
-
-**Indirect prompt injection** (LLM01): the instructions were hidden in content the model read. The damage was possible because of **excessive agency** (LLM06): the assistant could send email without a human approving it. The fix is least privilege for the agent, human approval for outbound actions, and guardrails on inputs and outputs.
-
-</details>
-
-<details><summary>17. A developer puts "only reveal salary data to users in the HR group" and a database password in the chatbot's system prompt. What's wrong?</summary>
-
-**System prompt leakage** (LLM07): assume the prompt **will** be revealed. The password must come out of the prompt entirely, and the HR rule must be enforced by the application and the data layer, because the system prompt isn't a security boundary.
-
-</details>
-
-<details><summary>18. A company's internal RAG chatbot answers a junior employee's question by quoting from an executive compensation file that employee can't open in SharePoint. Which weakness, and the fix?</summary>
-
-A **vector and embedding weakness** (LLM08): the retrieval step didn't enforce document permissions. The fix is **permission-aware retrieval**, so only chunks the user is entitled to see can enter the prompt.
-
-</details>
-
-<details><summary>19. A SQL database is hit by an injection attack. The database runs in AWS. Is this an on-premises or a cloud threat?</summary>
+<details><summary>14. A SQL database is hit by an injection attack. The database runs in AWS. Is this an on-premises or a cloud threat?</summary>
 
 A **cloud** threat. Threats follow **where the service lives**. SQL injection is usually listed under on-premises, but here the database is in the cloud.
 
 </details>
 
-<details><summary>20. You verify a downloaded IOS image's SHA-512 hash against Cisco's published value. Which CIA property is checked, and what does a match prove and not prove?</summary>
+<details><summary>15. You verify a downloaded IOS image's SHA-512 hash against Cisco's published value. Which CIA property is checked, and what does a match prove and not prove?</summary>
 
 **Integrity.** A match proves the file wasn't altered or corrupted. It doesn't prove **who** made it; for that you need a **digital signature**, which Cisco also applies to its images.
 

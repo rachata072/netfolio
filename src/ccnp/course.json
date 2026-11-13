@@ -334,16 +334,16 @@
       "slug": "attack-threats-vulnerabilities-cia-triad",
       "module": "06",
       "file": "06_attack-threats-and-cia-triad.md",
-      "title": "Attack Threats, Vulnerabilities & the CIA Triad",
-      "seo_title": "SCOR 350-701 Threats & Vulnerabilities: OWASP, APIs, AI, PQC (1.1-1.3)",
-      "description": "Free CCNP Security notes for SCOR 350-701 v2.0 topics 1.1 to 1.3: malware, DDoS, OWASP and API risks, CVSS, post-quantum crypto, LLM vulnerabilities.",
-      "dek": "Take any attack apart into actor, vector, vulnerability, exploit, payload and impact. Malware, DDoS, on-path attacks, OWASP and API risks, CVE and CVSS, stolen credentials, the quantum threat and LLM vulnerabilities, all tied back to the CIA triad.",
+      "title": "Attack Threats & the CIA Triad",
+      "seo_title": "SCOR 350-701 Attack Threats: Malware, DDoS, APIs, AI & PQC (1.1)",
+      "description": "Free CCNP Security notes for SCOR 350-701 v2.0 topic 1.1: malware, DDoS, on-path attacks, insecure APIs, stolen credentials, quantum and AI threats, CIA.",
+      "dek": "Take any attack apart into actor, vector, vulnerability, exploit, payload and impact. Malware, DDoS, on-path attacks, breaches, insecure APIs, stolen credentials, the quantum threat and attacks on AI, all tied back to the CIA triad.",
       "objectives": [
-        "1.1",
-        "1.2",
-        "1.3"
+        "1.1"
       ],
       "supports": [
+        "1.2",
+        "1.3",
         "1.4",
         "1.5",
         "2.3",
@@ -357,6 +357,30 @@
       ],
       "date": "2026-11-12",
       "order": 5
+    },
+    {
+      "slug": "security-vulnerabilities-exploits",
+      "module": "07",
+      "file": "07_security-vulnerabilities-and-exploits.md",
+      "title": "Security Vulnerabilities & Exploits",
+      "seo_title": "SCOR 350-701 Vulnerabilities: OWASP Top 10, CVE/CVSS & LLM Risks (1.2, 1.3)",
+      "description": "Free CCNP Security notes for SCOR 350-701 v2.0 topics 1.2 and 1.3: OWASP Top 10, buffer overflow, XSS, CSRF, SQLi, CVE and CVSS, prompt injection, RAG.",
+      "dek": "Almost every vulnerability is a system trusting something it shouldn't. Bugs, passwords and weak ciphers, OWASP, buffer overflow, traversal, XSS, CSRF and SQL injection, zero-days, CVE and CVSS prioritization, and the weaknesses in AI and LLM applications.",
+      "objectives": [
+        "1.2",
+        "1.3"
+      ],
+      "supports": [
+        "1.1",
+        "1.4",
+        "2.5",
+        "2.7",
+        "4.4",
+        "5.5",
+        "6.6"
+      ],
+      "date": "2026-11-12",
+      "order": 6
     }
   ],
   "labs": [
