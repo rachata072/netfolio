@@ -596,6 +596,363 @@
    "ref": "security-vulnerabilities-exploits#the-owasp-top-10-for-llm-applications"
   },
   {
+   "id": "c1.4-001",
+   "obj": "1.4",
+   "front": "Vishing, smishing, quishing, tailgating?",
+   "back": "**Vishing**: voice. **Smishing**: SMS. **Quishing**: QR code. **Tailgating**: following someone through a secure door (physical, not phishing).",
+   "ref": "phishing-defense-cryptography#social-engineering-what-you-re-defending-against"
+  },
+  {
+   "id": "c1.4-002",
+   "obj": "1.4",
+   "front": "Business email compromise (BEC)?",
+   "back": "A real or spoofed **executive or supplier** email asking for a payment or bank-detail change. Stopped by **call-back verification** on a known number.",
+   "ref": "phishing-defense-cryptography#social-engineering-what-you-re-defending-against"
+  },
+  {
+   "id": "c1.4-003",
+   "obj": "1.4",
+   "front": "Spear phishing vs. whaling?",
+   "back": "**Spear phishing** targets a specific person or team with researched details. **Whaling** is spear phishing aimed at **executives**.",
+   "ref": "phishing-defense-cryptography#social-engineering-what-you-re-defending-against"
+  },
+  {
+   "id": "c1.4-004",
+   "obj": "1.4",
+   "front": "The five layers of phishing defense?",
+   "back": "**Email filtering**, **SPF/DKIM/DMARC**, **identity** (MFA, least privilege), **people and process**, and **catch the rest** (DNS security, SWG, SIEM, XDR).",
+   "ref": "phishing-defense-cryptography#protecting-against-phishing-five-layers"
+  },
+  {
+   "id": "c1.4-005",
+   "obj": "1.4",
+   "front": "Secure Email Gateway vs. Email Threat Defense?",
+   "back": "**Gateway** (ex-ESA) sits **in the mail path** via MX records and acts before delivery. **Email Threat Defense** connects to Microsoft 365 by **API** and can remove mail **after** delivery.",
+   "ref": "phishing-defense-cryptography#layer-1-email-filtering"
+  },
+  {
+   "id": "c1.4-006",
+   "obj": "1.4",
+   "front": "How does a cloud email filter get in the mail path?",
+   "back": "The domain's **MX records** point at the filtering service, so all inbound mail goes through it first.",
+   "ref": "phishing-defense-cryptography#layer-1-email-filtering"
+  },
+  {
+   "id": "c1.4-007",
+   "obj": "1.4",
+   "front": "SPF?",
+   "back": "A DNS TXT record listing the **servers allowed to send** for a domain. Checks the sending IP against the **envelope** sender's domain.",
+   "ref": "phishing-defense-cryptography#layer-2-spf-dkim-and-dmarc"
+  },
+  {
+   "id": "c1.4-008",
+   "obj": "1.4",
+   "front": "SPF -all vs. ~all?",
+   "back": "**-all**: hard fail (not authorized). **~all**: soft fail (accept but mark suspicious). Never use **+all**.",
+   "ref": "phishing-defense-cryptography#layer-2-spf-dkim-and-dmarc"
+  },
+  {
+   "id": "c1.4-009",
+   "obj": "1.4",
+   "front": "DKIM?",
+   "back": "The sending server **signs** each message with its **private key**; receivers verify with the **public key** in DNS at **selector._domainkey.domain**. Proves origin and integrity.",
+   "ref": "phishing-defense-cryptography#layer-2-spf-dkim-and-dmarc"
+  },
+  {
+   "id": "c1.4-010",
+   "obj": "1.4",
+   "front": "DMARC?",
+   "back": "A DNS TXT record at **_dmarc.domain** that requires SPF or DKIM to pass **and align** with the From: domain, sets a **policy** (none, quarantine, reject) and requests **reports**.",
+   "ref": "phishing-defense-cryptography#layer-2-spf-dkim-and-dmarc"
+  },
+  {
+   "id": "c1.4-011",
+   "obj": "1.4",
+   "front": "DMARC alignment?",
+   "back": "The domain that passed SPF or DKIM must **match the visible From: domain**. Without it, an attacker can pass SPF for their own domain while showing yours.",
+   "ref": "phishing-defense-cryptography#layer-2-spf-dkim-and-dmarc"
+  },
+  {
+   "id": "c1.4-012",
+   "obj": "1.4",
+   "front": "What don't SPF, DKIM and DMARC stop?",
+   "back": "**Lookalike domains** (examp1e.com): the attacker publishes valid records for their own domain.",
+   "ref": "phishing-defense-cryptography#layer-2-spf-dkim-and-dmarc"
+  },
+  {
+   "id": "c1.4-013",
+   "obj": "1.4",
+   "front": "Recommended DMARC rollout?",
+   "back": "Start at **p=none** and read the reports, then **quarantine**, then **reject**.",
+   "ref": "phishing-defense-cryptography#layer-2-spf-dkim-and-dmarc"
+  },
+  {
+   "id": "c1.4-014",
+   "obj": "1.4",
+   "front": "Why is DNS-layer security a strong phishing control?",
+   "back": "Even after a click, the phishing domain **doesn't resolve**, so the connection never happens (Umbrella, Secure Access).",
+   "ref": "phishing-defense-cryptography#layer-5-catch-what-gets-through"
+  },
+  {
+   "id": "c1.5-001",
+   "obj": "1.5",
+   "front": "Hashing vs. encryption?",
+   "back": "**Hashing**: one-way, no key, integrity. **Encryption**: reversible with a key, confidentiality.",
+   "ref": "phishing-defense-cryptography#hashing"
+  },
+  {
+   "id": "c1.5-002",
+   "obj": "1.5",
+   "front": "What does the 256 in SHA-256 mean?",
+   "back": "The **digest length** in bits, not a key size. Hashes have no key.",
+   "ref": "phishing-defense-cryptography#hashing"
+  },
+  {
+   "id": "c1.5-003",
+   "obj": "1.5",
+   "front": "Broken hash algorithms?",
+   "back": "**MD5** and **SHA-1** (practical SHA-1 collision in 2017). Use **SHA-2** or **SHA-3**.",
+   "ref": "phishing-defense-cryptography#hashing"
+  },
+  {
+   "id": "c1.5-004",
+   "obj": "1.5",
+   "front": "Avalanche effect?",
+   "back": "Changing **one bit** of input changes about **half** the bits of the digest.",
+   "ref": "phishing-defense-cryptography#hashing"
+  },
+  {
+   "id": "c1.5-005",
+   "obj": "1.5",
+   "front": "Symmetric encryption: strength and weakness?",
+   "back": "**Fast**, used for bulk data. Weakness: **key distribution**, getting the same secret safely to every peer.",
+   "ref": "phishing-defense-cryptography#symmetric-encryption"
+  },
+  {
+   "id": "c1.5-006",
+   "obj": "1.5",
+   "front": "AEAD?",
+   "back": "**Authenticated encryption**: encrypts and adds an integrity tag, so tampered ciphertext fails (AES-GCM, ChaCha20-Poly1305). TLS 1.3 allows only AEAD.",
+   "ref": "phishing-defense-cryptography#symmetric-encryption"
+  },
+  {
+   "id": "c1.5-007",
+   "obj": "1.5",
+   "front": "Asymmetric key direction for confidentiality vs. a signature?",
+   "back": "**Confidentiality**: encrypt with the **recipient's public** key. **Signature**: sign with the **sender's private** key; verify with their public key.",
+   "ref": "phishing-defense-cryptography#asymmetric-cryptography"
+  },
+  {
+   "id": "c1.5-008",
+   "obj": "1.5",
+   "front": "Does Diffie-Hellman encrypt data?",
+   "back": "**No.** It lets two peers **agree on a shared secret** over an open network; that secret becomes the symmetric key.",
+   "ref": "phishing-defense-cryptography#asymmetric-cryptography"
+  },
+  {
+   "id": "c1.5-009",
+   "obj": "1.5",
+   "front": "RSA vs. ECDSA vs. ECDH?",
+   "back": "**RSA**: encrypt and sign. **ECDSA**: sign only. **ECDH**: key agreement only.",
+   "ref": "phishing-defense-cryptography#asymmetric-cryptography"
+  },
+  {
+   "id": "c1.5-010",
+   "obj": "1.5",
+   "front": "How is a digital signature made?",
+   "back": "**Hash** the message, then **sign the hash** with the sender's **private key**. Gives integrity, authenticity and non-repudiation.",
+   "ref": "phishing-defense-cryptography#asymmetric-cryptography"
+  },
+  {
+   "id": "c1.5-011",
+   "obj": "1.5",
+   "front": "Hybrid cryptosystem?",
+   "back": "**Certificates/signatures** prove identity, **Diffie-Hellman** agrees on a key, **symmetric AEAD** encrypts the data.",
+   "ref": "phishing-defense-cryptography#hybrid-cryptography-and-forward-secrecy"
+  },
+  {
+   "id": "c1.5-012",
+   "obj": "1.5",
+   "front": "Forward secrecy?",
+   "back": "A fresh **ephemeral** DH key per session, so a stolen long-term private key **can't decrypt past sessions**. Mandatory in TLS 1.3; the **PFS** setting in IPsec phase 2.",
+   "ref": "phishing-defense-cryptography#hybrid-cryptography-and-forward-secrecy"
+  },
+  {
+   "id": "c1.5-013",
+   "obj": "1.5",
+   "front": "CA vs. RA?",
+   "back": "**CA** issues and signs certificates. **RA** verifies the requester's identity first.",
+   "ref": "phishing-defense-cryptography#the-pieces-of-pki"
+  },
+  {
+   "id": "c1.5-014",
+   "obj": "1.5",
+   "front": "What's in a CSR?",
+   "back": "The requester's **public key** and identity details. **Never the private key.**",
+   "ref": "phishing-defense-cryptography#the-pieces-of-pki"
+  },
+  {
+   "id": "c1.5-015",
+   "obj": "1.5",
+   "front": "CRL vs. OCSP vs. OCSP stapling?",
+   "back": "**CRL**: published list of revoked serials. **OCSP**: ask the CA about one certificate. **Stapling**: the server attaches a fresh signed OCSP response in the handshake.",
+   "ref": "phishing-defense-cryptography#the-pieces-of-pki"
+  },
+  {
+   "id": "c1.5-016",
+   "obj": "1.5",
+   "front": "What does a browser check before trusting a certificate?",
+   "back": "The **chain** to a trusted root, every **signature**, the **dates**, the **name** (SAN), and **revocation**.",
+   "ref": "phishing-defense-cryptography#how-a-client-decides-to-trust-a-certificate"
+  },
+  {
+   "id": "c1.5-017",
+   "obj": "1.5",
+   "front": "Public TLS certificate lifetimes from 2026?",
+   "back": "**200 days** from March 2026, **100 days** from March 2027, **47 days** from March 2029 (CA/Browser Forum), so automate renewal.",
+   "ref": "phishing-defense-cryptography#how-a-client-decides-to-trust-a-certificate"
+  },
+  {
+   "id": "c1.5-018",
+   "obj": "1.5",
+   "front": "Which SSL/TLS versions are acceptable?",
+   "back": "**TLS 1.2** (strong AEAD suites, forward secrecy) and **TLS 1.3**. SSL 2.0/3.0 and TLS 1.0/1.1 are deprecated.",
+   "ref": "phishing-defense-cryptography#ssl-and-tls"
+  },
+  {
+   "id": "c1.5-019",
+   "obj": "1.5",
+   "front": "TLS 1.2 vs. TLS 1.3?",
+   "back": "1.3: **one round trip**, **mandatory forward secrecy** (no RSA key transport), **5 AEAD suites**, **encrypted certificate**.",
+   "ref": "phishing-defense-cryptography#the-handshake-hybrid-crypto-in-action"
+  },
+  {
+   "id": "c1.5-020",
+   "obj": "1.5",
+   "front": "In TLS 1.3, what does CertificateVerify prove?",
+   "back": "That the server **holds the private key** for the certificate it sent: it signs the handshake.",
+   "ref": "phishing-defense-cryptography#the-handshake-hybrid-crypto-in-action"
+  },
+  {
+   "id": "c1.5-021",
+   "obj": "1.5",
+   "front": "DTLS and where Cisco uses it?",
+   "back": "**TLS over UDP**. Cisco Secure Client uses DTLS on **UDP 443** for tunnel data after a TLS session.",
+   "ref": "phishing-defense-cryptography#where-tls-is-used"
+  },
+  {
+   "id": "c1.5-022",
+   "obj": "1.5",
+   "front": "STARTTLS vs. implicit TLS?",
+   "back": "**STARTTLS** upgrades a plaintext connection on the same port (SMTP 587). **Implicit TLS** starts encrypted on a dedicated port (465, 993).",
+   "ref": "phishing-defense-cryptography#where-tls-is-used"
+  },
+  {
+   "id": "c1.5-023",
+   "obj": "1.5",
+   "front": "QUIC?",
+   "back": "Transport and **TLS 1.3 in one protocol over UDP** (usually 443); one handshake, no head-of-line blocking between streams, connection migration. Carries **HTTP/3**.",
+   "ref": "phishing-defense-cryptography#quic"
+  },
+  {
+   "id": "c1.5-024",
+   "obj": "1.5",
+   "front": "Why do some firewalls block UDP 443?",
+   "back": "To block **QUIC**, so browsers **fall back to TCP + TLS**, which the firewall or SWG can inspect.",
+   "ref": "phishing-defense-cryptography#quic"
+  },
+  {
+   "id": "c1.5-025",
+   "obj": "1.5",
+   "front": "MASQUE?",
+   "back": "Tunnels over **HTTP/3 and QUIC** through a proxy (CONNECT-UDP, CONNECT-IP). Used by **Cisco Secure Access Zero Trust Access**, iCloud Private Relay, Cloudflare WARP.",
+   "ref": "phishing-defense-cryptography#masque"
+  },
+  {
+   "id": "c1.5-026",
+   "obj": "1.5",
+   "front": "AH vs. ESP?",
+   "back": "**AH** (IP 51): integrity and authentication, **no encryption**, breaks through NAT. **ESP** (IP 50): **encryption** + integrity + authentication.",
+   "ref": "phishing-defense-cryptography#ah-and-esp"
+  },
+  {
+   "id": "c1.5-027",
+   "obj": "1.5",
+   "front": "Transport vs. tunnel mode?",
+   "back": "**Transport**: protects the payload, original IP header visible (host-to-host, GRE over IPsec). **Tunnel**: wraps the whole packet behind a new IP header (VPNs).",
+   "ref": "phishing-defense-cryptography#transport-and-tunnel-mode"
+  },
+  {
+   "id": "c1.5-028",
+   "obj": "1.5",
+   "front": "IKEv1 vs. IKEv2 exchanges?",
+   "back": "**IKEv1**: main (6) or aggressive (3) mode, then quick mode. **IKEv2**: IKE_SA_INIT + IKE_AUTH (4 messages) build the IKE SA and first child SA.",
+   "ref": "phishing-defense-cryptography#ike-negotiating-the-tunnel"
+  },
+  {
+   "id": "c1.5-029",
+   "obj": "1.5",
+   "front": "What must match on both IPsec peers?",
+   "back": "**Encryption**, **integrity** (hash), **DH group**, **authentication method** and **lifetimes**.",
+   "ref": "phishing-defense-cryptography#ike-negotiating-the-tunnel"
+  },
+  {
+   "id": "c1.5-030",
+   "obj": "1.5",
+   "front": "Why does ESP break through PAT?",
+   "back": "ESP is **IP protocol 50** with **no port numbers**, so PAT can't track it.",
+   "ref": "phishing-defense-cryptography#nat-and-nat-t"
+  },
+  {
+   "id": "c1.5-031",
+   "obj": "1.5",
+   "front": "NAT-T?",
+   "back": "Detected during IKE; IKE moves to **UDP 4500** and every ESP packet is wrapped in **UDP 4500** so NAT can track it. Keepalives hold the NAT entry open.",
+   "ref": "phishing-defense-cryptography#nat-and-nat-t"
+  },
+  {
+   "id": "c1.5-032",
+   "obj": "1.5",
+   "front": "IPsec ports and protocols?",
+   "back": "IKE **UDP 500**; IKE + ESP with NAT-T **UDP 4500**; ESP **IP 50**; AH **IP 51**.",
+   "ref": "phishing-defense-cryptography#nat-and-nat-t"
+  },
+  {
+   "id": "c1.5-033",
+   "obj": "1.5",
+   "front": "PSK vs. certificates for IPsec?",
+   "back": "**PSK**: one shared secret per pair, doesn't scale, a leak works until changed everywhere. **Certificates**: PKI, scale, **revoke individually**, can drive authorization.",
+   "ref": "phishing-defense-cryptography#authenticating-the-peers-pre-shared-keys-and-certificates"
+  },
+  {
+   "id": "c1.5-034",
+   "obj": "1.5",
+   "front": "Certificate-based authorization?",
+   "back": "Certificate fields (organization, OU, name) **map the peer to a profile or group policy**, so the certificate decides what access it gets.",
+   "ref": "phishing-defense-cryptography#authenticating-the-peers-pre-shared-keys-and-certificates"
+  },
+  {
+   "id": "c1.5-035",
+   "obj": "1.5",
+   "front": "PQC in TLS and IKEv2?",
+   "back": "TLS/QUIC: hybrid **X25519MLKEM768**. IKEv2: **additional key exchanges** with ML-KEM (RFC 9370) and **post-quantum preshared keys** (RFC 8784).",
+   "ref": "phishing-defense-cryptography#post-quantum-cryptography-in-these-protocols"
+  },
+  {
+   "id": "c1.5-036",
+   "obj": "1.5",
+   "front": "TLS vs. IPsec: what each protects?",
+   "back": "**TLS**: one application's connection. **IPsec**: IP packets, so every application in the tunnel.",
+   "ref": "phishing-defense-cryptography#telling-the-protocols-apart"
+  },
+  {
+   "id": "c1.5-037",
+   "obj": "1.5",
+   "front": "QUIC vs. MASQUE?",
+   "back": "**QUIC** is a secure transport for one connection. **MASQUE** is a tunnel built on HTTP/3 and QUIC to carry other traffic.",
+   "ref": "phishing-defense-cryptography#telling-the-protocols-apart"
+  },
+  {
    "id": "c2.1-001",
    "obj": "2.1",
    "front": "What is the one deciding question for whether a security device can block traffic?",

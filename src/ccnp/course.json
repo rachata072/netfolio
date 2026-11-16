@@ -381,6 +381,30 @@
       ],
       "date": "2026-11-12",
       "order": 6
+    },
+    {
+      "slug": "phishing-defense-cryptography",
+      "module": "08",
+      "file": "08_phishing-defense-and-cryptography.md",
+      "title": "Phishing Defense & Cryptographic Security",
+      "seo_title": "SCOR 350-701 Phishing Controls & Cryptography: SPF, DKIM, TLS, QUIC, MASQUE, IPsec",
+      "description": "Free CCNP Security notes for SCOR 350-701 v2.0 topics 1.4 and 1.5: SPF, DKIM, DMARC, hashing, PKI, TLS 1.3, QUIC, MASQUE, IPsec, NAT-T, PSK vs certificates.",
+      "dek": "Phishing defense in five layers, then the cryptography underneath it all: hashes, keys and signatures, PKI, and how TLS, QUIC, MASQUE and IPsec differ in what they protect, where they sit and how they look on the wire.",
+      "objectives": [
+        "1.4",
+        "1.5"
+      ],
+      "supports": [
+        "1.1",
+        "1.6",
+        "2.7",
+        "2.9",
+        "4.1",
+        "5.7",
+        "6.7"
+      ],
+      "date": "2026-11-16",
+      "order": 7
     }
   ],
   "labs": [

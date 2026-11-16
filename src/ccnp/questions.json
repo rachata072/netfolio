@@ -746,6 +746,422 @@
    "ref": "security-vulnerabilities-exploits#vector-and-embedding-weaknesses"
   },
   {
+   "id": "q1.4-001",
+   "obj": "1.4",
+   "type": "single",
+   "stem": "Which DNS record lets a domain owner tell receiving servers to reject mail that fails authentication, and request reports?",
+   "options": [
+    "SPF",
+    "DKIM",
+    "DMARC",
+    "MX"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "DMARC sets the policy (none, quarantine, reject) for mail that fails aligned SPF or DKIM, and its rua/ruf tags request reports. SPF lists allowed senders; DKIM signs messages.",
+   "ref": "phishing-defense-cryptography#layer-2-spf-dkim-and-dmarc",
+   "sample": true
+  },
+  {
+   "id": "q1.4-002",
+   "obj": "1.4",
+   "type": "single",
+   "stem": "An attacker sends mail from their own domain, which passes SPF, while the From: line shows ceo@example.com. Which DMARC concept causes this message to fail?",
+   "options": [
+    "Hard fail (-all)",
+    "Identifier alignment",
+    "DKIM selector rotation",
+    "MX priority"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "DMARC requires the domain that passed SPF or DKIM to align with the visible From: domain. The attacker's SPF pass is for a different domain, so DMARC fails.",
+   "ref": "phishing-defense-cryptography#layer-2-spf-dkim-and-dmarc"
+  },
+  {
+   "id": "q1.4-003",
+   "obj": "1.4",
+   "type": "single",
+   "stem": "What does a valid DKIM signature prove?",
+   "options": [
+    "The sending IP is listed in the domain's SPF record",
+    "The message was signed by the domain and not altered after signing",
+    "The recipient's mailbox is authenticated",
+    "The message passed a sandbox scan"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The sender signs with its private key and receivers verify with the public key in DNS, proving origin and integrity of the signed content.",
+   "ref": "phishing-defense-cryptography#layer-2-spf-dkim-and-dmarc"
+  },
+  {
+   "id": "q1.4-004",
+   "obj": "1.4",
+   "type": "single",
+   "stem": "A company has strict SPF, DKIM and a p=reject DMARC policy, but employees still receive phishing from examp1e.com. Why?",
+   "options": [
+    "DMARC only works for outbound mail",
+    "The lookalike domain is a different domain that can pass its own checks",
+    "SPF records expire after 24 hours",
+    "DKIM doesn't support RSA keys"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "SPF, DKIM and DMARC protect the exact domain that publishes them. A lookalike domain publishes its own valid records; filtering, DNS security and trained users must catch it.",
+   "ref": "phishing-defense-cryptography#layer-2-spf-dkim-and-dmarc"
+  },
+  {
+   "id": "q1.4-005",
+   "obj": "1.4",
+   "type": "single",
+   "stem": "Which Cisco email product connects to Microsoft 365 by API and can remove malicious messages after they've been delivered?",
+   "options": [
+    "Cisco Secure Email Gateway",
+    "Cisco Secure Email Threat Defense",
+    "Cisco Umbrella",
+    "Cisco Secure Endpoint"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Secure Email Threat Defense integrates by API and supports retrospective remediation. The Secure Email Gateway sits in the mail path via MX records and acts before delivery.",
+   "ref": "phishing-defense-cryptography#layer-1-email-filtering"
+  },
+  {
+   "id": "q1.4-006",
+   "obj": "1.4",
+   "type": "single",
+   "stem": "An employee receives a call from someone claiming to be the help desk who asks for an MFA code. What technique is this?",
+   "options": [
+    "Smishing",
+    "Vishing",
+    "Whaling",
+    "Tailgating"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Vishing is voice phishing. Smishing uses SMS, whaling targets executives, and tailgating is physical.",
+   "ref": "phishing-defense-cryptography#social-engineering-what-you-re-defending-against"
+  },
+  {
+   "id": "q1.4-007",
+   "obj": "1.4",
+   "type": "multi",
+   "stem": "Which two controls reduce the damage after a user's password is phished?",
+   "options": [
+    "MFA",
+    "Least privilege",
+    "A longer SPF record",
+    "Disabling DKIM",
+    "Sending more marketing email"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "MFA stops the stolen password logging in alone, and least privilege limits what a compromised account can reach.",
+   "ref": "phishing-defense-cryptography#layer-3-identity-and-access"
+  },
+  {
+   "id": "q1.4-008",
+   "obj": "1.4",
+   "type": "single",
+   "stem": "A user clicks a phishing link, but the page never loads because the domain doesn't resolve. Which control did this?",
+   "options": [
+    "DMARC",
+    "DNS-layer security",
+    "A SIEM",
+    "SPF soft fail"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "DNS-layer security (Cisco Umbrella, Secure Access) refuses to resolve malicious domains, so the connection never happens even after the click.",
+   "ref": "phishing-defense-cryptography#layer-5-catch-what-gets-through"
+  },
+  {
+   "id": "q1.5-001",
+   "obj": "1.5",
+   "type": "single",
+   "stem": "Which statement about hashing is correct?",
+   "options": [
+    "A hash can be decrypted with the right key",
+    "SHA-256 uses a 256-bit encryption key",
+    "A hash is a one-way, fixed-length fingerprint with no key",
+    "Hashing provides confidentiality"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "Hashing is one-way and keyless; the 256 in SHA-256 is the digest length. It provides integrity, not confidentiality.",
+   "ref": "phishing-defense-cryptography#hashing"
+  },
+  {
+   "id": "q1.5-002",
+   "obj": "1.5",
+   "type": "single",
+   "stem": "Lois wants to send Bob a message only Bob can read, using asymmetric cryptography. Which key does she encrypt with?",
+   "options": [
+    "Lois's private key",
+    "Lois's public key",
+    "Bob's public key",
+    "Bob's private key"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "For confidentiality, encrypt with the recipient's public key; only the recipient's private key can decrypt. Signing would use the sender's private key.",
+   "ref": "phishing-defense-cryptography#asymmetric-cryptography",
+   "sample": true
+  },
+  {
+   "id": "q1.5-003",
+   "obj": "1.5",
+   "type": "single",
+   "stem": "What is the role of Diffie-Hellman in an IPsec or TLS session?",
+   "options": [
+    "It encrypts the bulk data",
+    "It signs the certificate",
+    "It lets the peers agree on a shared secret used to derive symmetric keys",
+    "It hashes the payload"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "Diffie-Hellman is key agreement only. The derived secret becomes the symmetric keys that AES uses to encrypt data.",
+   "ref": "phishing-defense-cryptography#asymmetric-cryptography"
+  },
+  {
+   "id": "q1.5-004",
+   "obj": "1.5",
+   "type": "single",
+   "stem": "A server's long-term private key is stolen, but recorded TLS 1.3 sessions from last month still can't be decrypted. Which property explains this?",
+   "options": [
+    "Non-repudiation",
+    "Forward secrecy",
+    "OCSP stapling",
+    "Certificate pinning"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "TLS 1.3 uses ephemeral Diffie-Hellman for every session, so session keys never depended on the long-term key.",
+   "ref": "phishing-defense-cryptography#hybrid-cryptography-and-forward-secrecy"
+  },
+  {
+   "id": "q1.5-005",
+   "obj": "1.5",
+   "type": "single",
+   "stem": "Which PKI component verifies a requester's identity before a certificate is issued?",
+   "options": [
+    "Certificate Authority",
+    "Registration Authority",
+    "CRL distribution point",
+    "OCSP responder"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The RA verifies identity; the CA signs and issues the certificate. CRLs and OCSP handle revocation.",
+   "ref": "phishing-defense-cryptography#the-pieces-of-pki"
+  },
+  {
+   "id": "q1.5-006",
+   "obj": "1.5",
+   "type": "single",
+   "stem": "What does a certificate signing request (CSR) contain?",
+   "options": [
+    "The private key and identity",
+    "The public key and identity",
+    "The CA's private key",
+    "The CRL"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A CSR carries the requester's public key and identity details. The private key never leaves the requester.",
+   "ref": "phishing-defense-cryptography#the-pieces-of-pki"
+  },
+  {
+   "id": "q1.5-007",
+   "obj": "1.5",
+   "type": "single",
+   "stem": "With OCSP stapling, who obtains the certificate's revocation status?",
+   "options": [
+    "The client, from the CA",
+    "The server, which presents a signed status in the handshake",
+    "The RA, during enrollment",
+    "Nobody; stapling disables revocation checks"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The server fetches a signed OCSP response and staples it to the TLS handshake, so clients don't contact the CA.",
+   "ref": "phishing-defense-cryptography#the-pieces-of-pki"
+  },
+  {
+   "id": "q1.5-008",
+   "obj": "1.5",
+   "type": "multi",
+   "stem": "Which two are characteristics of TLS 1.3 compared with TLS 1.2?",
+   "options": [
+    "Forward secrecy is mandatory",
+    "RSA key transport is preferred",
+    "The server certificate is encrypted",
+    "CBC cipher suites are required",
+    "It needs two round trips"
+   ],
+   "answer": [
+    0,
+    2
+   ],
+   "explanation": "TLS 1.3 removed RSA key transport so every session uses ephemeral DH, encrypts the certificate, allows only AEAD suites and completes in one round trip.",
+   "ref": "phishing-defense-cryptography#the-handshake-hybrid-crypto-in-action"
+  },
+  {
+   "id": "q1.5-009",
+   "obj": "1.5",
+   "type": "single",
+   "stem": "Which protocol combines transport and TLS 1.3 encryption in one protocol over UDP and underlies HTTP/3?",
+   "options": [
+    "DTLS",
+    "QUIC",
+    "MASQUE",
+    "IKEv2"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "QUIC runs over UDP with TLS 1.3 integrated. DTLS is TLS over UDP for other applications; MASQUE builds tunnels on HTTP/3 and QUIC.",
+   "ref": "phishing-defense-cryptography#quic"
+  },
+  {
+   "id": "q1.5-010",
+   "obj": "1.5",
+   "type": "single",
+   "stem": "Which Cisco solution uses QUIC and MASQUE to carry users' traffic to private applications?",
+   "options": [
+    "Cisco Secure Email Gateway",
+    "Cisco Secure Access Zero Trust Access",
+    "Cisco ISE posture",
+    "Cisco Catalyst Center"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The Zero Trust Access module of Cisco Secure Client with Cisco Secure Access uses QUIC and MASQUE tunnels.",
+   "ref": "phishing-defense-cryptography#masque"
+  },
+  {
+   "id": "q1.5-011",
+   "obj": "1.5",
+   "type": "single",
+   "stem": "Which IPsec protocol provides integrity and authentication but no confidentiality?",
+   "options": [
+    "ESP",
+    "AH",
+    "IKE",
+    "NAT-T"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "AH (IP protocol 51) authenticates the whole packet but never encrypts. ESP (IP protocol 50) encrypts and authenticates.",
+   "ref": "phishing-defense-cryptography#ah-and-esp"
+  },
+  {
+   "id": "q1.5-012",
+   "obj": "1.5",
+   "type": "single",
+   "stem": "Which combination is normally used for a site-to-site VPN that must hide the original packets?",
+   "options": [
+    "AH in transport mode",
+    "AH in tunnel mode",
+    "ESP in transport mode",
+    "ESP in tunnel mode"
+   ],
+   "answer": [
+    3
+   ],
+   "explanation": "ESP encrypts; tunnel mode wraps and encrypts the entire original packet behind a new IP header.",
+   "ref": "phishing-defense-cryptography#transport-and-tunnel-mode"
+  },
+  {
+   "id": "q1.5-013",
+   "obj": "1.5",
+   "type": "single",
+   "stem": "An IPsec tunnel fails after one peer is placed behind a PAT device. What resolves it?",
+   "options": [
+    "Switching from ESP to AH",
+    "NAT-T, which encapsulates ESP in UDP 4500",
+    "Moving IKE to TCP 443",
+    "Disabling perfect forward secrecy"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "ESP has no ports, so PAT can't track it. NAT-T wraps ESP and IKE in UDP 4500. AH can't cross NAT at all.",
+   "ref": "phishing-defense-cryptography#nat-and-nat-t"
+  },
+  {
+   "id": "q1.5-014",
+   "obj": "1.5",
+   "type": "multi",
+   "stem": "Which two ports or protocols does an IPsec VPN use when NAT is not in the path?",
+   "options": [
+    "UDP 500",
+    "UDP 4500",
+    "IP protocol 50",
+    "TCP 443",
+    "IP protocol 17"
+   ],
+   "answer": [
+    0,
+    2
+   ],
+   "explanation": "IKE uses UDP 500 and ESP is IP protocol 50. UDP 4500 is used once NAT-T is active.",
+   "ref": "phishing-defense-cryptography#nat-and-nat-t"
+  },
+  {
+   "id": "q1.5-015",
+   "obj": "1.5",
+   "type": "single",
+   "stem": "Why do large IPsec deployments prefer certificates over pre-shared keys?",
+   "options": [
+    "Certificates need no CA",
+    "Certificates scale, can be revoked individually and can drive authorization",
+    "Pre-shared keys can't be used with IKEv2",
+    "Certificates disable Diffie-Hellman"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Certificates come from a CA, so new sites enroll once, a compromised peer is revoked without touching others, and certificate fields can map peers to policies.",
+   "ref": "phishing-defense-cryptography#authenticating-the-peers-pre-shared-keys-and-certificates"
+  },
+  {
+   "id": "q1.5-016",
+   "obj": "1.5",
+   "type": "single",
+   "stem": "What is the key difference between TLS and IPsec?",
+   "options": [
+    "TLS protects one application's connection; IPsec protects IP packets for every application in the tunnel",
+    "TLS works only over UDP; IPsec works only over TCP",
+    "TLS provides no integrity",
+    "IPsec cannot use certificates"
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "TLS secures a specific application connection; IPsec works at the network layer, so all traffic through the tunnel is protected.",
+   "ref": "phishing-defense-cryptography#telling-the-protocols-apart"
+  },
+  {
    "id": "q2.1-001",
    "obj": "2.1",
    "type": "single",

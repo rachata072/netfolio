@@ -482,7 +482,7 @@ When you log in, the server issues a **session token** (usually a cookie) so you
 | **Short token lifetimes, re-authentication for sensitive actions, token binding** | Replay of stolen tokens |
 | **User training** | Spotting lookalike domains before typing anything |
 
-These controls belong to topic 1.4 (protecting against phishing and social engineering), and Duo returns in topic 6.7.
+These controls are part of topic 1.4, covered in full in [phishing defense in five layers](/ccnp-security/phishing-defense-cryptography#protecting-against-phishing-five-layers), and Duo returns in topic 6.7.
 
 **Exam traps**
 
@@ -549,7 +549,7 @@ NIST's transition guidance (**NIST IR 8547**, finalized in October 2026) sets th
 | **Upgrade symmetric** | **AES-256** and **SHA-384** or stronger |
 | **Build in agility** | Make algorithms configurable, not hard-coded |
 
-On Cisco gear, recent IOS XE releases add **hybrid ML-KEM-768 key exchange to IKEv2** and support **post-quantum preshared keys (PPK, RFC 8784)**, which mix an extra out-of-band secret into the IKEv2 keys so the tunnel stays safe even if the Diffie-Hellman exchange is broken. The cryptography details belong to topic **1.5**.
+On Cisco gear, recent IOS XE releases add **hybrid ML-KEM-768 key exchange to IKEv2** and support **post-quantum preshared keys (PPK, RFC 8784)**, which mix an extra out-of-band secret into the IKEv2 keys so the tunnel stays safe even if the Diffie-Hellman exchange is broken. How these fit into TLS, QUIC and IPsec is covered in [post-quantum cryptography in these protocols](/ccnp-security/phishing-defense-cryptography#post-quantum-cryptography-in-these-protocols) (topic 1.5).
 
 > **PQC isn't QKD.** **Quantum key distribution** uses physics (photons on special fiber links) to share keys and needs dedicated hardware. **Post-quantum cryptography** is ordinary software math that runs on today's computers and networks. When an exam answer says "quantum-safe algorithms on existing infrastructure", that's PQC.
 

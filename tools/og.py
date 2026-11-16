@@ -141,6 +141,7 @@ def make_all(site, posts, outdir):
         ("ccnp-secure-network-management", "R1# show snmp user", "SECURE NETWORK\nMANAGEMENT"),
         ("ccnp-attack-threats-vulnerabilities-cia-triad", "edge# show scor 1.1", "ATTACK THREATS\n& THE CIA TRIAD"),
         ("ccnp-security-vulnerabilities-exploits", "edge# show scor 1.2 1.3", "VULNS &\nEXPLOITS"),
+        ("ccnp-phishing-defense-cryptography", "edge# show crypto ipsec sa", "PHISHING &\nCRYPTO"),
         ("ccnp-lab-snmpv3-authpriv-lab", "nms$ snmpwalk -v3", "IOS LAB:\nSNMPv3"),
         ("ccnp-lab-netconf-restconf-lab", "nms$ ssh -p 830 -s netconf", "NETCONF +\nRESTCONF LAB"),
         ("ccnp-lab-ntp-authentication-lab", "R1# show ntp status", "IOS LAB:\nNTP AUTH"),
