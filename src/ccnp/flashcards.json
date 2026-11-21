@@ -893,7 +893,7 @@
    "id": "c1.5-029",
    "obj": "1.5",
    "front": "What must match on both IPsec peers?",
-   "back": "**Encryption**, **integrity** (hash), **DH group**, **authentication method** and **lifetimes**.",
+   "back": "**Encryption**, **integrity** (hash), **DH group** and **authentication method**. Lifetimes don't have to match: IOS uses the **shorter** one.",
    "ref": "phishing-defense-cryptography#ike-negotiating-the-tunnel"
   },
   {
@@ -2491,6 +2491,223 @@
    "front": "Why does secure syslog depend on NTP?",
    "back": "TLS certificates have validity dates. A wrong clock makes them look not-yet-valid or expired, and the TLS session fails.",
    "ref": "secure-network-management#hardening-the-log-pipeline"
+  },
+  {
+   "id": "c1.6-001",
+   "obj": "1.6",
+   "front": "What does a VPN protect, and across what kind of network?",
+   "back": "Confidentiality, integrity and authenticity of traffic crossing a network you don't control, such as the internet.",
+   "ref": "vpn-ipsec-ike#what-a-vpn-is-for"
+  },
+  {
+   "id": "c1.6-002",
+   "obj": "1.6",
+   "front": "Does an MPLS VPN encrypt traffic?",
+   "back": "No. MPLS separates customers with labels and VRFs but carries traffic in cleartext. Run IPsec over it, or GETVPN, for confidentiality.",
+   "ref": "vpn-ipsec-ike#a-private-circuit-is-not-an-encrypted-circuit"
+  },
+  {
+   "id": "c1.6-003",
+   "obj": "1.6",
+   "front": "Site-to-site vs. remote-access VPN: what does each connect?",
+   "back": "Site-to-site joins whole networks through two gateways and is transparent to users. Remote access joins one user's device to a network through a headend.",
+   "ref": "vpn-ipsec-ike#site-to-site-and-remote-access"
+  },
+  {
+   "id": "c1.6-004",
+   "obj": "1.6",
+   "front": "Name the three remote-access VPN types.",
+   "back": "IPsec (IKEv2) with Secure Client, client SSL VPN (TLS then DTLS) with Secure Client, and clientless SSL VPN through a browser HTTPS portal.",
+   "ref": "vpn-ipsec-ike#three-kinds-of-remote-access"
+  },
+  {
+   "id": "c1.6-005",
+   "obj": "1.6",
+   "front": "Does an SSL VPN use IPsec?",
+   "back": "No. It uses TLS (and DTLS for the client). SSL VPN and IPsec VPN are separate technologies.",
+   "ref": "vpn-ipsec-ike#three-kinds-of-remote-access"
+  },
+  {
+   "id": "c1.6-006",
+   "obj": "1.6",
+   "front": "Why does Cisco Secure Client add a DTLS tunnel after TLS?",
+   "back": "TCP inside TCP performs badly when packets are lost. DTLS runs over UDP 443; the client falls back to TLS if UDP is blocked.",
+   "ref": "vpn-ipsec-ike#three-kinds-of-remote-access"
+  },
+  {
+   "id": "c1.6-007",
+   "obj": "1.6",
+   "front": "Which headend supports clientless SSL VPN: ASA or FTD?",
+   "back": "ASA. FTD supports Secure Client with SSL or IKEv2, but not clientless.",
+   "ref": "vpn-ipsec-ike#three-kinds-of-remote-access"
+  },
+  {
+   "id": "c1.6-008",
+   "obj": "1.6",
+   "front": "Full tunnel vs. split tunnel?",
+   "back": "Full tunnel sends all of the user's traffic to the headend for inspection. Split tunnel sends only corporate subnets; internet traffic goes direct.",
+   "ref": "vpn-ipsec-ike#full-tunnel-and-split-tunnel"
+  },
+  {
+   "id": "c1.6-009",
+   "obj": "1.6",
+   "front": "Which VPN protocols provide authentication, encryption and integrity?",
+   "back": "IPsec and TLS/DTLS. GRE, L2TP, L2F and MPLS don't encrypt; PPTP's protection is broken.",
+   "ref": "vpn-ipsec-ike#vpn-protocols-who-provides-what"
+  },
+  {
+   "id": "c1.6-010",
+   "obj": "1.6",
+   "front": "Why is GRE paired with IPsec?",
+   "back": "GRE carries multicast and non-IP traffic, so routing protocols can run over it, but has no security. IPsec adds encryption, integrity and authentication.",
+   "ref": "vpn-ipsec-ike#vpn-protocols-who-provides-what"
+  },
+  {
+   "id": "c1.6-011",
+   "obj": "1.6",
+   "front": "ISAKMP vs. IKE?",
+   "back": "ISAKMP (RFC 2408) is the framework and message format; IKE is the key exchange protocol that runs in it. IOS IKEv1 commands use the keyword isakmp.",
+   "ref": "vpn-ipsec-ike#ipsec-and-ike-who-does-what"
+  },
+  {
+   "id": "c1.6-012",
+   "obj": "1.6",
+   "front": "What does IKEv1 Phase 1 create, and what does Phase 2 create?",
+   "back": "Phase 1 creates one bidirectional ISAKMP SA that protects the negotiation. Phase 2 (quick mode) creates a pair of one-way IPsec SAs that protect user data.",
+   "ref": "vpn-ipsec-ike#phase-1-and-phase-2-compared"
+  },
+  {
+   "id": "c1.6-013",
+   "obj": "1.6",
+   "front": "Why does one working IPsec tunnel show Active SAs: 2?",
+   "back": "IPsec SAs are one-way: one inbound, one outbound, each with its own SPI.",
+   "ref": "vpn-ipsec-ike#quick-mode-pfs-and-diffie-hellman-groups"
+  },
+  {
+   "id": "c1.6-014",
+   "obj": "1.6",
+   "front": "IOS default lifetimes for IKEv1 Phase 1 and Phase 2?",
+   "back": "Phase 1: 86,400 seconds. Phase 2: 3,600 seconds or 4,608,000 KB. They're configured separately.",
+   "ref": "vpn-ipsec-ike#phase-1-and-phase-2-compared"
+  },
+  {
+   "id": "c1.6-015",
+   "obj": "1.6",
+   "front": "What happens in each pair of IKEv1 main mode messages?",
+   "back": "1 and 2: agree on a policy. 3 and 4: Diffie-Hellman values and nonces. 5 and 6: identities and authentication, encrypted.",
+   "ref": "vpn-ipsec-ike#what-each-main-mode-message-pair-does"
+  },
+  {
+   "id": "c1.6-016",
+   "obj": "1.6",
+   "front": "IKEv1 stuck at MM_NO_STATE: likely cause?",
+   "back": "A Phase 1 policy mismatch (encryption, hash, authentication or DH group), or the peer isn't answering on UDP 500.",
+   "ref": "vpn-ipsec-ike#what-each-main-mode-message-pair-does"
+  },
+  {
+   "id": "c1.6-017",
+   "obj": "1.6",
+   "front": "IKEv1 stuck at MM_KEY_EXCH with IKMP_BAD_MESSAGE on the peer: likely cause?",
+   "back": "A pre-shared key mismatch. DH worked, but keys derived from different PSKs can't verify messages 5 and 6.",
+   "ref": "vpn-ipsec-ike#what-each-main-mode-message-pair-does"
+  },
+  {
+   "id": "c1.6-018",
+   "obj": "1.6",
+   "front": "What does QM_IDLE mean in show crypto isakmp sa?",
+   "back": "Phase 1 is complete and healthy; the ISAKMP SA is idle and ready for quick mode.",
+   "ref": "vpn-ipsec-ike#what-each-main-mode-message-pair-does"
+  },
+  {
+   "id": "c1.6-019",
+   "obj": "1.6",
+   "front": "Main mode vs. aggressive mode?",
+   "back": "Main: 6 messages, identity encrypted. Aggressive: 3 messages, identity and the responder's hash sent in cleartext, so a PSK can be cracked offline.",
+   "ref": "vpn-ipsec-ike#main-mode-and-aggressive-mode"
+  },
+  {
+   "id": "c1.6-020",
+   "obj": "1.6",
+   "front": "What does PFS add to IKEv1 Phase 2?",
+   "back": "A fresh Diffie-Hellman exchange in quick mode, so each Phase 2 negotiation has independent keys.",
+   "ref": "vpn-ipsec-ike#quick-mode-pfs-and-diffie-hellman-groups"
+  },
+  {
+   "id": "c1.6-021",
+   "obj": "1.6",
+   "front": "Which DH groups should you avoid, and which are recommended?",
+   "back": "Avoid 1, 2, 5 and 24. Group 14 is the minimum; elliptic-curve groups 19, 20 and 21 are recommended.",
+   "ref": "vpn-ipsec-ike#quick-mode-pfs-and-diffie-hellman-groups"
+  },
+  {
+   "id": "c1.6-022",
+   "obj": "1.6",
+   "front": "What is interesting traffic in an IKEv1 crypto map?",
+   "back": "Traffic routed out the crypto-map interface that matches the crypto ACL. It triggers the tunnel and is the only traffic encrypted.",
+   "ref": "vpn-ipsec-ike#interesting-traffic-why-a-configured-tunnel-can-be-down"
+  },
+  {
+   "id": "c1.6-023",
+   "obj": "1.6",
+   "front": "Why must crypto ACLs on two peers mirror each other?",
+   "back": "They become the proxy identities. If they don't describe the same flow, Phase 2 fails with proxy identities not supported.",
+   "ref": "vpn-ipsec-ike#interesting-traffic-why-a-configured-tunnel-can-be-down"
+  },
+  {
+   "id": "c1.6-024",
+   "obj": "1.6",
+   "front": "Order to build an IOS IKEv1 site-to-site VPN?",
+   "back": "ISAKMP policy and key, transform set, crypto ACL, crypto map, then apply the crypto map to the outside interface.",
+   "ref": "vpn-ipsec-ike#the-ikev1-configuration-piece-by-piece"
+  },
+  {
+   "id": "c1.6-025",
+   "obj": "1.6",
+   "front": "IKEv2 names for the Phase 1 SA and the data SAs?",
+   "back": "IKE SA, and Child SAs. IKEv1 calls them the ISAKMP SA and IPsec SAs.",
+   "ref": "vpn-ipsec-ike#the-names-change"
+  },
+  {
+   "id": "c1.6-026",
+   "obj": "1.6",
+   "front": "How many messages does IKEv2 need to build the first Child SA?",
+   "back": "Four: two IKE_SA_INIT and two IKE_AUTH. IKEv1 needs 9 with main mode or 6 with aggressive mode.",
+   "ref": "vpn-ipsec-ike#the-names-change"
+  },
+  {
+   "id": "c1.6-027",
+   "obj": "1.6",
+   "front": "Name five things IKEv2 has built in.",
+   "back": "NAT traversal, liveness checks, EAP, asymmetric authentication, MOBIKE, anti-DoS cookies and acknowledged exchanges.",
+   "ref": "vpn-ipsec-ike#what-ikev2-fixes"
+  },
+  {
+   "id": "c1.6-028",
+   "obj": "1.6",
+   "front": "What does asymmetric authentication in IKEv2 allow?",
+   "back": "Each side proves itself differently, for example a certificate on the headend and EAP for the user. IKEv1 requires the same method on both ends.",
+   "ref": "vpn-ipsec-ike#the-ikev2-configuration-on-ios"
+  },
+  {
+   "id": "c1.6-029",
+   "obj": "1.6",
+   "front": "Crypto map vs. VTI: what selects the traffic?",
+   "back": "Crypto map: a crypto ACL (policy-based). VTI: the routing table, sending traffic into a tunnel interface (route-based).",
+   "ref": "vpn-ipsec-ike#crypto-maps-and-virtual-tunnel-interfaces"
+  },
+  {
+   "id": "c1.6-030",
+   "obj": "1.6",
+   "front": "DMVPN, FlexVPN, GETVPN in one line each?",
+   "back": "DMVPN: mGRE + NHRP + IPsec with dynamic spoke-to-spoke tunnels. FlexVPN: IKEv2-only framework for site-to-site and remote access. GETVPN: tunnel-less group keys for a private WAN.",
+   "ref": "vpn-ipsec-ike#the-1-6-deployment-types-at-a-glance"
+  },
+  {
+   "id": "c1.6-031",
+   "obj": "1.6",
+   "front": "Why does GETVPN only work over a private WAN?",
+   "back": "It preserves the original IP header, so private addresses must be routable, and it uses group keys from a key server (GDOI) instead of point-to-point tunnels.",
+   "ref": "vpn-ipsec-ike#the-1-6-deployment-types-at-a-glance"
   }
  ]
 }

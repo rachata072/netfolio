@@ -142,6 +142,7 @@ def make_all(site, posts, outdir):
         ("ccnp-attack-threats-vulnerabilities-cia-triad", "edge# show scor 1.1", "ATTACK THREATS\n& THE CIA TRIAD"),
         ("ccnp-security-vulnerabilities-exploits", "edge# show scor 1.2 1.3", "VULNS &\nEXPLOITS"),
         ("ccnp-phishing-defense-cryptography", "edge# show crypto ipsec sa", "PHISHING &\nCRYPTO"),
+        ("ccnp-vpn-ipsec-ike", "R2# show crypto isakmp sa", "VPNS, IPSEC\n& IKE"),
         ("ccnp-lab-snmpv3-authpriv-lab", "nms$ snmpwalk -v3", "IOS LAB:\nSNMPv3"),
         ("ccnp-lab-netconf-restconf-lab", "nms$ ssh -p 830 -s netconf", "NETCONF +\nRESTCONF LAB"),
         ("ccnp-lab-ntp-authentication-lab", "R1# show ntp status", "IOS LAB:\nNTP AUTH"),
@@ -150,6 +151,7 @@ def make_all(site, posts, outdir):
         ("ccnp-lab-l2-attack-prevention-packet-tracer", "edge# show ip dhcp snooping", "PACKET TRACER\nLAB: L2 ATTACKS"),
         ("ccnp-lab-aaa-tacacs-configure-troubleshoot", "R8# debug tacacs", "IOS LAB:\nTACACS+ AAA"),
         ("ccnp-lab-aaa-device-hardening-packet-tracer", "R1-HQ# show login", "PACKET TRACER\nLAB: AAA"),
+        ("ccnp-lab-ipsec-ikev1-site-to-site-vpn", "R2# show crypto session", "IOS LAB:\nIPSEC VPN"),
     ]
     ccnp_sub = "SCOR 350-701 v2.0  /  notes, flashcards, practice exam  /  free"
     for stem, kicker, title in ccnp:

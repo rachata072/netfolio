@@ -405,6 +405,24 @@
       ],
       "date": "2026-11-16",
       "order": 7
+    },
+    {
+      "slug": "vpn-ipsec-ike",
+      "module": "09",
+      "file": "09_vpn-ipsec-and-ike.md",
+      "title": "VPNs, IPsec & IKE",
+      "seo_title": "SCOR 350-701 VPNs: Site-to-Site vs Remote Access, IKEv1 vs IKEv2, VTI, DMVPN, GETVPN",
+      "description": "Free CCNP Security notes for SCOR 350-701 v2.0 topic 1.6: site-to-site vs remote access, SSL VPN, IKEv1 phases, IKEv2, crypto maps vs VTI, DMVPN, FlexVPN, GETVPN.",
+      "dek": "How a VPN decides who, how and which traffic: site-to-site vs remote access, which protocols protect and which only tunnel, IKEv1 message by message, what IKEv2 fixes, crypto maps vs VTIs, and the six 1.6 deployment types side by side.",
+      "objectives": [
+        "1.6"
+      ],
+      "supports": [
+        "1.5",
+        "2.9"
+      ],
+      "date": "2026-11-21",
+      "order": 8
     }
   ],
   "labs": [
@@ -623,6 +641,46 @@
         {
           "name": "Your own gear",
           "note": "Two IOS or IOS XE routers; older releases may offer md5 keys only."
+        }
+      ]
+    },
+    {
+      "slug": "ipsec-ikev1-site-to-site-vpn",
+      "file": "ipsec-ikev1-site-to-site.md",
+      "lecture": "vpn-ipsec-ike",
+      "platform": "ios",
+      "title": "IKEv1 Site-to-Site VPN Lab: Build, Verify, Break and Harden",
+      "short": "IPsec site-to-site lab",
+      "cta": "Build a crypto-map IPsec tunnel between two routers, read every show command, then break it six ways and harden it",
+      "seo_title": "Free IPsec Lab: IKEv1 Site-to-Site VPN on Cisco IOS, Verify and Troubleshoot (SCOR 1.6)",
+      "description": "Free CCNP Security lab: build an IKEv1 crypto-map IPsec VPN on Cisco IOS, verify both phases, then troubleshoot PSK, policy, transform-set and ACL mismatches.",
+      "dek": "Build a standards-based IPsec tunnel between two routers one verified block at a time, prove each IKE phase from real output, watch main mode in debug, break it six ways and harden it to AES-256, SHA-256, group 14 and PFS.",
+      "objectives": [
+        "1.6"
+      ],
+      "date": "2026-11-21",
+      "time": "90 to 120 min",
+      "tool": "Three IOS routers + two hosts",
+      "environments": [
+        {
+          "name": "Your course's hosted lab",
+          "note": "Any pre-built topology with two edge routers, a transit router and a host behind each. The screenshots come from one."
+        },
+        {
+          "name": "Cisco Modeling Labs",
+          "note": "Three IOSv routers and two Alpine or desktop hosts. Recommended."
+        },
+        {
+          "name": "EVE-NG or GNS3",
+          "note": "IOSv or IOL routers with VPCS hosts, so the host commands match the lab exactly."
+        },
+        {
+          "name": "Your own gear",
+          "note": "Two ISR routers with the security license and any router in the middle."
+        },
+        {
+          "name": "Packet Tracer 9.0+",
+          "note": "ISR 1941 or 2911 with securityk9 builds the crypto map and shows the SAs, but has no debug crypto, so the break-and-fix half doesn't work."
         }
       ]
     }

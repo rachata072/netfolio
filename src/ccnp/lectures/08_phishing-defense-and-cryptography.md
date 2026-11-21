@@ -486,7 +486,7 @@ Before any data flows, the peers use **IKE (Internet Key Exchange)** on **UDP 50
 | Built in | Little; NAT-T and dead-peer detection were add-ons | **NAT-T, dead-peer detection, EAP** for remote access, MOBIKE |
 | Cisco | Legacy crypto maps | **FlexVPN**, Secure Firewall (FTD) VPNs |
 
-Both peers must agree on the **encryption algorithm, integrity (hash) algorithm, DH group, authentication method and lifetimes**. A mismatch in any of them is the most common reason a tunnel won't come up.
+Both peers must agree on the **encryption algorithm, integrity (hash) algorithm, DH group and authentication method**. A mismatch in any of them is the most common reason a tunnel won't come up. The [IKEv1 exchange, message by message](/ccnp-security/vpn-ipsec-ike#ikev1-step-by-step), shows exactly where each mismatch fails.
 
 ## NAT and NAT-T
 
@@ -586,6 +586,8 @@ Three pairs the exam likes to confuse:
 | Site-to-site IPsec, VTI, DMVPN, FlexVPN, GETVPN | **IPsec ESP**, keys negotiated by **IKE** (GETVPN uses a group key server instead of per-pair IKE) |
 | Remote access with Cisco Secure Client | **TLS + DTLS** ("SSL VPN") or **IKEv2/IPsec** |
 | Zero trust access with Cisco Secure Access | **QUIC + MASQUE** |
+
+The deployment types themselves, and how IKE builds an IPsec tunnel message by message, are in [VPNs, IPsec & IKE](/ccnp-security/vpn-ipsec-ike).
 
 **Exam traps**
 

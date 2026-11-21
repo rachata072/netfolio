@@ -3252,6 +3252,232 @@
    ],
    "explanation": "The client obtains a token from the FMC token endpoint and sends it in the X-auth-access-token header on each request. Tokens expire and must be refreshed.",
    "ref": "secure-network-management#apis-on-security-devices"
+  },
+  {
+   "id": "q1.6-001",
+   "obj": "1.6",
+   "type": "single",
+   "stem": "A sales team must reach internal web apps, file shares and an ERP client from hotel Wi-Fi with full network access. Which solution fits?",
+   "options": [
+    "A site-to-site IPsec VPN",
+    "A remote-access VPN with Cisco Secure Client",
+    "A clientless SSL VPN portal",
+    "An MPLS L3VPN"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Full network access from a single device needs a remote-access VPN with a client. Clientless gives only selected web apps, and site-to-site and MPLS connect networks, not users.",
+   "ref": "vpn-ipsec-ike#three-kinds-of-remote-access",
+   "sample": true
+  },
+  {
+   "id": "q1.6-002",
+   "obj": "1.6",
+   "type": "multi",
+   "stem": "Which two protocols provide authentication, encryption and integrity on their own?",
+   "options": [
+    "GRE",
+    "IPsec ESP",
+    "L2TP",
+    "TLS",
+    "MPLS L3VPN"
+   ],
+   "answer": [
+    1,
+    3
+   ],
+   "explanation": "IPsec ESP and TLS provide all three. GRE and L2TP only tunnel, and MPLS separates traffic without encrypting it.",
+   "ref": "vpn-ipsec-ike#vpn-protocols-who-provides-what"
+  },
+  {
+   "id": "q1.6-003",
+   "obj": "1.6",
+   "type": "single",
+   "stem": "Two sites must run OSPF across an encrypted link. Which design supports it?",
+   "options": [
+    "A crypto map with a crypto ACL for the OSPF subnets",
+    "GRE over IPsec",
+    "L2TP without IPsec",
+    "Aggressive mode IKEv1"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A crypto map carries unicast IP selected by an ACL, so OSPF's multicast hellos can't cross. GRE carries multicast and IPsec protects it. A VTI would also work.",
+   "ref": "vpn-ipsec-ike#vpn-protocols-who-provides-what"
+  },
+  {
+   "id": "q1.6-004",
+   "obj": "1.6",
+   "type": "single",
+   "stem": "Which IKEv1 exchange negotiates the IPsec SAs that protect user traffic?",
+   "options": [
+    "Main mode",
+    "Aggressive mode",
+    "Quick mode",
+    "IKE_AUTH"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "Quick mode is IKEv1 Phase 2 and builds the IPsec SAs. Main and aggressive mode are Phase 1; IKE_AUTH belongs to IKEv2.",
+   "ref": "vpn-ipsec-ike#phase-1-and-phase-2-compared"
+  },
+  {
+   "id": "q1.6-005",
+   "obj": "1.6",
+   "type": "single",
+   "stem": "show crypto isakmp sa shows MM_KEY_EXCH and never progresses, and the peer logs IKMP_BAD_MESSAGE. What is the most likely cause?",
+   "options": [
+    "Mismatched transform sets",
+    "Crypto ACLs that are not mirrored",
+    "Mismatched pre-shared keys",
+    "Mismatched Diffie-Hellman groups"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "Reaching MM_KEY_EXCH means the policy and DH exchange worked. Messages 5 and 6 fail because each side derived keys from a different PSK. A DH group mismatch fails earlier, at MM_NO_STATE; transform sets and ACLs are Phase 2.",
+   "ref": "vpn-ipsec-ike#what-each-main-mode-message-pair-does"
+  },
+  {
+   "id": "q1.6-006",
+   "obj": "1.6",
+   "type": "single",
+   "stem": "Phase 1 is up (QM_IDLE), but no IPsec SA forms and the responder logs proxy identities not supported. What should you fix?",
+   "options": [
+    "The ISAKMP policy encryption",
+    "The crypto ACLs, so they mirror each other",
+    "The pre-shared key",
+    "The NAT-T keepalive"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The proxy identities come from the crypto ACLs. If the peers' ACLs don't describe the same flow in reverse, Phase 2 is rejected.",
+   "ref": "vpn-ipsec-ike#interesting-traffic-why-a-configured-tunnel-can-be-down"
+  },
+  {
+   "id": "q1.6-007",
+   "obj": "1.6",
+   "type": "single",
+   "stem": "Why is IKEv1 aggressive mode with a pre-shared key discouraged?",
+   "options": [
+    "It can't negotiate AES",
+    "It sends the identity and the responder's authentication hash before encryption, so the PSK can be cracked offline",
+    "It requires certificates",
+    "It disables PFS"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Aggressive mode compresses Phase 1 into three messages, exposing the identity and a hash derived from the PSK. Disable it with crypto isakmp aggressive-mode disable.",
+   "ref": "vpn-ipsec-ike#main-mode-and-aggressive-mode"
+  },
+  {
+   "id": "q1.6-008",
+   "obj": "1.6",
+   "type": "single",
+   "stem": "An ISAKMP policy is configured with lifetime 86400. What lifetime do the IPsec SAs get on IOS if nothing else is set?",
+   "options": [
+    "86,400 seconds",
+    "28,800 seconds",
+    "3,600 seconds",
+    "They never expire"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "The ISAKMP lifetime applies only to Phase 1. IPsec SAs use the IOS default of 3,600 seconds or 4,608,000 KB unless set globally or in the crypto map.",
+   "ref": "vpn-ipsec-ike#phase-1-and-phase-2-compared"
+  },
+  {
+   "id": "q1.6-009",
+   "obj": "1.6",
+   "type": "multi",
+   "stem": "Which two features are part of the IKEv2 base protocol but were add-ons or missing in IKEv1?",
+   "options": [
+    "NAT traversal",
+    "Pre-shared key authentication",
+    "EAP authentication",
+    "ESP encryption",
+    "Diffie-Hellman key exchange"
+   ],
+   "answer": [
+    0,
+    2
+   ],
+   "explanation": "NAT-T and EAP are built into IKEv2 (RFC 7296). IKEv1 used add-on RFCs for NAT-T and had XAUTH instead of EAP. PSKs, ESP and DH exist in both.",
+   "ref": "vpn-ipsec-ike#what-ikev2-fixes"
+  },
+  {
+   "id": "q1.6-010",
+   "obj": "1.6",
+   "type": "single",
+   "stem": "An IKEv2 profile contains authentication local rsa-sig and authentication remote eap. What does this demonstrate?",
+   "options": [
+    "Aggressive mode",
+    "Asymmetric authentication",
+    "Perfect Forward Secrecy",
+    "MOBIKE"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "IKEv2 lets each side authenticate differently: here the headend uses a certificate and the remote user uses EAP. IKEv1 requires the same method on both ends.",
+   "ref": "vpn-ipsec-ike#the-ikev2-configuration-on-ios"
+  },
+  {
+   "id": "q1.6-011",
+   "obj": "1.6",
+   "type": "single",
+   "stem": "What decides which traffic is encrypted in a static VTI design?",
+   "options": [
+    "A crypto ACL on the physical interface",
+    "The routing table, by sending traffic into the tunnel interface",
+    "The transform set",
+    "The ISAKMP policy priority"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A VTI is route-based: anything routed into the tunnel interface is encrypted. A crypto map is policy-based and uses a crypto ACL.",
+   "ref": "vpn-ipsec-ike#crypto-maps-and-virtual-tunnel-interfaces"
+  },
+  {
+   "id": "q1.6-012",
+   "obj": "1.6",
+   "type": "single",
+   "stem": "A company wants to encrypt traffic across its private MPLS WAN between 200 sites without building point-to-point tunnels and without changing routing. Which deployment fits?",
+   "options": [
+    "DMVPN",
+    "FlexVPN",
+    "GETVPN",
+    "Clientless SSL VPN"
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "GETVPN gives all members group keys from a key server and preserves the original IP header, so the existing MPLS routing keeps working without tunnels.",
+   "ref": "vpn-ipsec-ike#the-1-6-deployment-types-at-a-glance"
+  },
+  {
+   "id": "q1.6-013",
+   "obj": "1.6",
+   "type": "single",
+   "stem": "Which VPN technology is an IKEv2-only framework on IOS XE that covers site-to-site, hub-and-spoke and remote access?",
+   "options": [
+    "DMVPN",
+    "FlexVPN",
+    "GETVPN",
+    "L2TP over IPsec"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "FlexVPN is built on IKEv2 and VTIs. DMVPN is an mGRE and NHRP design that can use IKEv1 or IKEv2.",
+   "ref": "vpn-ipsec-ike#the-1-6-deployment-types-at-a-glance"
   }
  ]
 }
